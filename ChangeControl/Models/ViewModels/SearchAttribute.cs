@@ -1,0 +1,39 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace ChangeControl.Models
+{
+    public class SearchAttribute
+    {
+        public string Type{ get; set; }
+        public int Status{ get; set; }
+        public string ProductType{ get; set; }
+        public string Overstatus{ get; set; }
+        public string Changeitem{ get; set; }
+        public string ControlNo{ get; set; }
+        public  string Model{ get; set; }
+        public string Chosechangeitem{ get; set; }
+        public string Partno{ get; set; }
+        public string Partname{ get; set; }
+        public string Related{ get; set; }
+        public string Processname{ get; set; }
+        public string Production{ get; set; }
+        public SearchAttribute(string Type,int Status,string ProductType,string Overstatus,string Changeitem,string ControlNo, string Model,string Chosechangeitem,string Partno,string Partname,string Related,string Processname ,string Production ,string Line){
+            this.Type = Type;
+            this.Status = Status;
+            this.ProductType = ProductType;
+            this.Overstatus = Overstatus;
+            this.Changeitem = Changeitem;
+            this.ControlNo = ControlNo;
+            this.Model = Model;
+            this.Chosechangeitem = Chosechangeitem;
+            this.Partno = Partno;
+            this.Partname = Partname;
+            this.Related = Related;
+            this.Processname = Processname;
+            this.Production = Production;
+        }
+    }
+}

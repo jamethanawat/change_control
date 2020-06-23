@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://tempuri.org/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/">
+      <s:element name="ChkAuth">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="user" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="pass" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ChkAuthResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="ChkAuthResult" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ChkEmail">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="username" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ChkEmailResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ChkEmailResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ChkDept">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="username" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ChkDeptResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ChkDeptResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ChkFullName">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="username" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ChkFullNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ChkFullNameResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ChkName">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="username" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ChkNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ChkNameResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ChkSurName">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="username" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ChkSurNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ChkSurNameResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ChkPosition">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="username" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ChkPositionResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ChkPositionResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="ChkAuthSoapIn">
+    <wsdl:part name="parameters" element="tns:ChkAuth" />
+  </wsdl:message>
+  <wsdl:message name="ChkAuthSoapOut">
+    <wsdl:part name="parameters" element="tns:ChkAuthResponse" />
+  </wsdl:message>
+  <wsdl:message name="ChkEmailSoapIn">
+    <wsdl:part name="parameters" element="tns:ChkEmail" />
+  </wsdl:message>
+  <wsdl:message name="ChkEmailSoapOut">
+    <wsdl:part name="parameters" element="tns:ChkEmailResponse" />
+  </wsdl:message>
+  <wsdl:message name="ChkDeptSoapIn">
+    <wsdl:part name="parameters" element="tns:ChkDept" />
+  </wsdl:message>
+  <wsdl:message name="ChkDeptSoapOut">
+    <wsdl:part name="parameters" element="tns:ChkDeptResponse" />
+  </wsdl:message>
+  <wsdl:message name="ChkFullNameSoapIn">
+    <wsdl:part name="parameters" element="tns:ChkFullName" />
+  </wsdl:message>
+  <wsdl:message name="ChkFullNameSoapOut">
+    <wsdl:part name="parameters" element="tns:ChkFullNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="ChkNameSoapIn">
+    <wsdl:part name="parameters" element="tns:ChkName" />
+  </wsdl:message>
+  <wsdl:message name="ChkNameSoapOut">
+    <wsdl:part name="parameters" element="tns:ChkNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="ChkSurNameSoapIn">
+    <wsdl:part name="parameters" element="tns:ChkSurName" />
+  </wsdl:message>
+  <wsdl:message name="ChkSurNameSoapOut">
+    <wsdl:part name="parameters" element="tns:ChkSurNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="ChkPositionSoapIn">
+    <wsdl:part name="parameters" element="tns:ChkPosition" />
+  </wsdl:message>
+  <wsdl:message name="ChkPositionSoapOut">
+    <wsdl:part name="parameters" element="tns:ChkPositionResponse" />
+  </wsdl:message>
+  <wsdl:portType name="ADInfoSoap">
+    <wsdl:operation name="ChkAuth">
+      <wsdl:input message="tns:ChkAuthSoapIn" />
+      <wsdl:output message="tns:ChkAuthSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ChkEmail">
+      <wsdl:input message="tns:ChkEmailSoapIn" />
+      <wsdl:output message="tns:ChkEmailSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ChkDept">
+      <wsdl:input message="tns:ChkDeptSoapIn" />
+      <wsdl:output message="tns:ChkDeptSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ChkFullName">
+      <wsdl:input message="tns:ChkFullNameSoapIn" />
+      <wsdl:output message="tns:ChkFullNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ChkName">
+      <wsdl:input message="tns:ChkNameSoapIn" />
+      <wsdl:output message="tns:ChkNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ChkSurName">
+      <wsdl:input message="tns:ChkSurNameSoapIn" />
+      <wsdl:output message="tns:ChkSurNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ChkPosition">
+      <wsdl:input message="tns:ChkPositionSoapIn" />
+      <wsdl:output message="tns:ChkPositionSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="ADInfoSoap" type="tns:ADInfoSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="ChkAuth">
+      <soap:operation soapAction="http://tempuri.org/ChkAuth" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ChkEmail">
+      <soap:operation soapAction="http://tempuri.org/ChkEmail" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ChkDept">
+      <soap:operation soapAction="http://tempuri.org/ChkDept" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ChkFullName">
+      <soap:operation soapAction="http://tempuri.org/ChkFullName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ChkName">
+      <soap:operation soapAction="http://tempuri.org/ChkName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ChkSurName">
+      <soap:operation soapAction="http://tempuri.org/ChkSurName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ChkPosition">
+      <soap:operation soapAction="http://tempuri.org/ChkPosition" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="ADInfoSoap12" type="tns:ADInfoSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="ChkAuth">
+      <soap12:operation soapAction="http://tempuri.org/ChkAuth" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ChkEmail">
+      <soap12:operation soapAction="http://tempuri.org/ChkEmail" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ChkDept">
+      <soap12:operation soapAction="http://tempuri.org/ChkDept" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ChkFullName">
+      <soap12:operation soapAction="http://tempuri.org/ChkFullName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ChkName">
+      <soap12:operation soapAction="http://tempuri.org/ChkName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ChkSurName">
+      <soap12:operation soapAction="http://tempuri.org/ChkSurName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ChkPosition">
+      <soap12:operation soapAction="http://tempuri.org/ChkPosition" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ADInfo">
+    <wsdl:port name="ADInfoSoap" binding="tns:ADInfoSoap">
+      <soap:address location="http://172.27.170.23/ADInfo/ADInfo.asmx" />
+    </wsdl:port>
+    <wsdl:port name="ADInfoSoap12" binding="tns:ADInfoSoap12">
+      <soap12:address location="http://172.27.170.23/ADInfo/ADInfo.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

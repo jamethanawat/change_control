@@ -1,0 +1,109 @@
+.inputAnimate {
+  --offsetLeft: 0;
+  --offsetLeftScale: 16px;
+  padding: 16px;
+  min-width: 220px;
+  position: relative;
+}
+.inputAnimate input,
+.inputAnimate span {
+  display: block;
+  font-size: 16px;
+  font-family: inherit;
+  line-height: 22px;
+  padding: 0 0 0 3px;
+  color: transparent;
+  text-shadow: 0 0 0 #8C6FF0;
+}
+.inputAnimate input {
+  background: none;
+  outline: none;
+  border: 0;
+  position: relative;
+  z-index: 1;
+  -webkit-transition: text-shadow .3s ease;
+  transition: text-shadow .3s ease;
+}
+.inputAnimate input::-webkit-input-placeholder {
+  color: rgb(255, 255, 255);
+}
+.inputAnimate input + div {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: #fff;
+  border-radius: 6px;
+  -webkit-transition: left .4s ease, border-radius .5s ease, -webkit-transform .4s ease;
+  transition: left .4s ease, border-radius .5s ease, -webkit-transform .4s ease;
+  transition: transform .4s ease, left .4s ease, border-radius .5s ease;
+  transition: transform .4s ease, left .4s ease, border-radius .5s ease, -webkit-transform .4s ease;
+  -webkit-transform-origin: 0 50%;
+          transform-origin: 0 50%;
+}
+.inputAnimate input + div + em {
+  opacity: 0;
+  left: 16px;
+  width: 1px;
+  height: 24px;
+  top: 50%;
+  margin: -12px 0 0 0;
+  position: absolute;
+  z-index: 1;
+  display: block;
+  background: #fff;
+  -webkit-transform: translateX(var(--offsetLeft));
+          transform: translateX(var(--offsetLeft));
+}
+.inputAnimate input:not(:focus) {
+  width: 100% !important;
+}
+.inputAnimate input:not(:focus):not(:hover) {
+  text-shadow: 0 0 0 #fff;
+}
+.inputAnimate input:not(:focus):not(:hover) + div {
+  border-radius: 0;
+  left: var(--offsetLeftScale);
+  -webkit-transform: scale(0, 0.45);
+          transform: scale(0, 0.45);
+}
+.inputAnimate span {
+  display: none;
+}
+
+@-webkit-keyframes blink {
+  30%, 70% {
+    opacity: 1;
+  }
+}
+
+@keyframes blink {
+  30%, 70% {
+    opacity: 1;
+  }
+}
+html {
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: inherit;
+}
+*:before, *:after {
+  box-sizing: inherit;
+}
+
+.input-body {
+  /* min-height: 100vh; */
+  font-family: Roboto, Arial;
+  color: #ADAFB6;
+  background: #5628EE;
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+          align-items: center;
+}

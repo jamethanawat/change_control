@@ -1,0 +1,836 @@
+﻿@using System.Data
+@using ChangeControl.Models;
+@model DataSet
+@{
+    ViewBag.Title = "Change Control System | Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<FormReviewItem> ReviewItems = ViewData["FormReviewItem"] as List<FormReviewItem>;
+    List<Review> ReviewList = ViewData["ViewReviewItem"] as List<Review>;
+    List<DepartmentList> DepartmentLists = ViewData["DepartmentList"] as List<DepartmentList>;
+    List<Resubmit> ResubmitLists = ViewData["ResubmitList"] as List<Resubmit>;
+    TopicAlt Topic = ViewData["Topic"] as TopicAlt;
+    bool isManager = false;
+
+    var isTrialable = (bool) ViewData["isTrialable"];
+    
+    if((string)Session["Position"] == "Manager"){
+        isManager = true;
+    }
+
+    
+    string department = (string)Session["Department"];
+    var isPEProcess = false;
+    var isQC = false;
+    
+    if(department == "PE1_Process" || department == "PE2_Process"){
+        isPEProcess = true;
+    }
+
+    if(department == "QC1" || department == "QC2" || department == "QC3"){
+        isQC = true;
+    }
+
+
+    
+    var list = Topic.RelatedListAlt as List<RelatedAlt>;
+    var isReviewd = false;
+    var isRelated = false;
+    string[] status_define = {"-","Approved","Rejected","Waiting","Need more document","Re-submit","Closed","Request","Review","Trial"};
+    var status = status_define[Topic.Status];
+    
+
+    var isInternal = true;
+    var isExternal = false;
+    var topic_type = Topic.Topic_type;
+    if(topic_type == "Internal"){
+        isInternal = true;
+    }else{
+        isExternal = true;
+        isInternal = false;
+    }
+
+    if(list.Exists(Related => Related.name == Session["Department"].ToString())){
+        isRelated = true;
+    }
+    if(list.Exists(Related => Related.status == 1 && Related.name == Session["Department"].ToString())){
+        isReviewd = true;
+    }
+
+}
+
+
+<script type="text/javascript">
+    InsertReviewPath = '@Url.Action("InsertReview", "Detail")';
+    InsertReviewItemPath = '@Url.Action("InsertReviewItem", "Detail")';
+    SubmitFilePath = '@Url.Action("SaveFile", "Detail")';
+    UpdateFileDescPath = '@Url.Action("UpdateFileDesc", "Detail")';
+    InsertFilePath = '@Url.Action("SubmitFile", "Detail")';
+    InsertFileResponsePath = '@Url.Action("SubmitFileResponse", "Detail")';
+    InsertRelatedPath = '@Url.Action("SubmitRelated", "Detail")';
+    InsertResponsePath = '@Url.Action("SubmitResponse", "Detail")';
+    DepartmentLists = @Html.Raw(Json.Encode(DepartmentLists));
+    ReqResubmitPath = '@Url.Action("RequestResubmit", "Detail")';
+    topic_status = '@status';
+    topic_id = '@Topic.ID';
+    isQC = '@isQC'.toLowerCase() == 'true' ? true : false;
+    isTrialable = '@isTrialable'.toLowerCase() == 'true' ? true : false;
+</script>
+
+
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/bootstrap")
+
+
+<script>
+        $(() => {
+            console.log(isTrialable);
+            if(isTrialable){
+                console.log("trialable");
+            }
+        });
+
+</script>
+
+<style>
+    .card-sticky{
+          position: -webkit-sticky;
+        position: sticky;
+        top: 73px;
+    }
+    
+    #Top {
+        box-shadow: rgba(0, 0, 0, 0.29) 0px 3px 9px 0px;
+        background: white;
+        display: inline-block;
+        width: 50px;
+        height: 50px;
+        text-align: center;
+        border-radius: 36px;
+        position: fixed;
+        top: 72px;
+        transition: background-color .3s, opacity .5s, visibility .5s;
+        opacity: 0;
+        visibility: hidden;
+        z-index: 50;
+        left: 56%;
+        cursor: pointer;
+    }
+        #Top:hover {
+            @* cursor: pointer;
+            background-color: #333; *@
+        }
+
+        #Top:active {
+            background-color: #555;
+        }
+
+        #Top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+    @@media (min-width: 500px) {
+       
+        #Top {
+            margin: 10px;
+        }
+    }
+
+    .arrow-collapse{
+        position: absolute;
+        float: right;
+        display: block;
+        right: 10px;
+        top: 20px;
+    }
+
+    .timeline-footer{
+        padding: 0px 10px 10px 10px !important;
+    }
+ 
+    .bg-warning, .bg-warning>a {
+        color: white !important;
+    }
+
+    .tooltip-inner {
+        background-color: #007bff;
+    }
+    .tooltip.bs-tooltip-top .arrow:before {
+        border-top-color: #007bff !important;
+    }
+
+    .sidebar-collapse .mailbox-attachments li {
+        width: 165px;
+        transition: transform 0.5s !important;
+
+    }
+
+    .mailbox-attachments li {
+        width: 180px;
+        transition: transform 0.5s !important;
+    }
+
+</style>
+
+
+
+<!-- Summernote -->
+<script src="~/tmp/plugins/summernote/summernote-bs4.min.js"></script>
+<link href="~/Plugin/SweetAlert/sweetalert.css" rel="stylesheet" />
+<script src="~/Plugin/SweetAlert/sweetalert-dev.js"></script>
+<script src="~/Plugin/SweetAlert/sweetalert.min.js"></script>
+
+<link href="~/Plugin/filepond/filepond.css" rel="stylesheet">
+<script src="~/Plugin/filepond/filepond-plugin-file-encode.js"></script>
+<script src="~/Plugin/filepond/filepond.min.js"></script>
+<script src="~/Plugin/filepond/filepond.jquery.js"></script>
+<script src="~/Plugin/filepond/filepond-plugin-image-preview.min.js"></script>
+<script src="~/Scripts/Shared/FilePond.js"></script>
+<script src="~/Scripts/Shared/FilePond_alt.js"></script>
+
+
+<script src="~/Scripts/Detail/Detail.js"></script>
+
+<script>
+    $(document).ready(function () {
+        @* console.log("Detail"); *@
+        $("#menu3-1").addClass('active');
+        $('#menu1-1').removeClass('active');
+        $('#menu2-1').removeClass('active');
+
+    });
+</script>
+
+<!-- Content Wrapper. Contains page content -->
+
+@* @Html.Partial("_Department") *@
+<div class="content-wrapper">
+
+<!-- Main content -->
+<section class="content">
+<div class="container-fluid">
+
+
+<a id="Top" style="font-size: 35px;color: #676767;"><i class="fas fa-angle-up"></i></a>
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-12">
+                    @if(isQC || isPEProcess){
+                        @Html.Partial("Fab",DepartmentLists)
+                    }
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>TNS Control No. @Html.DisplayFor(model => Topic.ID_Topic)</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="main.html?menu=home">Change Control System</a></li>
+                        <li class="breadcrumb-item active">Project Detail</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <!-- /.container-fluid -->
+    </section>
+            <div class="row">
+                <div class="col-md-3">
+
+                    <!-- Profile Image -->
+                    <div class="card card-primary card-outline">
+                        <div class="card-body box-profile">
+
+                            <div class="card-body">
+                                <strong> Change Type</strong>
+                                <p class="text-muted">
+                                    @Html.DisplayFor(model => Topic.ID_Topic)
+                                </p>
+                                <hr>
+                                <strong> Change Items</strong>
+                                <p class="text-muted">
+                                    @Html.DisplayFor(model => Topic.Change_item)
+                                </p>
+                                <hr>
+                                @* <strong> Approve</strong>
+                                <p class="text-muted">
+                                    @Html.DisplayFor(model => Topic.Change_item)
+                                </p>
+                                <hr> *@
+                                <strong> Related Department</strong>
+                                <p class="text-muted">
+                                @{
+                                    var RelatedList = Topic.RelatedListAlt;
+                                    var j=0;
+                                    foreach (var Related in RelatedList){
+                                        var isResponsed = (Related.status == 1) ? true : false;
+                                        @(j>0?" , ":"")@Related.name
+                                        j++;
+                                    }
+                                }
+                                </p>
+                                <hr>
+                            </div>
+                            <!-- /.card-body -->
+
+                            <a href="#" class="btn btn-primary btn-block"><b>Status : @status</b></a>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                    <!-- About Me Box -->
+                    <div class="card card-primary card-outline card-sticky">
+                        <div class="card-body box-profile">
+                            <!-- /.card-header -->
+                            <div class="card-body">
+                                <strong> Product Type</strong>
+                                <p class="text-muted">
+                                    @Html.DisplayFor(model => Topic.Product_type)
+                                </p>
+                                <hr>
+                                <strong> Model :</strong>
+                                <p class="text-muted">
+                                    @Html.DisplayFor(model => Topic.Model)
+                                </p>
+                                <hr>
+                                <strong> Part No :</strong>
+                                <p class="text-muted">
+                                    @Html.DisplayFor(model => Topic.PartNo)
+                                </p>
+                                <hr>
+                                <strong> Part Name :</strong>
+                                <p class="text-muted">
+                                    @Html.DisplayFor(model => Topic.PartName)
+                                </p>
+                                <hr>
+                                <strong> Process Name :</strong>
+                                <p class="text-muted">
+                                    @Html.DisplayFor(model => Topic.ProcessName)
+                                </p>
+                                <hr>
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                    <!-- /.card -->
+                </div>
+                <!-- /.col -->
+                <div class="col-md-9">
+                    <div class="card">
+                        <div class="card-header p-2">
+                            <ul class="nav nav-pills">
+                                <li class="nav-item"><a class="nav-link active" href="#Detail" data-toggle="tab">Detail</a></li>
+                                <li class='nav-item @(ResubmitLists.Count == 0 ? "hidden" : "")'' ><a class="nav-link" href="#timeline" data-toggle="tab">Request Re-submit</a></li>
+                            </ul>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class="card-body">
+                            <div class="tab-content">
+                                <div class="active tab-pane" id="Detail">
+                                    <!-- /.mailbox-controls -->
+                                    <div class="mailbox-read-message">
+                                    <form class="form-horizontal">
+                                        <h3>
+                                            Subject/Purpose for change
+                                        </h3>
+                                        <span>
+                                            @Html.Raw(HttpUtility.HtmlDecode(Topic.Subject))
+                                        </span>
+
+                                        <h3>
+                                            Change Details
+                                        </h3>
+                                        <span>
+                                            @Html.Raw(HttpUtility.HtmlDecode(Topic.Detail))
+                                        </span>
+
+                                        <h3>
+                                            Introduction Timing
+                                        </h3>
+                                        <span>
+                                            @Html.Raw(HttpUtility.HtmlDecode(Topic.Timing))
+                                        </span>
+                                    </form>
+
+
+                                @if(Topic.FileList.Count != 0){
+                                    var FileList = Topic.FileList;
+                                    <h3>Attach File</h3>
+                                    <!-- /.card-body -->
+                                    <div class="card-footer bg-white">
+                                        <ul class="mailbox-attachments d-flex flex-wrap align-items-stretch clearfix">
+                                                @foreach(var File in FileList){
+                                                    var FileSize = "0 Bytes";
+                                                    <li>
+                                                        <span class="mailbox-attachment-icon">
+                                                            @{var FileType = Path.GetExtension(File.Name);}
+                                                            @if(FileType == ".docx" || FileType == ".doc" ){
+                                                                <i class="far fa-file-word"></i>
+                                                            }else if(FileType == ".pptx" || FileType == ".ppt" ){
+                                                                <i class="far fa-file-powerpoint"></i>
+                                                            }else if(FileType == ".xls" || FileType == ".xlxs" ){
+                                                                <i class="far fa-file-excel"></i>
+                                                            }else if(FileType == ".pdf"){
+                                                                <i class="far fa-file-pdf"></i>
+                                                            }else if(FileType == ".png" || FileType == ".jpeg" || FileType == ".jpg" || FileType == ".JPG" || FileType == ".gif" ){
+                                                                <i class="far fa-file-image"></i>
+                                                            }else{
+                                                                <i class="far fa-file"></i>
+                                                            }
+                                                        </span>
+                                                        <div class="mailbox-attachment-info">
+                                                            <a href="#" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> @Html.DisplayFor(model => File.Name)
+                                                            </a>
+                                                            <span class="mailbox-attachment-size clearfix mt-1">
+                                                            @if(File.Size != null){
+                                                                if(File.Size > 1000){
+                                                                    FileSize = (File.Size / 1000) + " KB";
+                                                                }else{
+                                                                    FileSize = File.Size + " Bytes";
+                                                                }
+                                                            }
+                                                                <span>@FileSize</span>
+                                                                <a href="#" class="btn btn-default btn-sm float-right"><i class="fas fa-cloud-download-alt"></i></a>
+                                                            </span>
+                                                        </div>
+                                                    </li>
+                                                }
+                                        </ul>
+                                    </div>
+                                }   
+                                    </div>
+                                    <br>
+                                    <!------------------------------------QUALITY CONTROL---------------------------------------------------------->
+                                @if(ReviewList.Count != 0){
+                                    <hr>
+                                    @* <h1>Quality Control</h1> *@
+                                    <!-- The timeline -->
+                                    <div class="timeline timeline-inverse">
+                                        <!-- timeline time label -->
+                                        <div class="time-label">
+                                            <span class="bg-danger">
+                                                Review <br> 
+                                                @* <span class="time"><i class="far fa-clock"></i> 12:05</span> *@
+                                            </span>
+                                        </div>
+                                        <!-- /.timeline-label -->
+                                        <!-- timeline item -->
+                                        @* @if(ReviewList != null){ *@
+                                            @{var i = 0;}
+                                            @{var tlb = "";}
+                                            @foreach(var Review in ReviewList){
+                                            if(Review.Item.Count != 0){
+
+                                            <div>
+                                                @* <i class="fas bg-primary" style="font-family:Kanit !important">@Html.DisplayFor(model => Review.Department)</i> *@
+                                                @if(Review.Status == 1){
+                                                    <i class="fas fa-check bg-primary blue-tooltip" data-toggle="tooltip" data-placement="top" title="Approved"></i>
+                                                }else if(Review.Status == 3){
+                                                    <i class="far fa-clock bg-warning blue-tooltip" data-toggle="tooltip" data-placement="top" title="Waiting for approve"></i>
+                                                }else if(Review.Status == 4){
+                                                    <i class="fas fa-info bg-warning blue-tooltip" data-toggle="tooltip" data-placement="top" title="Need more information"></i>
+                                                }else{
+                                                    <i class="fas fa-question bg-error blue-tooltip" data-toggle="tooltip" data-placement="top" title="Unknown"></i>
+                                                }
+                                                @{tlb = "tlb" + i;}
+                                                <div class="timeline-item card">
+                                                    <div class="timeline-header card-header d-flex" style="padding: 10px 10px 5px 10px;"  data-card-widget="collapse">
+                                                            <h6 class="mr-auto" style="font-family:Kanit"> @Review.Department - @Review.Profile.Name @Review.Profile.SurName (@Review.Date) </h6>
+                                                            <button type="button" class="btn btn-tool arrow-collapse" data-card-widget="collapse"><i class="fas fa-chevron-down"></i></button>
+                                                    </div>
+
+                                                    <div class="timeline-body card-body">
+                                                            <form class="form-horizontal">
+                                                                @{var ReviewItem = Review.Item;}
+                                                                @foreach(var Item in ReviewItem){
+                                                                    var temp_status = (String)null;
+                                                                    if(Item.Status == true){
+                                                                        temp_status = "Yes";
+                                                                    }else if(Item.Status == false){
+                                                                        temp_status = "No";
+                                                                    }else if(Item.Status == null){
+                                                                        temp_status = "-";
+                                                                    }
+                                                                <div class="row">
+                                                                    <label class="col-sm-4 col-form-label" style="text-align:right">
+                                                                        @Html.DisplayFor(model => Item.Name) :
+                                                                    </label>
+                                                                    <div class="col-sm-8 col-form-label">
+                                                                        @if(temp_status != null && Item.Description != ""){
+                                                                            if(temp_status != "-"){
+                                                                                <span>@Html.DisplayFor(model => temp_status)</span>
+                                                                                <span>,</span>
+                                                                            }
+                                                                            <span>@Html.DisplayFor(model => Item.Description)</span><br>
+                                                                        }else if(temp_status != null && Item.Description == ""){
+                                                                            <span>@Html.DisplayFor(model => temp_status)</span>
+                                                                        }
+                                                                    </div>
+                                                                </div>
+                                                                }
+                                                                <div class="row">
+                                                                    <label class="col-sm-4 col-form-label" style="text-align:right">
+                                                                        Approved By :
+                                                                    </label>
+                                                                    <div class="col-sm-8 col-form-label">
+                                                                        <span>
+                                                                            Pakawat Smutkun (05 มิถุนายน 2020)
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </form>
+
+                                                            @if(Review.FileList != null){
+                                                                if(Review.FileList.Count != 0){
+                                                            <div class="col-sm-12 d-flex mt-4">
+                                                            <ul class="mailbox-attachments d-flex flex-wrap align-items-stretch clearfix">
+                                                                @{var FileList = Review.FileList;
+                                                                    foreach(var File in FileList){
+                                                                        var FileSize = "0 Bytes";
+                                                                        <li>
+                                                                            <span class="mailbox-attachment-icon">
+                                                                                @{var FileType = Path.GetExtension(File.Name);}
+                                                                                @if(FileType == ".docx" || FileType == ".doc" ){
+                                                                                    <i class="far fa-file-word"></i>
+                                                                                }else if(FileType == ".pptx" || FileType == ".ppt" ){
+                                                                                    <i class="far fa-file-powerpoint"></i>
+                                                                                }else if(FileType == ".xls" || FileType == ".xlxs" ){
+                                                                                    <i class="far fa-file-excel"></i>
+                                                                                }else if(FileType == ".pdf"){
+                                                                                    <i class="far fa-file-pdf"></i>
+                                                                                }else if(FileType == ".png" || FileType == ".jpeg" || FileType == ".jpg" || FileType == ".JPG" || FileType == ".gif" ){
+                                                                                    <i class="far fa-file-image"></i>
+                                                                                }else{
+                                                                                    <i class="far fa-file"></i>
+                                                                                }
+                                                                            </span>
+                                                                            <div class="mailbox-attachment-info">
+                                                                                <a href="#" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> @Html.DisplayFor(model => File.Name)
+                                                                                </a>
+                                                                                <span class="mailbox-attachment-size clearfix mt-1">
+                                                                                @if(File.Size != null){
+                                                                                    if(File.Size > 1000){
+                                                                                        FileSize = (File.Size / 1000) + " KB";
+                                                                                    }else{
+                                                                                        FileSize = File.Size + " Bytes";
+                                                                                    }
+                                                                                }
+                                                                                    <span>@FileSize</span>
+                                                                                    <a href="#" class="btn btn-default btn-sm float-right"><i class="fas fa-cloud-download-alt"></i></a>
+                                                                                </span>
+                                                                            </div>
+                                                                        </li>
+                                                                    }
+                                                                }
+                                                                </ul>
+                                                                </div>
+                                                                }
+                                                            }
+                                                    </div>
+                                                    @{
+                                                        var isDepartment = false;
+                                                        if(department == Review.Department){
+                                                             isDepartment = true;
+                                                        }
+
+                                                        if((isManager || isDepartment) && Review.Status != 1){
+                                                        <hr style="margin-top:0px !important">
+                                                        <div class="timeline-footer">
+                                                            <div class="float-right ">
+                                                                @* <a href="#" class="btn btn-warning btn-sm">Request Re-Submit</a> *@
+                                                                @if(Review.Status !=1 && isDepartment){
+                                                                    <a href="#" class="btn btn-warning btn-sm" >Edit</a> 
+                                                                }
+                                                                @if(Review.Status !=5 && Review.Status !=6 && isManager){
+                                                                    <a a href="#" class="btn btn-success btn-sm style="margin-right:10px"">Approve</a>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                        }
+                                                    }
+                                                </div>  
+                                            </div>
+                                            }
+                                             i++;
+
+                                            }
+                                        @* } *@
+                                        <!-- END timeline item -->
+                                        @if(status == "Trial" || status == "Closed"){
+                                        <!-- timeline time label -->
+                                        <div class="time-label">
+                                            <span class="bg-primary">
+                                                Trail & Follow up status <br> <span class="time"><i class="far fa-clock"></i> 27 mins ago</span>
+                                            </span>
+                                        </div>
+                                        <!-- /.timeline-label -->
+                                        <!-- timeline item -->
+                                        <div>
+                                            <i class="fas fa-comments bg-warning"></i>
+
+                                            <div class="timeline-item">
+                                                <!--span class="time"><i class="far fa-clock"></i> 27 mins ago</span>
+
+                                                <h3 class="timeline-header"><a href="#">Jay White</a> commented on your post</h3-->
+
+                                                <div class="timeline-body">
+                                                    <p style="background-color: rgb(248, 249, 250);"><span style="background-color: rgb(255, 255, 255);"><font color="#495057" face="Arial, Helvetica, sans-serif"><b>Suggestion</b></font></span>
+                                                        <font color="#495057" face="Arial, Helvetica, sans-serif"><b>&nbsp;:</b><span style="font-size: 1rem;">&nbsp;</span></font><span>Lorem ipsum represents a long-held tradition for designers, typographers and the like. Some people hate it and argue for its demise, but others ignore the hate as they create awesome tools to help create filler text for everyone from bacon lovers to Charlie Sheen fans.</span><br></p>
+                                                    <p style="background-color: rgb(248, 249, 250);">
+                                                        <font color="#495057" face="Arial, Helvetica, sans-serif"><b>Attach File :</b></font>
+                                                    </p>
+
+                                                    <img src="http://placehold.it/150x100" alt="...">
+                                                    <img src="http://placehold.it/150x100" alt="...">
+                                                    <img src="http://placehold.it/150x100" alt="...">
+                                                    <img src="http://placehold.it/150x100" alt="...">
+
+                                                    <br><br><br>
+                                                    <p style="text-align: center; background-color: rgb(248, 249, 250);"><span style="background-color: rgb(255, 255, 255);"><font color="#495057" face="Arial, Helvetica, sans-serif"><b>Review by</b></font></span><span style="font-weight: bolder; color: rgb(73, 80, 87); font-family: Arial, Helvetica, sans-serif;">&nbsp;:&nbsp; s.chuerawi</span>&nbsp;
+                                                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                                                        <font color="#495057" face="Arial, Helvetica, sans-serif"><b>Approved by :&nbsp; s.chuerawi</b></font>
+                                                    </p>
+                                                    <p style="text-align: center; background-color: rgb(248, 249, 250);"><span style="font-size: 1rem;">&nbsp; &nbsp;</span>
+                                                        <font color="#495057" face="Arial, Helvetica, sans-serif" style="font-size: 1rem;"><b>Date : 04/04/2020</b></font><span style="font-size: 1rem;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span style="font-size: 1rem; font-weight: bolder; color: rgb(73, 80, 87); font-family: Arial, Helvetica, sans-serif;">Date : 04/04/2020</span></p>
+                                                    <p style="background-color: rgb(248, 249, 250);"><br></p>
+                                                </div>
+                                                <hr>
+                                                <div class="timeline-footer">
+                                                    <a href="#" class="btn btn-warning btn-sm">Request Re-Submit</a>
+                                                    <!--a href="#" class="btn btn-danger btn-sm">Edit</a-->
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- END timeline item -->
+                                        }
+                                        @if(status == "Closed"){
+                                        <!-- timeline time label -->
+                                        <div class="time-label">
+                                            <span class="bg-success">
+                                                Close confrim status <br><span class="time"><i class="far fa-clock"></i> 2 days ago</span>
+                                            </span>
+                                        </div>
+                                        <!-- /.timeline-label -->
+                                        <!-- timeline item -->
+                                        <div>
+                                            <i class="fas fa-camera bg-purple"></i>
+
+                                            <div class="timeline-item">
+                                                <!--span class="time"><i class="far fa-clock"></i> 2 days ago</span>
+
+                                                <h3 class="timeline-header"><a href="#">Mina Lee</a> uploaded new photos</h3-->
+
+                                                <div class="timeline-body">
+                                                    <p style="background-color: rgb(248, 249, 250);"><span style="background-color: rgb(255, 255, 255);"><font color="#495057" face="Arial, Helvetica, sans-serif"><b>Suggestion</b></font></span>
+                                                        <font color="#495057" face="Arial, Helvetica, sans-serif"><b>&nbsp;:</b><span style="font-size: 1rem;">&nbsp;</span></font><span>Lorem ipsum represents a long-held tradition for designers, typographers and the like. Some people hate it and argue for its demise, but others ignore the hate as they create awesome tools to help create filler text for everyone from bacon lovers to Charlie Sheen fans.</span><br></p>
+                                                    <p style="background-color: rgb(248, 249, 250);">
+                                                        <font color="#495057" face="Arial, Helvetica, sans-serif"><b>Attach File :</b></font>
+                                                    </p>
+
+                                                    <img src="http://placehold.it/150x100" alt="...">
+                                                    <img src="http://placehold.it/150x100" alt="...">
+                                                    <img src="http://placehold.it/150x100" alt="...">
+                                                    <img src="http://placehold.it/150x100" alt="...">
+
+                                                    <br><br><br>
+                                                    <p style="text-align: center; background-color: rgb(248, 249, 250);"><span style="background-color: rgb(255, 255, 255);"><font color="#495057" face="Arial, Helvetica, sans-serif"><b>Review by</b></font></span><span style="font-weight: bolder; color: rgb(73, 80, 87); font-family: Arial, Helvetica, sans-serif;">&nbsp;:&nbsp; s.chuerawi</span>&nbsp;
+                                                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                                                        <font color="#495057" face="Arial, Helvetica, sans-serif"><b>Approved by :&nbsp; s.chuerawi</b></font>
+                                                    </p>
+                                                    <p style="text-align: center; background-color: rgb(248, 249, 250);"><span style="font-size: 1rem;">&nbsp; &nbsp;</span>
+                                                        <font color="#495057" face="Arial, Helvetica, sans-serif" style="font-size: 1rem;"><b>Date : 04/04/2020</b></font><span style="font-size: 1rem;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span style="font-size: 1rem; font-weight: bolder; color: rgb(73, 80, 87); font-family: Arial, Helvetica, sans-serif;">Date : 04/04/2020</span></p>
+                                                    <p style="background-color: rgb(248, 249, 250);"><br></p>
+                                                </div>
+                                                <hr>
+                                                <div class="timeline-footer">
+                                                    <a href="#" class="btn btn-warning btn-sm">Request Re-Submit</a>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- END timeline item -->
+                                        }
+                                        <div>
+                                            <i class="far fa-clock bg-gray"></i>
+                                        </div>
+                                    </div>
+                                    <br>
+                                }
+                                @if(isRelated && !isReviewd){
+                                    <!-----------------------------------REVIEW PROCESS (PE)---------------------------------------------------------->
+                                    if(isPEProcess && (status == "Request" || status == "Review")){
+                                    <hr><br>
+                                        Session["isIssued"] = true;
+                                       @Html.Partial("Review/PE_Process") 
+                                        
+                                    }
+                                    
+                                    <!-----------------------------------REVIEW PROCESS (QC)---------------------------------------------------------->
+                                    if(isQC){
+                                    <hr><br>
+                                        if(!(isInternal && status == "Request")){
+                                            @Html.Partial("Review/QC") 
+                                        }
+                                    }
+                                    
+                                    <!-----------------------------------------REVIEW PROCESS---------------------------------------------------------->
+                                    if(!isPEProcess && !isQC){
+                                        if(!(isInternal && status == "Request") && status == "Review"){
+                                        <hr><br>
+                                            @Html.Partial("Review/Other", ReviewItems) 
+                                        }
+                                    }
+                                    <!------------------------------------END REVIEW PROCESS---------------------------------------------------------->
+                                } @* End of check isRelated and is(Not)Reviewed   *@
+                                @if(status == "Trial" && isTrialable){
+                                    <hr><br>
+                                    <h1>Trial</h1><br>
+                                    <form class="form-horizontal"  action="javascript:void(0);" id="Review">
+                                        <div class="form-group row">
+                                            <label for="inputAcceptance" class="col-sm-2 col-form-label">Evaluation result</label>
+
+                                            <div class="col-sm-3 col-form-label">
+                                                <label style="margin-right: 15px;">
+                                                    <input type="radio" name="rd-0" value="1" class="flat-red" checked>
+                                                    Acceptance
+                                                </label>
+                                                <label style="margin-right: 15px;">
+                                                    <input type="radio" name="rd-0" value="0" class="flat-red">
+                                                    Not, Acceptance
+                                                </label>
+                                            </div>
+                                            <div class="col-sm-7 col-form-label">
+                                                <label>Not Approve reason :</label>
+                                                <input type="text" name="desc-0" class="form-control" placeholder="200 character limit ">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="inputChangeDetails" class="col-sm-2 col-form-label">Change date</label>
+                                            <div class="col-sm-10 col-form-label">
+                                                <input data-toggle="datepicker" class="form-control" placeholder="Select Date " autocomplete="off" name="desc-32">
+                                                <div data-toggle="datepicker"></div>
+                                                @* <input type="text" name="desc-32" class="form-control" placeholder="Enter Date "> *@
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="inputChangeDetails" class="col-sm-2 col-form-label">Change details</label>
+                                            <div class="col-sm-10 col-form-label">
+                                                <input type="text" name="desc-1" class="form-control" placeholder="500 character limit">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="inputProDesRe" class="col-sm-2 col-form-label">Process design review</label>
+                                            <div class="col-sm-3 col-form-label">
+                                                <label style="margin-right: 15px;">
+                                                    <input type="radio" name="rd-2" value="1" class="flat-red" checked>
+                                                    Yes
+                                                </label>
+                                                <label style="margin-right: 15px;">
+                                                    <input type="radio" name="rd-2" value="0" class="flat-red">
+                                                    No, Acceptance
+                                                </label>
+                                            </div>
+                                            <div class="col-sm-7 col-form-label">
+                                                <label>if yes,inform to NS   Due date :</label>
+                                                <textarea name="desc-2" class="form-control" placeholder=""></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="inputEffeDoc" class="col-sm-2 col-form-label">Effected to Document (Control Plan ,FMEA)</label>
+                                            <div class="col-sm-3 col-form-label">
+                                                <label style="margin-right: 15px;">
+                                                    <input type="radio" name="rd-3" value="1" class="flat-red" checked>
+                                                    Yes
+                                                </label>
+                                                <label style="margin-right: 15px;">
+                                                    <input type="radio" name="rd-3" value="0" class="flat-red">
+                                                    No, Acceptance
+                                                </label>
+                                            </div>
+                                            <div class="col-sm-4 col-form-label">
+                                                <label>Control Plan no. :</label>
+                                                <textarea name="desc-29" class="form-control" placeholder=""></textarea>
+                                            </div>
+                                            <div class="col-sm-3 col-form-label">
+                                                <label>FMEA No. :</label>
+                                                <textarea name="desc-30" class="form-control" placeholder=""></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="inputSkills" class="col-sm-2 col-form-label">Due Date</label>
+                                                <div class="col-sm-10 col-form-label">
+                                                <input data-toggle="datepicker" class="form-control" placeholder="Select Date " autocomplete="off" name="desc-31">
+                                                <div data-toggle="datepicker"></div>
+                                                @* <input type="text" name="desc-32" class="form-control" placeholder="Enter Date "> *@
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="inputSkills" class="col-sm-2 col-form-label">Others  (Please specify)</label>
+                                            <div class="col-sm-10 col-form-label">
+                                                <input name="desc-22" type="text" class="form-control" placeholder="500 character limit">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="inputReqReTrial" class="col-sm-2 col-form-label">Request Trial</label>
+                                            <div class="col-sm-3 col-form-label">
+                                                <label style="margin-right: 15px;">
+                                                    <input type="radio" name="rd-24" value="1" class="flat-red" checked>
+                                                    Yes
+                                                </label>
+                                                <label style="margin-right: 15px;">
+                                                    <input type="radio" name="rd-24" value="0" class="flat-red">
+                                                    No, Acceptance
+                                                </label>
+                                            </div>
+                                            <div class="col-sm-7 col-form-label">
+                                                <label>Details :</label>
+                                                <textarea class="form-control" name="desc-24" placeholder=""></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="inputSkills" class="col-sm-2 col-form-label">Attach File</label>
+                                            <div class="col-sm-10">
+                                                <input type="file" class="my-pond" name="filepond"/>
+                                                @* <input type="file" name="filepond" data-max-files="10" required> *@
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <hr>
+                                        <br>
+                                        <div class="form-group row">
+                                            <div class="col-sm-12">
+                                                <button type="button" class="btn btn-warning float-left" style="color:white" data-toggle="modal" data-target="#resubmit_modal">Request Re-Submit</button>
+                                                <button type="submit" class="btn btn-info float-right">Submit</button>
+                                            </div>
+                                        </div>
+                                    </form>                                    
+                                }
+                                
+                                </div> @* End of tab-pane *@
+                                <!-- /.tab-pane -->
+                                <div class ="tab-pane" id="timeline">
+                                    <!-- The timeline -->
+                                    @Html.Partial("Resubmit",ResubmitLists) 
+                                </div>
+                                <!-- /.tab-pane -->
+                                
+                                <!-- /.tab-pane -->
+                            </div>
+                            <!-- /.tab-content -->
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.nav-tabs-custom -->
+                </div>
+                <!-- /.col -->
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->

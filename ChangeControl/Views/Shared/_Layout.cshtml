@@ -1,0 +1,610 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    @*@Scripts.Render("~/bundles/modernizr")*@
+    @*<title>Change Control System | </title>*@
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="~/tmp/plugins/fontawesome-free/css/all.min.css">
+    <!-- overlayScrollbars -->
+    <link rel="stylesheet" href="~/tmp/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="~/tmp/dist/css/ionicons.min.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/tmp/plugins/datatables-bs4/css/dataTables.bootstrap4.css">
+    <!-- daterange picker -->
+    <link rel="stylesheet" href="~/tmp/plugins/daterangepicker/daterangepicker.css">
+    <!-- iCheck for checkboxes and radio inputs -->
+    <link rel="stylesheet" href="~/tmp/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- Bootstrap Color Picker -->
+    <link rel="stylesheet" href="~/tmp/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css">
+    <!-- Tempusdominus Bbootstrap 4 -->
+    <link rel="stylesheet" href="~/tmp/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="~/tmp/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="~/tmp/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+    <!-- Bootstrap4 Duallistbox -->
+    <link rel="stylesheet" href="~/tmp/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css">
+    <!-- summernote -->
+    <link rel="stylesheet" href="~/tmp/plugins/summernote/summernote-bs4.css">
+
+    <!-- Theme style -->
+    <link rel="stylesheet" href="~/tmp/dist/css/adminlte.min.css">
+    @* <link rel="preload" href="~/tmp/dist/css/adminlte.min.css" as="style" onload="this.rel='stylesheet'"> *@
+
+    <!-- SweetAlert2 -->
+    <script src="~/tmp/plugins/sweetalert2/sweetalert2.all.js"></script>
+
+    <!-- jq-fab -->
+    <link rel="stylesheet" href="~/Plugin/jq-fab/css/index.css">
+
+    <script type="text/javascript">
+        var file_list = [];
+        var file_array = [];
+        var file_length = 0;
+    </script>    
+    
+    <!-- Google Font: Source Sans Pro -->
+    @*<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">*@
+
+
+    <!-- blueimp Gallery styles jame-->
+    @*<link rel="stylesheet" href="~/tmp/upload/css/blueimp-gallery.min.css" />*@
+
+    <!-- CSS to style the file input field as button and adjust the Bootstrap progress bars jame-->
+    @*<link rel="stylesheet" href="~/tmp/upload/css/jquery.fileupload.css" />
+        <link rel="stylesheet" href="~/tmp/upload/css/jquery.fileupload-ui.css" />*@
+    <!-- CSS adjustments for browsers with JavaScript disabled -->
+    <!-- CSS loading -->
+    <link href="~/Plugin/loading.css" rel="stylesheet">
+    <!-- jame -->
+    @*<noscript>
+        <link rel="stylesheet" href="~/tmp/upload/css/jquery.fileupload-noscript.css" />
+    </noscript>
+    <noscript>
+        <link rel="stylesheet" href="~/tmp/upload/css/jquery.fileupload-ui-noscript.css" />
+    </noscript>*@
+
+
+    <link href="~/Plugin/animsition/dist/css/animsition.css" rel="stylesheet" />
+
+    <style>
+        body {
+            font-family: Kanit-Light , sans-serif ;
+            font-size: 14px;
+        }
+
+        b,span,a{
+            font-family: Kanit , sans-serif !important;
+            font-size: 14px;
+        }
+        /* The Modal (background) */
+
+        .modal {
+            display: none;
+            /* Hidden by default */
+            position: fixed;
+            /* Stay in place */
+            z-index: 1;
+            /* Sit on top */
+            padding-top: 100px;
+            /* Location of the box */
+            left: 0;
+            top: 0;
+            width: 100%;
+            /* Full width */
+            height: 100%;
+            /* Full height */
+            overflow: auto;
+            /* Enable scroll if needed */
+            background-color: rgb(0, 0, 0);
+            /* Fallback color */
+            background-color: rgba(0, 0, 0, 0.4);
+            /* Black w/ opacity */
+        }
+        /* Modal Content */
+
+        /*.modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            margin-left: 300px;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }*/
+        /* The Close Button */
+
+        .close {
+            color: #aaaaaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        @@font-face
+        {
+            font-family: 'Kanit-Thin';
+            src: url('@Request.Url.GetLeftPart(UriPartial.Authority)/fonts/Kanit/Kanit-Thin.ttf') format("truetype");
+        }
+        @@font-face
+        {
+            font-family: 'Kanit-ExtraLight';
+            src: url('@Request.Url.GetLeftPart(UriPartial.Authority)/fonts/Kanit/Kanit-ExtraLight.ttf') format("truetype");
+        }
+        @@font-face
+        {
+            font-family: 'Kanit-Light';
+            src: url('@Request.Url.GetLeftPart(UriPartial.Authority)/fonts/Kanit/Kanit-Light.ttf') format("truetype");
+        }
+        @@font-face
+        {
+            font-family: 'Kanit';
+            src: url('@Request.Url.GetLeftPart(UriPartial.Authority)/fonts/Kanit/Kanit-Regular.ttf') format("truetype");
+        }
+        @@font-face
+        {
+            font-family: 'Kanit-SemiBold';
+            src: url('@Request.Url.GetLeftPart(UriPartial.Authority)/fonts/Kanit/Kanit-SemiBold.ttf') format("truetype");
+        }
+        @@font-face
+        {
+            font-family: 'Kanit-Bold';
+            src: url('@Request.Url.GetLeftPart(UriPartial.Authority)/fonts/Kanit/Kanit-Bold.ttf') format("truetype");
+            font-weight: bold;
+        }           
+
+        .center{
+            text-align: center;
+        }             
+
+        .right{
+            float: right;
+        }
+
+        .left{
+            float: left;
+        }
+        
+        [data-filepond-item-state='idle'] .filepond--item-panel {
+            background-color: #22a061;
+        }
+
+        .swal-button--clear, .swal-button--clear:hover {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+
+        .swal-button--confirm, .btn-info {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+        .btn-info.disabled, .btn-info:disabled {
+            color: #fff;
+            background-color: #aab0b1;
+            border-color: #aab0b1;
+        }
+
+        .btn-info:hover {
+            color: #fff;
+            background-color: #135396;
+            border-color: #135396;
+        }
+
+        .hidden{
+            display: none;        
+        }
+
+        .txt-right{
+            text-align: right;
+        }
+
+        .btn-warning {
+            color: white;
+        }
+
+    </style>
+
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
+@* <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed sidebar-collapse"> *@
+    <div class="wrapper">
+   
+        <!-- Navbar -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <!-- Left navbar links -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
+                </li>
+                <li class="nav-item d-none d-sm-inline-block">
+                    <a href="#" class="nav-link">Home</a>
+                </li>
+            </ul>
+
+            <!-- SEARCH FORM
+            <form class="form-inline ml-3">
+                <div class="input-group input-group-sm">
+                    <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
+                    <div class="input-group-append">
+                        <button class="btn btn-navbar" type="submit">
+                    <i class="fas fa-search"></i>
+                    </button>
+                    </div>
+                </div>
+            </form>
+            -->
+            <!-- Right navbar links -->
+            <ul class="navbar-nav ml-auto">
+                <!-- Messages Dropdown Menu -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link" data-toggle="dropdown" href="#">
+                        <i class="far fa-file"></i>
+                        <ion-icon name="document-outline"></ion-icon>
+
+                        <span class="badge badge-primary navbar-badge">3</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                        <a href="#" class="dropdown-item">
+                            <!-- Message Start -->
+                            <div class="media">
+                                <img src="~/tmp/dist/img/doc.png" alt="User Avatar" class="img-size-50 mr-3 img-circle">
+                                <div class="media-body">
+                                    <h3 class="dropdown-item-title">
+                                        Document Review No. 1
+                                        <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
+                                    </h3>
+                                    <p class="text-sm">See Document Review No. 1</p>
+                                    <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 1 Hours Ago</p>
+                                </div>
+                            </div>
+                            <!-- Message End -->
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item">
+                            <!-- Message Start -->
+                            <div class="media">
+                                <img src="~/tmp/dist/img/doc.png" alt="User Avatar" class="img-size-50 img-circle mr-3">
+                                <div class="media-body">
+                                    <h3 class="dropdown-item-title">
+                                        Document Review No. 2
+                                        <span class="float-right text-sm text-muted"><i class="fas fa-star"></i></span>
+                                    </h3>
+                                    <p class="text-sm">See Document Review No. 2</p>
+                                    <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 2 Hours Ago</p>
+                                </div>
+                            </div>
+                            <!-- Message End -->
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item">
+                            <!-- Message Start -->
+                            <div class="media">
+                                <img src="~/tmp/dist/img/doc.png" alt="User Avatar" class="img-size-50 img-circle mr-3">
+                                <div class="media-body">
+                                    <h3 class="dropdown-item-title">
+                                        Document Review No. 3
+                                        <span class="float-right text-sm text-warning"><i class="fas fa-star"></i></span>
+                                    </h3>
+                                    <p class="text-sm">See Document Review No. 3</p>
+                                    <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 3 Hours Ago</p>
+                                </div>
+                            </div>
+                            <!-- Message End -->
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item dropdown-footer">See All Document Review</a>
+                    </div>
+                </li>
+                <!-- Notifications Dropdown Menu -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link" data-toggle="dropdown" href="#">
+                        <i class="fas fa-book"></i>
+                        <span class="badge badge-info navbar-badge">3</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                        <a href="#" class="dropdown-item">
+                            <!-- Message Start -->
+                            <div class="media">
+                                <img src="~/tmp/dist/img/search.png" alt="User Avatar" class="img-size-50 mr-3 img-circle">
+                                <div class="media-body">
+                                    <h3 class="dropdown-item-title">
+                                        Document Trial No. 1
+                                        <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
+                                    </h3>
+                                    <p class="text-sm">See Document Trial No. 1</p>
+                                    <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 1 Hours Ago</p>
+                                </div>
+                            </div>
+                            <!-- Message End -->
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item">
+                            <!-- Message Start -->
+                            <div class="media">
+                                <img src="~/tmp/dist/img/search.png" alt="User Avatar" class="img-size-50 img-circle mr-3">
+                                <div class="media-body">
+                                    <h3 class="dropdown-item-title">
+                                        Document Trial No. 2
+                                        <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
+                                    </h3>
+                                    <p class="text-sm">See Document Trial No. 2</p>
+                                    <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 2 Hours Ago</p>
+                                </div>
+                            </div>
+                            <!-- Message End -->
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item">
+                            <!-- Message Start -->
+                            <div class="media">
+                                <img src="~/tmp/dist/img/search.png" alt="User Avatar" class="img-size-50 img-circle mr-3">
+                                <div class="media-body">
+                                    <h3 class="dropdown-item-title">
+                                        Document Trial No. 3
+                                        <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
+                                    </h3>
+                                    <p class="text-sm">See Document Trial No. 1</p>
+                                    <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 3 Hours Ago</p>
+                                </div>
+                            </div>
+                            <!-- Message End -->
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item dropdown-footer">See All Document Trial</a>
+                    </div>
+                </li>
+                <!-- Notifications Dropdown Menu -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link" data-toggle="dropdown" href="#">
+                        <i class="far fa-clipboard"></i>
+                        <span class="badge badge-success navbar-badge">3</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                        <a href="#" class="dropdown-item">
+                            <!-- Message Start -->
+                            <div class="media">
+                                <img src="~/tmp/dist/img/file.png" alt="User Avatar" class="img-size-50 mr-3 img-circle">
+                                <div class="media-body">
+                                    <h3 class="dropdown-item-title">
+                                        Document Approve No. 1
+                                        <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
+                                    </h3>
+                                    <p class="text-sm">See Document Approve No. 1</p>
+                                    <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 1 Hours Ago</p>
+                                </div>
+                            </div>
+                            <!-- Message End -->
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item">
+                            <!-- Message Start -->
+                            <div class="media">
+                                <img src="~/tmp/dist/img/file.png" alt="User Avatar" class="img-size-50 img-circle mr-3">
+                                <div class="media-body">
+                                    <h3 class="dropdown-item-title">
+                                        Document Approve No. 2
+                                        <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
+                                    </h3>
+                                    <p class="text-sm">See Document Trial No. 2</p>
+                                    <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 2 Hours Ago</p>
+                                </div>
+                            </div>
+                            <!-- Message End -->
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item">
+                            <!-- Message Start -->
+                            <div class="media">
+                                <img src="~/tmp/dist/img/file.png" alt="User Avatar" class="img-size-50 img-circle mr-3">
+                                <div class="media-body">
+                                    <h3 class="dropdown-item-title">
+                                        Document Approve No. 3
+                                        <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
+                                    </h3>
+                                    <p class="text-sm">See Document Approve No. 3</p>
+                                    <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 3 Hours Ago</p>
+                                </div>
+                            </div>
+                            <!-- Message End -->
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item dropdown-footer">See All Document Approve</a>
+                    </div>
+                </li>
+                <!-- Notifications Dropdown Menu -->
+            </ul>
+        </nav>
+        <!-- /.navbar -->
+        <!-- Main Sidebar Container -->
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+            <!-- Brand Logo -->
+            <a href="http://172.27.170.23/intranet/index.aspx" class="brand-link">
+                @* <img src="~/tmp/dist/img/change.png" alt="AdminLTE Logo" class="brand-image " style="opacity: .8"> *@
+                <img src="~/tmp/dist/img/logo-square.png" alt="AdminLTE Logo" class="brand-image " style="opacity: .8; transform: scale(1.5);">
+                <span class="brand-text font-weight-light" style="font-size: 20px; margin-left: 3%; font-family: Kanit-Light !important"> CHANGE CONTROL</span>
+                <!--span class="brand-text font-weight-light">Change Control System</span-->
+            </a>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Sidebar user panel (optional) -->
+                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                    <div class="image">
+                        <img src="~/tmp/dist/img/TNSavatar.png" class="img-circle elevation-2" alt="User Image">
+                    </div>
+                    <div class="info">
+                        <a href="#" class="d-block px-2">@Session["FullName"].ToString() (@Session["Department"])</a>
+                    </div>
+                </div>
+          
+                <!-- Sidebar Menu -->
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                        <!-- Add icons to the links using the .nav-icon class
+    with font-awesome or any other icon font library -->
+                        <li id="menu1" class="nav-item">
+                            <a id="menu1-1" href="@Url.Action("Index", "Home")" class="nav-link animsition-link">
+                                <i class="nav-icon fas fa-tachometer-alt"></i>
+                                <p>
+                                    Search
+                                    <span class="right badge badge-danger">New</span>
+                                </p>
+                            </a>
+                        </li>
+                        <li id="menu2" class="nav-item">
+                            <a id="menu2-1" href="@Url.Action("Index", "Request")" class="nav-link animsition-link">
+                                <i class="nav-icon fas fa-edit"></i>
+
+                                <p>
+                                    Request
+                                </p>
+                            </a>
+                        </li>
+                        <li id="menu3" class="nav-item">
+                            <a id="menu3-1" href="@Url.Action("Index", "Detail")" class="nav-link animsition-link">
+                                <i class="nav-icon far fa-clone"></i>
+                                <p>
+                                    Detail
+                                </p>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <!-- /.sidebar-menu -->
+            </div>
+            <!-- /.sidebar -->
+        </aside>
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="">
+        @* <div class="animsition"> *@
+            <div class="loading hidden" id="loading">
+            @* <div class="loading" id="loading" style="display:none"> *@
+                <img src="~/Plugin/img/loading-3.svg" style="width:auto;height:auto;">
+            </div>
+            @RenderBody()
+        </div>
+
+        <!-- /.content-wrapper -->
+        <!-- Control Sidebar -->
+        <aside class="control-sidebar control-sidebar-dark">
+            <!-- Control sidebar content goes here -->
+        </aside>
+        <!-- /.control-sidebar -->
+        <!-- Main Footer -->
+        <footer class="main-footer" style="position: unset;">
+            <strong>Copyright &copy; 2019-2020 Tapics Design Team</strong> All rights reserved.
+            <div class="float-right d-none d-sm-inline-block">
+                <b>Version</b> 1
+            </div>
+        </footer>
+    </div>
+    <!-- ./wrapper -->
+    <!-- REQUIRED SCRIPTS -->
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+    <!-- jQuery -->
+    <script src="~/tmp/plugins/jquery/jquery.min.js"></script>
+    <!-- jQuery UI -->
+    <link rel="stylesheet" href="~/tmp/plugins/jquery-ui/jquery-ui.min.css">
+    <script src="~/tmp/plugins/jquery-ui/jquery-ui.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="~/tmp/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- DataTables -->
+    <script src="~/tmp/plugins/datatables/jquery.dataTables.js"></script>
+    <script src="~/tmp/plugins/datatables-bs4/js/dataTables.bootstrap4.js"></script>
+    <!-- overlayScrollbars -->
+    <script src="~/tmp/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="~/tmp/dist/js/adminlte.js"></script>
+
+    <!-- OPTIONAL SCRIPTS -->
+    <script src="~/tmp/dist/js/demo.js"></script>
+
+    <!-- PAGE PLUGINS -->
+    <!-- jQuery Mapael -->
+    <script src="~/tmp/plugins/jquery-mousewheel/jquery.mousewheel.js"></script>
+    <script src="~/tmp/plugins/raphael/raphael.min.js"></script>
+    <script src="~/tmp/plugins/jquery-mapael/jquery.mapael.min.js"></script>
+    <script src="~/tmp/plugins/jquery-mapael/maps/usa_states.min.js"></script>
+    <!-- jquery-validation -->
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <!-- ChartJS -->
+    <script rel="preload" src="~/tmp/plugins/chart.js/Chart.min.js" as="script" onload="this.rel='script'"></script>
+    @* <script src="~/tmp/plugins/chart.js/Chart.min.js"></script> *@
+    <!-- PAGE SCRIPTS -->
+    <script src="~/tmp/dist/js/pages/dashboard2.js"></script>
+    <!-- Summernote -->
+    <script src="~/tmp/plugins/summernote/summernote-bs4.min.js"></script>
+    <!-- jQuery Modal -->
+
+    <script src="~/tmp/plugins/moment/moment-with-locales.min.js"></script>
+
+    <!-- jq-fab -->
+    <script src="~/Plugin/jq-fab/js/index.js"></script>
+    
+    <script src="~/Scripts/jquery.modal-wizard.js"></script>
+
+    
+    <link  href="~/Plugin/datepicker/datepicker.min.css" rel="stylesheet">
+    <script src="~/Plugin/datepicker/datepicker.min.js"></script>
+
+    <script src="~/Plugin/animsition/dist/js/animsition.js"></script>
+
+    <script src="~/Scripts/Shared/Shared.js"></script>
+    
+    <script src="~/Scripts/jquery.transit.min.js"></script> 
+    <!-- page script -->
+    <script>
+        $(function () {
+            $("#example1").DataTable();
+        });
+        $(document).ready(function () {
+              $(".animsition").animsition({
+                    inClass: 'fade-in',
+                    outClass: 'fade-out',
+                    inDuration: 1000,
+                    outDuration: 3500,
+                    linkElement: '.animsition-link',
+                    // e.g. linkElement: 'a:not([target="_blank"]):not([href^="#"])'
+                    loading: true,
+                    loadingParentElement: 'body', //animsition wrapper element
+                    loadingClass: 'animsition-loading',
+                    loadingInner: '', // e.g '<img src="loading.svg" />'
+                    timeout: true,
+                    timeoutCountdown: 5000,
+                    onLoadEvent: true,
+                    browser: [ 'animation-duration', '-webkit-animation-duration'],
+                    // "browser" option allows you to disable the "animsition" in case the css property in the array is not supported by your browser.
+                    // The default setting is to disable the "animsition" in a browser that does not support "animation-duration".
+                    overlay : false,
+                    overlayClass : 'animsition-overlay-slide',
+                    overlayParentElement : 'body',
+                    transition: function(url){ window.location.href = url; }
+                });
+        });
+        // Get the modal
+        var modal = document.getElementById("myModal");
+        var btn = document.getElementById("myBtn");
+        var span = document.getElementsByClassName("close")[0];
+
+    </script>
+    <script src="~/Scripts/Layout/layout.js"></script>
+
+</body>
+
+</html>

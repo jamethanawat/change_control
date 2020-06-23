@@ -1,0 +1,57 @@
+using ChangeControl.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using Npgsql;
+using System.Web.Routing;
+using System.Dynamic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Configuration;
+
+namespace ChangeControl.Models{
+    public class LoginModel{
+        private DbTapics _dbtapics;
+        private DbCCS _dbCCS;
+        public List<Department> A = new List<Department>();
+        private SqlConnection cn = new SqlConnection(ConfigurationManager.ConnectionStrings["CCS"].ConnectionString);
+        public LoginModel(){
+            _dbtapics = new DbTapics();
+            _dbCCS = new DbCCS();
+        }
+        public string CheckUser(string user, string password){
+        try{
+                System.Net.ServicePointManager.Expect100Continue = false;
+
+                // CheckUser.LdapAuth chk = new CheckUser.LdapAuth();
+                // bool result = chk.checkLogin(user, password);
+                myAD.ADInfo conAD = new myAD.ADInfo();
+                bool chk = false;
+                bool result = conAD.ChkAuth("username","password");
+                if (result){
+                    DataSet ds = new DataSet();
+                    SqlDataAdapter da = new SqlDataAdapter();
+                    var sql = "SELECT TOP(1) Dept FROM dbo.[User] WHERE Name ='" + user + "' ";
+                    da = new SqlDataAdapter(sql, cn);
+                    da.Fill(ds, "item");
+
+                    var temp_dept = ds.Tables["item"].Rows[0][0].ToString();
+                    return temp_dept;
+                }
+                else{
+                    dynamic response = new ExpandoObject();
+                    response.message = "error";
+                    return "error";
+                }
+             
+            }
+            catch (Exception er)
+            {
+                return "error";
+            }  
+        } 
+        
+    }
+}

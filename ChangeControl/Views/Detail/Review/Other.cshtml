@@ -1,0 +1,40 @@
+<h1>Review Items</h1><br>
+<form class="form-horizontal" action="javascript:void(0);" id="Review" >
+    @if(Model != null){
+        foreach(var Item in Model){
+        var temp_rd = $"rd-{@Item.ID}";
+        var temp_desc = $"desc-{@Item.ID}";
+        <div class="form-group row">
+            <label for="inputProDesRe" class="col-sm-2 col-form-label">@Item.Name</label>
+            <div class="col-sm-3 col-form-label">
+                <label style="margin-right: 15px;">
+                    <input type="radio" name="@temp_rd" value="1" class="flat-red" checked>
+                    Yes
+                </label>
+                <label style="margin-right: 15px;">
+                    <input type="radio" name="@temp_rd" value="0" class="flat-red">
+                    No
+                </label>
+            </div>
+            <div class="col-sm-7 col-form-label">
+                <label>Details :</label>
+                <textarea class="form-control" name="@temp_desc" placeholder=""></textarea>
+            </div>
+        </div>
+        }
+    }
+    <div class="form-group row">
+        <label for="inputSkills" class="col-sm-2 col-form-label">Attach File</label>
+        <div class="col-sm-10">
+            <input type="file" class="my-pond" name="filepond"/>
+        </div>
+    </div>
+    <br>
+    <hr>
+    <br>
+    <div class="form-group row">
+        <div class="col-sm-12">
+            <button type="submit" id="ReviewSubmit" class="btn btn-info float-right">Submit</button>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,443 @@
+﻿@{
+    //ViewBag.Title = "Home Page";
+    ViewBag.Title = "Change Control System | Home";
+}
+@model IEnumerable<ChangeControl.Models.SearchResult>
+
+<script type="text/javascript">
+    Search = '@Url.Action("Search", "Home")';
+    GetLine = '@Url.Action("GetLine", "Home")';
+    GetSearch = '@Url.Action("GetSearch", "Home")';
+    RedirectTo = '@Url.Action("RedirectTo", "Home")';
+    SessionUser = '@Session["User"].ToString()';
+</script>
+
+@Scripts.Render("~/bundles/jquery")
+<script src="~/Scripts/Home/Home.js"></script>
+<script>
+    $(document).ready(function () {
+        console.log("Home");
+        $("#menu1-1").addClass('active');
+        $('#menu2-1').removeClass('active');
+        $('#menu3-1').removeClass('active');
+
+    });
+</script>
+<style>
+
+    .txtcenter {
+        text-align: center;
+    }
+
+    .setcheckbox {
+        margin-top: 10px;
+        margin-right: 15px;
+    }
+
+    .btn-hidden {
+        display: none;
+    }
+</style>
+<!-- Content Wrapper. Contains page content -->
+@using (Html.BeginForm("Index", "Home", FormMethod.Post))
+{
+    <button class="btn-hidden" type="submit" id="submit">  </button>
+
+}
+
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Main Menu</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="#">Change Control System</a></li>
+                        <li class="breadcrumb-item active">Search</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <!-- /.container-fluid -->
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <h5 class="mb-2">Info Box</h5>
+            <div class="row">
+                <div class="col-md-3 col-sm-6 col-12">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-info"><i class="far fa-envelope"></i></span>
+
+                        <div class="info-box-content">
+                            <span class="info-box-text">Messages</span>
+                            <span class="info-box-number">1,410</span>
+                        </div>
+                        <!-- /.info-box-content -->
+                    </div>
+                    <!-- /.info-box -->
+                </div>
+                <!-- /.col -->
+                <div class="col-md-3 col-sm-6 col-12">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-success"><i class="far fa-flag"></i></span>
+
+                        <div class="info-box-content">
+                            <span class="info-box-text">Bookmarks</span>
+                            <span class="info-box-number">410</span>
+                        </div>
+                        <!-- /.info-box-content -->
+                    </div>
+                    <!-- /.info-box -->
+                </div>
+                <!-- /.col -->
+                <div class="col-md-3 col-sm-6 col-12">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-warning"><i class="far fa-copy"></i></span>
+
+                        <div class="info-box-content">
+                            <span class="info-box-text">Uploads</span>
+                            <span class="info-box-number">13,648</span>
+                        </div>
+                        <!-- /.info-box-content -->
+                    </div>
+                    <!-- /.info-box -->
+                </div>
+                <!-- /.col -->
+                <div class="col-md-3 col-sm-6 col-12">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-danger"><i class="far fa-star"></i></span>
+
+                        <div class="info-box-content">
+                            <span class="info-box-text">Likes</span>
+                            <span class="info-box-number">93,139</span>
+                        </div>
+                        <!-- /.info-box-content -->
+                    </div>
+                    <!-- /.info-box -->
+                </div>
+                <!-- /.col -->
+            </div>
+            <!-- /.row -->
+        </div>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- left column -->
+                <div class="col-md-12">
+                    <!-- jquery validation -->
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title">Search </h3>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="row">
+                                <!-- left column -->
+                                <div class="col-md-12">
+                                    <!-- select2 -->
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label>Change Type :</label>
+                                                <select class="form-control select2" id="changeType" style="width: 100%;">
+                                                    <option disabled="disabled" selected="selected">Select Type</option>
+                                                    <option>Internal Change</option>
+                                                    <option>External Change</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+
+                                                <label>Department Review Status :</label><br>
+                                                @* <label class="setcheckbox">
+                                                    <input type="radio" name="h2" id="ST_pending" class="flat-red" checked>
+                                                    Pending
+                                                </label>
+                                                <label class="setcheckbox">
+                                                    <input type="radio" name="h2" id="ST_issued" class="flat-red">
+                                                    Issued
+                                                </label>
+                                                <label class="setcheckbox">
+                                                    <input type="radio" name="h2" id="ST_check" class="flat-red">
+                                                    Checked
+                                                </label>
+                                                <label class="setcheckbox">
+                                                    <input type="radio" name="h2" id="ST_approved" class="flat-red">
+                                                    Approved
+                                                </label>
+                                                <label class="setcheckbox">
+                                                    <input type="radio" name="h2" id="ST_finished" class="flat-red">
+                                                    Finished
+                                                </label> *@
+                                                
+                                                <label class="setcheckbox">
+                                                    <input type="radio" name="h2" id="ST_request" class="flat-red" checked>
+                                                    Request
+                                                </label>
+                                                <label class="setcheckbox">
+                                                    <input type="radio" name="h2" id="ST_review" class="flat-red">
+                                                    Review
+                                                </label>
+                                                <label class="setcheckbox">
+                                                    <input type="radio" name="h2" id="ST_trial" class="flat-red">
+                                                    Trial
+                                                </label>
+                                                <label class="setcheckbox">
+                                                    <input type="radio" name="h2" id="ST_closed" class="flat-red">
+                                                    Closed
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label>Product Type :</label>
+                                                <select class="form-control select2" id="productType" style="width: 100%;">
+                                                    <option disabled="disabled" selected="selected">Select Type</option>
+                                                    <option>Meter 2R</option>
+                                                    <option>Meter 4R</option>
+                                                    <option>Agriculture</option>
+                                                    <option>FU/SP</option>
+                                                    <option>D/P</option>
+                                                    <option>Pointer</option>
+                                                    <option>Consumer</option>
+                                                    <option>Others</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label>Over All Status :</label><br>
+                                                <label class="setcheckbox">
+                                                    <input type="radio" name="h3" id="ST_review_complete" class="flat-red" checked>
+                                                    Review complete
+                                                </label>
+                                                <label class="setcheckbox">
+                                                    <input type="radio" name="h3" id="ST_Confirm_complete" class="flat-red">
+                                                    Confirm Complete
+                                                </label>
+                                                <label class="setcheckbox">
+                                                    <input type="radio" name="h3" id="ST_allstatus" class="flat-red">
+                                                    All status
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label>Change Items :</label>
+                                                <select class="form-control select2" id="changeitem" style="width: 100%;">
+                                                    <option disabled="disabled" selected="selected">Select Item</option>
+                                                    <option>New Part</option>
+                                                    <option>Material change</option>
+                                                    <option>Manufacturing Method change</option>
+                                                    <option>Inspection Method change</option>
+                                                    <option>Jig /Tool change</option>
+                                                    <option>Design Change</option>
+                                                    <option>New Supplier</option>
+                                                    <option>Machine change</option>
+                                                    <option>Manufacturing Process order change</option>
+                                                    <option>Packing ,Transportation change</option>
+                                                    <option>Die / Mold change</option>
+                                                    <option>Others</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="row">
+                                                    <div class="col-6">
+                                                        <!-- /.form-group -->
+                                                        <div class="form-group">
+                                                            <label>TNS Control No. :</label>
+                                                            <input type="text" class="form-control" id="TNScontrolNo" placeholder="Enter ...">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <div class="form-group">
+                                                            <label>Model :</label>
+                                                            <input type="text" class="form-control" id="Model" placeholder="Enter ...">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- radio -->
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label>Change Items :</label><br>
+
+                                                <label class="setcheckbox" style="margin-right: 30px;">
+                                                    <input type="radio" name="h1" id="changeitem_All" class="flat-red" checked>
+                                                    All
+                                                </label>
+                                                <label class="setcheckbox" style="margin-right: 30px;">
+                                                    <input type="radio" name="h1" id="changeitem_Yes" class="flat-red">
+                                                    Yes
+                                                </label>
+                                                <label class="setcheckbox" style="margin-right: 30px;">
+                                                    <input type="radio" name="h1" id="changeitem_No" class="flat-red">
+                                                    No
+                                                </label>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="row">
+                                                    <div class="col-6">
+                                                        <div class="form-group">
+                                                            <label>Part No :</label>
+                                                            <input type="text" class="form-control" id="partno" placeholder="Enter ...">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <div class="form-group">
+                                                            <label>Part Name :</label>
+                                                            <input type="text" class="form-control" id="partname" placeholder="Enter ...">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- select2 -->
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label>Related Section :</label>
+                                                <select class="form-control select2" id="related" style="width: 100%;">
+                                                    <option disabled="disabled" selected="selected">Department</option>
+                                                    <option>QC1</option>
+                                                    <option>QC2</option>
+                                                    <option>QC3</option>
+                                                    <option>PCH</option>
+                                                    <option>PE1</option>
+                                                    <option>PE2</option>
+                                                    <option>IT</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="row">
+                                                    <div class="col-4">
+                                                        <div class="form-group">
+                                                            <label>Process Name :</label>
+                                                            <input type="text" id="processname" class="form-control" placeholder="Enter ...">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label>Production :</label>
+                                                        <select class="form-control select2" id="Production" style="width: 100%;">
+                                                            <option disabled="disabled" selected="selected">Production</option>
+                                                            <option>P1</option>
+                                                            <option>P2</option>
+                                                            <option>P3</option>
+                                                            <option>P4</option>
+                                                            <option>P5</option>
+                                                            <option>P6</option>
+                                                            <option>P7</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <!-- select2 -->
+                                                        <div class="form-group">
+                                                            <label>Line :</label>
+                                                            <select class="form-control select2" id="Line" style="width: 100%;">
+                                                                <option disabled="disabled" selected="selected">Line</option>
+                                                                @*<option>FN1</option>
+                                                                    <option>FN2</option>
+                                                                    <option>FN3</option>
+                                                                    <option>FN4</option>
+                                                                    <option>FN5</option>
+                                                                    <option>FN6</option>
+                                                                    <option>FN7</option>*@
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-default">Clear</button>
+                            <button type="submit" class="btn btn-primary float-right" style="margin-left: 5px;"><i class="fa fa-file-archive-o"></i>&nbsp;&nbsp;Report</button>
+                            <button id="search" class="btn btn-info float-right"><i class="fa  fa-search"></i>&nbsp;&nbsp;Search</button>
+                        </div>
+
+
+
+
+                    </div>
+                    <!-- /.card -->
+                </div>
+                <!--/.col (left) -->
+                <!-- right column -->
+                <!--/.col (right) -->
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+        <div class="row">
+            <!-- left column -->
+            <div class="col-md-12">
+                <!-- jquery validation -->
+                <div class="card card-primary">
+                            <div class="card-header">
+                                <h3 class="card-title">Total records <small>....</small></h3>
+                            </div>
+                            <!-- /.card-header -->
+
+                            <div class="card-body table-responsive">
+                                <table id="ChangeRequestTable" class="table table-bordered table-hover txtcenter" width="100%">
+                                    <thead>
+                                        <tr>
+
+                                            <th>Change Type</th>
+                                            <th>TNS Control</th>
+                                            <th>ECO No.</th>
+                                            <th>Request Date</th>
+                                            <th>Model</th>
+                                            <th>Request Department</th>
+                                            <th>Change Detail</th>
+                                            <th>Review Status</th>
+                                            <th>More</th>
+                                            @*<th>Inform to Customer</th>
+                                <th>Trail & Followup status</th>
+                                <th>Close Status</th>*@
+                                        </tr>
+                                    </thead>
+                                    @using (Html.BeginForm("GoTo", "Home", FormMethod.Post))
+                                    {
+                                        <tbody id="tbody1">
+                                        </tbody>
+                                    }
+                            </table>
+                        </div>
+                    </div>
+                            <!-- /.card -->
+                </div>
+                    <!-- /.row -->
+        </div>
+        </div>
+        <!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+</div>
