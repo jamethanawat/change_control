@@ -119,8 +119,7 @@ namespace ChangeControl.Models{
         }
 
          public int UpdateTopic(Topic m){
-            string query = "INSERT INTO Topic (ID_Topic,Topic_type, Change_item, Product_type, Revision , Model, PartNo, PartName, ProcessName, Status, [APP/IPP], Subject, Detail, Timing , [File],Related, User_insert, Time_insert)  OUTPUT Inserted.ID ";
-            query = query + $"VALUES( '{m.ID_Topic}','{m.Topic_type}', {m.Change_item} , '{m.Product_type}' , '{m.Revision}' ,'{m.Model}', '{m.PartNo}', '{m.PartName}', '{m.ProcessName}', '{m.Status}', '{m.App}' , '{m.Subject}' , '{m.Detail}', '{m.Timing}','{m.File}','{m.Related}','{m.User_insert}','{m.Time_insert}' );";
+            string query = $@"INSERT INTO Topic (ID_Topic,Topic_type, Change_item, Product_type, Revision , Model, PartNo, PartName, ProcessName, Status, [APP/IPP], Subject, Detail, Timing , [File],Related, User_insert, Time_insert)  OUTPUT Inserted.ID VALUES( '{m.ID_Topic}','{m.Topic_type}', {m.Change_item} , '{m.Product_type}' , '{m.Revision}' ,'{m.Model}', '{m.PartNo}', '{m.PartName}', '{m.ProcessName}', '{m.Status}', '{m.App}' , '{m.Subject}' , '{m.Detail}', '{m.Timing}','{m.File}','{m.Related}','{m.User_insert}','{m.Time_insert}' );";
             var result = _dbCCS.Database.SqlQuery<int>(query).First();
             return result;
         }

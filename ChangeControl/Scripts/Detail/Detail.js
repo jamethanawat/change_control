@@ -6,6 +6,8 @@ var InsertFilePath;
 var InsertFileResponsePath;
 var InsertRelatedPath;
 var InsertResponsePath;
+var InsertTrialPath;
+var InsertFileTrialPath;
 var ReqResubmitPath;
 var DepartmentLists;
 var file_list = [];
@@ -186,7 +188,7 @@ $(() => {
                     success: function () {
                     },
                     error: function() {
-                        alert('error handling here');
+                        swal("Error", "Upload file not success", "error");
                     }
                 }));
             });
@@ -246,37 +248,81 @@ $(() => {
                 delete files[index].detail;
             }
 
-            files.forEach(element => {
-                var Data = new FormData();
-                Data.append("file",element.file);
-                Data.append("description",element.description);
-                promises.push($.ajax({
-                    type: "POST",
-                    url: InsertFileResponsePath,
-                    data: Data,
-                    cache: false,
-                    processData: false,
-                    contentType: false,
-                    success: function () {
-                    },
-                    error: function() {
-                        alert('error handling here');
-                    }
-                }));
-            });
+            promises.push($.post(InsertResponsePath,{ desc: form_response[0].value, resubmit_id: response_id },() => {
+                console.log('Inserted item');
+                files.forEach(element => {
+                    var Data = new FormData();
+                    Data.append("file",element.file);
+                    Data.append("description",element.description);
+                    promises.push($.ajax({
+                        type: "POST",
+                        url: InsertFileResponsePath,
+                        data: Data,
+                        cache: false,
+                        processData: false,
+                        contentType: false,
+                        success: function () {
+                        },
+                        error: function() {
+                            swal("Error", "Upload file not success", "error");
+                        }
+                    }));
+                });
+            }).fail(() => {
+                swal("Error", "Reply not success", "error");
+            }));
 
-            promises.push(
-                $.post(InsertResponsePath,{ desc: form_response[0].value, resubmit_id: response_id },() => {
-                    console.log('Inserted item');
-                }).fail(() => {
-                alert('error handling here');
-            }))
+            Promise.all(promises).then(() => {
+                $('#loading').addClass('hidden')
+                InsertReviewStatus = false;
+                $("#ResponseSubmit").prop("disabled",true)
+                swal("Success", "Insert Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
+            })
+    });
+
+    $("form#Trial").submit((e) => {
+        e.preventDefault();
+        $('#loading').removeClass('hidden')
+            let trial_form = $("form#Trial").serializeArray();
+            var promises = [];
+
+            files = file_list;
+            console.log("files",files);
+            
+            for(var index in files){
+                files[index].file = files[index].detail.file;
+                delete files[index].detail;
+            }
+
+            promises.push($.post(InsertTrialPath,{ desc: trial_form[0].value},() => {
+                console.log('Inserted trial');
+                files.forEach(element => {
+                    var Data = new FormData();
+                    Data.append("file",element.file);
+                    Data.append("description",element.description);
+                    promises.push($.ajax({
+                        type: "POST",
+                        url: InsertFileTrialPath,
+                        data: Data,
+                        cache: false,
+                        processData: false,
+                        contentType: false,
+                        success: function () {
+                            console.log('trial file uploaded');
+                        },error: function() {
+                            swal("Error", "Upload file not success", "error");
+                        }
+                    }));
+                });
+            }).fail(() => {
+                swal("Error", "Trial not success", "error");
+            }));
 
             
             Promise.all(promises).then(() => {
                 $('#loading').addClass('hidden')
                 InsertReviewStatus = false;
-                $("#ResponseSubmit").prop("disabled",true)
+                $("#trial_submit").prop("disabled",true)
                 swal("Success", "Insert Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
             })
     });

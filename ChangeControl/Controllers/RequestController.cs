@@ -161,10 +161,9 @@ namespace ChangeControl.Controllers
           var app = "";
           var mode = "Edit";
           var revision = Topic.Revision + 1;
-          var status = 1;
+          var status = Topic.Status;
 
           Session["Mode"] = mode;
-
           try{
                 if(model == "" || model == null) model = "-";
                 if(partNo == "" || partNo == null) partNo = "-";
@@ -177,7 +176,6 @@ namespace ChangeControl.Controllers
 
                 temp_related = "T" + Topic.ID_Topic + "-" + revision;
 
-                status = 1;
                 var new_topic = new Topic(Topic.ID_Topic, Topic.Topic_type, changeItem, productType, revision, model,partNo, partName, processName, status, appDescription, subject, detail, timing, Topic.File, temp_related,(string)(Session["User"]), date );
                 ID = _requestModel.UpdateTopic(new_topic);
 

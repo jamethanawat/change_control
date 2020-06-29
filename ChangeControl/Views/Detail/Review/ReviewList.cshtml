@@ -1,0 +1,148 @@
+@{
+    var str_date = "05 มิถุนายน 2020";
+    var i = 0;
+    var tlb = "";
+    string department = (string)Session["Department"];
+    var isManager = false;
+    if((string)Session["Position"] == "Manager"){
+        isManager = true;
+    }
+    
+}
+
+@foreach(var Review in Model){
+if(Review.Item.Count != 0){
+
+<div>
+    @* <i class="fas bg-primary" style="font-family:Kanit !important">@Html.DisplayFor(model => Review.Department)</i> *@
+    @if(Review.Status == 1){
+        <i class="fas fa-check bg-primary blue-tooltip" data-toggle="tooltip" data-placement="top" title="Approved"></i>
+    }else if(Review.Status == 3){
+        <i class="far fa-clock bg-warning blue-tooltip" data-toggle="tooltip" data-placement="top" title="Waiting for approve"></i>
+    }else if(Review.Status == 4){
+        <i class="fas fa-info bg-warning blue-tooltip" data-toggle="tooltip" data-placement="top" title="Need more information"></i>
+    }else{
+        <i class="fas fa-question bg-error blue-tooltip" data-toggle="tooltip" data-placement="top" title="Unknown"></i>
+    }
+    @{tlb = "tlb" + i;}
+    <div class="timeline-item card">
+        <div class="timeline-header card-header d-flex" style="padding: 10px 10px 5px 10px;"  data-card-widget="collapse">
+                <h6 class="mr-auto" style="font-family:Kanit"> @Review.Department - @Review.Profile.Name @Review.Profile.SurName (@Review.Date) </h6>
+                <button type="button" class="btn btn-tool arrow-collapse" data-card-widget="collapse"><i class="fas fa-chevron-down"></i></button>
+        </div>
+
+        <div class="timeline-body card-body">
+                <form class="form-horizontal">
+                    @{var ReviewItem = Review.Item;}
+                    @foreach(var Item in ReviewItem){
+                        var temp_status = (String)null;
+                        if(Item.Status == true){
+                            temp_status = "Yes";
+                        }else if(Item.Status == false){
+                            temp_status = "No";
+                        }else if(Item.Status == null){
+                            temp_status = "-";
+                        }
+                    <div class="row">
+                        <label class="col-sm-4 col-form-label" style="text-align:right">
+                            @Item.Name :
+                        </label>
+                        <div class="col-sm-8 col-form-label">
+                            @if(temp_status != null && Item.Description != ""){
+                                if(temp_status != "-"){
+                                    <span>@temp_status</span>
+                                    <span>,</span>
+                                }
+                                <span>@Item.Description</span><br>
+                            }else if(temp_status != null && Item.Description == ""){
+                                <span>@temp_status</span>
+                            }
+                        </div>
+                    </div>
+                    }
+                    <div class="row">
+                        <label class="col-sm-4 col-form-label" style="text-align:right">
+                            Approved By :
+                        </label>
+                        <div class="col-sm-8 col-form-label">
+                            <span>
+                                Pakawat Smutkun (@Review.Date)
+                            </span>
+                        </div>
+                    </div>
+                </form>
+
+                @if(Review.FileList != null){
+                    if(Review.FileList.Count != 0){
+                <div class="col-sm-12 d-flex mt-4">
+                <ul class="mailbox-attachments d-flex flex-wrap align-items-stretch clearfix">
+                    @{var FileList = Review.FileList;
+                        foreach(var File in FileList){
+                            var FileSize = "0 Bytes";
+                            <li>
+                                <span class="mailbox-attachment-icon">
+                                    @{var FileType = Path.GetExtension(File.Name);}
+                                    @if(FileType == ".docx" || FileType == ".doc" ){
+                                        <i class="far fa-file-word"></i>
+                                    }else if(FileType == ".pptx" || FileType == ".ppt" ){
+                                        <i class="far fa-file-powerpoint"></i>
+                                    }else if(FileType == ".xls" || FileType == ".xlxs" ){
+                                        <i class="far fa-file-excel"></i>
+                                    }else if(FileType == ".pdf"){
+                                        <i class="far fa-file-pdf"></i>
+                                    }else if(FileType == ".png" || FileType == ".jpeg" || FileType == ".jpg" || FileType == ".JPG" || FileType == ".gif" ){
+                                        <i class="far fa-file-image"></i>
+                                    }else{
+                                        <i class="far fa-file"></i>
+                                    }
+                                </span>
+                                <div class="mailbox-attachment-info">
+                                    <a href="#" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> @File.Name
+                                    </a>
+                                    <span class="mailbox-attachment-size clearfix mt-1">
+                                    @if(File.Size != null){
+                                        if(File.Size > 1000){
+                                            FileSize = (File.Size / 1000) + " KB";
+                                        }else{
+                                            FileSize = File.Size + " Bytes";
+                                        }
+                                    }
+                                        <span>@FileSize</span>
+                                        <a href="#" class="btn btn-default btn-sm float-right"><i class="fas fa-cloud-download-alt"></i></a>
+                                    </span>
+                                </div>
+                            </li>
+                        }
+                    }
+                    </ul>
+                    </div>
+                    }
+                }
+        </div>
+        @{
+            var isDepartment = false;
+            if(department == Review.Department){
+                    isDepartment = true;
+            }
+
+            if((isManager || isDepartment) && Review.Status != 1){
+            <hr style="margin-top:0px !important">
+            <div class="timeline-footer">
+                <div class="float-right ">
+                    @* <a href="#" class="btn btn-warning btn-sm">Request Re-Submit</a> *@
+                    @if(Review.Status !=1 && isDepartment){
+                        <a href="#" class="btn btn-warning btn-sm" >Edit</a> 
+                    }
+                    @if(Review.Status !=5 && Review.Status !=6 && isManager){
+                        <a a href="#" class="btn btn-success btn-sm style="margin-right:10px"">Approve</a>
+                    }
+                </div>
+            </div>
+            }
+        }
+    </div>  
+</div>
+}
+    i++;
+
+}

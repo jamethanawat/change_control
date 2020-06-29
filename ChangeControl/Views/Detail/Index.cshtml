@@ -17,7 +17,6 @@
         isManager = true;
     }
 
-    
     string department = (string)Session["Department"];
     var isPEProcess = false;
     var isQC = false;
@@ -68,6 +67,8 @@
     InsertFileResponsePath = '@Url.Action("SubmitFileResponse", "Detail")';
     InsertRelatedPath = '@Url.Action("SubmitRelated", "Detail")';
     InsertResponsePath = '@Url.Action("SubmitResponse", "Detail")';
+    InsertTrialPath = '@Url.Action("SubmitTrial", "Detail")';
+    InsertFileTrialPath = '@Url.Action("SubmitFileTrial", "Detail")';
     DepartmentLists = @Html.Raw(Json.Encode(DepartmentLists));
     ReqResubmitPath = '@Url.Action("RequestResubmit", "Detail")';
     topic_status = '@status';
@@ -418,163 +419,23 @@
                                         </div>
                                         <!-- /.timeline-label -->
                                         <!-- timeline item -->
-                                        @* @if(ReviewList != null){ *@
-                                            @{var i = 0;}
-                                            @{var tlb = "";}
-                                            @foreach(var Review in ReviewList){
-                                            if(Review.Item.Count != 0){
-
-                                            <div>
-                                                @* <i class="fas bg-primary" style="font-family:Kanit !important">@Html.DisplayFor(model => Review.Department)</i> *@
-                                                @if(Review.Status == 1){
-                                                    <i class="fas fa-check bg-primary blue-tooltip" data-toggle="tooltip" data-placement="top" title="Approved"></i>
-                                                }else if(Review.Status == 3){
-                                                    <i class="far fa-clock bg-warning blue-tooltip" data-toggle="tooltip" data-placement="top" title="Waiting for approve"></i>
-                                                }else if(Review.Status == 4){
-                                                    <i class="fas fa-info bg-warning blue-tooltip" data-toggle="tooltip" data-placement="top" title="Need more information"></i>
-                                                }else{
-                                                    <i class="fas fa-question bg-error blue-tooltip" data-toggle="tooltip" data-placement="top" title="Unknown"></i>
-                                                }
-                                                @{tlb = "tlb" + i;}
-                                                <div class="timeline-item card">
-                                                    <div class="timeline-header card-header d-flex" style="padding: 10px 10px 5px 10px;"  data-card-widget="collapse">
-                                                            <h6 class="mr-auto" style="font-family:Kanit"> @Review.Department - @Review.Profile.Name @Review.Profile.SurName (@Review.Date) </h6>
-                                                            <button type="button" class="btn btn-tool arrow-collapse" data-card-widget="collapse"><i class="fas fa-chevron-down"></i></button>
-                                                    </div>
-
-                                                    <div class="timeline-body card-body">
-                                                            <form class="form-horizontal">
-                                                                @{var ReviewItem = Review.Item;}
-                                                                @foreach(var Item in ReviewItem){
-                                                                    var temp_status = (String)null;
-                                                                    if(Item.Status == true){
-                                                                        temp_status = "Yes";
-                                                                    }else if(Item.Status == false){
-                                                                        temp_status = "No";
-                                                                    }else if(Item.Status == null){
-                                                                        temp_status = "-";
-                                                                    }
-                                                                <div class="row">
-                                                                    <label class="col-sm-4 col-form-label" style="text-align:right">
-                                                                        @Html.DisplayFor(model => Item.Name) :
-                                                                    </label>
-                                                                    <div class="col-sm-8 col-form-label">
-                                                                        @if(temp_status != null && Item.Description != ""){
-                                                                            if(temp_status != "-"){
-                                                                                <span>@Html.DisplayFor(model => temp_status)</span>
-                                                                                <span>,</span>
-                                                                            }
-                                                                            <span>@Html.DisplayFor(model => Item.Description)</span><br>
-                                                                        }else if(temp_status != null && Item.Description == ""){
-                                                                            <span>@Html.DisplayFor(model => temp_status)</span>
-                                                                        }
-                                                                    </div>
-                                                                </div>
-                                                                }
-                                                                <div class="row">
-                                                                    <label class="col-sm-4 col-form-label" style="text-align:right">
-                                                                        Approved By :
-                                                                    </label>
-                                                                    <div class="col-sm-8 col-form-label">
-                                                                        <span>
-                                                                            Pakawat Smutkun (05 มิถุนายน 2020)
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-                                                            </form>
-
-                                                            @if(Review.FileList != null){
-                                                                if(Review.FileList.Count != 0){
-                                                            <div class="col-sm-12 d-flex mt-4">
-                                                            <ul class="mailbox-attachments d-flex flex-wrap align-items-stretch clearfix">
-                                                                @{var FileList = Review.FileList;
-                                                                    foreach(var File in FileList){
-                                                                        var FileSize = "0 Bytes";
-                                                                        <li>
-                                                                            <span class="mailbox-attachment-icon">
-                                                                                @{var FileType = Path.GetExtension(File.Name);}
-                                                                                @if(FileType == ".docx" || FileType == ".doc" ){
-                                                                                    <i class="far fa-file-word"></i>
-                                                                                }else if(FileType == ".pptx" || FileType == ".ppt" ){
-                                                                                    <i class="far fa-file-powerpoint"></i>
-                                                                                }else if(FileType == ".xls" || FileType == ".xlxs" ){
-                                                                                    <i class="far fa-file-excel"></i>
-                                                                                }else if(FileType == ".pdf"){
-                                                                                    <i class="far fa-file-pdf"></i>
-                                                                                }else if(FileType == ".png" || FileType == ".jpeg" || FileType == ".jpg" || FileType == ".JPG" || FileType == ".gif" ){
-                                                                                    <i class="far fa-file-image"></i>
-                                                                                }else{
-                                                                                    <i class="far fa-file"></i>
-                                                                                }
-                                                                            </span>
-                                                                            <div class="mailbox-attachment-info">
-                                                                                <a href="#" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> @Html.DisplayFor(model => File.Name)
-                                                                                </a>
-                                                                                <span class="mailbox-attachment-size clearfix mt-1">
-                                                                                @if(File.Size != null){
-                                                                                    if(File.Size > 1000){
-                                                                                        FileSize = (File.Size / 1000) + " KB";
-                                                                                    }else{
-                                                                                        FileSize = File.Size + " Bytes";
-                                                                                    }
-                                                                                }
-                                                                                    <span>@FileSize</span>
-                                                                                    <a href="#" class="btn btn-default btn-sm float-right"><i class="fas fa-cloud-download-alt"></i></a>
-                                                                                </span>
-                                                                            </div>
-                                                                        </li>
-                                                                    }
-                                                                }
-                                                                </ul>
-                                                                </div>
-                                                                }
-                                                            }
-                                                    </div>
-                                                    @{
-                                                        var isDepartment = false;
-                                                        if(department == Review.Department){
-                                                             isDepartment = true;
-                                                        }
-
-                                                        if((isManager || isDepartment) && Review.Status != 1){
-                                                        <hr style="margin-top:0px !important">
-                                                        <div class="timeline-footer">
-                                                            <div class="float-right ">
-                                                                @* <a href="#" class="btn btn-warning btn-sm">Request Re-Submit</a> *@
-                                                                @if(Review.Status !=1 && isDepartment){
-                                                                    <a href="#" class="btn btn-warning btn-sm" >Edit</a> 
-                                                                }
-                                                                @if(Review.Status !=5 && Review.Status !=6 && isManager){
-                                                                    <a a href="#" class="btn btn-success btn-sm style="margin-right:10px"">Approve</a>
-                                                                }
-                                                            </div>
-                                                        </div>
-                                                        }
-                                                    }
-                                                </div>  
-                                            </div>
-                                            }
-                                             i++;
-
-                                            }
+                                            @Html.Partial("Review/ReviewList",ReviewList) 
                                         @* } *@
                                         <!-- END timeline item -->
                                         @if(status == "Trial" || status == "Closed"){
                                         <!-- timeline time label -->
                                         <div class="time-label">
                                             <span class="bg-primary">
-                                                Trail & Follow up status <br> <span class="time"><i class="far fa-clock"></i> 27 mins ago</span>
+                                                Trail and following
                                             </span>
                                         </div>
                                         <!-- /.timeline-label -->
                                         <!-- timeline item -->
                                         <div>
                                             <i class="fas fa-comments bg-warning"></i>
-
                                             <div class="timeline-item">
-                                                <!--span class="time"><i class="far fa-clock"></i> 27 mins ago</span>
 
-                                                <h3 class="timeline-header"><a href="#">Jay White</a> commented on your post</h3-->
+                                                <h3 class="timeline-header"><a href="#">Jay White</a> commented on your post</h3>
 
                                                 <div class="timeline-body">
                                                     <p style="background-color: rgb(248, 249, 250);"><span style="background-color: rgb(255, 255, 255);"><font color="#495057" face="Arial, Helvetica, sans-serif"><b>Suggestion</b></font></span>
@@ -688,122 +549,27 @@
                                 @if(status == "Trial" && isTrialable){
                                     <hr><br>
                                     <h1>Trial</h1><br>
-                                    <form class="form-horizontal"  action="javascript:void(0);" id="Review">
-                                        <div class="form-group row">
-                                            <label for="inputAcceptance" class="col-sm-2 col-form-label">Evaluation result</label>
-
-                                            <div class="col-sm-3 col-form-label">
-                                                <label style="margin-right: 15px;">
-                                                    <input type="radio" name="rd-0" value="1" class="flat-red" checked>
-                                                    Acceptance
-                                                </label>
-                                                <label style="margin-right: 15px;">
-                                                    <input type="radio" name="rd-0" value="0" class="flat-red">
-                                                    Not, Acceptance
-                                                </label>
-                                            </div>
-                                            <div class="col-sm-7 col-form-label">
-                                                <label>Not Approve reason :</label>
-                                                <input type="text" name="desc-0" class="form-control" placeholder="200 character limit ">
-                                            </div>
+                                    <form class="form-horizontal"  action="javascript:void(0);" id="Trial">
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label " >
+                                            Description:
+                                        </label>
+                                        <div class="col-sm-10 col-form-label">
+                                            <textarea class="form-control" name="desc" placeholder="" style="height:20vh"></textarea>
                                         </div>
-                                        <div class="form-group row">
-                                            <label for="inputChangeDetails" class="col-sm-2 col-form-label">Change date</label>
-                                            <div class="col-sm-10 col-form-label">
-                                                <input data-toggle="datepicker" class="form-control" placeholder="Select Date " autocomplete="off" name="desc-32">
-                                                <div data-toggle="datepicker"></div>
-                                                @* <input type="text" name="desc-32" class="form-control" placeholder="Enter Date "> *@
-                                            </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label " >
+                                            Attach File:
+                                        </label>
+                                        <div class="col-sm-10">
+                                            <input type="file" class="my-pond" name="filepond"/>
                                         </div>
-                                        <div class="form-group row">
-                                            <label for="inputChangeDetails" class="col-sm-2 col-form-label">Change details</label>
-                                            <div class="col-sm-10 col-form-label">
-                                                <input type="text" name="desc-1" class="form-control" placeholder="500 character limit">
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <label for="inputProDesRe" class="col-sm-2 col-form-label">Process design review</label>
-                                            <div class="col-sm-3 col-form-label">
-                                                <label style="margin-right: 15px;">
-                                                    <input type="radio" name="rd-2" value="1" class="flat-red" checked>
-                                                    Yes
-                                                </label>
-                                                <label style="margin-right: 15px;">
-                                                    <input type="radio" name="rd-2" value="0" class="flat-red">
-                                                    No, Acceptance
-                                                </label>
-                                            </div>
-                                            <div class="col-sm-7 col-form-label">
-                                                <label>if yes,inform to NS   Due date :</label>
-                                                <textarea name="desc-2" class="form-control" placeholder=""></textarea>
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <label for="inputEffeDoc" class="col-sm-2 col-form-label">Effected to Document (Control Plan ,FMEA)</label>
-                                            <div class="col-sm-3 col-form-label">
-                                                <label style="margin-right: 15px;">
-                                                    <input type="radio" name="rd-3" value="1" class="flat-red" checked>
-                                                    Yes
-                                                </label>
-                                                <label style="margin-right: 15px;">
-                                                    <input type="radio" name="rd-3" value="0" class="flat-red">
-                                                    No, Acceptance
-                                                </label>
-                                            </div>
-                                            <div class="col-sm-4 col-form-label">
-                                                <label>Control Plan no. :</label>
-                                                <textarea name="desc-29" class="form-control" placeholder=""></textarea>
-                                            </div>
-                                            <div class="col-sm-3 col-form-label">
-                                                <label>FMEA No. :</label>
-                                                <textarea name="desc-30" class="form-control" placeholder=""></textarea>
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <label for="inputSkills" class="col-sm-2 col-form-label">Due Date</label>
-                                                <div class="col-sm-10 col-form-label">
-                                                <input data-toggle="datepicker" class="form-control" placeholder="Select Date " autocomplete="off" name="desc-31">
-                                                <div data-toggle="datepicker"></div>
-                                                @* <input type="text" name="desc-32" class="form-control" placeholder="Enter Date "> *@
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <label for="inputSkills" class="col-sm-2 col-form-label">Others  (Please specify)</label>
-                                            <div class="col-sm-10 col-form-label">
-                                                <input name="desc-22" type="text" class="form-control" placeholder="500 character limit">
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <label for="inputReqReTrial" class="col-sm-2 col-form-label">Request Trial</label>
-                                            <div class="col-sm-3 col-form-label">
-                                                <label style="margin-right: 15px;">
-                                                    <input type="radio" name="rd-24" value="1" class="flat-red" checked>
-                                                    Yes
-                                                </label>
-                                                <label style="margin-right: 15px;">
-                                                    <input type="radio" name="rd-24" value="0" class="flat-red">
-                                                    No, Acceptance
-                                                </label>
-                                            </div>
-                                            <div class="col-sm-7 col-form-label">
-                                                <label>Details :</label>
-                                                <textarea class="form-control" name="desc-24" placeholder=""></textarea>
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <label for="inputSkills" class="col-sm-2 col-form-label">Attach File</label>
-                                            <div class="col-sm-10">
-                                                <input type="file" class="my-pond" name="filepond"/>
-                                                @* <input type="file" name="filepond" data-max-files="10" required> *@
-                                            </div>
-                                        </div>
-                                        <br>
-                                        <hr>
-                                        <br>
+                                    </div>
+                                    <hr><br>
                                         <div class="form-group row">
                                             <div class="col-sm-12">
-                                                <button type="button" class="btn btn-warning float-left" style="color:white" data-toggle="modal" data-target="#resubmit_modal">Request Re-Submit</button>
-                                                <button type="submit" class="btn btn-info float-right">Submit</button>
+                                                <button type="submit" id="trial_submit" class="btn btn-info float-right">Submit</button>
                                             </div>
                                         </div>
                                     </form>                                    

@@ -20,6 +20,7 @@ namespace ChangeControl.Controllers
         public static int ID;
         public static int related_id;
         public static int response_id;
+        public static int trial_id;
         public List<Review> ReviewList = new List<Review>();
         public static int ReviewID;
         public static int? FileID;
@@ -39,8 +40,7 @@ namespace ChangeControl.Controllers
 
         public bool isTrialable = false;
         public ActionResult Index(string id){
-            if ((string)(Session["User"]) == null)
-            {
+            if ((string)(Session["User"]) == null){
                 Session["url"] = "Detail";
                 return RedirectToAction("Index", "Login");
             }
@@ -294,6 +294,41 @@ namespace ChangeControl.Controllers
             }catch (Exception ex){
                 return Json(new {code=false}, JsonRequestBehavior.AllowGet);
             }
+        }
+
+        [HttpPost]
+        public ActionResult SubmitTrial(string desc){
+            try{
+                var temp_user = Session["User"].ToString();
+                var temp_department = Session["Department"].ToString();
+                trial_id = _detailModel.InsertTrial(Topic.ID ,desc, temp_department, temp_user);
+                return Json(new { code = true },JsonRequestBehavior.AllowGet);
+            }catch (Exception ex){
+                return Json(new { code = false }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public ActionResult SubmitFileTrial(RawFile file_item){
+             _detailModel.key = DetailController.FileCode;
+
+            Value temp_file = new Value();
+            temp_file = Session["TxtFile"] as Value;
+            
+            var date_ff = DateTime.Now.ToString("yyyyMMddHHmmss.fff");
+            var date = DateTime.Now.ToString("yyyyMMddHHmmss");
+
+            var temp_file_code =  trial_id.ToString("0000");;
+            var file_code = $"TR-{temp_file_code}";
+            if (file_item.file != null && file_item.file.ContentLength > 0){
+                var InputFileName = Path.GetFileName(date_ff);
+                var ServerSavePath = Path.Combine("D:/File/Topic/" + InputFileName);
+                file_item.file.SaveAs(ServerSavePath);
+                if(file_item.description == "null" || file_item.description == null) file_item.description = " ";
+                _detailModel.InsertFile(file_item.file, file_code, file_item.description, Session["User"]);
+            }
+            _detailModel.UpdateTrialFileCode((int) trial_id, file_code);
+            return Json(new {code=1}, JsonRequestBehavior.AllowGet);
         }
 
     }

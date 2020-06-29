@@ -113,10 +113,8 @@ namespace ChangeControl.Models
             return result;
 
         }
-        public TopicAlt GetTopicByID(string TopicID)
-        {
-            try
-            {
+        public TopicAlt GetTopicByID(string TopicID){
+            try{
                 var sql = $@"SELECT ID_Topic, Topic_type, Item as Change_item, Product_Type.Product_type, Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, Timing, [File], Related, User_insert, Time_insert, 
                 ID FROM CCS.dbo.Topic 
                 LEFT JOIN Change_Item ON Topic.Change_item = ID_Change_item 
@@ -297,5 +295,22 @@ namespace ChangeControl.Models
                 return false;
             }
         }
+
+        public int InsertTrial(int topic_id,string desc, string department, string user){
+            try{
+                var sql= $@"INSERT INTO CCS.dbo.Trial (Topic, Detail, [Date], [User], Revision, Department, Status, UpdateDate, UpdateBy) 
+                OUTPUT Inserted.ID_Trial 
+                VALUES({topic_id}, '{desc}', '{date}','{user}', 1, '{department}', 3, '{date}', '{user}');";
+                var result = _dbCCS.Database.SqlQuery<int>(sql).First();
+                return result;
+            }catch(Exception ex){
+                return 0;
+            }
+        }
+
+        public void UpdateTrialFileCode(int trial_id,string file_code){
+            string sql = $"UPDATE CCS.dbo.Trial SET [File]='{file_code}' WHERE ID_Trial={trial_id}";
+            _dbCCS.Database.ExecuteSqlCommand(sql);
+        } 
     }
 }
