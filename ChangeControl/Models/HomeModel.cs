@@ -104,8 +104,8 @@ namespace ChangeControl.Models
             //sql = "SELECT ID_Topic,Topic_type,Change_item,Product_type,Revision,Model,PartNo,PartName,User_insert FROM Topic INNER JOIN";
             //sql = sql + "[User] ON Topic.User_insert = [User].Name";
             // Session["sql"] = sql;
-            var result = _dbCCS.Database.SqlQuery<SearchResult>(sql);
-            return result.ToList();
+            var result = _dbCCS.Database.SqlQuery<SearchResult>(sql).ToList();
+            return result;
         } 
     }
 }

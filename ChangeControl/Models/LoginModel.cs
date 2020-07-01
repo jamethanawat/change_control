@@ -32,7 +32,6 @@ namespace ChangeControl.Models{
                 // CheckUser.LdapAuth chk = new CheckUser.LdapAuth();
                 // bool result = chk.checkLogin(user, password);
                 myAD.ADInfo conAD = new myAD.ADInfo();
-                bool chk = false;
                 bool FoundUser = conAD.ChkAuth(user,password);
                 if (FoundUser){
                     User temp_user = new User(conAD.ChkFullName(user), conAD.ChkName(user), conAD.ChkSurName(user), conAD.ChkEmail(user),conAD.ChkDept(user), conAD.ChkPosition(user));
@@ -41,14 +40,12 @@ namespace ChangeControl.Models{
                     response.message = "success";
                     response.data = temp_user;
                     return response;
-                }
-                else{
+                }else{
                     return response;
                 }
              
             }
-            catch (Exception er)
-            {
+            catch (Exception er){
                 return response;
             }  
          } 

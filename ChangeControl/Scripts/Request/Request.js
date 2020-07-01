@@ -112,34 +112,23 @@ $(document).ready(function () {
                     console.log('files: ',files);
                     
                     files.forEach(element => {
-                        if(element.id != null){
-                            promises.push(
-                                $.post(
-                                    UpdateFilePath, {'id': element.id, 'description': element.description}
-                                ).fail((xhr, status, error) => {
-                                    var errorMessage = xhr.status + ': ' + xhr.statusText
-                                    alert('Error - ' + errorMessage);
-                                })
-                            );
-                        }else{
-                            var Data = new FormData();
-                            Data.append("file",element.file);
-                            Data.append("description",element.description);
-                            promises.push($.ajax({
-                                type: "POST",
-                                url: InsertFilePath,
-                                data: Data,
-                                cache: false,
-                                processData: false,
-                                contentType: false,
-                                success: function () {
-                                },
-                                error: function(xhr, status, error) {
-                                    var errorMessage = xhr.status + ': ' + xhr.statusText
-                                    alert('Error - ' + errorMessage);
-                                }
-                                }));
-                        }
+                        var Data = new FormData();
+                        Data.append("file",element.file);
+                        Data.append("description",element.description);
+                        promises.push($.ajax({
+                            type: "POST",
+                            url: InsertFilePath,
+                            data: Data,
+                            cache: false,
+                            processData: false,
+                            contentType: false,
+                            success: function () {
+                            },
+                            error: function(xhr, status, error) {
+                                var errorMessage = xhr.status + ': ' + xhr.statusText
+                                alert('Error - ' + errorMessage);
+                            }
+                        }));
                     });
                     
                     Promise.all(promises).then(() => {

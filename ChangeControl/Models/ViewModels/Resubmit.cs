@@ -5,7 +5,7 @@ using System.Web;
 
 namespace ChangeControl.Models{
     public class Resubmit{
-        public int ID { get; set; }
+        public long ID { get; set; }
         public string Description{ get; set; }
         public string DueDate { get; set; }
         public string Date { get; set; }

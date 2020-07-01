@@ -5,9 +5,8 @@ using System.Web;
 
 namespace ChangeControl.Models{
     public class Review{
-        public int ID_Review { get; set; }
-        public int Topic { get; set; }
-        public string File{ get; set; }
+        public long ID_Review { get; set; }
+        public long Topic { get; set; }
         public string Date { get; set; }
         public string User { get; set; }
         public string Department { get; set; }

@@ -5,9 +5,10 @@ using System.Web;
 
 namespace ChangeControl.Models{
     public class Response{
-        public int ID { get; set; }
+        public long ID { get; set; }
+        public long Resubmit { get; set; }
         public string Description{ get; set; }
-        public string File { get; set; }
+        public long File { get; set; }
         public string Department{ get; set; }
         public string Date { get; set; }
         public string User { get; set; }

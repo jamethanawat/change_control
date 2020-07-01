@@ -5,8 +5,8 @@ using System.Web;
 
 namespace ChangeControl.Models{
     public class Topic_Approve{
-        public int ID { get; set; }
-        public int Topic { get; set; }
+        public long ID { get; set; }
+        public long Topic { get; set; }
         public string RequestBy { get; set; }
         public string RequestDate { get; set; }
         public string ReviewBy { get; set; }

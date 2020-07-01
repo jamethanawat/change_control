@@ -13,8 +13,8 @@ using System.Configuration;
 
 namespace ChangeControl.Models{
     public class RequestModel{
-        private DbTapics _dbtapics;
-        private DbCCS _dbCCS;
+        private DbTapics DB_Tapics;
+        private DbCCS DB_CCS;
 
 
         private DataSet ds = new DataSet();
@@ -31,8 +31,8 @@ namespace ChangeControl.Models{
         }
 
         public RequestModel(){
-            _dbtapics = new DbTapics();
-            _dbCCS = new DbCCS();
+            DB_Tapics = new DbTapics();
+            DB_CCS = new DbCCS();
             date = DateTime.Now.ToString("yyyyMMddHHmmss");
             date_ff = DateTime.Now.ToString("yyyyMMddHHmmss.fff");
         }
@@ -80,125 +80,126 @@ namespace ChangeControl.Models{
 
         public void DeleteFile(){
             string del = "DELETE FROM [File] WHERE ID_File like '%" + ForeignKey + "%' ";
-            _dbCCS.Database.ExecuteSqlCommand(del);
+            DB_CCS.Database.ExecuteSqlCommand(del);
         }
 
-        public int InsertFile(HttpPostedFileBase file, string FileCode, string description, object session_user){
-            string query = $"INSERT INTO [File] ( ID_File, Name, Size, Name_Format, Description, Time_Insert, User_Insert) OUTPUT Inserted.ID VALUES( '{FileCode}','{file.FileName.ToString()}','{file.ContentLength}','{date_ff}','{description}','{date}','{session_user}');";
-            // _dbCCS.Database.ExecuteSqlCommand(query);
-            var result = _dbCCS.Database.SqlQuery<int>(query).First();
+        public long InsertFile(HttpPostedFileBase file, long fk_id, string type, string description, object session_user){
+            string query = $@"INSERT INTO [File] (FK_ID, [Type], Name, Size, Name_Format, Description, Time_Insert, User_Insert) 
+            OUTPUT Inserted.ID VALUES({fk_id}, '{type}', '{file.FileName.ToString()}','{file.ContentLength}','{date_ff}','{description}','{date}','{session_user}');";
+            long result = DB_CCS.Database.SqlQuery<long>(query).First();
             return result;
         }
 
         public void UpdateFile(string id, object description){
-            int ID = int.Parse(id);
+            long ID = int.Parse(id);
             string query = $"UPDATE [File] SET Description= '{description}', Time_Insert ='{date}' WHERE ID = {ID}";
-            _dbCCS.Database.ExecuteSqlCommand(query);
+            DB_CCS.Database.ExecuteSqlCommand(query);
         }
-        public void UpdateTopicFileCode(int ReviewID, string FileCode){
-            string query = $"UPDATE CCS.dbo.Topic SET [File]='{FileCode}' WHERE ID = {ReviewID}";
-            _dbCCS.Database.ExecuteSqlCommand(query);
-        }
-        
         public List<GetID> GetExternalTopicId(){
             var sql = $"SELECT TOP(1) ID_Topic FROM Topic WHERE ID_Topic LIKE 'EX-{date.Substring(2,2)}%' ORDER BY ID_Topic DESC";
-            var dept = _dbCCS.Database.SqlQuery<GetID>(sql);
+            var dept = DB_CCS.Database.SqlQuery<GetID>(sql);
             return dept.ToList();
         }
         public List<GetID> GetInternalTopicId(){
             var sql = $"SELECT TOP(1) ID_Topic FROM Topic WHERE ID_Topic LIKE 'IN-{date.Substring(2,2)}%' ORDER BY ID_Topic DESC";
-            var dept = _dbCCS.Database.SqlQuery<GetID>(sql);
+            var dept = DB_CCS.Database.SqlQuery<GetID>(sql);
             return dept.ToList();
         }
 
-        public int InsertTopic(Topic m){
-            string query = "INSERT INTO Topic (ID_Topic,Topic_type, Change_item, Product_type, Revision , Model, PartNo, PartName, ProcessName, Status, [APP/IPP], Subject, Detail, Timing ,Related, User_insert, Time_insert)  OUTPUT Inserted.ID ";
-            query = query + $"VALUES( '{m.ID_Topic}','{m.Topic_type}', {m.Change_item} , '{m.Product_type}' , '{m.Revision}' ,'{m.Model}', '{m.PartNo}', '{m.PartName}', '{m.ProcessName}', '{m.Status}', '{m.App}' , '{m.Subject}' , '{m.Detail}', '{m.Timing}', '{m.Related}','{m.User_insert}','{m.Time_insert}' );";
-            var result = _dbCCS.Database.SqlQuery<int>(query).First();
+        public long InsertTopic(Topic m){
+            string query = $@"INSERT INTO Topic (ID_Topic,Topic_type, Change_item, Product_type, Revision , Model, PartNo, PartName, ProcessName, Status, [APP/IPP], Subject, Detail, Timing ,Related, User_insert, Time_insert)  OUTPUT Inserted.ID 
+            VALUES( '{m.ID_Topic}','{m.Topic_type}', {m.Change_item} , '{m.Product_type}' , '{m.Revision}' ,'{m.Model}', '{m.PartNo}', '{m.PartName}', '{m.ProcessName}', '{m.Status}', '{m.App}' , '{m.Subject}' , '{m.Detail}', '{m.Timing}', '{m.Related}','{m.User_insert}','{m.Time_insert}' );";
+            var result = DB_CCS.Database.SqlQuery<long>(query).First();
             return result;
         }
 
-         public int UpdateTopic(Topic m){
-            string query = $@"INSERT INTO Topic (ID_Topic,Topic_type, Change_item, Product_type, Revision , Model, PartNo, PartName, ProcessName, Status, [APP/IPP], Subject, Detail, Timing , [File],Related, User_insert, Time_insert)  OUTPUT Inserted.ID VALUES( '{m.ID_Topic}','{m.Topic_type}', {m.Change_item} , '{m.Product_type}' , '{m.Revision}' ,'{m.Model}', '{m.PartNo}', '{m.PartName}', '{m.ProcessName}', '{m.Status}', '{m.App}' , '{m.Subject}' , '{m.Detail}', '{m.Timing}','{m.File}','{m.Related}','{m.User_insert}','{m.Time_insert}' );";
-            var result = _dbCCS.Database.SqlQuery<int>(query).First();
+         public long UpdateTopic(Topic m){
+            string query = $@"INSERT INTO Topic (ID_Topic,Topic_type, Change_item, Product_type, Revision , Model, PartNo, PartName, ProcessName, Status, [APP/IPP], Subject, Detail, Timing , [File],Related, User_insert, Time_insert)  
+            OUTPUT Inserted.ID VALUES( '{m.ID_Topic}','{m.Topic_type}', {m.Change_item} , '{m.Product_type}' , '{m.Revision}' ,'{m.Model}', '{m.PartNo}', '{m.PartName}', '{m.ProcessName}', '{m.Status}', '{m.App}' , '{m.Subject}' , '{m.Detail}', '{m.Timing}','{m.Related}','{m.User_insert}','{m.Time_insert}' );";
+            var result = DB_CCS.Database.SqlQuery<long>(query).First();
             return result;
         }
 
         public void DeleteRelated(string ID_Related){
             string del = $"DELETE FROM Related WHERE ID_Related like '% {ID_Related}%' ";
-            _dbCCS.Database.ExecuteSqlCommand(del);
+            DB_CCS.Database.ExecuteSqlCommand(del);
         }
         public void InsertRelated(string key,Related obj){
-            string query = "INSERT INTO Related (ID_Related, PT1, PT2, PT3A, PT3M, PT4, PT5, PT6, PT7, IT, MKT, PC1, PC2, PCH1, PCH2, PE1, PE2, PE2_SMT, PE2_PCB, PE2_MT, QC_IN1, QC_IN2, QC_IN3, QC_FINAL1, QC_FINAL2, QC_FINAL3, QC_NFM1, QC_NFM2, QC_NFM3, QC1, QC2, QC3, PE1_Process, PE2_Process)";
-            query = query + $"VALUES( '{key}','{obj.PT1}', '{obj.PT2}', '{obj.PT3A}', '{obj.PT3M}', '{obj.PT4}', '{obj.PT5}', '{obj.PT6}', '{obj.PT7}', '{obj.IT}', '{obj.MKT}', '{obj.PC1}', '{obj.PC2}', '{obj.PCH1}', '{obj.PCH2}', '{obj.PE1}', '{obj.PE2}', '{obj.PE2_SMT}', '{obj.PE2_PCB}', '{obj.PE2_MT}', '{obj.QC_IN1}', '{obj.QC_IN2}', '{obj.QC_IN3}', '{obj.QC_FINAL1}', '{obj.QC_FINAL2}', '{obj.QC_FINAL3}', '{obj.QC_NFM1}', '{obj.QC_NFM2}', '{obj.QC_NFM3}', '{obj.QC1}', '{obj.QC2}', '{obj.QC3}', '{obj.PE1_Process}', '{obj.PE2_Process}');";
-            _dbCCS.Database.ExecuteSqlCommand(query);
+            string query = $@"INSERT INTO Related (ID_Related, PT1, PT2, PT3A, PT3M, PT4, PT5, PT6, PT7, IT, MKT, PC1, PC2, PCH1, PCH2, PE1, PE2, PE2_SMT, PE2_PCB, PE2_MT, QC_IN1, QC_IN2, QC_IN3, QC_FINAL1, QC_FINAL2, QC_FINAL3, QC_NFM1, QC_NFM2, QC_NFM3, QC1, QC2, QC3, PE1_Process, PE2_Process)
+            VALUES( '{key}','{obj.PT1}', '{obj.PT2}', '{obj.PT3A}', '{obj.PT3M}', '{obj.PT4}', '{obj.PT5}', '{obj.PT6}', '{obj.PT7}', '{obj.IT}', '{obj.MKT}', '{obj.PC1}', '{obj.PC2}', '{obj.PCH1}', '{obj.PCH2}', '{obj.PE1}', '{obj.PE2}', '{obj.PE2_SMT}', '{obj.PE2_PCB}', '{obj.PE2_MT}', '{obj.QC_IN1}', '{obj.QC_IN2}', '{obj.QC_IN3}', '{obj.QC_FINAL1}', '{obj.QC_FINAL2}', '{obj.QC_FINAL3}', '{obj.QC_NFM1}', '{obj.QC_NFM2}', '{obj.QC_NFM3}', '{obj.QC1}', '{obj.QC2}', '{obj.QC3}', '{obj.PE1_Process}', '{obj.PE2_Process}');";
+            DB_CCS.Database.ExecuteSqlCommand(query);
         }
 
         public Related GetRelatedByID(string ID){
-            string query = $"SELECT ID_Related, PT1, PT2, PT3A, PT3M, PT4, PT5, PT6, PT7, IT, MKT, PC1, PC2, PCH1, PCH2, PE1, PE2, PE2_SMT, PE2_PCB, PE2_MT, QC_IN1, QC_IN2, QC_IN3, QC_FINAL1, QC_FINAL2, QC_FINAL3, QC_NFM1, QC_NFM2, QC_NFM3, QC1, QC2, QC3, PE1_Process, PE2_Process FROM CCS.dbo.Related WHERE ID_Related = '{ID}'";
-            var result = _dbCCS.Database.SqlQuery<Related>(query).First();
+            string query = $@"SELECT ID_Related, PT1, PT2, PT3A, PT3M, PT4, PT5, PT6, PT7, IT, MKT, PC1, PC2, PCH1, PCH2, PE1, PE2, PE2_SMT, PE2_PCB, PE2_MT, QC_IN1, QC_IN2, QC_IN3, QC_FINAL1, QC_FINAL2, QC_FINAL3, QC_NFM1, QC_NFM2, QC_NFM3, QC1, QC2, QC3, PE1_Process, PE2_Process 
+            FROM CCS.dbo.Related WHERE ID_Related = '{ID}'";
+            var result = DB_CCS.Database.SqlQuery<Related>(query).First();
             return result;
         }
 
         public void RemoveData(string key,string session_key){
             string DEquery = "DELETE Related WHERE ID_Related =  '" + key + "'";
-                _dbCCS.Database.ExecuteSqlCommand(DEquery);
+                DB_CCS.Database.ExecuteSqlCommand(DEquery);
                  DEquery = "DELETE [File] WHERE ID_File = '" + key + "'";
-                _dbCCS.Database.ExecuteSqlCommand(DEquery);
+                DB_CCS.Database.ExecuteSqlCommand(DEquery);
                  DEquery = "DELETE Topic WHERE ID_Topic = '"+ session_key + "'";
-                _dbCCS.Database.ExecuteSqlCommand(DEquery);
+                DB_CCS.Database.ExecuteSqlCommand(DEquery);
         }
 
         public List<Summernote> GetSummernote(string ID){
              string query = $"SELECT [APP/IPP] as APP , Subject , Detail, Timing FROM Topic WHERE ID_Topic =  '{ID}'";
-            var result = _dbCCS.Database.SqlQuery<Summernote>(query).ToList();
+            var result = DB_CCS.Database.SqlQuery<Summernote>(query).ToList();
             return result;
         }
 
         public List<ListMail> GetEmail(string user){
             var sql = "SELECT Email FROM dbo.[User] WHERE Name ='" + user + "'";
-            var result = _dbCCS.Database.SqlQuery<ListMail>(sql).ToList();
+            var result = DB_CCS.Database.SqlQuery<ListMail>(sql).ToList();
             return result;
         }
 
         public List<ChangeItem> GetChangeItem(){
             var sql = "SELECT ID_Change_item as ID, Item as Name FROM CCS.dbo.Change_Item;";
-            var result = _dbCCS.Database.SqlQuery<ChangeItem>(sql);
+            var result = DB_CCS.Database.SqlQuery<ChangeItem>(sql);
             return result.ToList();
         }
         
         public List<ProductType> GetProductType(){
             var sql = "SELECT ID_Product_Type as ID, Product_Type as Name FROM CCS.dbo.Product_Type;";
-            var result = _dbCCS.Database.SqlQuery<ProductType>(sql);
+            var result = DB_CCS.Database.SqlQuery<ProductType>(sql);
             return result.ToList();
         }
 
         public List<string> GetDepartmentGroup(){
             var sql = "SELECT [Group] FROM CCS.dbo.Department GROUP BY [Group];";
-            var result = _dbCCS.Database.SqlQuery<string>(sql);
+            var result = DB_CCS.Database.SqlQuery<string>(sql);
             return result.ToList();    
         }
 
         public List<Department> GetDepartmentByGroup(string DepartmentGroup){
             var sql = $"SELECT ID_Department as ID, Name, Email, [Group] FROM CCS.dbo.Department WHERE [Group] = '{DepartmentGroup}';";
-            var result = _dbCCS.Database.SqlQuery<Department>(sql);
+            var result = DB_CCS.Database.SqlQuery<Department>(sql);
             return result.ToList();    
         }
 
         public TopicAlt GetTopicByID(string TopicID){
-            var sql = $"SELECT TOP(1) ID_Topic, Topic_type, Item as Change_item, Product_Type.Product_type, Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, Timing, [File], Related, User_insert, Time_insert, ID FROM CCS.dbo.Topic LEFT JOIN Change_Item ON Topic.Change_item = ID_Change_item LEFT JOIN Product_Type ON Topic.Product_Type = ID_Product_Type WHERE ID_Topic = '{TopicID}' ORDER BY Revision DESC;";
-            var Topic = _dbCCS.Database.SqlQuery<TopicAlt>(sql);
+            var sql = $"SELECT TOP(1) ID_Topic, Topic_type, Item as Change_item, Product_Type.Product_type, Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, Timing, Related, User_insert, Time_insert, ID FROM CCS.dbo.Topic LEFT JOIN Change_Item ON Topic.Change_item = ID_Change_item LEFT JOIN Product_Type ON Topic.Product_Type = ID_Product_Type WHERE ID_Topic = '{TopicID}' ORDER BY Revision DESC;";
+            var Topic = DB_CCS.Database.SqlQuery<TopicAlt>(sql);
             return Topic.First();
         }
-        public List<FileItem> GetFileByID(string FileCode){
-            var sql = $"SELECT ID, ID_File, Name, Size, Name_Format, Description, Time_Insert, User_Insert FROM CCS.dbo.[File] WHERE ID_File = '{FileCode}'; ";
-            var FileList = _dbCCS.Database.SqlQuery<FileItem>(sql).ToList();
-            return FileList;
+        public List<FileItem> GetFileByID(long fk_id, string type){
+            try{
+                var sql = $"SELECT ID, FK_ID, [Type], Name, Name_Format, Description, [Size], Time_Insert, User_Insert FROM CCS.dbo.[File]; WHERE FK_ID = {fk_id} AMD [Type] = '{type}";
+                var FileList = DB_CCS.Database.SqlQuery<FileItem>(sql).ToList();
+                return FileList;
+            }catch(Exception err){
+                return null;
+            }
         }
 
-        public void InsertTopicApprove(int topic_id){
+        public void InsertTopicApprove(long topic_id){
             var sql = $"INSERT INTO CCS.dbo.Topic_Approve (Topic, RequestBy, RequestDate, ReviewBy, ReviewDate, TrialBy, TrialDate, CloseBy, CloseDate) VALUES({topic_id}, '', '', '', '', '', '', '', ''); ";
-            _dbCCS.Database.ExecuteSqlCommand(sql);
+            DB_CCS.Database.ExecuteSqlCommand(sql);
         }
 
     }

@@ -14,11 +14,11 @@ using System.Configuration;
 namespace ChangeControl.Controllers{
     public class LoginController : Controller{
         
-        private LoginModel _loginModel;
+        private LoginModel M_Login;
         public List<Department> A = new List<Department>();
         private string admin = "63014";
         public LoginController(){
-            _loginModel = new LoginModel();
+            M_Login = new LoginModel();
         }
 
         public static string DevMode = "on";
@@ -57,7 +57,7 @@ namespace ChangeControl.Controllers{
                     res.message = "error";
                     res.data = null;
 
-            res = _loginModel.CheckUser(username, password);
+            res = M_Login.CheckUser(username, password);
             if(res.message == "error"){
                 return Json("Error");
             }else{
@@ -85,7 +85,7 @@ namespace ChangeControl.Controllers{
                 }
                 Session["DepartmentRawName"] = response.Department;
                 
-                var DepartmentResult = _loginModel.GetDepartmentIdByDepartmentName(CuttedDepartment); 
+                var DepartmentResult = M_Login.GetDepartmentIdByDepartmentName(CuttedDepartment); 
                 var DepartmentID = DepartmentResult.ID;
                 Session["DepartmentID"] = DepartmentID;
                 Session["Position"] = response.Position;
@@ -118,7 +118,7 @@ namespace ChangeControl.Controllers{
                 }
                 Session["DepartmentRawName"] = department;
 
-                var DepartmentResult = _loginModel.GetDepartmentIdByDepartmentName(department);
+                var DepartmentResult = M_Login.GetDepartmentIdByDepartmentName(department);
 
                 System.Diagnostics.Debug.WriteLine($"Department ID : {DepartmentResult}");
 
@@ -185,7 +185,7 @@ namespace ChangeControl.Controllers{
         }
 
         public int GetDepartmentIdByName(string DepartmentName){
-            var DepartmentResult = _loginModel.GetDepartmentIdByDepartmentName(DepartmentName); 
+            var DepartmentResult = M_Login.GetDepartmentIdByDepartmentName(DepartmentName); 
                 var DepartmentID = DepartmentResult.ID;
             return DepartmentID;
         }

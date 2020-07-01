@@ -9,14 +9,14 @@ using System.Web.Mvc;
 namespace ChangeControl.Controllers{
     public class HomeController : Controller{
 
-        private HomeModel _homeModel;
+        private HomeModel M_Home;
         public static List<SearchResult> searchResult = new List<SearchResult>();
   
         public class Line{
             public string line { get; set; }
         }
         public HomeController(){
-            _homeModel = new HomeModel();
+            M_Home = new HomeModel();
 
         }
         public ActionResult Index(){
@@ -68,12 +68,12 @@ namespace ChangeControl.Controllers{
 
         [HttpPost]
         public ActionResult GetLine(string Production){
-            var result = _homeModel.GetLine(Production);
+            var result = M_Home.GetLine(Production);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
         public ActionResult GetSearch(string Type,int Status,string ProductType,string Overstatus,string Changeitem,string ControlNo, string Model,string Chosechangeitem,string Partno,string Partname,string Related,string Processname ,string Production ,string Line){
             var temp_search = new SearchAttribute(Type, Status, ProductType, Overstatus, Changeitem, ControlNo, Model, Chosechangeitem, Partno, Partname, Related, Processname, Production, Line);
-            var result = _homeModel.GetSearch(temp_search);
+            var result = M_Home.GetSearch(temp_search);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 

@@ -16,14 +16,14 @@ namespace ChangeControl.Controllers
     public class RequestController : Controller
     {
         // GET: Request
-        private DbTapics _dbtapics;
-        private DbCCS _dbCCS;
-        private RequestModel _requestModel;
+        private DbTapics DB_Tapics;
+        private DbCCS DB_CCS;
+        private RequestModel M_Req;
         public List<Review> ReviewList = new List<Review>();
         public RequestController(){
-            _dbtapics = new DbTapics();
-            _dbCCS = new DbCCS();
-            _requestModel = new RequestModel();
+            DB_Tapics = new DbTapics();
+            DB_CCS = new DbCCS();
+            M_Req = new RequestModel();
         }
         public class Value{
             public List<string> value { get; set; }
@@ -35,12 +35,12 @@ namespace ChangeControl.Controllers
         private static string temp_related;
         public static TopicAlt Topic;
         public static string TopicID;
-        public static int ID;
+        public static long review_id;
         public static bool isEditMode = false;
         public List<GetID> TopicDetail = new List<GetID>();
         private string date = DateTime.Now.ToString("yyyyMMddHHmmss");
-        public ActionResult Index(string ID)
-        {
+        private string date_ff = DateTime.Now.ToString("yyyyMMddHHmmss.fff");
+        public ActionResult Index(string ID){
                 Topic = null;
                 ViewBag.mode = "Insert";
                 if ((string)(Session["User"]) == null){
@@ -49,8 +49,8 @@ namespace ChangeControl.Controllers
                 }  
                 List<GetID> last_iTopic = new List<GetID>();
                 List<GetID> last_eTopic = new List<GetID>();
-                last_iTopic = _requestModel.GetInternalTopicId();
-                last_eTopic = _requestModel.GetExternalTopicId();
+                last_iTopic = M_Req.GetInternalTopicId();
+                last_eTopic = M_Req.GetExternalTopicId();
 
                 if (last_iTopic.Count == 0){ //Case Internal Topic not exist
                     ViewData["iTopic_id"] = "IN-" + date.Substring(2, 4) + "001"; //Then new ID = IN2006001
@@ -67,39 +67,40 @@ namespace ChangeControl.Controllers
                  }
                 
 
-                var formChangeItem = _requestModel.GetChangeItem(); //Get list of change items radio
+                var formChangeItem = M_Req.GetChangeItem(); //Get list of change items radio
                 ViewData["FormChangeItem"] = formChangeItem;
 
-                var formProductType = _requestModel.GetProductType(); //Get list of product type radio
+                var formProductType = M_Req.GetProductType(); //Get list of product type radio
                 ViewData["FormProductType"] = formProductType;
 
-                var DepartmentGroup = _requestModel.GetDepartmentGroup(); //Get raw group of departments
+                var DepartmentGroup = M_Req.GetDepartmentGroup(); //Get raw group of departments
 
                 List<DepartmentList> departmentList = new List<DepartmentList>();
                 foreach(string GroupName in DepartmentGroup){
                     List<Department> department = new List<Department>();
-                    department = _requestModel.GetDepartmentByGroup(GroupName);
+                    department = M_Req.GetDepartmentByGroup(GroupName);
                     departmentList.Add(new DepartmentList(){Name = GroupName.Replace(" ", "_"), Department = department}); //Convert raw group into department list for radio
                 }
                 ViewData["DepartmentList"] = departmentList;
 
             if(ID != null){ // In case of edit mode
                 isEditMode = true;
-                Topic = _requestModel.GetTopicByID(ID);
+                Topic = M_Req.GetTopicByID(ID);
                 var temp_topic = Topic;
-                var TopicRelatedList = _requestModel.GetRelatedByID(temp_topic.Related.Replace(" ",""));
+                var TopicRelatedList = M_Req.GetRelatedByID(temp_topic.Related.Replace(" ",""));
                 temp_topic.RelatedList = TopicRelatedList;
-                var TopicFileList = _requestModel.GetFileByID(temp_topic.File);
-                temp_topic.FileList = TopicFileList;
-                ViewData["Topic"] = temp_topic;
+                
+                var topic_file_list = M_Req.GetFileByID(temp_topic.ID, "Topic");
+                if(topic_file_list != null){
+                  temp_topic.FileList = topic_file_list;
+                  ViewData["Topic"] = temp_topic;
+                }
             }
-             return View();
+            return View();
         }
         [HttpPost, ValidateInput(false)]
         public ActionResult Submit(string changeType,int changeItem,int productType,string model,string partNo, string partName, string processName,string appRadio, string appDescription,string subject,string detail,string timing){
           int status;
-
-          var app = "";
           var mode = "Insert";
           var revision = 1;
 
@@ -111,10 +112,10 @@ namespace ChangeControl.Controllers
 
                 try{
                     if(changeType == "Internal"){
-                        TopicDetail = _requestModel.GetInternalTopicId();
+                        TopicDetail = M_Req.GetInternalTopicId();
                     }
                     else{
-                        TopicDetail = _requestModel.GetExternalTopicId();
+                        TopicDetail = M_Req.GetExternalTopicId();
                     }
                     if (TopicDetail.Count == 0){
                         if (changeType == "Internal") Session["Foreignkey"] = "IN-" + date.Substring(2, 4) + "001";
@@ -138,27 +139,23 @@ namespace ChangeControl.Controllers
                     temp_related = "T" + Session["Foreignkey"] + "-" + revision;
 
                     status = 7;
-                    var temp_topic = new Topic((string)(Session["Foreignkey"]), changeType, changeItem, productType, revision, model,partNo, partName, processName, status, appDescription, subject, detail, timing, null, temp_related,(string)(Session["User"]), date );
+                    var temp_topic = new Topic((string)(Session["Foreignkey"]), changeType, changeItem, productType, revision, model,partNo, partName, processName, status, appDescription, subject, detail, timing, temp_related,(string)(Session["User"]), date );
 
-                    ID = _requestModel.InsertTopic(temp_topic);
-                    _requestModel.InsertTopicApprove(ID);
+                    review_id = M_Req.InsertTopic(temp_topic);
+                    M_Req.InsertTopicApprove(review_id);
                     TopicID = (string) Session["Foreignkey"];
 
                     return Json(TopicID,JsonRequestBehavior.AllowGet);
                 }
                 catch (Exception ex){
-
                     System.Diagnostics.Debug.WriteLine("Exception");
                     System.Diagnostics.Debug.WriteLine(ex);
-
                     return Json(new { code = -1 }, JsonRequestBehavior.AllowGet);
                 }
         }
 
         [HttpPost, ValidateInput(false)]
         public ActionResult UpdateRequest(int changeItem,int productType,string model,string partNo, string partName, string processName,string appRadio, string appDescription,string subject,string detail,string timing){
-          
-          var app = "";
           var mode = "Edit";
           var revision = Topic.Revision + 1;
           var status = Topic.Status;
@@ -176,8 +173,8 @@ namespace ChangeControl.Controllers
 
                 temp_related = "T" + Topic.ID_Topic + "-" + revision;
 
-                var new_topic = new Topic(Topic.ID_Topic, Topic.Topic_type, changeItem, productType, revision, model,partNo, partName, processName, status, appDescription, subject, detail, timing, Topic.File, temp_related,(string)(Session["User"]), date );
-                ID = _requestModel.UpdateTopic(new_topic);
+                var new_topic = new Topic(Topic.ID_Topic, Topic.Topic_type, changeItem, productType, revision, model,partNo, partName, processName, status, appDescription, subject, detail, timing, temp_related,(string)(Session["User"]), date );
+                review_id = M_Req.UpdateTopic(new_topic);
 
                 return Json(Topic.ID_Topic, JsonRequestBehavior.AllowGet);
             }
@@ -195,7 +192,7 @@ namespace ChangeControl.Controllers
         public ActionResult SubmitRelated(string IT,string MKT,string PC1,string PC2,string PT1,string PT2,string PT3A,string PT3M,string PT4,string PT5,string PT6,string PT7,string PE1,string PE2,string PE2_SMT,string PE2_PCB,string PE2_MT,string PE1_Process,string PE2_Process,string PCH1,string PCH2,string QC_IN1,string QC_IN2,string QC_IN3,string QC_FINAL1,string QC_FINAL2,string QC_FINAL3,string QC_NFM1,string QC_NFM2,string QC_NFM3,string QC1,string QC2,string QC3){
             try{
                 Related related = new Related(IT,MKT,PC1,PC2,PT1,PT2,PT3A,PT3M,PT4,PT5,PT6,PT7,PE1,PE2,PE2_SMT,PE2_PCB,PE2_MT,PE1_Process,PE2_Process,PCH1,PCH2,QC_IN1,QC_IN2,QC_IN3,QC_FINAL1,QC_FINAL2,QC_FINAL3,QC_NFM1,QC_NFM2,QC_NFM3,QC1,QC2,QC3);
-                _requestModel.InsertRelated(temp_related.Trim(), related);
+                M_Req.InsertRelated(temp_related.Trim(), related);
                 return Json(new { code = 1 },JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex){
@@ -209,25 +206,19 @@ namespace ChangeControl.Controllers
             Value temp_file = new Value();
             temp_file = Session["TxtFile"] as Value;
             
-            var date_ff = DateTime.Now.ToString("yyyyMMddHHmmss.fff");
-            var date = DateTime.Now.ToString("yyyyMMddHHmmss");
-
-            var temp_file_code =  ID.ToString("0000");;
-            var file_code = (isEditMode)?Topic.File:$"TC-{temp_file_code}";
             if (file_item.file != null && file_item.file.ContentLength > 0){
                 var InputFileName = Path.GetFileName(date_ff);
                 var ServerSavePath = Path.Combine("D:/File/Topic/" + InputFileName);
                 file_item.file.SaveAs(ServerSavePath);
                 if(file_item.description == "null" || file_item.description == null) file_item.description = " ";
-                _requestModel.InsertFile(file_item.file, file_code,file_item.description, Session["User"]);
+                M_Req.InsertFile(file_item.file, review_id, "Topic", file_item.description, Session["User"]);
             }
-            _requestModel.UpdateTopicFileCode(ID, file_code);
             return Json(TopicID);
         }
 
         [HttpPost]
         public ActionResult UpdateFile(string id , string description){
-            _requestModel.UpdateFile(id, description);
+            M_Req.UpdateFile(id, description);
             return Json(new { code = 1 }, JsonRequestBehavior.AllowGet);
         }
 
@@ -235,7 +226,7 @@ namespace ChangeControl.Controllers
         public ActionResult RemoveDATA(){
             try{
                 var key = "T" + Session["Foreignkey"]+"-"+ Session["Revision"];
-                _requestModel.RemoveData(key,(string)(Session["Foreignkey"]));
+                M_Req.RemoveData(key,(string)(Session["Foreignkey"]));
                 return Json(new { code = 1 }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex){
@@ -263,7 +254,7 @@ namespace ChangeControl.Controllers
                 //         + "&nbsp&nbsp&nbsp&nbsp Details <font color='#CC3300'><b>" + Mdetail + "</b></font><br>"
                 //         + "&nbsp&nbsp&nbsp&nbsp<a href = http://172.27.170.23/safedrive >คุณสามารถเข้าไปดูรายละเอียดได้ที่นี้</a><br> "
                 //         //+ "&nbsp&nbsp&nbsp&nbsp <a href= http://172.27.170.23/support/CheckStatus.aspx ">คุณสามารถเข้าไปดูสถานะงานได้ที่นี้ </a><br> "
-                //         + "----------------------------------------------------------------------------------------------------<br>");      
+                //         + "---------------------------z-------------------------------------------------------------------------<br>");      
            
              string body = @"<!DOCTYPE html> <html lang = ""en"" xmlns = ""http://www.w3.org/1999/xhtml"" xmlns: v = ""urn:schemas-microsoft-com:vml""xmlns: o = ""urn:schemas-microsoft-com:office:office"">
 <head>
@@ -581,7 +572,7 @@ namespace ChangeControl.Controllers
             List <ListMail> temp_email = new List<ListMail>();
    
             var sql = "";
-            temp_email = _requestModel.GetEmail((string)(Session["User"]));
+            temp_email = M_Req.GetEmail((string)(Session["User"]));
             if(temp_email.Count != 0){
               Email.Add(temp_email[0].Email);
 

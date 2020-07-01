@@ -7,6 +7,7 @@ namespace ChangeControl.Models
 {
     public class TopicAlt
     {
+        public long ID { get; set;}
         public string ID_Topic{ get; set;}
         public string Topic_type{ get; set; }
         public string Change_item{ get; set; }
@@ -21,14 +22,12 @@ namespace ChangeControl.Models
         public string Subject{ get; set; }
         public string Detail{ get; set; }
         public string Timing { get; set; }
-        public string File { get; set; }
         public List<FileItem> FileList { get; set; }
         public string Related{ get; set; }
         public Related RelatedList{ get; set; }
         public List<RelatedAlt> RelatedListAlt{ get; set; }
         public string User_insert{ get; set; }
         public string Time_insert{ get; set; }
-        public int ID { get; set;}
         
         public TopicAlt(string ID_Topic,string Type,string ChangeItem,string ProductType,int Revision ,string Model,string PartNo,string PartName,string ProcessName,int Status,string App,string Subject,string Detail,string Timing ,string Related,string UserInsert,string TimeInsert){
             this.ID_Topic = ID_Topic;

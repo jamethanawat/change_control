@@ -7,6 +7,7 @@ namespace ChangeControl.Models
 {
     public class Topic
     {
+        public long ID { get; set;}
         public string ID_Topic{ get; set;}
         public string Topic_type{ get; set; }
         public int Change_item{ get; set; }
@@ -21,13 +22,11 @@ namespace ChangeControl.Models
         public string Subject{ get; set; }
         public string Detail{ get; set; }
         public string Timing{ get; set; }
-        public string File{ get; set; }
         public string Related{ get; set; }
         public string User_insert{ get; set; }
         public string Time_insert{ get; set; }
-        public int ID { get; set;}
         
-        public Topic(string ID_Topic,string changeType,int changeItem,int productType,int revision ,string model,string partNo,string partName,string processName,int status,string appDescription,string subject,string detail,string timing , string file, string related,string UserInsert,string TimeInsert){
+        public Topic(string ID_Topic,string changeType,int changeItem,int productType,int revision ,string model,string partNo,string partName,string processName,int status,string appDescription,string subject,string detail,string timing, string related,string UserInsert,string TimeInsert){
             this.ID_Topic = ID_Topic;
             this.Topic_type = changeType;
             this.Change_item = changeItem;
@@ -42,7 +41,6 @@ namespace ChangeControl.Models
             this.Subject = subject;
             this.Detail = detail;
             this.Timing = timing;
-            this.File = file;
             this.Related = related;
             this.User_insert = UserInsert;
             this.Time_insert = TimeInsert;
@@ -62,7 +60,6 @@ namespace ChangeControl.Models
             this.Subject = null;
             this.Detail = null;
             this.Timing = null;
-            this.File = null;
             this.Related = null;
             this.User_insert = null;
             this.Time_insert = null;

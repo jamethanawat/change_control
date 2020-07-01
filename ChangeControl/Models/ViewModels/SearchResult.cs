@@ -7,7 +7,7 @@ namespace ChangeControl.Models
 {
     public class SearchResult
     {
-        public int ID { get; set; }
+        public long ID { get; set; }
         public string ID_Topic { get; set; }
         public string Topic_type { get; set; }
         public int Change_item { get; set; }

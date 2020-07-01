@@ -315,7 +315,8 @@ $(() => {
                     }));
                 });
             }).fail(() => {
-                swal("Error", "Trial not success", "error");
+                swal("Error", "Trial not succes, Please contact admin", "error");
+                $('#loading').addClass('hidden')
             }));
 
             

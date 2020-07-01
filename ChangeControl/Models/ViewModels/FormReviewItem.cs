@@ -6,6 +6,6 @@ using System.Web;
 namespace ChangeControl.Models{
     public class FormReviewItem{
         public string Name { get; set;} 
-        public int ID { get; set;}
+        public long ID { get; set;}
     }
 }
