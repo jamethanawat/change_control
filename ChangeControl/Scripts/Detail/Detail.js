@@ -1,5 +1,4 @@
-﻿var UpdateFileDescPath;
-var InsertReviewStatus = false;
+﻿var InsertReviewStatus = false;
 var optimized_arr = [];
 var ReviewStatus = false;
 var InsertFilePath;
@@ -14,14 +13,14 @@ var file_list = [];
 var file_list_alt = [];
 var isQC;
 var isTrialable;
-var quickFormIsEmpty = true;
+var resubmit_formIsEmpty = true;
 
 $(() => {
-    $("#quickForm [name='desc'], #quickForm [name='due_date']").on("keypress", () => {
-        if($("#quickForm [name='desc']").val() != "" && $("#quickForm [name='due_date']").val() !== ""){
-            quickFormIsEmpty = false;
+    $("#resubmit_form [name='desc'], #resubmit_form [name='due_date']").on("keypress", () => {
+        if($("#resubmit_form [name='desc']").val() != "" && $("#resubmit_form [name='due_date']").val() !== ""){
+            resubmit_formIsEmpty = false;
         }else{
-            quickFormIsEmpty = true;
+            resubmit_formIsEmpty = true;
         }
     });
 
@@ -48,7 +47,7 @@ $(() => {
 
     $("#resubmit_modal").on("navigate", (e, navDir, stepNumber) => {
         if($("#resubmit_modal").attr("data-current-step") == 3){
-            let quick_form = $("form#quickForm").serializeArray();
+            let quick_form = $("form#resubmit_form").serializeArray();
             console.log(quick_form);
             let related = "";
             let due_date = "";
@@ -78,7 +77,7 @@ $(() => {
             if(navDir == "prev"){
                 relatedValidate();
             }else{
-                if(!quickFormIsEmpty){
+                if(!resubmit_formIsEmpty){
                     if(validator.form()){
                         $(".btn-success").prop('disabled', false);
                     }
@@ -88,7 +87,7 @@ $(() => {
         }
     });
 
-    var validator = $('#quickForm').validate({
+    var validator = $('#resubmit_form').validate({
         rules: {
           desc: {required: true,},
           due_date: {required: true,date: true}
@@ -107,8 +106,8 @@ $(() => {
         unhighlight: function (element, errorClass, validClass) {$(element).removeClass('is-invalid');}
     });
     
-    $("#quickForm").on("click keypress",() => { 
-        if(!quickFormIsEmpty){
+    $("#resubmit_form").on("click keypress",() => { 
+        if(!resubmit_formIsEmpty){
             if(validator.form()){$(".btn-success").prop('disabled', false);}
         }
     });
@@ -216,9 +215,9 @@ $(() => {
 
     });
 
-    $("form#quickForm").submit((e) => {
+    $("form#resubmit_form").submit((e) => {
         e.preventDefault();
-        let quick_form = $("form#quickForm").serialize();
+        let quick_form = $("form#resubmit_form").serialize();
         console.log(quick_form);
         $.post(InsertRelatedPath, quick_form, () =>{
             console.log('Related created');
@@ -315,11 +314,57 @@ $(() => {
                     }));
                 });
             }).fail(() => {
-                swal("Error", "Trial not succes, Please contact admin", "error");
+                swal("Error", "Trial is not succes, Please contact admin", "error");
+                $('#loading').addClass('hidden')
+            }));
+            
+            Promise.all(promises).then(() => {
+                $('#loading').addClass('hidden')
+                InsertReviewStatus = false;
+                $("#trial_submit").prop("disabled",true)
+                swal("Success", "Insert Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
+            })
+    });
+
+    $("form#Confirm").submit((e) => {
+        e.preventDefault();
+        $('#loading').removeClass('hidden')
+            let confirm_form = $("form#Confirm").serializeArray();
+            var promises = [];
+
+            files = file_list;
+            console.log("files",files);
+            
+            for(var index in files){
+                files[index].file = files[index].detail.file;
+                delete files[index].detail;
+            }
+
+            promises.push($.post(InsertConfirmPath,{ desc: confirm_form[0].value},() => {
+                console.log('Inserted trial');
+                files.forEach(element => {
+                    var Data = new FormData();
+                    Data.append("file",element.file);
+                    Data.append("description",element.description);
+                    promises.push($.ajax({
+                        type: "POST",
+                        url: InsertFileConfirmPath,
+                        data: Data,
+                        cache: false,
+                        processData: false,
+                        contentType: false,
+                        success: function () {
+                            console.log('confirm file uploaded');
+                        },error: function() {
+                            swal("Error", "Upload file not success", "error");
+                        }
+                    }));
+                });
+            }).fail(() => {
+                swal("Error", "Confirm is not succes, Please contact admin", "error");
                 $('#loading').addClass('hidden')
             }));
 
-            
             Promise.all(promises).then(() => {
                 $('#loading').addClass('hidden')
                 InsertReviewStatus = false;
@@ -342,51 +387,44 @@ $(() => {
                 if(!datastring[i].hasOwnProperty('splitted_value')){
                     datastring[i].splitted_value = datastring[i].name.split('-');
                 }
-
                 if(i+1 != datastring.length){
-
                     if(!datastring[i+1].hasOwnProperty('splitted_value')){
-                        datastring[i+1].splitted_value = datastring[i+1].name.split('-');
+                        datastring[i+1].splitted_value = datastring[i+1].name.split('-'); //split desc-1234 to [0]desc, [1]1234
                     }
-
                     if(datastring[i].splitted_value[0] == "rd"){
                         new_item.id = datastring[i].splitted_value[1];
-                        new_item.status = datastring[i].value;
+                        new_item.status = datastring[i].value; // rd -> radio equal status
                         if(datastring[i+1].splitted_value[0] == "desc" && datastring[i].splitted_value[1] == datastring[i+1].splitted_value[1]){
                             new_item.description = datastring[i+1].value;
                         }
-
                     }else if(datastring[i].splitted_value[0] == "desc"){
                         new_item.id = datastring[i].splitted_value[1];
-                        new_item.description = datastring[i].value;
+                        new_item.description = datastring[i].value; // desc -> description
                         if(datastring[i+1].splitted_value[0] == "rd" && datastring[i].splitted_value[1] == datastring[i+1].splitted_value[1]){
                             new_item.status = datastring[i+1].value;
                         }
                     }
-
                     if(datastring[i].splitted_value[1] == datastring[i+1].splitted_value[1]){
                         i++;
                     }
                 }else{
                     new_item.id = datastring[i].splitted_value[1];
-
                     if(datastring[i].splitted_value[0] == "rd"){
                         new_item.status = datastring[i].value;
                     }else if(datastring[i].splitted_value[0] == "desc"){
                         new_item.description = datastring[i].value;
                     }
                 }
-
-                if(new_item.id == 999 && new_item.status == null && new_item.description == null){
+                if(new_item.id == 999 && new_item.status == null && new_item.description == null){ // exception case
                     console.error("optimized_arr error");                
                 }else{
                     this.optimized_arr.push(new_item);
                 }
             }
         }
-
         console.log(optimized_arr);
     }
+
     $(".zoom-fab#change_status").click(() => {
         var change_status = "Change status from";
         var new_status = 0;
@@ -394,8 +432,11 @@ $(() => {
             change_status += " Review to Trial";
             new_status = 9;
         }else if(topic_status == "Trial"){
-            change_status += " Trial to Closed";
-            new_status = 6;
+            change_status += " Trial to Confirm";
+            new_status = 10;
+        }else if(topic_status == "Confirm"){
+            change_status += " Confirm to Close";
+            new_status = 11;
         }
         swal({
             title: "Change Status", 

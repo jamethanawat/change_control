@@ -8,20 +8,14 @@ using System.Web;
 using System.Web.Mvc;
 using System.Reflection;
 
-namespace ChangeControl.Controllers
-{
-    public class DetailController : Controller
-    {
+namespace ChangeControl.Controllers{
+    public class DetailController : Controller{
         // GET: Detail
         private DetailModel M_Detail;
         private RequestModel M_Req;
         public static TopicAlt Topic;
-        public static string TopicID;
-        public static long related_id;
-        public static long response_id;
-        public static long trial_id;
-        public List<Review> ReviewList = new List<Review>();
-        public static long review_id;
+        public static string topic_code;
+        public static long related_id, response_id, trial_id, review_id, confirm_id;
         public static long? file_id;
        
         public DetailController(){
@@ -48,54 +42,17 @@ namespace ChangeControl.Controllers
             }
 
             if(id != null){
-                DetailController.TopicID = id;
+                topic_code = id;
                 Session["TopicID"] = id;
             }else{
-                DetailController.TopicID = M_Detail.GetFirstTopic();
+                topic_code = M_Detail.GetFirstTopic();
             }
 
             ViewData["ViewReviewItem"] = this.GetReviewListByTopicID();
+            ViewData["ResubmitList"] = this.GetResubmitListByTopicID();
+            ViewData["TrialList"] = this.GetTrialListByTopicID();
+            ViewData["ConfirmList"] = this.GetConfirmListByTopicID();
 
-            var ResubmitList = M_Detail.GetResubmitByTopicID(Topic.ID);
-            foreach(Resubmit Resubmit in ResubmitList){
-                List<Response> ResponseList = new List<Response>();
-
-                DateTime temp_date = DateHelper.StringToDateTime(Resubmit.Date);
-                DateTime temp_due_date = DateHelper.StringToDateTime2(Resubmit.DueDate);
-                Resubmit.Date = temp_date.ToString("d MMMM yyyy");
-                Resubmit.DueDate = temp_due_date.ToString("d MMMM yyyy");
-
-                var result = M_Detail.GetResponseByResubmitID(Resubmit.ID);
-                foreach(var Response in result){
-                    DateTime temp_res_date = DateHelper.StringToDateTime(Response.Date);
-                    Response.Date = temp_res_date.ToString("d MMMM yyyy");
-                }
-                if(result != null){
-                    ResponseList = result;
-                }
-                Resubmit.Responses = ResponseList;
-                foreach(var Response in Resubmit.Responses){
-                    var ResponseFileList = M_Detail.GetFileByID(Response.ID, "Response");
-                    Response.FileList = ResponseFileList;
-                }
-                var Related = M_Detail.GetRelatedByID(Resubmit.Related);
-                List<RelatedAlt> RelatedList = new List<RelatedAlt>();
-                foreach (var prop in Related.GetType().GetProperties()){
-                    var prop_val = prop.GetValue(Related, null);
-                    var isRelated = ((int) prop_val == 1)? true : false;
-                        if(isRelated){
-                            var isResponsed = ResponseList.Exists( e => e.Department == prop.Name);
-                            var status = (isResponsed)? 1 : 0 ;
-                            if((int) prop_val == 1){
-                                RelatedList.Add(new RelatedAlt{name = prop.Name, status = status});
-                            }
-                        }
-                }
-                Resubmit.RelatedList = RelatedList;
-            }
-            
-            ViewData["ResubmitList"] = ResubmitList;
-            
             var DepartmentGroup = M_Detail.GetDepartmentGroup(); //Get raw group of departments
             List<DepartmentList> departmentList = new List<DepartmentList>();
             foreach(string GroupName in DepartmentGroup){
@@ -108,7 +65,7 @@ namespace ChangeControl.Controllers
         }
 
         public ActionResult InsertReview(){
-            long temp_topic_id = DetailController.Topic.ID;
+            long temp_topic_id = Topic.ID;
             var temp_user = Session["User"].ToString();
             var temp_department = Session["Department"].ToString();
             if(Topic.Status == 7 && Topic.Topic_type == "Internal" && (int)Session["DepartmentID"] == 32 || (int)Session["DepartmentID"] == 33 ){
@@ -128,7 +85,7 @@ namespace ChangeControl.Controllers
 
         [HttpPost]
         public ActionResult SubmitFile(RawFile file_item){
-            TopicAlt temp_topic = DetailController.Topic;
+            TopicAlt temp_topic = Topic;
             Value temp_file = new Value();
             temp_file = Session["TxtFile"] as Value;
             
@@ -142,7 +99,7 @@ namespace ChangeControl.Controllers
             return Json(new {code=1}, JsonRequestBehavior.AllowGet);
         }
         public ActionResult UpdateFileDesc(string desc){
-            var fileID = DetailController.file_id;
+            var fileID = file_id;
             M_Detail.UpdateFileDesc(file_id,desc);
             return Json(true);
         }
@@ -158,41 +115,41 @@ namespace ChangeControl.Controllers
         }
 
         public List<Review> GetReviewListByTopicID(){
-            List<ReviewItem> ReviewItemList = new List<ReviewItem>();
-            List<FileItem> FileList = new List<FileItem>();
-            Topic = M_Detail.GetTopicByID(TopicID);
+            List<ReviewItem> rv_item_list = new List<ReviewItem>();
+            List<Review> rv_list = new List<Review>();
+            List<FileItem> file_list = new List<FileItem>();
+
+            Topic = M_Detail.GetTopicByID(topic_code);
             var temp_topic = Topic;
-            var TopicFileList = M_Detail.GetFileByID(Topic.ID, "Topic");
-            temp_topic.FileList = TopicFileList;
+            var tc_file_list = M_Detail.GetFileByID(Topic.ID, "Topic");
+            temp_topic.FileList = tc_file_list;
             var temp_topid_id  = Topic.ID;
 
-            
             ViewData["FormReviewItem"] = null;
-            
             var temp_department = (string) Session["Department"];
 
             // Set review item for each department
             if(temp_department != "PE1_Process" && temp_department != "PE1_Process" && temp_department != "QC"){
-                var formReviewItem = M_Detail.GetReviewItemByDepartment((int)Session["DepartmentID"]);
-                ViewData["FormReviewItem"] = formReviewItem;
+                var rv_form_item = M_Detail.GetReviewItemByDepartment((int)Session["DepartmentID"]);
+                ViewData["FormReviewItem"] = rv_form_item;
             }
             var temp_department_id = (int)Session["DepartmentID"];
-            ReviewList = M_Detail.GetReviewByTopicID(temp_topid_id);
+            rv_list = M_Detail.GetReviewByTopicID(temp_topid_id);
             
             isTrialable = M_Detail.GetTrialStatusByTopicAndDept(Topic.ID,(int) Session["DepartmentID"]);
             ViewData["isTrialable"] = isTrialable;
 
-            foreach(Review ReviewElement in ReviewList){
-                ReviewItemList = M_Detail.GetReviewItemByReviewID(ReviewElement.ID_Review);
-                ReviewElement.Item = ReviewItemList;
-                DateTime temp_date = DateHelper.StringToDateTime(ReviewElement.Date);
-                ReviewElement.Date = temp_date.ToString("d MMMM yyyy");
-                ReviewElement.Profile = M_Detail.getUserByID(ReviewElement.User);
-                ReviewElement.Profile.Name = StringHelper.UppercaseFirst(ReviewElement.Profile.Name);
-                ReviewElement.Profile.SurName = StringHelper.UppercaseFirst(ReviewElement.Profile.SurName);
+            foreach(Review rv_element in rv_list){
+                rv_item_list = M_Detail.GetReviewItemByReviewID(rv_element.ID_Review);
+                rv_element.Item = rv_item_list;
+                DateTime temp_date = DateHelper.StringToDateTime(rv_element.Date);
+                rv_element.Date = temp_date.ToString("d MMMM yyyy");
+                rv_element.Profile = M_Detail.getUserByID(rv_element.User);
+                rv_element.Profile.Name = StringHelper.UppercaseFirst(rv_element.Profile.Name);
+                rv_element.Profile.SurName = StringHelper.UppercaseFirst(rv_element.Profile.SurName);
                 
-                FileList = M_Detail.GetFileByID(ReviewElement.ID_Review, "Review");
-                ReviewElement.FileList = FileList;
+                file_list = M_Detail.GetFileByID(rv_element.ID_Review, "Review");
+                rv_element.FileList = file_list;
             }
 
 
@@ -202,7 +159,7 @@ namespace ChangeControl.Controllers
                 var prop_val = prop.GetValue(Related, null);
                 var isRelated = ((int) prop_val == 1)? true : false;
                     if(isRelated){
-                        var isResponsed = ReviewList.Exists( e => e.Department == prop.Name);
+                        var isResponsed = rv_list.Exists( e => e.Department == prop.Name);
                         var status = (isResponsed)? 1 : 0 ;
                         if((int) prop_val == 1){
                             RelatedList.Add(new RelatedAlt{name = prop.Name, status = status});
@@ -211,7 +168,80 @@ namespace ChangeControl.Controllers
             }
             temp_topic.RelatedListAlt = RelatedList;
             ViewData["Topic"] = temp_topic;
-            return ReviewList;
+            return rv_list;
+        }
+
+        public List<Resubmit> GetResubmitListByTopicID(){
+            var temp_resubmit_list = M_Detail.GetResubmitByTopicID(Topic.ID);
+            foreach(Resubmit resubmit in temp_resubmit_list){
+                List<Response> response_list = new List<Response>();
+
+                DateTime temp_date = DateHelper.StringToDateTime(resubmit.Date);
+                DateTime temp_due_date = DateHelper.StringToDateTime2(resubmit.DueDate);
+                resubmit.Date = temp_date.ToString("d MMMM yyyy");
+                resubmit.DueDate = temp_due_date.ToString("d MMMM yyyy");
+
+                var result = M_Detail.GetResponseByResubmitID(resubmit.ID);
+                foreach(var response in result){
+                    DateTime temp_res_date = DateHelper.StringToDateTime(response.Date);
+                    response.Date = temp_res_date.ToString("d MMMM yyyy");
+                }
+                if(result != null){
+                    response_list = result;
+                }
+                resubmit.Responses = response_list;
+                foreach(var response in resubmit.Responses){
+                    var rs_file_list = M_Detail.GetFileByID(response.ID, "Response");
+                    response.FileList = rs_file_list;
+                }
+                var Related = M_Detail.GetRelatedByID(resubmit.Related);
+                List<RelatedAlt> RelatedList = new List<RelatedAlt>();
+                foreach (var prop in Related.GetType().GetProperties()){
+                    var prop_val = prop.GetValue(Related, null);
+                    var isRelated = ((int) prop_val == 1)? true : false;
+                        if(isRelated){
+                            var isResponsed = response_list.Exists( e => e.Department == prop.Name);
+                            var status = (isResponsed)? 1 : 0 ;
+                            if((int) prop_val == 1){
+                                RelatedList.Add(new RelatedAlt{name = prop.Name, status = status});
+                            }
+                        }
+                }
+                resubmit.RelatedList = RelatedList;
+            }
+            return temp_resubmit_list;
+        }
+
+        public List<Trial> GetTrialListByTopicID(){
+            List<Trial> trial_list = new List<Trial>();
+            List<FileItem> file_list = new List<FileItem>();
+            trial_list = M_Detail.GetTrialByTopicID(Topic.ID);
+            foreach(Trial trial in trial_list){
+                var tr_file_list = M_Detail.GetFileByID(trial.ID, "Trial");
+                trial.FileList = tr_file_list;
+                trial.Profile = M_Detail.getUserByID(trial.User);
+                trial.Profile.Name = StringHelper.UppercaseFirst(trial.Profile.Name);
+                trial.Profile.SurName = StringHelper.UppercaseFirst(trial.Profile.SurName);
+                var temp_date = DateHelper.StringToDateTime(trial.Date);
+                trial.Date = temp_date.ToString("d MMMM yyyy");
+            }
+            return trial_list;
+        }
+
+        public List<Confirm> GetConfirmListByTopicID(){
+            List<Confirm> Confirm_list = new List<Confirm>();
+            List<FileItem> file_list = new List<FileItem>();
+            Confirm_list = M_Detail.GetConfirmByTopicID(Topic.ID);
+            foreach(Confirm Confirm in Confirm_list){
+                var tr_file_list = M_Detail.GetFileByID(Confirm.ID, "Confirm");
+                Confirm.FileList = tr_file_list;
+                Confirm.Profile = M_Detail.getUserByID(Confirm.User);
+                Confirm.Profile.Name = StringHelper.UppercaseFirst(Confirm.Profile.Name);
+                Confirm.Profile.SurName = StringHelper.UppercaseFirst(Confirm.Profile.SurName);
+                var temp_date = DateHelper.StringToDateTime(Confirm.Date);
+                Confirm.Date = temp_date.ToString("d MMMM yyyy");
+            }
+            return Confirm_list;
         }
 
         public ActionResult RequestResubmit(string desc, string due_date){
@@ -269,10 +299,11 @@ namespace ChangeControl.Controllers
                 M_Detail.UpdateTopicStatus(topic_id,status);
                 if(status == 9){
                     M_Detail.UpdateTopicApproveReview(Session["User"].ToString(), Topic.ID);
-                }else if(status == 6){
+                }else if(status == 10){
                     M_Detail.UpdateTopicApproveTrial(Session["User"].ToString(), Topic.ID);
+                }else if(status == 11){
+                    M_Detail.UpdateTopicApproveClose(Session["User"].ToString(), Topic.ID);
                 }
-                    // _detailModel.UpdateTopicApproveClose(Session["User"].ToString(), Topic.ID);
                 return Json(new {code=true}, JsonRequestBehavior.AllowGet);
             }catch (Exception ex){
                 return Json(new {code=false}, JsonRequestBehavior.AllowGet);
@@ -304,6 +335,43 @@ namespace ChangeControl.Controllers
                 M_Detail.InsertFile(file_item.file, trial_id, "Trial", file_item.description, Session["User"]);
             }
             return Json(new {code=1}, JsonRequestBehavior.AllowGet);
+        }
+
+                [HttpPost]
+        public ActionResult SubmitConfirm(string desc){
+            try{
+                var temp_user = Session["User"].ToString();
+                var temp_department = Session["Department"].ToString();
+                confirm_id = M_Detail.InsertConfirm(Topic.ID ,desc, temp_department, temp_user);
+                return Json(new { code = true },JsonRequestBehavior.AllowGet);
+            }catch (Exception ex){
+                return Json(new { code = false }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public ActionResult SubmitFileConfirm(RawFile file_item){
+            Value temp_file = new Value();
+            temp_file = Session["TxtFile"] as Value;
+            
+            if (file_item.file != null && file_item.file.ContentLength > 0){
+                var InputFileName = Path.GetFileName(date_ff);
+                var ServerSavePath = Path.Combine("D:/File/Topic/" + InputFileName);
+                file_item.file.SaveAs(ServerSavePath);
+                if(file_item.description == "null" || file_item.description == null) file_item.description = " ";
+                M_Detail.InsertFile(file_item.file, confirm_id, "Confirm", file_item.description, Session["User"]);
+            }
+            return Json(new {code=1}, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult ReviewApprove(long rv_id){
+            try{
+                M_Detail.ReviewApprove(review_id,(string) Session["User"]);
+                return Json(new {code=true}, JsonRequestBehavior.AllowGet);
+            }catch(Exception err){
+                return Json(new {code=false}, JsonRequestBehavior.AllowGet);
+            }
         }
 
     }
