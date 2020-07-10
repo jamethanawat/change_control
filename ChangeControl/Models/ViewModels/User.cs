@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-
+using StringHelper;
 namespace ChangeControl.Models{
     public class User{
         public string FullName { get; set; }
@@ -12,12 +12,13 @@ namespace ChangeControl.Models{
         public string Department { get; set; }
         public string Position { get; set; }
         public User(string FullName, string Name, string SurName, string Email, string Department, string Position){
-            this.FullName = FullName;
-            this.Name = Name;
-            this.SurName = SurName;
+            this.FullName = FullName.UppercaseFirst();
+            this.Name = Name.UppercaseFirst();
+            this.SurName = SurName.UppercaseFirst();
             this.Email = Email;
             this.Department = Department;
             this.Position = Position;
         }
     }
+
 }

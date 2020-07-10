@@ -12,16 +12,11 @@
 
     var eTopic_id = ViewData["eTopic_id"];
     var iTopic_id = ViewData["iTopic_id"];
-    var isInternal = true; //Default when insert
-    var isEditMode = false; //Default when insert
-    var test = "test";
+    var isInternal = true;
     if(Topic != null){
-        isInternal = false;
-        isEditMode = true;
-        if(Topic.Topic_type.Replace(" ", "") == "Internal"){
-            isInternal = true;
-        }
+        isInternal = Topic. Type.Replace(" ", "") == "Internal"; //Default when insert
     }
+    var isEditMode = (Topic != null); //Default when insert
     Session["isEditMode"] = isEditMode;
 
     Related RelatedList = new Related();
@@ -39,7 +34,6 @@
     remove = '@Url.Action("RemoveDATA", "Request")';
     sendmail = '@Url.Action("AddListMail", "Request")';
     GetSummernote = '@Url.Action("GetSummernote", "Request")';
-    test= '@Url.Action("test", "Request")';
     SubmitFilePath = '@Url.Action("SaveFile", "Request")';
     DepartmentLists = @Html.Raw(Json.Encode(DepartmentLists));
     isEditMode = '@Session["isEditMode"]';
@@ -311,10 +305,11 @@
 <script src="~/Plugin/SweetAlert/sweetalert.min.js"></script>
 
 <link href="~/Plugin/filepond/filepond.css" rel="stylesheet">
-<script src="~/Plugin/filepond/filepond-plugin-file-encode.js"></script>
 <script src="~/Plugin/filepond/filepond.min.js"></script>
 <script src="~/Plugin/filepond/filepond.jquery.js"></script>
+<script src="~/Plugin/filepond/filepond-plugin-file-encode.js"></script>
 <script src="~/Plugin/filepond/filepond-plugin-image-preview.min.js"></script>
+<script src="~/Plugin/filepond/filepond-plugin-file-validate-size.js"></script>
 <script src="~/Scripts/Shared/FilePond.js"></script>
 
 
@@ -357,9 +352,9 @@
                                 </div>
                                 <div class="col-sm-2">
                                     @{
-                                        if(isEditMode){
-                                                iTopic_id = Topic.ID_Topic;
-                                                eTopic_id = Topic.ID_Topic;
+                                        if(isEditMode){ 
+                                            iTopic_id = Topic.Code; 
+                                            eTopic_id = Topic.Code; 
                                         }
                                     }
                                     <input type="text" name="model" style="max-width: 143px;" class="form-control center right" id="iTopic" value="ID: @iTopic_id" disabled>
@@ -616,7 +611,7 @@
                                     <input type="file" class="my-pond" name="filepond"/>
                                 </div>
 
-                                    @if(isEditMode){
+                                    @* @if(isEditMode){
                                         foreach(FileItem item in Topic.FileList){
                                         <script>
                                             $(() => {
@@ -641,7 +636,7 @@
                                         <script> 
                                             $(() => { pondSetOptions(); });
                                         </script>
-                                    }
+                                    } *@
                             </div>
                             
                             <hr>

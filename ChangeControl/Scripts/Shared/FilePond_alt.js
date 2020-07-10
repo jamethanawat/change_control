@@ -9,17 +9,19 @@ $(() => {
         maxFiles: 20,
         allowMultiple: true,
         required: false,
-        labelIdle: `<i class="fas fa-paperclip"></i> Drag &amp; Drop your files or <span class="filepond--label-action"> Browse  </span>`
+        labelIdle: `<i class="fas fa-paperclip"></i> Drag &amp; Drop your files or <span class="filepond--label-action"> Browse</span> (Limit 10MB)`,
+        maxFileSize: '10MB'
     });
     // pond.addFile('/nature.jpg');
 
 
-    pond_alt.on('addfilestart',() => { 
-        file_length = $('.filepond--item').length;
-    });
+    // pond_alt.on('addfilestart',() => { 
+    //     file_length = $(".filepond--item[data-filepond-item-state='idle'] > fieldset > .filepond--file").length;
+    // });
 
     var count = 0;
     pond_alt.on('addfile', (error, item) => {
+        file_length = $(".filepond--file").length - $(".filepond--item[data-filepond-item-state='load-invalid'] > fieldset > .filepond--file").length;
         var file_obj = {id : null, detail : null,description : null};
         console.log("file length :",file_length);        
         if (error) {
@@ -28,7 +30,7 @@ $(() => {
             return;
         }
 
-        let fp_file = $(".filepond--file");
+        let fp_file = $(".filepond--item[data-filepond-item-state='idle'] > fieldset > .filepond--file");
             fp_file.eq(count).addClass("description");
             
             if(file_detail.length == 0){

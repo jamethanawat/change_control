@@ -85,11 +85,23 @@ $(document).ready(function () {
             if(!(PE1_Process || PE2_Process) || !(QC1 || QC2 || QC3)){ //Need to select PE_Process or QC as Auditor at lease one
                 swal("Error", "Please select PE_Process and QC at least one", "error");
                 return;
+            }else if(Number(QC1) + Number(QC2) + Number(QC3) != 1 && ((PE1_Process ^ PE2_Process)) == false){ //When select QC and PE_Process more than one
+                swal("Error", "Please select one QC and one PE_Process", "error");
+                return
+            }else if(Number(QC1) + Number(QC2) + Number(QC3) != 1 ){ //When select QC more than one
+                swal("Error", "Please select one QC", "error");
+                return
+            }else if(((PE1_Process ^ PE2_Process)) == false){ //When select PE_Process more than one
+                swal("Error", "Please select one PE_Process", "error");
+                return
             }
         }else if(isExternal){
             if(!(QC1 || QC2 || QC3)){ //Need to select QC as Auditor at lease one
                 swal("Error", "Please select QC at least one", "error");
                 return;
+            }else if(Number(QC1) + Number(QC2) + Number(QC3) != 1 ){ //When select QC more than one
+                swal("Error", "Please select one QC", "error");
+                return
             }
         }
         
@@ -103,11 +115,11 @@ $(document).ready(function () {
         }
         $("#loading").removeClass('hidden');
         var inserted_id = "ER-0000000";
-        $.post(InsertRequestPath, form, (id) => {
+        $.post(InsertRelatedPath, form, () => {
+            console.log('Related created');
+            $.post(InsertRequestPath, form, (id) => {
                 console.log('Topic created');
                 inserted_id = id;
-                $.post(InsertRelatedPath, form, () => {
-                    console.log('Related created');
                     var promises = [];
                     console.log('files: ',files);
                     
@@ -145,8 +157,10 @@ $(document).ready(function () {
                 });
 
 
-        }).fail(() => {
-            alert('error handling here');
+        }).fail((xhr, status, errorThrown) => {
+            alert("Insert not success");
+                var errorMessage = xhr.status + ': ' + xhr.statusText
+                alert('Error - ' + errorMessage);
         })
     });
 
@@ -163,20 +177,29 @@ $(document).ready(function () {
 
             $("#loading").removeClass('hidden');
             var inserted_id = "ER-0000000";
-            $.post(UpdateRequestPath,form, (id) => {
+            $.post(InsertRelatedPath,form, () => {
+                console.log('Related created');
+                $.post(UpdateRequestPath, form, (id) =>{
                     console.log('Topic created');
                     inserted_id = id;
-                    $.post(InsertRelatedPath, form, () =>{
-                        console.log('Related created');
                         var promises = [];
                         
                         files.forEach(element => {
                             if(element.id != null){
-                                promises.push($.post(UpdateFilePath, {id: element.id, description: element.description}, () => {
-                                    }).fail((xhr, status, error) => {
+                                promises.push($.ajax({
+                                    type: "POST",
+                                    url: InsertFilePath,
+                                    data: Data,
+                                    cache: false,
+                                    processData: false,
+                                    contentType: false,
+                                    success: function () {
+                                    },
+                                    error: function(xhr, status, error) {
                                         var errorMessage = xhr.status + ': ' + xhr.statusText
                                         alert('Error - ' + errorMessage);
-                                    }));
+                                    }
+                                }));
                             }else{
                                 var Data = new FormData();
                                 Data.append("file",element.file);

@@ -28,15 +28,10 @@ namespace ChangeControl.Models{
                     response.data = null;
             try{
                 System.Net.ServicePointManager.Expect100Continue = false;
-
-                // CheckUser.LdapAuth chk = new CheckUser.LdapAuth();
-                // bool result = chk.checkLogin(user, password);
                 myAD.ADInfo conAD = new myAD.ADInfo();
                 bool FoundUser = conAD.ChkAuth(user,password);
                 if (FoundUser){
                     User temp_user = new User(conAD.ChkFullName(user), conAD.ChkName(user), conAD.ChkSurName(user), conAD.ChkEmail(user),conAD.ChkDept(user), conAD.ChkPosition(user));
-                    // string temp_pos = conAD.ChkPosition("63014");
-                    // string manager_id = conAD.ChkPosition("49024");
                     response.message = "success";
                     response.data = temp_user;
                     return response;

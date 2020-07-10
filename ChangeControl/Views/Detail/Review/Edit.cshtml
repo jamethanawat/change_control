@@ -1,0 +1,66 @@
+@using ChangeControl.Models;
+<!-- Modal -->
+<div class="modal fade" id="edit_review" tabindex="-1" role="dialog" aria-labelledby="edit_review" aria-modal="true" style="z-index:1200">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="edit_review">Edit Review</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" style="height:auto;">
+            <div class="row">
+            <div class="col-sm-12">
+                <form action method="post" class="form-horizontal" id="edit_review_form">
+                    @{var ReviewItem = Model.Item;}
+                    @foreach(var Item in ReviewItem){
+                        var temp_rd = $"rd-{@Item.Type}";
+                        var temp_desc = $"desc-{@Item.Type}";
+                        <div class="form-group row">
+                            <label for="inputProDesRe" class="col-sm-2 col-form-label">@Item.Name</label>
+                            @if(Item.Status != null){
+
+                            <div class="col-sm-3 col-form-label">
+                                <label style="margin-right: 15px;">
+                                    <input type="radio" name="@temp_rd" value="1" class="flat-red" @(Item.Status ? "checked" : "")>
+                                    Yes
+                                </label>
+                                <label style="margin-right: 15px;">
+                                    <input type="radio" name="@temp_rd" value="0" class="flat-red" @(Item.Status ? "" : "checked")>
+                                    No
+                                </label>
+                            </div>
+                            <div class="col-sm-7 col-form-label">
+                                <label>Details :</label>
+                                <textarea class="form-control" name="@temp_desc" placeholder="">@Item.Description</textarea>
+                            </div>
+                            }else{
+                            <div class="col-sm-10 col-form-label">
+                                <label>Details :</label>
+                                <textarea class="form-control" name="@temp_desc" placeholder="">@Item.Description</textarea>
+                            </div>
+                            }
+                        </div>
+                    }
+                    <div class="row">
+                        <label class="col-sm-2 col-form-label " >
+                            Attach File:
+                        </label>
+                        <div class="col-sm-10">
+                            <input type="file" class="my-pond" name="filepond_alt"/>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                Close
+            </button>
+            <button type="submit" id="submit_edit_review" form="edit_review_form" class="btn btn-info">
+                Submit
+            </button>
+        </div>
+        </div>
+    </div>
+</div>

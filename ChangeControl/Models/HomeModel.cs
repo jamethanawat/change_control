@@ -32,7 +32,7 @@ namespace ChangeControl.Models
             var temp_change_item = 0;
             if (model.Type != null)
             {
-                where += (model.Type == "Internal Change") ? "WHERE Topic.Topic_type='Internal'" : "WHERE Topic.Topic_type='External'";
+                where += (model.Type == "Internal Change") ? "WHERE Topic.Type='Internal'" : "WHERE Topic.Type='External'";
             }
                 where += (where.IndexOf("WHERE") == -1) ? "WHERE Topic.Status=" + model.Status+"" : " AND Topic.Status=" + model.Status + "";
                 // where += (where.IndexOf("WHERE") == -1) ? "WHERE Topic.Status=" + model.Status+"" : " AND Topic.Status=" + model.Status + "";
@@ -68,7 +68,7 @@ namespace ChangeControl.Models
             }
             if (model.ControlNo != "")
             {
-                where += (where.IndexOf("WHERE") == -1) ? "WHERE Topic.ID_Topic ='" + model.ControlNo + "'" : " AND Topic.ID_Topic ='" + model.ControlNo + "'";             
+                where += (where.IndexOf("WHERE") == -1) ? "WHERE Topic.Code ='" + model.ControlNo + "'" : " AND Topic.Code ='" + model.ControlNo + "'";             
             }
             if (model.Model != "")
             {
@@ -77,33 +77,24 @@ namespace ChangeControl.Models
             //ยัง
            // where += (where.IndexOf("WHERE") == -1) ? "WHERE Topic.Status=" + Chosechangeitem + "" : " AND Topic.Status=" + Chosechangeitem + "";
 
-            if (model.Partno != "")
-            {
-                where += (where.IndexOf("WHERE") == -1) ? "WHERE Topic.PartNo ='" + model.Partno + "'" : " AND Topic.PartNo ='" + model.Partno + "'";
+            if(model.Partno != ""){
+               where += (where.IndexOf("WHERE") == -1) ? "WHERE Topic.PartNo ='" + model.Partno + "'" : " AND Topic.PartNo ='" + model.Partno + "'";
             }
-            if (model.Partname != "")
-            {
-                where += (where.IndexOf("WHERE") == -1) ? "WHERE Topic.PartName ='" + model.Partname + "'" : " AND Topic.PartName ='" + model.Partname + "'";
+            if(model.Partname != ""){
+               where += (where.IndexOf("WHERE") == -1) ? "WHERE Topic.PartName ='" + model.Partname + "'" : " AND Topic.PartName ='" + model.Partname + "'";
             }
-            if (model.Processname != "")
-            {
-                where += (where.IndexOf("WHERE") == -1) ? "WHERE Topic.ProcessName ='" + model.Processname + "'" : " AND Topic.ProcessName ='" + model.Processname + "'";
+            if(model.Processname != ""){
+               where += (where.IndexOf("WHERE") == -1) ? "WHERE Topic.ProcessName ='" + model.Processname + "'" : " AND Topic.ProcessName ='" + model.Processname + "'";
             }
-            if (model.Related != null)
-            {
+            if(model.Related != null){
                 var remove = where.Replace("WHERE","");
-                sql = @"SELECT Topic.ID, Topic.ID_Topic, Topic.Topic_type, Topic.Change_item, Topic.Product_type, Topic.Revision,Topic.Model, Topic.PartNo, Topic.PartName, 
+                sql = @"SELECT Topic.ID, Topic.Code, Topic.Type, Topic.Change_item, Topic.Product_type, Topic.Revision,Topic.Model, Topic.PartNo, Topic.PartName, 
                        Topic.ProcessName, Topic.Status, Topic.Related, Topic.User_insert, Topic.Time_insert FROM Related INNER JOIN
-                       Topic ON Related.ID_Related = Topic.Related , (SELECT MAX(Revision) as Version, ID_Topic FROM CCS.dbo.Topic Group by ID_Topic) lastest WHERE (Related." + model.Related + " <> 0) AND "+remove+" AND Topic.Revision  = lastest.Version AND Topic.ID_Topic = lastest.ID_Topic Topic.ID ORDER BY DESC";
+                       Topic ON Related.ID = Topic.Related , (SELECT MAX(Revision) as Version, Code FROM CCS.dbo.Topic Group by Code) lastest WHERE (Related." + model.Related + " <> 0) AND "+remove+" AND Topic.Revision  = lastest.Version AND Topic.Code = lastest.Code Topic.ID ORDER BY DESC";
+            }else{
+                sql = @"SELECT Topic.ID, Topic.Code, Topic.Type, Topic.Change_item, Topic.Product_type, Topic.Revision,Topic.Model, Topic.PartNo, Topic.PartName, 
+                       Topic.ProcessName, Topic.Status, Topic.Related, Topic.User_insert, Topic.Time_insert FROM Topic , (SELECT MAX(Revision) as Version, Code FROM CCS.dbo.Topic Group by Code) lastest "+where+ " AND Topic.Revision  = lastest.Version AND Topic.Code = lastest.Code ORDER BY Topic.ID DESC";
             }
-            else
-            {
-                sql = @"SELECT Topic.ID, Topic.ID_Topic, Topic.Topic_type, Topic.Change_item, Topic.Product_type, Topic.Revision,Topic.Model, Topic.PartNo, Topic.PartName, 
-                       Topic.ProcessName, Topic.Status, Topic.Related, Topic.User_insert, Topic.Time_insert FROM Topic , (SELECT MAX(Revision) as Version, ID_Topic FROM CCS.dbo.Topic Group by ID_Topic) lastest "+where+ " AND Topic.Revision  = lastest.Version AND Topic.ID_Topic = lastest.ID_Topic ORDER BY Topic.ID DESC";
-            }
-            //sql = "SELECT ID_Topic,Topic_type,Change_item,Product_type,Revision,Model,PartNo,PartName,User_insert FROM Topic INNER JOIN";
-            //sql = sql + "[User] ON Topic.User_insert = [User].Name";
-            // Session["sql"] = sql;
             var result = _dbCCS.Database.SqlQuery<SearchResult>(sql).ToList();
             return result;
         } 

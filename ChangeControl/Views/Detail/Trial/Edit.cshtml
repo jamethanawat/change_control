@@ -1,0 +1,73 @@
+@using ChangeControl.Models;
+<!-- Modal -->
+<div class="modal fade" id="edit_trial" tabindex="-1" role="dialog" aria-labelledby="edit_trial" aria-modal="true" style="z-index:1200">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="edit_trial">Edit Trial</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" style="height:auto;">
+            <div class="row">
+            <div class="col-sm-12">
+                <form action method="post" class="form-horizontal" id="edit_trial_form">
+                    @* @{var TrialItem = Model.Item;} *@
+                        @* var temp_rd = $"rd-{@Item.Type}";
+                        var temp_desc = $"desc-{@Item.Type}"; *@
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label " >
+                            Description:
+                        </label>
+                        <div class="col-sm-10 col-form-label">
+                            <textarea class="form-control" name="desc" placeholder="" style="height:20vh">@Model.Detail</textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-sm-2 col-form-label " >
+                            Attach File:
+                        </label>
+                        <div class="col-sm-10">
+                            <input type="file" class="my-pond" name="filepond_alt"/>
+                        </div>
+                        @* @foreach(FileItem item in Model.FileList){
+                        <script>
+                            $(() => {
+                                let obj = {
+                                    options: {
+                                        file: {
+                                            name: '@item.Name',
+                                            size: '@item.Size',
+                                        }
+                                    }
+                                }
+                                console.log(obj);
+                                if('@item.Description' != null && '@item.Description' != ""){
+                                    alt_addFile('@item.ID',obj,'@item.Description');
+                                }else{
+                                    alt_addFile(obj);
+                                }
+                            });
+                        </script>
+                        }
+                        <script> 
+                            $(() => { 
+                                console.log(alt_getFile());
+                                pondSetOptions(); 
+                            });
+                        </script> *@
+                    </div>
+                </form>
+            </div>
+        </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                Close
+            </button>
+            <button type="submit" id="submit_edit_trial" form="edit_trial_form" class="btn btn-info">
+                Submit
+            </button>
+        </div>
+        </div>
+    </div>
+</div>

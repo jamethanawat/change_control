@@ -8,8 +8,8 @@ namespace ChangeControl.Models
     public class SearchResult
     {
         public long ID { get; set; }
-        public string ID_Topic { get; set; }
-        public string Topic_type { get; set; }
+        public string  Code { get; set; }
+        public string  Type { get; set; }
         public int Change_item { get; set; }
         public int Product_type { get; set; }
         public int Revision { get; set; }

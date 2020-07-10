@@ -1,18 +1,11 @@
 @{
     var str_date = "05 มิถุนายน 2020";
-    var i = 0;
-    var tlb = "";
     string department = (string)Session["Department"];
-    var isManager = false;
-    if((string)Session["Position"] == "Manager"){
-        isManager = true;
-    }
-    
+    var isManager = ((string)Session["Position"] == "Manager");
 }
 
 @foreach(var Review in Model){
 if(Review.Item.Count != 0){
-
 <div>
     @* <i class="fas bg-primary" style="font-family:Kanit !important">@Html.DisplayFor(model => Review.Department)</i> *@
     @if(Review.Status == 1){
@@ -24,7 +17,6 @@ if(Review.Item.Count != 0){
     }else{
         <i class="fas fa-question bg-error blue-tooltip" data-toggle="tooltip" data-placement="top" title="Unknown"></i>
     }
-    @{tlb = "tlb" + i;}
     <div class="timeline-item card">
         <div class="timeline-header card-header d-flex" style="padding: 10px 10px 5px 10px;"  data-card-widget="collapse">
                 <h6 class="mr-auto" style="font-family:Kanit"> @Review.Department - @Review.Profile.Name @Review.Profile.SurName (@Review.Date) </h6>
@@ -60,26 +52,29 @@ if(Review.Item.Count != 0){
                         </div>
                     </div>
                     }
+                    @if(Review.Approver.FullName != "" && Review.Approver.FullName != null){
                     <div class="row">
                         <label class="col-sm-4 col-form-label" style="text-align:right">
                             Approved By :
                         </label>
                         <div class="col-sm-8 col-form-label">
                             <span>
-                                Pakawat Smutkun (@Review.Date)
+                                @Review.Approver.FullName (@Review.ApprovedDate)
                             </span>
                         </div>
                     </div>
+                    }
                 </form>
 
-                @if(Review.FileList != null){
-                    if(Review.FileList.Count != 0){
-                <div class="col-sm-12 d-flex mt-4">
+            @if(Review.FileList != null){
+                if(Review.FileList.Count != 0){
+                <div class="col-sm-12 d-flex mt-4 file-list">
                 <ul class="mailbox-attachments d-flex flex-wrap align-items-stretch clearfix">
                     @{var FileList = Review.FileList;
                         foreach(var File in FileList){
                             var FileSize = "0 Bytes";
-                            <li>
+                            var file_desc = (File.Description.Trim() == null || File.Description.Trim() == "") ? "<i>No information</i>" : File.Description;
+                            <li data-toggle="tooltip" data-placement="top" data-html="true" title="@file_desc">
                                 <span class="mailbox-attachment-icon">
                                     @{var FileType = Path.GetExtension(File.Name);}
                                     @if(FileType == ".docx" || FileType == ".doc" ){
@@ -116,26 +111,19 @@ if(Review.Item.Count != 0){
                     }
                     </ul>
                     </div>
-                    }
                 }
+            }
         </div>
         @{
-            var isDepartment = false;
-            if(department == Review.Department){
-                    isDepartment = true;
-            }
-
-            if((isManager || isDepartment) && Review.Status != 1){
+            var isDepartment = (department == Review.Department);
+            @* if((isDepartment) && Review.Status != 1 && ((string)Session["Status"] == "Request" || (string)Session["Status"] == "Review")){ //Disable edit and approve button when Review have approved *@
+            if((isDepartment) && ((string)Session["Status"] == "Request" || (string)Session["Status"] == "Review")){
             <hr style="margin-top:0px !important">
             <div class="timeline-footer">
                 <div class="float-right ">
-                    @* <a href="#" class="btn btn-warning btn-sm">Request Re-Submit</a> *@
-                    @if(Review.Status !=1 && isDepartment){
-                        <a href="#" class="btn btn-warning btn-sm" >Edit</a> 
-                    }
-                    @if(Review.Status !=5 && Review.Status !=6 && isManager){
-                        <a a href="#" class="btn btn-success btn-sm style="margin-right:10px"">Approve</a>
-                    }
+                    @* @if(Review.Status !=1 && isDepartment){ //Disable edit button when Review have approved*@ 
+                    <a class="btn btn-warning btn-sm rv-edit" id="edit_rv" data-toggle="modal" data-target="#edit_review" value="@Review.ID_Review">Edit</a>
+                    @if(Review.Status !=1 && Review.Status !=5 && Review.Status !=6 && isManager ){ <button class="btn btn-info btn-sm mr-1 rv-approve" value="@Review.ID_Review">Approve</button>}
                 </div>
             </div>
             }
@@ -143,6 +131,4 @@ if(Review.Item.Count != 0){
     </div>  
 </div>
 }
-    i++;
-
 }

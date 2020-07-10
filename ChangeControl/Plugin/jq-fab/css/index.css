@@ -63,6 +63,7 @@
   height: 100%;
   list-style: none;
   text-align: right;
+  padding: 0px;
 }
 
 .zoom-menu li {

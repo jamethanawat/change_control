@@ -18,7 +18,7 @@
     if(Topic != null){
         isInternal = false;
         isEditMode = true;
-        if(Topic.Topic_type.Replace(" ", "") == "Internal"){
+        if(Topic. Type.Replace(" ", "") == "Internal"){
             isInternal = true;
         }
     }
@@ -354,8 +354,8 @@
                                 <div class="col-sm-2">
                                     @{
                                         if(isEditMode){
-                                                iTopic_id = Topic.ID_Topic;
-                                                eTopic_id = Topic.ID_Topic;
+                                                iTopic_id = Topic.Code;
+                                                eTopic_id = Topic.Code;
                                         }
                                     }
                                     <input type="text" name="model" style="max-width: 143px;" class="form-control center right" id="iTopic" value="ID: @iTopic_id" disabled>

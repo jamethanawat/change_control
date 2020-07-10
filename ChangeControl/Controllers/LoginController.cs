@@ -175,8 +175,6 @@ namespace ChangeControl.Controllers{
             }else{
                 result = "Not found";
             }
-
-             System.Diagnostics.Debug.WriteLine(result);
             return result;
         }
 

@@ -1,5 +1,6 @@
 $(() => {
     FilePond.registerPlugin(FilePondPluginFileEncode);
+    FilePond.registerPlugin(FilePondPluginFileValidateSize);
     const inputElement = document.querySelector('input[name="filepond"]');
     var file_length = 0;
     var file_arry = [];
@@ -9,26 +10,26 @@ $(() => {
         maxFiles: 20,
         allowMultiple: true,
         required: false,
-        labelIdle: `<i class="fas fa-paperclip"></i> Drag &amp; Drop your files or <span class="filepond--label-action"> Browse  </span>`
-    });
-    // pond.addFile('/nature.jpg');
-
-
-    pond.on('addfilestart',() => { 
-        file_length = $('.filepond--item').length;
+        labelIdle: `<i class="fas fa-paperclip"></i> Drag &amp; Drop your files or <span class="filepond--label-action"> Browse</span> (Limit 10MB)`,
+        maxFileSize: '10MB'
     });
 
+    // pond.on('addfilestart',() => { 
+        // file_length = $('.filepond--item').length;
+    // });
+    
     var count = 0;
     pond.on('addfile', (error, item) => {
+        file_length = $(".filepond--file").length - $(".filepond--item[data-filepond-item-state='load-invalid'] > fieldset > .filepond--file").length;
         var file_obj = {id : null, detail : null,description : null};
-        console.log("file length :",file_length);        
+         console.log("file length :",file_length);        
         if (error) {
             console.log(error);
             console.log('Oh no');
             return;
         }
 
-        let fp_file = $(".filepond--file");
+        let fp_file = $(".filepond--item[data-filepond-item-state='idle'] > fieldset > .filepond--file");
             fp_file.eq(count).addClass("description");
             
             if(file_detail.length == 0){
@@ -55,18 +56,20 @@ $(() => {
         file_list.push(file_obj);
         
         count++;
-        console.log("compared: ",file_list.length);
+         console.log("compared: ",file_list.length);
         if(file_list.length == file_length){
             $(".filepond-add-desc").off("click");
             $(".filepond-add-desc").on("click",(e) => {
                 add_description(e.target.id);
             })
+            console.log("set zero")
             count = 0;
             origin_file = file_arry;
             file_detail = [];
             file_arry = [];
         }
-        console.log(file_list);
+         console.log(file_list);
+         console.log("count",count);
     });
 
     pond.on('removefile', (error,file) =>{
@@ -80,7 +83,7 @@ $(() => {
 
     function add_description(update_id){
         update_id = update_id.slice(1);
-        console.log("before: ",file_list);
+         console.log("before: ",file_list);
         update_i = file_list.findIndex(item => item.detail.id == update_id);
         swal({
             title: "Please provide a description.", 
@@ -106,7 +109,7 @@ $(() => {
             icon:"warning",
         }).then((result) => {
             if(result != null && result != "" && result != "clear"){
-                console.log(`${update_id}`);
+                 console.log(`${update_id}`);
                 $(`.filepond--file-status-main#s${update_id}`).html(result).show("slow");
                 file_list[update_i].description = result;
                 swal({

@@ -1,0 +1,112 @@
+@{
+    var str_date = "05 มิถุนายน 2020";
+    string department = (string)Session["Department"];
+    var isManager = ((string)Session["Position"] == "Manager");
+}
+
+@foreach(var Trial in Model){
+<div>
+    @* <i class="fas bg-primary" style="font-family:Kanit !important">@Html.DisplayFor(model => Trial.Department)</i> *@
+    @if(Trial.Status == 1){
+        <i class="fas fa-check bg-primary blue-tooltip" data-toggle="tooltip" data-placement="top" title="Approved"></i>
+    }else if(Trial.Status == 3){
+        <i class="far fa-clock bg-warning blue-tooltip" data-toggle="tooltip" data-placement="top" title="Waiting for approve"></i>
+    }else if(Trial.Status == 4){
+        <i class="fas fa-info bg-warning blue-tooltip" data-toggle="tooltip" data-placement="top" title="Need more information"></i>
+    }else{
+        <i class="fas fa-question bg-error blue-tooltip" data-toggle="tooltip" data-placement="top" title="Unknown"></i>
+    }
+    <div class="timeline-item card">
+        <div class="timeline-header card-header d-flex" style="padding: 10px 10px 5px 10px;"  data-card-widget="collapse">
+                <h6 class="mr-auto" style="font-family:Kanit"> @Trial.Department - @Trial.Profile.Name @Trial.Profile.SurName (@Trial.Date) </h6>
+                <button type="button" class="btn btn-tool arrow-collapse" data-card-widget="collapse"><i class="fas fa-chevron-down"></i></button>
+        </div>
+
+        <div class="timeline-body card-body">
+                <form class="form-horizontal">
+                    <div class="row">
+                        <label class="col-sm-4 col-form-label" style="text-align:right">
+                            Detail : 
+                        </label>
+                        <div class="col-sm-8 col-form-label">
+                            <span>@Trial.Detail</span>
+                        </div>
+                    </div>
+                    @if(Trial.Approver.FullName != "" && Trial.Approver.FullName != null){
+                    <div class="row">
+                        <label class="col-sm-4 col-form-label" style="text-align:right">
+                            Approved By :
+                        </label>
+                        <div class="col-sm-8 col-form-label">
+                            <span>
+                                @Trial.Approver.FullName (@Trial.ApprovedDate)
+                            </span>
+                        </div>
+                    </div>
+                    }
+                </form>
+
+                @if(Trial.FileList != null){
+                    if(Trial.FileList.Count != 0){
+                <div class="col-sm-12 d-flex mt-4 file-list">
+                <ul class="mailbox-attachments d-flex flex-wrap align-items-stretch clearfix">
+                    @{var FileList = Trial.FileList;
+                        foreach(var File in FileList){
+                            var FileSize = "0 Bytes";
+                            var file_desc = (File.Description.Trim() == null || File.Description.Trim() == "") ? "<i>No information</i>" : File.Description;
+                            <li data-toggle="tooltip" data-placement="top" data-html="true" title="@file_desc">
+                                <span class="mailbox-attachment-icon">
+                                    @{var FileType = Path.GetExtension(File.Name);}
+                                    @if(FileType == ".docx" || FileType == ".doc" ){
+                                        <i class="far fa-file-word"></i>
+                                    }else if(FileType == ".pptx" || FileType == ".ppt" ){
+                                        <i class="far fa-file-powerpoint"></i>
+                                    }else if(FileType == ".xls" || FileType == ".xlxs" ){
+                                        <i class="far fa-file-excel"></i>
+                                    }else if(FileType == ".pdf"){
+                                        <i class="far fa-file-pdf"></i>
+                                    }else if(FileType == ".png" || FileType == ".jpeg" || FileType == ".jpg" || FileType == ".JPG" || FileType == ".gif" ){
+                                        <i class="far fa-file-image"></i>
+                                    }else{
+                                        <i class="far fa-file"></i>
+                                    }
+                                </span>
+                                <div class="mailbox-attachment-info">
+                                    <a href="#" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> @File.Name
+                                    </a>
+                                    <span class="mailbox-attachment-size clearfix mt-1">
+                                    @if(File.Size != null){
+                                        if(File.Size > 1000){
+                                            FileSize = (File.Size / 1000) + " KB";
+                                        }else{
+                                            FileSize = File.Size + " Bytes";
+                                        }
+                                    }
+                                        <span>@FileSize</span>
+                                        <a href="#" class="btn btn-default btn-sm float-right"><i class="fas fa-cloud-download-alt"></i></a>
+                                    </span>
+                                </div>
+                            </li>
+                        }
+                    }
+                    </ul>
+                    </div>
+                    }
+                }
+        </div>
+        @{
+            var isDepartment = (department == Trial.Department);
+            @* if((isManager || isDepartment) && Trial.Status != 1  && (string)Session["Status"] == "Trial"){ *@
+            if((isDepartment) && (string)Session["Status"] == "Trial"){
+            <hr style="margin-top:0px !important">
+            <div class="timeline-footer">
+                <div class="float-right ">
+                    <a href="#" class="btn btn-warning btn-sm tr-edit"id="edit_tr" data-toggle="modal" data-target="#edit_trial" value="@Trial.ID" >Edit</a> 
+                    @if(Trial.Status !=1 && Trial.Status !=5 && Trial.Status !=6 && isManager ){ <button a href="#" class="btn btn-info btn-sm mr-1 tr-approve" value="@Trial.ID">Approve</button> }
+                </div>
+            </div>
+            }
+        }
+    </div>  
+</div>
+}

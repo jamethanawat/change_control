@@ -44,35 +44,37 @@ $(document).ready(function () {
 
         //status
         var status;
-        // if ($("#ST_pending").prop("checked")) {
+        // if ($("#st_pending").prop("checked")) {
         //     status = 7;
-        // } else if ($("#ST_issued").prop("checked")) {
+        // } else if ($("#st_issued").prop("checked")) {
         //     status = 1;
-        // } else if ($("#ST_check").prop("checked")) {
+        // } else if ($("#st_check").prop("checked")) {
         //     status = 1;
-        // } else if ($("#ST_approved").prop("checked")) {
+        // } else if ($("#st_approved").prop("checked")) {
         //     status = 1;
-        // } else if ($("#ST_finished").prop("checked")) {
+        // } else if ($("#st_finished").prop("checked")) {
         //     status = 1;
         // }
         
-        if ($("#ST_request").prop("checked")) {
+        if ($("#st_request").prop("checked")) {
             status = 7;
-        } else if ($("#ST_review").prop("checked")) {
+        } else if ($("#st_review").prop("checked")) {
             status = 8;
-        } else if ($("#ST_trial").prop("checked")) {
+        } else if ($("#st_trial").prop("checked")) {
             status = 9;
-        } else if ($("#ST_closed").prop("checked")) {
-            status = 6;
+        } else if ($("#st_confirm").prop("checked")) {
+            status = 10;
+        } else if ($("#st_closed").prop("checked")) {
+            status = 11;
         } 
 
         //over status
         var overstatus;
-        if ($("#ST_review_complete").prop("checked")) {
+        if ($("#st_review_complete").prop("checked")) {
             overstatus = 1;
-        } else if ($("#ST_Confirm_complete").prop("checked")) {
+        } else if ($("#st_Confirm_complete").prop("checked")) {
             overstatus = 1;
-        } else if ($("#ST_allstatus").prop("checked")) {
+        } else if ($("#st_allstatus").prop("checked")) {
             overstatus = 1;
         } 
         //changeitem
@@ -132,27 +134,27 @@ $(document).ready(function () {
                                 return null;
                             }else if(row.User_insert === SessionUser){
                             // }else{
-                                return `<div class="btn-group-vertical"><button type="button" name="detail" id="${row.ID_Topic}" class="btn btn-info btn-sm mb-1" data-toggle="modal" data-target="#largeModal" onclick="RedirectToDetail(this)">`+
+                                return `<div class="btn-group-vertical"><button type="button" name="detail" id="${row. Code}" class="btn btn-info btn-sm mb-1" data-toggle="modal" data-target="#largeModal" onclick="RedirectToDetail(this)">`+
                                 `<i class="fas fa-external-link-alt"></i></button>` +
                                 `<button type="button" name="edit" id="${data}" class="btn btn-success btn-sm  mb-1" data-toggle="modal" data-target="#largeModal" onclick="EditTopic(this)">`+
                                 `<i class="fas fa-pen"></i>`+
                                 `</button></div>`;
                             }else{
-                                return `<div class="btn-group-vertical"><button type="button" name="detail" id="${row.ID_Topic}" class="btn btn-info btn-sm  mb-1" data-toggle="modal" data-target="#largeModal">`+
+                                return `<div class="btn-group-vertical"><button type="button" name="detail" id="${row. Code}" class="btn btn-info btn-sm  mb-1" data-toggle="modal" data-target="#largeModal">`+
                                 `<i class="fas fa-external-link-alt"></i></button></div>`;
                             }
                         }
                     }],
                     columns: [
-                        { data: 'Topic_type' },
-                        { data: 'ID_Topic' },
+                        { data: 'Type' },
+                        { data: 'Code' },
                         { data: 'Change_item' },
                         { data: 'Product_type' },
                         { data: 'Model' },
                         { data: 'Revision' },
                         { data: 'PartNo' },
                         { data: 'PartName' },
-                        { data: 'ID_Topic' },
+                        { data: 'Code' },
                     ],
                 });
             

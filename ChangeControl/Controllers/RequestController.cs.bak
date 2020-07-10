@@ -53,14 +53,14 @@ namespace ChangeControl.Controllers
                 if (last_iTopic.Count == 0){ //Case Internal Topic not exist
                     ViewData["iTopic_id"] = "IN-" + date.Substring(2, 4) + "001"; //Then new ID = IN2006001
                 }else if(last_iTopic.Count > 0){ //Case Internal Topic exist
-                    int i_id = Int32.Parse(last_iTopic[0].ID_Topic.Substring(7, 3)) + 1;
+                    int i_id = Int32.Parse(last_iTopic[0].Code.Substring(7, 3)) + 1;
                     ViewData["iTopic_id"] = "IN-" + date.Substring(2, 4) + "" + i_id.ToString("000") + ""; //Then new ID = last Topic ID +1
                 }
                 
                 if(last_eTopic.Count == 0){ //Case External Topic not exist
                     ViewData["eTopic_id"] = "EX-" + date.Substring(2, 4) + "001"; //Then new id = EX2006001
                 }else if(last_eTopic.Count > 0){ //Case External Topic exist
-                    int e_id = Int32.Parse(last_eTopic[0].ID_Topic.Substring(7, 3)) + 1;
+                    int e_id = Int32.Parse(last_eTopic[0].Code.Substring(7, 3)) + 1;
                     ViewData["eTopic_id"] = "EX-" + date.Substring(2, 4) + "" + e_id.ToString("000") + ""; //Then new ID = last Topic ID +1
                  }
                 
@@ -122,7 +122,7 @@ namespace ChangeControl.Controllers
                         if (changeType == "Internal") Session["Foreignkey"] = "IN-" + date.Substring(2, 4) + "001";
                         else Session["Foreignkey"] = "EX-" + date.Substring(2, 4) + "001";
                     }else{
-                        int id = Int32.Parse(TopicDetail[0].ID_Topic.Substring(7, 3)) + 1;
+                        int id = Int32.Parse(TopicDetail[0].Code.Substring(7, 3)) + 1;
                         if (changeType == "Internal") Session["Foreignkey"] = "IN-" + date.Substring(2, 4) + "" + id.ToString("000") + "";
                         else Session["Foreignkey"] = "EX-" + date.Substring(2, 4) + "" + id.ToString("000") + "";
                     }
@@ -152,7 +152,7 @@ namespace ChangeControl.Controllers
                     System.Diagnostics.Debug.WriteLine("Exception");
                     System.Diagnostics.Debug.WriteLine(ex);
 
-                    return Json(new { code = -1 }, JsonRequestBehavior.AllowGet);
+                    return Json(new {Code = -1 }, JsonRequestBehavior.AllowGet);
                 }
         }
 
@@ -161,10 +161,10 @@ namespace ChangeControl.Controllers
             try{
                 Related related = new Related(IT,MKT,PC1,PC2,PT1,PT2,PT3A,PT3M,PT4,PT5,PT6,PT7,PE1,PE2,PE2_SMT,PE2_PCB,PE2_MT,PE1_Process,PE2_Process,PCH1,PCH2,QC_IN1,QC_IN2,QC_IN3,QC_FINAL1,QC_FINAL2,QC_FINAL3,QC_NFM1,QC_NFM2,QC_NFM3,QC1,QC2,QC3);
                 _requestModel.InsertRelated(temp_related, related);
-                return Json(new { code = 1 },JsonRequestBehavior.AllowGet);
+                return Json(new {Code = 1 },JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex){
-                return Json(new { code = -1 }, JsonRequestBehavior.AllowGet);
+                return Json(new {Code = -1 }, JsonRequestBehavior.AllowGet);
             }
         }
 
@@ -194,10 +194,10 @@ namespace ChangeControl.Controllers
             try{
                 var key = "T" + Session["Foreignkey"]+"-"+ Session["Revision"];
                 _requestModel.RemoveData(key,(string)(Session["Foreignkey"]));
-                return Json(new { code = 1 }, JsonRequestBehavior.AllowGet);
+                return Json(new {Code = 1 }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex){
-                return Json(new { code = -1 }, JsonRequestBehavior.AllowGet);
+                return Json(new {Code = -1 }, JsonRequestBehavior.AllowGet);
             }
         }
 
@@ -208,7 +208,7 @@ namespace ChangeControl.Controllers
                 return Json(result, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex){
-                return Json(new { code = -1 }, JsonRequestBehavior.AllowGet);
+                return Json(new {Code = -1 }, JsonRequestBehavior.AllowGet);
             }
 
         }
@@ -566,9 +566,9 @@ namespace ChangeControl.Controllers
               //mail = item.ToList();
               //Email.Add(mail[0].Email);
               SendMail(Email);
-              return Json(new { code = 1 }, JsonRequestBehavior.AllowGet);
+              return Json(new {Code = 1 }, JsonRequestBehavior.AllowGet);
             }else{
-              return Json(new { code = -1 }, JsonRequestBehavior.AllowGet);
+              return Json(new {Code = -1 }, JsonRequestBehavior.AllowGet);
             }
         }
 

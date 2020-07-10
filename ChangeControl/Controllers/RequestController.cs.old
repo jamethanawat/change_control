@@ -66,7 +66,7 @@ namespace ChangeControl.Controllers
             }
             else
             {
-                Session["TopicID"] = ID;
+                Session["TopicCode"] = ID;
                 Session["Foreignkey"] = null;
                 Session["oldidfile"] = null;
                 Session["Foreignkey"] = ID;
@@ -175,7 +175,7 @@ namespace ChangeControl.Controllers
                         if (Type == "Internal") Session["Foreignkey"] = "IN-" + date.Substring(2, 4) + "001";
                         else Session["Foreignkey"] = "EX-" + date.Substring(2, 4) + "001";
                     }else{
-                        int id = Int32.Parse(TopicDetail[0].ID_Topic.Substring(7, 3)) + 1;
+                        int id = Int32.Parse(TopicDetail[0]. Code.Substring(7, 3)) + 1;
                         if (Type == "Internal") Session["Foreignkey"] = "IN-" + date.Substring(2, 4) + "" + id.ToString("000") + "";
                         else Session["Foreignkey"] = "EX-" + date.Substring(2, 4) + "" + id.ToString("000") + "";
                     }

@@ -278,6 +278,7 @@
     <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Models\RequestModel.cs" />
     <Compile Include="Models\ViewModels\ChangeItem.cs" />
+    <Compile Include="Models\ViewModels\Confirm.cs" />
     <Compile Include="Models\ViewModels\Department.cs" />
     <Compile Include="Models\ViewModels\DepartmentList.cs" />
     <Compile Include="Models\ViewModels\File.cs" />
@@ -298,6 +299,7 @@
     <Compile Include="Models\ViewModels\Topic.cs" />
     <Compile Include="Models\ViewModels\TopicAlt.cs" />
     <Compile Include="Models\ViewModels\TopicApprove.cs" />
+    <Compile Include="Models\ViewModels\Trial.cs" />
     <Compile Include="Models\ViewModels\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -379,6 +381,7 @@
     <Content Include="Plugin\datepicker\datepicker.js" />
     <Content Include="Plugin\datepicker\datepicker.min.css" />
     <Content Include="Plugin\datepicker\datepicker.min.js" />
+    <Content Include="Plugin\filepond\filepond-plugin-file-encode.js" />
     <Content Include="Plugin\filepond\filepond-plugin-image-preview.min.js" />
     <Content Include="Plugin\filepond\filepond.css" />
     <Content Include="Plugin\filepond\filepond.jquery.js" />
@@ -2217,6 +2220,14 @@
     <Content Include="Views\Detail\Review\PE_Process.cshtml" />
     <Content Include="Views\Detail\Review\QC.cshtml" />
     <Content Include="Views\Detail\Review\Other.cshtml" />
+    <Content Include="Views\Detail\Trial\TrialList.cshtml" />
+    <Content Include="Views\Detail\Confirm\List.cshtml" />
+    <Content Include="Views\Detail\Review\Edit.cshtml" />
+    <Content Include="Views\Detail\Review\List.cshtml" />
+    <Content Include="Views\Detail\Trial\List.cshtml" />
+    <Content Include="Views\Detail\Review\Edit_PE_Process.cshtml" />
+    <Content Include="Views\Detail\Review\Edit_QC.cshtml" />
+    <Content Include="Views\Detail\Trial\Edit.cshtml" />
     <None Include="Web References\myAD\ADInfo.disco" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">

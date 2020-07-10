@@ -8,8 +8,8 @@ namespace ChangeControl.Models
     public class Topic
     {
         public long ID { get; set;}
-        public string ID_Topic{ get; set;}
-        public string Topic_type{ get; set; }
+        public string Code{ get; set;}
+        public string Type{ get; set; }
         public int Change_item{ get; set; }
         public int Product_type{ get; set; }
         public int Revision{ get; set; }
@@ -22,13 +22,13 @@ namespace ChangeControl.Models
         public string Subject{ get; set; }
         public string Detail{ get; set; }
         public string Timing{ get; set; }
-        public string Related{ get; set; }
+        public long Related{ get; set; }
         public string User_insert{ get; set; }
         public string Time_insert{ get; set; }
         
-        public Topic(string ID_Topic,string changeType,int changeItem,int productType,int revision ,string model,string partNo,string partName,string processName,int status,string appDescription,string subject,string detail,string timing, string related,string UserInsert,string TimeInsert){
-            this.ID_Topic = ID_Topic;
-            this.Topic_type = changeType;
+        public Topic(string Code,string changeType,int changeItem,int productType,int revision ,string model,string partNo,string partName,string processName,int status,string appDescription,string subject,string detail,string timing, long related,string UserInsert,string TimeInsert){
+            this.Code = Code;
+            this.Type = changeType;
             this.Change_item = changeItem;
             this.Product_type = productType;
             this.Revision = revision;
@@ -47,8 +47,8 @@ namespace ChangeControl.Models
         }
 
         public Topic(){
-            this.ID_Topic = null;
-            this.Topic_type = null;
+            this.Code = null;
+            this.Type = null;
             this.Change_item = 0;
             this.Product_type = 0;
             this.Revision = 0;
@@ -60,7 +60,7 @@ namespace ChangeControl.Models
             this.Subject = null;
             this.Detail = null;
             this.Timing = null;
-            this.Related = null;
+            this.Related = 0;
             this.User_insert = null;
             this.Time_insert = null;
         }

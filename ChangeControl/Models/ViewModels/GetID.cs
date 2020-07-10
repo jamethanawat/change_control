@@ -7,6 +7,6 @@ namespace ChangeControl.Models
 {
     public class GetID
     {
-        public string ID_Topic { get; set; }
+        public string  Code { get; set; }
     }
 }

@@ -64,7 +64,7 @@
         z-index: 20 !important;
     }
 
-    #quickForm .form-group{
+    #resubmit_form .form-group{
         margin-bottom: 0.5rem;
     }
 
@@ -89,7 +89,7 @@
             <div class="modal-body">
               <div class="row">
                 <div class="col-sm-12">
-                    <form action method="post" id="quickForm">
+                    <form action method="post" id="resubmit_form">
                     <fieldset data-step="1">
                         @foreach(var DepartmentGroup in Model){
                             <fieldset class="group border p-2"> 
@@ -167,7 +167,7 @@
                 <button type="button" class="btn btn-success" data-step-to="next" disabled>
                     Next
                 </button>
-                <button type="submit" form="quickForm" class="btn btn-info">
+                <button type="submit" form="resubmit_form" class="btn btn-info">
                     Submit
                 </button>
             </div>

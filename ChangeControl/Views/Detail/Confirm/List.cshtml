@@ -1,0 +1,113 @@
+@{
+    var str_date = "05 มิถุนายน 2020";
+    string department = (string)Session["Department"];
+    var isManager = ((string)Session["Position"] == "Manager");
+}
+
+@foreach(var Confirm in Model){
+<div>
+    @* <i class="fas bg-primary" style="font-family:Kanit !important">@Html.DisplayFor(model => Confirm.Department)</i> *@
+    @if(Confirm.Status == 1){
+        <i class="fas fa-check bg-primary blue-tooltip" data-toggle="tooltip" data-placement="top" title="Approved"></i>
+    }else if(Confirm.Status == 3){
+        <i class="far fa-clock bg-warning blue-tooltip" data-toggle="tooltip" data-placement="top" title="Waiting for approve"></i>
+    }else if(Confirm.Status == 4){
+        <i class="fas fa-info bg-warning blue-tooltip" data-toggle="tooltip" data-placement="top" title="Need more information"></i>
+    }else{
+        <i class="fas fa-question bg-error blue-tooltip" data-toggle="tooltip" data-placement="top" title="Unknown"></i>
+    }
+    <div class="timeline-item card">
+        <div class="timeline-header card-header d-flex" style="padding: 10px 10px 5px 10px;"  data-card-widget="collapse">
+                <h6 class="mr-auto" style="font-family:Kanit"> @Confirm.Department - @Confirm.Profile.Name @Confirm.Profile.SurName (@Confirm.Date) </h6>
+                <button type="button" class="btn btn-tool arrow-collapse" data-card-widget="collapse"><i class="fas fa-chevron-down"></i></button>
+        </div>
+
+        <div class="timeline-body card-body">
+                <form class="form-horizontal">
+                    <div class="row">
+                        <label class="col-sm-4 col-form-label" style="text-align:right">
+                            Detail : 
+                        </label>
+                        <div class="col-sm-8 col-form-label">
+                            <span>@Confirm.Detail</span>
+                        </div>
+                    </div>
+                    @if(Confirm.Approver.FullName != "" && Confirm.Approver.FullName != null){
+                    <div class="row">
+                        <label class="col-sm-4 col-form-label" style="text-align:right">
+                            Approved By :
+                        </label>
+                        <div class="col-sm-8 col-form-label">
+                            <span>
+                                @Confirm.Approver.FullName (@Confirm.ApprovedDate)
+                            </span>
+                        </div>
+                    </div>
+                    }
+                </form>
+
+                @if(Confirm.FileList != null){
+                    if(Confirm.FileList.Count != 0){
+                <div class="col-sm-12 d-flex mt-4 file-list">
+                <ul class="mailbox-attachments d-flex flex-wrap align-items-stretch clearfix">
+                    @{var FileList = Confirm.FileList;
+                        foreach(var File in FileList){
+                            var FileSize = "0 Bytes";
+                            var file_desc = (File.Description.Trim() == null || File.Description.Trim() == "") ? "<i>No information</i>" : File.Description;
+                            <li data-toggle="tooltip" data-placement="top" data-html="true" title="@file_desc">
+                                <span class="mailbox-attachment-icon">
+                                    @{var FileType = Path.GetExtension(File.Name);}
+                                    @if(FileType == ".docx" || FileType == ".doc" ){
+                                        <i class="far fa-file-word"></i>
+                                    }else if(FileType == ".pptx" || FileType == ".ppt" ){
+                                        <i class="far fa-file-powerpoint"></i>
+                                    }else if(FileType == ".xls" || FileType == ".xlxs" ){
+                                        <i class="far fa-file-excel"></i>
+                                    }else if(FileType == ".pdf"){
+                                        <i class="far fa-file-pdf"></i>
+                                    }else if(FileType == ".png" || FileType == ".jpeg" || FileType == ".jpg" || FileType == ".JPG" || FileType == ".gif" ){
+                                        <i class="far fa-file-image"></i>
+                                    }else{
+                                        <i class="far fa-file"></i>
+                                    }
+                                </span>
+                                <div class="mailbox-attachment-info">
+                                    <a href="#" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> @File.Name
+                                    </a>
+                                    <span class="mailbox-attachment-size clearfix mt-1">
+                                    @if(File.Size != null){
+                                        if(File.Size > 1000){
+                                            FileSize = (File.Size / 1000) + " KB";
+                                        }else{
+                                            FileSize = File.Size + " Bytes";
+                                        }
+                                    }
+                                        <span>@FileSize</span>
+                                        <a href="#" class="btn btn-default btn-sm float-right"><i class="fas fa-cloud-download-alt"></i></a>
+                                    </span>
+                                </div>
+                            </li>
+                        }
+                    }
+                    </ul>
+                    </div>
+                    }
+                }
+        </div>
+        @{
+            var isDepartment = (department == Confirm.Department);
+            if((isManager || isDepartment) && Confirm.Status != 1  && (string)Session["Status"] == "Confirm"){
+            <hr style="margin-top:0px !important">
+            <div class="timeline-footer">
+                <div class="float-right ">
+                    @if(Confirm.Status !=1 && isDepartment){ 
+                        <a class="btn btn-warning btn-sm cf-edit" id="edit_cf" data-toggle="modal" data-target="#edit_confirm">Edit</a>
+                            if(Confirm.Status !=5 && Confirm.Status !=6 && isManager){ <a a href="#" class="btn btn-info btn-sm mr-1 cf-approve" >Approve</a> }
+                    }
+                </div>
+            </div>
+            }
+        }
+    </div>  
+</div>
+}

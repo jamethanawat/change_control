@@ -14,6 +14,7 @@ function SetDepartment(){
     swal({
         title: "Developer Mode", 
         text: "Please enter password", 
+        buttons : [true,true],
         content: {
             element: "input",
             attributes: {
@@ -22,25 +23,32 @@ function SetDepartment(){
             },
         },icon:"warning",
     }).then((password) => {
-        if(password == this.password || DevMode == "on"){
-            swal({
-                title: "Developer Mode", 
-                text: "Please submit Department", 
-                content: department_list,
-                icon:"warning",
-            }).then(() => {
-                let typedDepartment = $(".select-custom").children("option:selected").text();
-                console.log(typedDepartment);
-                $.post("/login/SetDepartment", {DepartmentName:typedDepartment}, (data) => {
-                    if(data == 1){
-                        swal("Success", "Set Department Complete", "success").then(location.reload());
-                    }else{
-                        swal("Error", "User Password Not Correct", "error");
+        if(password != null){
+            if(password == this.password || DevMode == "on"){
+                swal({
+                    title: "Developer Mode", 
+                    text: "Please submit Department", 
+                    content: department_list,
+                    buttons : [true,true],
+                    icon:"warning",
+                }).then((res) => {
+                    if(res){
+                        let typedDepartment = $(".select-custom").children("option:selected").text();
+                        if(typedDepartment != null){
+                            console.log(typedDepartment);
+                            $.post("/login/SetDepartment", {DepartmentName:typedDepartment}, (data) => {
+                                if(data == 1){
+                                    swal("Success", "Set Department Complete", "success").then(location.reload());
+                                }else{
+                                    swal("Error", "User Password Not Correct", "error");
+                                }
+                            },"json");
+                        }
                     }
-                },"json");
-            });
-        }else{
-            swal("Error", "User Password Not Correct", "error");
+                });
+            }else{
+                swal("Error", "User Password Not Correct", "error");
+            }
         }
     });
 }
@@ -66,6 +74,7 @@ function SetPosition(){
     swal({
         title: "Developer Mode", 
         text: "Please enter password", 
+        buttons : [true,true],
         content: {
             element: "input",
             attributes: {
@@ -74,25 +83,27 @@ function SetPosition(){
             },
         },icon:"warning",
     }).then((password) => {
-        if(password == this.password || DevMode == "on"){
-            swal({
-                title: "Developer Mode", 
-                text: "Please select Position", 
-                content: position_list,
-                icon:"warning",
-            }).then(() => {
-                let typedPosition = $(".select-custom").children("option:selected").text();
-                console.log(typedPosition);
-                $.post("/login/SetPosition", {PositionName:typedPosition}, (data) => {
-                    if(data == 1){
-                        swal("Success", "Set Position Complete", "success").then(location.reload());
-                    }else{
-                        swal("Error", "User Password Not Correct", "error");
-                    }
-                },"json");
-            });
-        }else{
-            swal("Error", "User Password Not Correct", "error");
+        if(password != null){
+            if(password == this.password || DevMode == "on"){
+                swal({
+                    title: "Developer Mode", 
+                    text: "Please select Position", 
+                    content: position_list,
+                    icon:"warning",
+                }).then(() => {
+                    let typedPosition = $(".select-custom").children("option:selected").text();
+                    console.log(typedPosition);
+                    $.post("/login/SetPosition", {PositionName:typedPosition}, (data) => {
+                        if(data == 1){
+                            swal("Success", "Set Position Complete", "success").then(location.reload());
+                        }else{
+                            swal("Error", "User Password Not Correct", "error");
+                        }
+                    },"json");
+                });
+            }else{
+                swal("Error", "User Password Not Correct", "error");
+            }
         }
     });
 }

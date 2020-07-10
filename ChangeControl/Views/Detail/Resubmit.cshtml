@@ -26,7 +26,14 @@
                     </div>
                     <div class="timeline-body card-body">
                         
-                            
+                        <div class="row">
+                            <label class="col-sm-2 col-form-label text-right" >
+                                Author:
+                            </label>
+                            <div class="col-sm-10 col-form-label">
+                                @Resubmit.Profile.FullName
+                            </div>
+                        </div> 
                         <div class="row">
                             <label class="col-sm-2 col-form-label text-right" >
                                 Description:
@@ -81,6 +88,14 @@
                         <div class="timeline-body card-body">
                             <div class="row">
                                 <label class="col-sm-2 col-form-label text-right" >
+                                    Author:
+                                </label>
+                                <div class="col-sm-10 col-form-label">
+                                    @Response.Profile.FullName
+                                </div>
+                            </div> 
+                            <div class="row">
+                                <label class="col-sm-2 col-form-label text-right" >
                                     Description:
                                 </label>
                                 <div class="col-sm-10 col-form-label">
@@ -95,7 +110,8 @@
                             @{var FileList = Response.FileList;
                                 foreach(var File in FileList){
                                     var FileSize = "0 Bytes";
-                                    <li>
+                                    var file_desc = (File.Description.Trim() == null || File.Description.Trim() == "") ? "<i>No information</i>" : File.Description;
+                                    <li data-toggle="tooltip" data-placement="top" data-html="true" title="@file_desc">
                                         <span class="mailbox-attachment-icon">
                                             @{var FileType = Path.GetExtension(File.Name);}
                                             @if(FileType == ".docx" || FileType == ".doc" ){

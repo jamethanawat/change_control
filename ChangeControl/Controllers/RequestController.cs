@@ -11,10 +11,8 @@ using System.Web;
 using System.Web.Mvc;
 using System.Text.Json;
 
-namespace ChangeControl.Controllers
-{
-    public class RequestController : Controller
-    {
+namespace ChangeControl.Controllers{
+    public class RequestController : Controller{
         // GET: Request
         private DbTapics DB_Tapics;
         private DbCCS DB_CCS;
@@ -32,62 +30,60 @@ namespace ChangeControl.Controllers
             public HttpPostedFileBase file {get; set;}
             public string description {get; set;}
         }
-        private static string temp_related;
         public static TopicAlt Topic;
-        public static string TopicID;
-        public static long review_id;
+        public static string topic_code;
+        public static long topic_id, related_id;
         public static bool isEditMode = false;
-        public List<GetID> TopicDetail = new List<GetID>();
+        public List<GetID> topic_detail = new List<GetID>();
         private string date = DateTime.Now.ToString("yyyyMMddHHmmss");
         private string date_ff = DateTime.Now.ToString("yyyyMMddHHmmss.fff");
         public ActionResult Index(string ID){
-                Topic = null;
-                ViewBag.mode = "Insert";
-                if ((string)(Session["User"]) == null){
-                   Session["url"] = "Request";
-                   return RedirectToAction("Index", "Login");
-                }  
-                List<GetID> last_iTopic = new List<GetID>();
-                List<GetID> last_eTopic = new List<GetID>();
-                last_iTopic = M_Req.GetInternalTopicId();
-                last_eTopic = M_Req.GetExternalTopicId();
+            Topic = null;
+            ViewBag.mode = "Insert";
+            if ((string)(Session["User"]) == null){
+                Session["url"] = "Request";
+                return RedirectToAction("Index", "Login");
+            }  
+            List<GetID> last_iTopic = new List<GetID>();
+            List<GetID> last_eTopic = new List<GetID>();
+            last_iTopic = M_Req.GetInternalTopicId();
+            last_eTopic = M_Req.GetExternalTopicId();
 
-                if (last_iTopic.Count == 0){ //Case Internal Topic not exist
-                    ViewData["iTopic_id"] = "IN-" + date.Substring(2, 4) + "001"; //Then new ID = IN2006001
-                }else if(last_iTopic.Count > 0){ //Case Internal Topic exist
-                    int i_id = Int32.Parse(last_iTopic[0].ID_Topic.Substring(7, 3)) + 1;
-                    ViewData["iTopic_id"] = "IN-" + date.Substring(2, 4) + "" + i_id.ToString("000") + ""; //Then new ID = last Topic ID +1
-                }
-                
-                if(last_eTopic.Count == 0){ //Case External Topic not exist
-                    ViewData["eTopic_id"] = "EX-" + date.Substring(2, 4) + "001"; //Then new id = EX2006001
-                }else if(last_eTopic.Count > 0){ //Case External Topic exist
-                    int e_id = Int32.Parse(last_eTopic[0].ID_Topic.Substring(7, 3)) + 1;
-                    ViewData["eTopic_id"] = "EX-" + date.Substring(2, 4) + "" + e_id.ToString("000") + ""; //Then new ID = last Topic ID +1
-                 }
-                
+            if (last_iTopic.Count == 0){ //Case Internal Topic not exist
+                ViewData["iTopic_id"] = "IN-" + date.Substring(2, 4) + "001"; //Then new ID = IN2006001
+            }else if(last_iTopic.Count > 0){ //Case Internal Topic exist
+                int i_id = Int32.Parse(last_iTopic[0].Code.Substring(7, 3)) + 1;
+                ViewData["iTopic_id"] = "IN-" + date.Substring(2, 4) + "" + i_id.ToString("000") + ""; //Then new ID = last Topic ID +1
+            }
+            
+            if(last_eTopic.Count == 0){ //Case External Topic not exist
+                ViewData["eTopic_id"] = "EX-" + date.Substring(2, 4) + "001"; //Then new id = EX2006001
+            }else if(last_eTopic.Count > 0){ //Case External Topic exist
+                int e_id = Int32.Parse(last_eTopic[0].Code.Substring(7, 3)) + 1;
+                ViewData["eTopic_id"] = "EX-" + date.Substring(2, 4) + "" + e_id.ToString("000") + ""; //Then new ID = last Topic ID +1
+            }
+            
+            var formChangeItem = M_Req.GetChangeItem(); //Get list of change items radio
+            ViewData["FormChangeItem"] = formChangeItem;
 
-                var formChangeItem = M_Req.GetChangeItem(); //Get list of change items radio
-                ViewData["FormChangeItem"] = formChangeItem;
+            var formProductType = M_Req.GetProductType(); //Get list of product type radio
+            ViewData["FormProductType"] = formProductType;
 
-                var formProductType = M_Req.GetProductType(); //Get list of product type radio
-                ViewData["FormProductType"] = formProductType;
+            var DepartmentGroup = M_Req.GetDepartmentGroup(); //Get raw group of departments
 
-                var DepartmentGroup = M_Req.GetDepartmentGroup(); //Get raw group of departments
-
-                List<DepartmentList> departmentList = new List<DepartmentList>();
-                foreach(string GroupName in DepartmentGroup){
-                    List<Department> department = new List<Department>();
-                    department = M_Req.GetDepartmentByGroup(GroupName);
-                    departmentList.Add(new DepartmentList(){Name = GroupName.Replace(" ", "_"), Department = department}); //Convert raw group into department list for radio
-                }
-                ViewData["DepartmentList"] = departmentList;
+            List<DepartmentList> departmentList = new List<DepartmentList>();
+            foreach(string GroupName in DepartmentGroup){
+                List<Department> department = new List<Department>();
+                department = M_Req.GetDepartmentByGroup(GroupName);
+                departmentList.Add(new DepartmentList(){Name = GroupName.Replace(" ", "_"), Department = department}); //Convert raw group into department list for radio
+            }
+            ViewData["DepartmentList"] = departmentList;
 
             if(ID != null){ // In case of edit mode
                 isEditMode = true;
                 Topic = M_Req.GetTopicByID(ID);
                 var temp_topic = Topic;
-                var TopicRelatedList = M_Req.GetRelatedByID(temp_topic.Related.Replace(" ",""));
+                var TopicRelatedList = M_Req.GetRelatedByID(temp_topic.Related);
                 temp_topic.RelatedList = TopicRelatedList;
                 
                 var topic_file_list = M_Req.GetFileByID(temp_topic.ID, "Topic");
@@ -108,50 +104,36 @@ namespace ChangeControl.Controllers
           Session["Foreignkey"] = null;
           Session["Revision"] = null;
           Session["TxtFile"] = null;
-          //TempData["TxtFile"] = null;
 
-                try{
-                    if(changeType == "Internal"){
-                        TopicDetail = M_Req.GetInternalTopicId();
-                    }
-                    else{
-                        TopicDetail = M_Req.GetExternalTopicId();
-                    }
-                    if (TopicDetail.Count == 0){
-                        if (changeType == "Internal") Session["Foreignkey"] = "IN-" + date.Substring(2, 4) + "001";
-                        else Session["Foreignkey"] = "EX-" + date.Substring(2, 4) + "001";
-                    }else{
-                        int id = Int32.Parse(TopicDetail[0].ID_Topic.Substring(7, 3)) + 1;
-                        if (changeType == "Internal") Session["Foreignkey"] = "IN-" + date.Substring(2, 4) + "" + id.ToString("000") + "";
-                        else Session["Foreignkey"] = "EX-" + date.Substring(2, 4) + "" + id.ToString("000") + "";
-                    }
+          try{
+              if(changeType == "Internal"){
+                  topic_detail = M_Req.GetInternalTopicId();
+              }
+              else{
+                  topic_detail = M_Req.GetExternalTopicId();
+              }
+              if (topic_detail.Count == 0){
+                  if (changeType == "Internal") topic_code = "IN-" + date.Substring(2, 4) + "001";
+                  else topic_code = "EX-" + date.Substring(2, 4) + "001";
+              }else{
+                  int id = Int32.Parse(topic_detail[0].Code.Substring(7, 3)) + 1;
+                  if (changeType == "Internal") topic_code = "IN-" + date.Substring(2, 4) + "" + id.ToString("000") + "";
+                  else topic_code = "EX-" + date.Substring(2, 4) + "" + id.ToString("000") + "";
+              }
+              Session["Foreignkey"] = topic_code;
+              Session["Revision"] = revision;
+              status = 7;
+              var temp_topic = new Topic((string)(Session["Foreignkey"]), changeType, changeItem, productType, revision, model,partNo, partName, processName, status, appDescription, subject, detail, timing, related_id,(string)(Session["User"]), date );
 
-                    if(model.Trim() == "" || model.Trim() == null) model = "-";
-                    if(partNo.Trim() == "" || partNo.Trim() == null) partNo = "-";
-                    if(partName.Trim() == "" || partName.Trim() == null) partName = "-";
-                    if(processName.Trim() == "" || processName.Trim() == null) processName = "-";
-                    if(appRadio == "1" && (appDescription.Trim() == ""  || appDescription.Trim() == null)) appDescription = "-";
-                    if(subject.Trim() == "" || subject.Trim() == null) subject = "-";
-                    if(detail.Trim() == "" || detail.Trim() == null) detail = "-";
-                    if(timing.Trim() == "" || timing.Trim() == null) timing = "-";
-
-                    Session["Revision"] = revision;
-                    temp_related = "T" + Session["Foreignkey"] + "-" + revision;
-
-                    status = 7;
-                    var temp_topic = new Topic((string)(Session["Foreignkey"]), changeType, changeItem, productType, revision, model,partNo, partName, processName, status, appDescription, subject, detail, timing, temp_related,(string)(Session["User"]), date );
-
-                    review_id = M_Req.InsertTopic(temp_topic);
-                    M_Req.InsertTopicApprove(review_id);
-                    TopicID = (string) Session["Foreignkey"];
-
-                    return Json(TopicID,JsonRequestBehavior.AllowGet);
-                }
-                catch (Exception ex){
-                    System.Diagnostics.Debug.WriteLine("Exception");
-                    System.Diagnostics.Debug.WriteLine(ex);
-                    return Json(new { code = -1 }, JsonRequestBehavior.AllowGet);
-                }
+              topic_id = M_Req.InsertTopic(temp_topic);
+              M_Req.InsertTopicApprove(topic_code);
+              return Json(topic_code,JsonRequestBehavior.AllowGet);
+          }
+          catch (Exception ex){
+              System.Diagnostics.Debug.WriteLine("Exception");
+              System.Diagnostics.Debug.WriteLine(ex);
+              return Json(new { code = -1 }, JsonRequestBehavior.AllowGet);
+          }
         }
 
         [HttpPost, ValidateInput(false)]
@@ -162,21 +144,10 @@ namespace ChangeControl.Controllers
 
           Session["Mode"] = mode;
           try{
-                if(model == "" || model == null) model = "-";
-                if(partNo == "" || partNo == null) partNo = "-";
-                if(partName == "" || partName == null) partName = "-";
-                if(processName == "" || processName == null) processName = "-";
-                if(appRadio == "1" && (appDescription == ""  || appDescription == null)) appDescription = "-";
-                if(subject == "" || subject == null) subject = "-";
-                if(detail == "" || detail == null) detail = "-";
-                if(timing == "" || timing == null) timing = "-";
+                var new_topic = new Topic(Topic.Code, Topic.Type, changeItem, productType, revision, model,partNo, partName, processName, status, appDescription, subject, detail, timing, related_id,(string)(Session["User"]), date );
+                topic_id = M_Req.UpdateTopic(new_topic);
 
-                temp_related = "T" + Topic.ID_Topic + "-" + revision;
-
-                var new_topic = new Topic(Topic.ID_Topic, Topic.Topic_type, changeItem, productType, revision, model,partNo, partName, processName, status, appDescription, subject, detail, timing, temp_related,(string)(Session["User"]), date );
-                review_id = M_Req.UpdateTopic(new_topic);
-
-                return Json(Topic.ID_Topic, JsonRequestBehavior.AllowGet);
+                return Json(Topic.Code, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex){
 
@@ -192,7 +163,7 @@ namespace ChangeControl.Controllers
         public ActionResult SubmitRelated(string IT,string MKT,string PC1,string PC2,string PT1,string PT2,string PT3A,string PT3M,string PT4,string PT5,string PT6,string PT7,string PE1,string PE2,string PE2_SMT,string PE2_PCB,string PE2_MT,string PE1_Process,string PE2_Process,string PCH1,string PCH2,string QC_IN1,string QC_IN2,string QC_IN3,string QC_FINAL1,string QC_FINAL2,string QC_FINAL3,string QC_NFM1,string QC_NFM2,string QC_NFM3,string QC1,string QC2,string QC3){
             try{
                 Related related = new Related(IT,MKT,PC1,PC2,PT1,PT2,PT3A,PT3M,PT4,PT5,PT6,PT7,PE1,PE2,PE2_SMT,PE2_PCB,PE2_MT,PE1_Process,PE2_Process,PCH1,PCH2,QC_IN1,QC_IN2,QC_IN3,QC_FINAL1,QC_FINAL2,QC_FINAL3,QC_NFM1,QC_NFM2,QC_NFM3,QC1,QC2,QC3);
-                M_Req.InsertRelated(temp_related.Trim(), related);
+                related_id = M_Req.InsertRelated(related);
                 return Json(new { code = 1 },JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex){
@@ -211,9 +182,9 @@ namespace ChangeControl.Controllers
                 var ServerSavePath = Path.Combine("D:/File/Topic/" + InputFileName);
                 file_item.file.SaveAs(ServerSavePath);
                 if(file_item.description == "null" || file_item.description == null) file_item.description = " ";
-                M_Req.InsertFile(file_item.file, review_id, "Topic", file_item.description, Session["User"]);
+                M_Req.InsertFile(file_item.file, topic_id, "Topic", file_item.description, Session["User"]);
             }
-            return Json(TopicID);
+            return Json(topic_code);
         }
 
         [HttpPost]
@@ -225,8 +196,7 @@ namespace ChangeControl.Controllers
         [HttpPost]
         public ActionResult RemoveDATA(){
             try{
-                var key = "T" + Session["Foreignkey"]+"-"+ Session["Revision"];
-                M_Req.RemoveData(key,(string)(Session["Foreignkey"]));
+                M_Req.RemoveData(0,(string)(Session["Foreignkey"]));
                 return Json(new { code = 1 }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex){

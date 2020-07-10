@@ -20,18 +20,10 @@ namespace ChangeControl.Controllers{
 
         }
         public ActionResult Index(){
-          
             if ((string)(Session["User"]) == null){
                 Session["url"] = "Home";
                 return RedirectToAction("Index", "Login");
             }
-            // if ((string)(Session["sql"]) != null)
-            // {
-            //     var result = _dbCCS.Database.SqlQuery<Modelsearch>(Session["sql"].ToString());
-            //     modelsearch = result.ToList();
-            //     return View(searchResult);
-            // }
-
             return View(searchResult);
         }
 
@@ -53,7 +45,7 @@ namespace ChangeControl.Controllers{
                 bool result = chk.checkLogin(user, password);
                 return Json(result, JsonRequestBehavior.AllowGet);
             }
-            catch (Exception er){
+            catch (Exception err){
                 return View();
             }
 
@@ -62,7 +54,7 @@ namespace ChangeControl.Controllers{
         public ActionResult RedirectTo(string ID){
             var rs="";
             rs = Url.Content("~/Detail/Index");
-            Session["TopicID"] = ID;
+            Session["TopicCode"] = ID;
             return Json(new { redirecturl = rs, id = ID }, JsonRequestBehavior.AllowGet);
         }
 

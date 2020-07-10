@@ -1,18 +1,12 @@
 ﻿var InsertReviewStatus = false;
 var optimized_arr = [];
 var ReviewStatus = false;
-var InsertFilePath;
-var InsertFileResponsePath;
-var InsertRelatedPath;
-var InsertResponsePath;
-var InsertTrialPath;
-var InsertFileTrialPath;
-var ReqResubmitPath;
 var DepartmentLists;
 var file_list = [];
 var file_list_alt = [];
 var isQC;
 var isTrialable;
+var isReview;
 var resubmit_formIsEmpty = true;
 
 $(() => {
@@ -24,7 +18,7 @@ $(() => {
         }
     });
 
-    if(topic_status == "Request" || !isQC){
+    if(topic_status == "Request" || !isQC || !isReview){
         $(".zoom-fab#change_status").addClass("hide-fab");
     }
 
@@ -158,12 +152,12 @@ $(() => {
     
    
 
-    $("form#Review").submit((e) => {
+    $("form#review").submit((e) => {
         e.preventDefault();
         $('#loading').removeClass('hidden')
         SerializeReviewForm();
 
-        $.post(InsertReviewPath, () => {
+        $.post("/detail/InsertReview", () => {
             var promises = [];
             files = file_list;
             console.log("files",files);
@@ -179,7 +173,7 @@ $(() => {
                 Data.append("description",element.description);
                 promises.push($.ajax({
                     type: "POST",
-                    url: InsertFilePath,
+                    url: "/detail/SubmitFile",
                     data: Data,
                     cache: false,
                     processData: false,
@@ -194,7 +188,7 @@ $(() => {
 
             optimized_arr.forEach(element => {
                 promises.push(
-                    $.post(InsertReviewItemPath, {
+                    $.post("/detail/InsertReviewItem", {
                         'status' : element.status,
                         'description' : element.description,
                         'id' : element.id,
@@ -219,9 +213,9 @@ $(() => {
         e.preventDefault();
         let quick_form = $("form#resubmit_form").serialize();
         console.log(quick_form);
-        $.post(InsertRelatedPath, quick_form, () =>{
+        $.post("/detail/SubmitRelated", quick_form, () =>{
             console.log('Related created');
-            $.post(ReqResubmitPath, quick_form, (res) =>{
+            $.post("/detail/RequestResubmit", quick_form, (res) =>{
                 console.log('Resubmit created');
                 if(res){
                     swal("Success", "Resubmit Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
@@ -247,7 +241,7 @@ $(() => {
                 delete files[index].detail;
             }
 
-            promises.push($.post(InsertResponsePath,{ desc: form_response[0].value, resubmit_id: response_id },() => {
+            promises.push($.post("/detail/SubmitResponse",{ desc: form_response[0].value, resubmit_id: response_id },() => {
                 console.log('Inserted item');
                 files.forEach(element => {
                     var Data = new FormData();
@@ -255,7 +249,7 @@ $(() => {
                     Data.append("description",element.description);
                     promises.push($.ajax({
                         type: "POST",
-                        url: InsertFileResponsePath,
+                        url: "/detail/SubmitFileResponse",
                         data: Data,
                         cache: false,
                         processData: false,
@@ -293,7 +287,7 @@ $(() => {
                 delete files[index].detail;
             }
 
-            promises.push($.post(InsertTrialPath,{ desc: trial_form[0].value},() => {
+            promises.push($.post("/detail/SubmitTrial",{ desc: trial_form[0].value},() => {
                 console.log('Inserted trial');
                 files.forEach(element => {
                     var Data = new FormData();
@@ -301,7 +295,7 @@ $(() => {
                     Data.append("description",element.description);
                     promises.push($.ajax({
                         type: "POST",
-                        url: InsertFileTrialPath,
+                        url: "/detail/SubmitFileTrial",
                         data: Data,
                         cache: false,
                         processData: false,
@@ -340,7 +334,7 @@ $(() => {
                 delete files[index].detail;
             }
 
-            promises.push($.post(InsertConfirmPath,{ desc: confirm_form[0].value},() => {
+            promises.push($.post("/detail/SubmitConfirm",{ desc: confirm_form[0].value},() => {
                 console.log('Inserted trial');
                 files.forEach(element => {
                     var Data = new FormData();
@@ -348,7 +342,7 @@ $(() => {
                     Data.append("description",element.description);
                     promises.push($.ajax({
                         type: "POST",
-                        url: InsertFileConfirmPath,
+                        url: "/detail/SubmitFileConfirm",
                         data: Data,
                         cache: false,
                         processData: false,
@@ -374,7 +368,7 @@ $(() => {
     });
 
     function SerializeReviewForm(){
-        var datastring = $("form#Review").serializeArray();
+        var datastring = $("form#review").serializeArray();
         console.log(datastring);
         for(var i=0 ; i<datastring.length ; i++){
             
@@ -422,7 +416,7 @@ $(() => {
                 }
             }
         }
-        console.log(optimized_arr);
+        console.log("optimized",optimized_arr);
     }
 
     $(".zoom-fab#change_status").click(() => {
@@ -444,7 +438,7 @@ $(() => {
             icon:"warning",
         }).then((isChanged) => {
             if(isChanged){
-                $.post("/detail/UpdateTopicStatus", {topic_id:topic_id,status:new_status}, (data) => {
+                $.post("/detail/UpdateTopicStatus", {topic_code:topic_code,status:new_status}, (data) => {
                     if(data){
                         swal("Success", "Change Status Success", "success").then(location.reload());
                     }else{
