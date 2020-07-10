@@ -213,22 +213,22 @@
                 <div class="col-sm-6">
                     <h1>TNS Control No. @Html.DisplayFor(model => Topic.Code)</h1>
                     @if(Topic.Status >= 7){
-                        <span class='badge badge-pill badge-@(Topic.Status == 7?"warning":"success")'>Request 
+                        <span class='badge badge-pill badge-@(Topic.Status == 7?"warning":"primary")'>Request 
                         <i class='fas @(Topic.Status == 7?"fa-clock":"fa-check")'></i>
                         </span>
                     }
                     @if(Topic.Status >= 8){
-                        <span class='badge badge-pill badge-@(Topic.Status == 8?"warning":"success")'>Review 
+                        <span class='badge badge-pill badge-@(Topic.Status == 8?"warning":"primary")'>Review 
                         <i class='fas @(Topic.Status == 8?"fa-clock":"fa-check")'></i>
                         </span>
                     }
                     @if(Topic.Status >= 9){
-                        <span class='badge badge-pill badge-@(Topic.Status == 9?"warning":"success")'>Trial 
+                        <span class='badge badge-pill badge-@(Topic.Status == 9?"warning":"primary")'>Trial 
                         <i class='fas @(Topic.Status == 9?"fa-clock":"fa-check")'></i>
                         </span>
                     }
                     @if(Topic.Status >= 10){
-                        <span class='badge badge-pill badge-@(Topic.Status == 10?"warning":"success")'>Confirm 
+                        <span class='badge badge-pill badge-@(Topic.Status == 10?"warning":"primary")'>Confirm 
                         <i class='fas @(Topic.Status == 10?"fa-clock":"fa-check")'></i>
                         </span>
                     }
