@@ -44,7 +44,7 @@ namespace ChangeControl.Controllers{
                 // Session["DepartmentID"] = 9;
             }
             
-            if ((string)(Session["User"]) != null){
+            if ((string)(Session["User"]) != null  && (string)(Session["Department"]) != null){
                 return RedirectToAction("Index", "Home");
             }
 
@@ -88,7 +88,7 @@ namespace ChangeControl.Controllers{
                 }else{
                     result = GetDepartment(username);
                 }
-                SetDepartmentAlt(result);
+                // SetDepartmentAlt(result);
                 return Json(new { status = "success" ,data = result }, JsonRequestBehavior.AllowGet);
             }
         }

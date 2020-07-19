@@ -42,7 +42,7 @@ namespace ChangeControl.Controllers{
             if(ID == null || M_Req.CheckTopicOwner((string) Session["User"], ID)){
                 Topic = null;
                 ViewBag.mode = "Insert";
-                if ((string)(Session["User"]) == null){
+                if ((string)(Session["User"]) == null || (string)(Session["Department"]) == null){
                     Session["url"] = "Request";
                     return RedirectToAction("Index", "Login");
                 }  

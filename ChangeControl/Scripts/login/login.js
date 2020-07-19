@@ -60,6 +60,7 @@
                         swal({
                             title: "Confirm Department", 
                             text: "Please select your Department",
+                            closeOnClickOutside: false,
                             content: select,
                             icon:"warning",
                         }).then(() => {

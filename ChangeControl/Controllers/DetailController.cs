@@ -39,8 +39,8 @@ namespace ChangeControl.Controllers{
         private static long topic_id;
 
         public ActionResult Index(string id){
-            if((string)(Session["User"]) == null){
-                return RedirectToAction("Index", "Home");
+            if((string)(Session["User"]) == null || (string)(Session["Department"]) == null){
+                return RedirectToAction("Index", "LogIn");
             }
             temp_user = Session["User"].ToString();
             temp_department = Session["Department"].ToString();

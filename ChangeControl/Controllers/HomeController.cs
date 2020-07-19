@@ -22,7 +22,7 @@ namespace ChangeControl.Controllers{
 
         }
         public ActionResult Index(){
-            if ((string)(Session["User"]) == null){
+            if ((string)(Session["User"]) == null || (string)(Session["Department"]) == null){
                 Session["url"] = "Home";
                 return RedirectToAction("Index", "Login");
             }
