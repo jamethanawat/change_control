@@ -73,7 +73,7 @@
     </section>
     <!-- Main content -->
     <section class="content">
-        <div class="container-fluid">
+        <div class="container-fluid" style="display:none">
             <h5 class="mb-2">Info Box</h5>
             <div class="row">
                 <div class="col">
@@ -168,6 +168,7 @@
                                                 <label>Change Type :</label>
                                                 <select class="form-control select2" id="changeType" style="width: 100%;">
                                                     <option disabled="disabled" selected="selected">Select Type</option>
+                                                    <option value="">--- Blank ---</option>
                                                     <option>Internal Change</option>
                                                     <option>External Change</option>
                                                 </select>
@@ -197,23 +198,23 @@
                                                 </label> *@
                                                 
                                                 <label class="setcheckbox">
-                                                    <input type="radio" name="h2" id="st_request" class="flat-red" checked>
+                                                    <input type="radio" name="status" value="7" class="flat-red" checked>
                                                     Request
                                                 </label>
                                                 <label class="setcheckbox">
-                                                    <input type="radio" name="h2" id="st_review" class="flat-red">
+                                                    <input type="radio" name="status" value="8" class="flat-red">
                                                     Review
                                                 </label>
                                                 <label class="setcheckbox">
-                                                    <input type="radio" name="h2" id="st_trial" class="flat-red">
+                                                    <input type="radio" name="status" value="9" class="flat-red">
                                                     Trial
                                                 </label>
                                                 <label class="setcheckbox">
-                                                    <input type="radio" name="h2" id="st_confirm" class="flat-red">
+                                                    <input type="radio" name="status" value="10" class="flat-red">
                                                     Confirm
                                                 </label>
                                                 <label class="setcheckbox">
-                                                    <input type="radio" name="h2" id="st_closed" class="flat-red">
+                                                    <input type="radio" name="status" value="11" class="flat-red">
                                                     Closed
                                                 </label>
                                             </div>
@@ -226,29 +227,30 @@
                                                 <label>Product Type :</label>
                                                 <select class="form-control select2" id="productType" style="width: 100%;">
                                                     <option disabled="disabled" selected="selected">Select Type</option>
-                                                    <option>Meter 2R</option>
-                                                    <option>Meter 4R</option>
-                                                    <option>Agriculture</option>
-                                                    <option>FU/SP</option>
-                                                    <option>D/P</option>
-                                                    <option>Pointer</option>
-                                                    <option>Consumer</option>
-                                                    <option>Others</option>
+                                                    <option value="">--- Blank ---</option>
+                                                    <option value="1">Meter 2R</option>
+                                                    <option value="2">Meter 4R</option>
+                                                    <option value="3">Agriculture</option>
+                                                    <option value="4">FU/SP</option>
+                                                    <option value="5">D/P</option>
+                                                    <option value="6">Pointer</option>
+                                                    <option value="7">Consumer</option>
+                                                    <option value="8">Others</option>
                                                 </select>
                                             </div>
 
                                             <div class="col-md-6">
                                                 <label>Over All Status :</label><br>
                                                 <label class="setcheckbox">
-                                                    <input type="radio" name="h3" id="st_review_complete" class="flat-red" checked>
+                                                    <input type="radio" name="h3" name="overstatus" value="1" class="flat-red" checked>
                                                     Review complete
                                                 </label>
                                                 <label class="setcheckbox">
-                                                    <input type="radio" name="h3" id="st_Confirm_complete" class="flat-red">
+                                                    <input type="radio" name="h3" name="overstatus" value="2" class="flat-red">
                                                     Confirm Complete
                                                 </label>
                                                 <label class="setcheckbox">
-                                                    <input type="radio" name="h3" id="st_allstatus" class="flat-red">
+                                                    <input type="radio" name="h3" name="overstatus" value="3" class="flat-red">
                                                     All status
                                                 </label>
                                             </div>
@@ -261,18 +263,19 @@
                                                 <label>Change Items :</label>
                                                 <select class="form-control select2" id="changeitem" style="width: 100%;">
                                                     <option disabled="disabled" selected="selected">Select Item</option>
-                                                    <option>New Part</option>
-                                                    <option>Material change</option>
-                                                    <option>Manufacturing Method change</option>
-                                                    <option>Inspection Method change</option>
-                                                    <option>Jig /Tool change</option>
-                                                    <option>Design Change</option>
-                                                    <option>New Supplier</option>
-                                                    <option>Machine change</option>
-                                                    <option>Manufacturing Process order change</option>
-                                                    <option>Packing ,Transportation change</option>
-                                                    <option>Die / Mold change</option>
-                                                    <option>Others</option>
+                                                    <option value="">--- Blank ---</option>
+                                                    <option value="1">New Part</option>
+                                                    <option value="2">Material change</option>
+                                                    <option value="3">Manufacturing Method change</option>
+                                                    <option value="4">Inspection Method change</option>
+                                                    <option value="5">Jig /Tool change</option>
+                                                    <option value="6">Design Change</option>
+                                                    <option value="7">New Supplier</option>
+                                                    <option value="8">Machine change</option>
+                                                    <option value="9">Manufacturing Process order change</option>
+                                                    <option value="10">Packing ,Transportation change</option>
+                                                    <option value="11">Die / Mold change</option>
+                                                    <option value="12">Others</option>
                                                 </select>
                                             </div>
                                             <div class="col-md-6">
@@ -337,15 +340,15 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <label>Related Section :</label>
-                                                <select class="form-control select2" id="related" style="width: 100%;">
+                                                <select class="form-control select2" name="dept" style="width: 100%;">
                                                     <option disabled="disabled" selected="selected">Department</option>
-                                                    <option>QC1</option>
-                                                    <option>QC2</option>
-                                                    <option>QC3</option>
-                                                    <option>PCH</option>
-                                                    <option>PE1</option>
-                                                    <option>PE2</option>
+                                                    <option value="">--- Blank ---</option>
                                                     <option>IT</option>
+                                                    <option>PCH</option>
+                                                    <option>PE</option>
+                                                    <option>PE_Process</option>
+                                                    <option>MKT</option>
+                                                    <option>QC</option>
                                                 </select>
                                             </div>
                                             <div class="col-md-6">
@@ -398,8 +401,8 @@
                         <!-- /.card-body -->
                         <div class="card-footer">
                             <button type="submit" class="btn btn-default">Clear</button>
-                            <button type="submit" class="btn btn-primary float-right" style="margin-left: 5px;"><i class="fa fa-file-archive-o"></i>&nbsp;&nbsp;Report</button>
-                            <button id="search" class="btn btn-info float-right"><i class="fa  fa-search"></i>&nbsp;&nbsp;Search</button>
+                            @* <button type="submit" class="btn btn-primary float-right" style="margin-left: 5px;"><i class="fa fa-file-archive-o"></i>&nbsp;&nbsp;Report</button> *@
+                            <button id="search" type="submit" value="search" class="btn btn-info float-right"><i class="fa  fa-search"></i>&nbsp;&nbsp;Search</button>
                         </div>
 
 
@@ -431,19 +434,17 @@
                             <!-- /.card-header -->
 
                             <div class="card-body table-responsive">
-                                <table id="ChangeRequestTable" class="table table-bordered table-hover txtcenter" width="100%">
+                                <table id="ChangeRequestTable" class="table table-bordered table-hover txtcenter" width="100%" style="table-layout: fixed;">
                                     <thead>
                                         <tr>
-
-                                            <th>Change Type</th>
-                                            <th>TNS Control</th>
-                                            <th>ECO No.</th>
-                                            <th>Request Date</th>
-                                            <th>Model</th>
-                                            <th>Request Department</th>
-                                            <th>Change Detail</th>
-                                            <th>Review Status</th>
-                                            <th>More</th>
+                                            <th width="8%">TNS No.</th>
+                                            <th width="12%">Request Date</th>
+                                            <th width="9%">Department</th>
+                                            <th width="21%">Change Detail</th>
+                                            <th width="10%">Change Type</th>
+                                            <th width="8%">Model</th>
+                                            <th width="8%">Status</th>
+                                            <th width="10%">More</th>
                                             @*<th>Inform to Customer</th>
                                 <th>Trail & Followup status</th>
                                 <th>Close Status</th>*@

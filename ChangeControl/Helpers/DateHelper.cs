@@ -43,9 +43,9 @@ namespace DateHelper
             if(date_time == null){
                 return DateTime.Now.ToString("d MMMM yyyy");
             }else{
-                var Year = date_time.Substring(6,4);
-                var Month = date_time.Substring(3,2);
                 var Day = date_time.Substring(0,2);
+                var Month = date_time.Substring(3,2);
+                var Year = date_time.Substring(6,4);
                 var result = DateTime.ParseExact($"{Year}-{Month}-{Day} 00:00:00", "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
                 return result.ToString("d MMMM yyyy");
             }

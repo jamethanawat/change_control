@@ -8,20 +8,15 @@ var isQC;
 var isTrialable;
 var isReview;
 var resubmit_formIsEmpty = true;
+var TrialIsEmpty = true;
 
 $(() => {
-    $("#resubmit_form [name='desc'], #resubmit_form [name='due_date']").on("keypress", () => {
-        if($("#resubmit_form [name='desc']").val() != "" && $("#resubmit_form [name='due_date']").val() !== ""){
-            resubmit_formIsEmpty = false;
-        }else{
-            resubmit_formIsEmpty = true;
-        }
-    });
-
+    
     if(topic_status == "Request" || !isQC || !isReview){
         $(".zoom-fab#change_status").addClass("hide-fab");
     }
 
+/* -------------------------------- Go to top ------------------------------- */
     $('[data-toggle="tooltip"]').tooltip();
     var btn = $('#Top');
     $(window).scroll(() => {
@@ -37,15 +32,34 @@ $(() => {
         $('html, body').animate({ scrollTop: 0 }, '300');
     });
 
+/* --------------------------- Resubmit's Validate -------------------------- */
+var rsm_validator = $('#resubmit_form').validate({
+    rules: {
+        desc: {required: true,},
+        due_date: {required: true,date: true}
+    },
+    messages: {
+        desc: {required: "Please enter a description",},
+        due_date: {required: "Please enter a due date",date: "Please enter a valid date"}
+    },
+    errorElement: 'span',
+    errorPlacement: function (error, element) {
+      error.addClass('invalid-feedback');
+      element.closest(".col-form-label").append(error);
+      $(".btn-success").prop('disabled', true);
+    },
+    highlight: function (element, errorClass, validClass) {$(element).addClass('is-invalid');},
+    unhighlight: function (element, errorClass, validClass) {$(element).removeClass('is-invalid');}
+});
+/* ------------------------- Resubmit's Wizard modal ------------------------ */
     $("#resubmit_modal").modalWizard();
-
     $("#resubmit_modal").on("navigate", (e, navDir, stepNumber) => {
         if($("#resubmit_modal").attr("data-current-step") == 3){
             let quick_form = $("form#resubmit_form").serializeArray();
             console.log(quick_form);
-            let related = "";
-            let due_date = "";
-            let desc = "";
+
+            let related = due_date = desc = "";
+            
             quick_form.forEach(item => {
                 if(item.value == "1"){
                     if(related == ""){
@@ -72,23 +86,34 @@ $(() => {
                 relatedValidate();
             }else{
                 if(!resubmit_formIsEmpty){
-                    if(validator.form()){
+                    if(rsm_validator.form()){
                         $(".btn-success").prop('disabled', false);
                     }
                 }
             }
-            // validator.form();
         }
     });
 
-    var validator = $('#resubmit_form').validate({
-        rules: {
-          desc: {required: true,},
-          due_date: {required: true,date: true}
+    $("#resubmit_form [name='desc'], #resubmit_form [name='due_date']").on("keydown keyup", () => {
+        if($("#resubmit_form [name='desc']").val() != "" && $("#resubmit_form [name='due_date']").val() !== ""){
+            resubmit_formIsEmpty = false;
+        }else{
+            resubmit_formIsEmpty = true;
+        }
+        if(!resubmit_formIsEmpty){
+            if(rsm_validator.form()){
+                $(".btn-success").prop('disabled', false);
+            }
+        }
+    });
+
+/* ---------------------------- Trial's Validate ---------------------------- */
+    var tr_validator = $('#Trial').validate({
+        rules: { 
+          tr_desc: {required: true,},
         },
         messages: {
-          desc: {required: "Please enter a description",},
-          due_date: {required: "Please enter a due date",date: "Please enter a valid date"}
+          tr_desc: {required: "Please enter a description",},
         },
         errorElement: 'span',
         errorPlacement: function (error, element) {
@@ -100,28 +125,42 @@ $(() => {
         unhighlight: function (element, errorClass, validClass) {$(element).removeClass('is-invalid');}
     });
     
-    $("#resubmit_form").on("click keypress",() => { 
-        if(!resubmit_formIsEmpty){
-            if(validator.form()){$(".btn-success").prop('disabled', false);}
-        }
+    $("#Trial [name='tr_desc']").on("keydown keyup", () => {
+        $("#tr_submit").prop('disabled', (tr_validator.form()) ? false : true); 
     });
 
+    var cf_validator = $('#Confirm').validate({
+        rules: { 
+          cf_desc: {required: true,},
+        },
+        messages: {
+          cf_desc: {required: "Please enter a description",},
+        },
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+          error.addClass('invalid-feedback');
+          element.closest(".col-form-label").append(error);
+          $(".btn-success").prop('disabled', true);
+        },
+        highlight: function (element, errorClass, validClass) {$(element).addClass('is-invalid');},
+        unhighlight: function (element, errorClass, validClass) {$(element).removeClass('is-invalid');}
+    });
+    
+    $("#Confirm [name='cf_desc']").on("keydown keyup", () => {
+        $("#cf_submit").prop('disabled', (cf_validator.form()) ? false : true); 
+    });
+    
+/* --------------------------- Department checkbox -------------------------- */
     $.each(DepartmentLists, (key,val) => {
         if($(`.${val.Name}`).length == $(`.${val.Name}:checked`).length){
             $(`#${val.Name}`).prop('checked', true);
             relatedValidate();
         }
         // console.log(DepartmentLists);
-        $(`#${val.Name}`).change(function() {
-            if (this.checked) {
+        $(`#${val.Name}`).change(function(e) {
                 $(`.${val.Name}`).each(function() {
-                    this.checked=true;
+                    this.checked = (e.target.checked) ? true : false;
                 });
-            } else {
-                $(`.${val.Name}`).each(function() {
-                    this.checked=false;
-                });
-            }
             relatedValidate();
         });
     
@@ -130,8 +169,7 @@ $(() => {
                 var isAllChecked = 0;
                 $(`.${val.Name}`).each(() => { if(!this.checked) isAllChecked = 1; });
                 if(isAllChecked == 0) $(`#${val.Name}`).prop("checked", true);     
-            }
-            else {
+            }else{
                 $(`#${val.Name}`).prop("checked", false);
             }
             relatedValidate();
@@ -139,11 +177,8 @@ $(() => {
     });
 
     function relatedValidate(){
-        if($('input:checkbox.qForm.checkSingle:checked').length > 0){
-            $(".btn-success").prop('disabled', false);
-        }else{
-            $(".btn-success").prop('disabled', true);
-        }
+        checkbox_dept = $('input:checkbox.qForm.checkSingle:checked').length
+        $(".btn-success").prop('disabled', (checkbox_dept > 0) ? false : true);
     }
 
     $('[data-toggle="datepicker"]').datepicker({
@@ -151,13 +186,13 @@ $(() => {
     });
     
    
-
+/* ------------------------------ Submit review topic ------------------------------ */
     $("form#review").submit((e) => {
         e.preventDefault();
         $('#loading').removeClass('hidden')
         SerializeReviewForm();
 
-        $.post("/detail/InsertReview", () => {
+        $.post(SubmitReviewPath, () => {
             var promises = [];
             files = file_list;
             console.log("files",files);
@@ -173,13 +208,11 @@ $(() => {
                 Data.append("description",element.description);
                 promises.push($.ajax({
                     type: "POST",
-                    url: "/detail/SubmitFile",
+                    url: SubmitFilePath,
                     data: Data,
                     cache: false,
                     processData: false,
                     contentType: false,
-                    success: function () {
-                    },
                     error: function() {
                         swal("Error", "Upload file not success", "error");
                     }
@@ -188,7 +221,7 @@ $(() => {
 
             optimized_arr.forEach(element => {
                 promises.push(
-                    $.post("/detail/InsertReviewItem", {
+                    $.post(SubmitReviewItemPath, {
                         'status' : element.status,
                         'description' : element.description,
                         'id' : element.id,
@@ -208,14 +241,109 @@ $(() => {
         });
 
     });
+/* --------------------------- Submit trial topic --------------------------- */
+$("form#Trial").submit((e) => {
+    e.preventDefault();
+    $('#loading').removeClass('hidden')
+        let trial_form = $("form#Trial").serializeArray();
+        var promises = [];
 
+        files = file_list;
+        console.log("files",files);
+        
+        for(var index in files){
+            files[index].file = files[index].detail.file;
+            delete files[index].detail;
+        }
+
+        promises.push($.post(SubmitTrialPath,{ desc: trial_form[0].value},() => {
+            console.log('Inserted trial');
+            files.forEach(element => {
+                var Data = new FormData();
+                Data.append("file",element.file);
+                Data.append("description",element.description);
+                promises.push($.ajax({
+                    type: "POST",
+                    url: SubmitFileTrialPath,
+                    data: Data,
+                    cache: false,
+                    processData: false,
+                    contentType: false,
+                    success: function () {
+                        console.log('trial file uploaded');
+                    },error: function() {
+                        swal("Error", "Upload file not success", "error");
+                    }
+                }));
+            });
+        }).fail(() => {
+            swal("Error", "Trial is not succes, Please contact admin", "error");
+            $('#loading').addClass('hidden')
+        }));
+        
+        Promise.all(promises).then(() => {
+            $('#loading').addClass('hidden')
+            InsertReviewStatus = false;
+            $("#trial_submit").prop("disabled",true)
+            swal("Success", "Insert Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
+        })
+});
+
+/* -------------------------- Submit confirm topic -------------------------- */
+$("form#Confirm").submit((e) => {
+    e.preventDefault();
+    $('#loading').removeClass('hidden')
+        let confirm_form = $("form#Confirm").serializeArray();
+        var promises = [];
+
+        files = file_list;
+        console.log("files",files);
+        
+        for(var index in files){
+            files[index].file = files[index].detail.file;
+            delete files[index].detail;
+        }
+
+        promises.push($.post(SubmitConfirmPath,{ desc: confirm_form[0].value},() => {
+            console.log('Inserted trial');
+            files.forEach(element => {
+                var Data = new FormData();
+                Data.append("file",element.file);
+                Data.append("description",element.description);
+                promises.push($.ajax({
+                    type: "POST",
+                    url: SubmitFileConfirmPath,
+                    data: Data,
+                    cache: false,
+                    processData: false,
+                    contentType: false,
+                    success: function () {
+                        console.log('confirm file uploaded');
+                    },error: function() {
+                        swal("Error", "Upload file not success", "error");
+                    }
+                }));
+            });
+        }).fail(() => {
+            swal("Error", "Confirm is not succes, Please contact admin", "error");
+            $('#loading').addClass('hidden')
+        }));
+
+        Promise.all(promises).then(() => {
+            $('#loading').addClass('hidden')
+            InsertReviewStatus = false;
+            $("#cf_submit").prop("disabled",true)
+            swal("Success", "Insert Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
+        })
+});
+/* ------------------------------ Apply resubmit ----------------------------- */
     $("form#resubmit_form").submit((e) => {
         e.preventDefault();
         let quick_form = $("form#resubmit_form").serialize();
         console.log(quick_form);
-        $.post("/detail/SubmitRelated", quick_form, () =>{
+        $.post(SubmitRelatedPath, quick_form, () =>{
             console.log('Related created');
-            $.post("/detail/RequestResubmit", quick_form, (res) =>{
+            $.post(RequestResubmitPath, quick_form, (res) =>{
                 console.log('Resubmit created');
                 if(res){
                     swal("Success", "Resubmit Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
@@ -226,6 +354,7 @@ $(() => {
         });
     });
 
+/* ---------------------------- Response resubmit --------------------------- */
     $("#submit_reply_form").click((e) => {
         e.preventDefault();
         $('#loading').removeClass('hidden')
@@ -241,7 +370,7 @@ $(() => {
                 delete files[index].detail;
             }
 
-            promises.push($.post("/detail/SubmitResponse",{ desc: form_response[0].value, resubmit_id: response_id },() => {
+            promises.push($.post(SubmitResponsePath,{ desc: form_response[0].value, resubmit_id: response_id },() => {
                 console.log('Inserted item');
                 files.forEach(element => {
                     var Data = new FormData();
@@ -249,7 +378,7 @@ $(() => {
                     Data.append("description",element.description);
                     promises.push($.ajax({
                         type: "POST",
-                        url: "/detail/SubmitFileResponse",
+                        url: SubmitFileResponse,
                         data: Data,
                         cache: false,
                         processData: false,
@@ -273,100 +402,7 @@ $(() => {
             })
     });
 
-    $("form#Trial").submit((e) => {
-        e.preventDefault();
-        $('#loading').removeClass('hidden')
-            let trial_form = $("form#Trial").serializeArray();
-            var promises = [];
-
-            files = file_list;
-            console.log("files",files);
-            
-            for(var index in files){
-                files[index].file = files[index].detail.file;
-                delete files[index].detail;
-            }
-
-            promises.push($.post("/detail/SubmitTrial",{ desc: trial_form[0].value},() => {
-                console.log('Inserted trial');
-                files.forEach(element => {
-                    var Data = new FormData();
-                    Data.append("file",element.file);
-                    Data.append("description",element.description);
-                    promises.push($.ajax({
-                        type: "POST",
-                        url: "/detail/SubmitFileTrial",
-                        data: Data,
-                        cache: false,
-                        processData: false,
-                        contentType: false,
-                        success: function () {
-                            console.log('trial file uploaded');
-                        },error: function() {
-                            swal("Error", "Upload file not success", "error");
-                        }
-                    }));
-                });
-            }).fail(() => {
-                swal("Error", "Trial is not succes, Please contact admin", "error");
-                $('#loading').addClass('hidden')
-            }));
-            
-            Promise.all(promises).then(() => {
-                $('#loading').addClass('hidden')
-                InsertReviewStatus = false;
-                $("#trial_submit").prop("disabled",true)
-                swal("Success", "Insert Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
-            })
-    });
-
-    $("form#Confirm").submit((e) => {
-        e.preventDefault();
-        $('#loading').removeClass('hidden')
-            let confirm_form = $("form#Confirm").serializeArray();
-            var promises = [];
-
-            files = file_list;
-            console.log("files",files);
-            
-            for(var index in files){
-                files[index].file = files[index].detail.file;
-                delete files[index].detail;
-            }
-
-            promises.push($.post("/detail/SubmitConfirm",{ desc: confirm_form[0].value},() => {
-                console.log('Inserted trial');
-                files.forEach(element => {
-                    var Data = new FormData();
-                    Data.append("file",element.file);
-                    Data.append("description",element.description);
-                    promises.push($.ajax({
-                        type: "POST",
-                        url: "/detail/SubmitFileConfirm",
-                        data: Data,
-                        cache: false,
-                        processData: false,
-                        contentType: false,
-                        success: function () {
-                            console.log('confirm file uploaded');
-                        },error: function() {
-                            swal("Error", "Upload file not success", "error");
-                        }
-                    }));
-                });
-            }).fail(() => {
-                swal("Error", "Confirm is not succes, Please contact admin", "error");
-                $('#loading').addClass('hidden')
-            }));
-
-            Promise.all(promises).then(() => {
-                $('#loading').addClass('hidden')
-                InsertReviewStatus = false;
-                $("#trial_submit").prop("disabled",true)
-                swal("Success", "Insert Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
-            })
-    });
-
+/* ----------- Identify and seperate beween description and radio ----------- */
     function SerializeReviewForm(){
         var datastring = $("form#review").serializeArray();
         console.log(datastring);
@@ -419,6 +455,7 @@ $(() => {
         console.log("optimized",optimized_arr);
     }
 
+/* --------------------------- Change topic status -------------------------- */
     $(".zoom-fab#change_status").click(() => {
         var change_status = "Change status from";
         var new_status = 0;
@@ -438,7 +475,7 @@ $(() => {
             icon:"warning",
         }).then((isChanged) => {
             if(isChanged){
-                $.post("/detail/UpdateTopicStatus", {topic_code:topic_code,status:new_status}, (data) => {
+                $.post(UpdateTopicStatusPath, {topic_code:topic_code,status:new_status}, (data) => {
                     if(data){
                         swal("Success", "Change Status Success", "success").then(location.reload());
                     }else{
@@ -449,6 +486,7 @@ $(() => {
         });
     });
 
+/* ---- Clear file in filepond when changing from Resubmit topic to topic --- */
     var reply_id = 0;
     $(".reply_modal").click((e) => {
         let new_reply_id = e.target.id.split("-")[1];
@@ -466,7 +504,7 @@ $(() => {
         }else{
             console.log("id matched");
         }
-    })
-
+    });
 
 });
+

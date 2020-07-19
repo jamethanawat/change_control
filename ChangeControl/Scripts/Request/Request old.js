@@ -32,16 +32,10 @@ $(document).ready(function () {
 
     $.each(DepartmentLists, (key,val) => {
         console.log(val.Name);
-        $(`#${val.Name}`).change(function() {
-            if (this.checked) {
+        $(`#${val.Name}`).change((e) => {
                 $(`.${val.Name}`).each(function() {
-                    this.checked=true;
+                    this.checked = (e.target.checked) ? true : false;
                 });
-            } else {
-                $(`.${val.Name}`).each(function() {
-                    this.checked=false;
-                });
-            }
         });
     
         $(`.${val.Name}`).click(function () {

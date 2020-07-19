@@ -15,7 +15,7 @@
             icon: "warning",
         }).then((res) => {
             if(res){
-                $.post("/detail/ApproveTrial", {trial_id:tr_id}, (data) => {
+                $.post(ApproveTrialPath, {trial_id:tr_id}, (data) => {
                     if(data){
                         swal("Success", "Change Status Success", "success").then(location.reload());
                     }else{
@@ -40,7 +40,7 @@
                 delete files[index].detail;
             }
 
-            promises.push($.post("/detail/UpdateTrial",{ desc: trial_form[0].value},() => {
+            promises.push($.post(UpdateTrialPath,{ desc: trial_form[0].value},() => {
                 console.log('Inserted trial');
                 files.forEach(element => {
                     var Data = new FormData();
@@ -48,7 +48,7 @@
                     Data.append("description",element.description);
                     promises.push($.ajax({
                         type: "POST",
-                        url: "/detail/SubmitFileTrial",
+                        url: SubmitFileTrialPath,
                         data: Data,
                         cache: false,
                         processData: false,

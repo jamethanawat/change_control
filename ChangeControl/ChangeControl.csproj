@@ -265,17 +265,20 @@
     <Compile Include="Controllers\DetailController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
+    <Compile Include="Controllers\MailController.cs" />
     <Compile Include="Controllers\RequestController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\DateHelper.cs" />
+    <Compile Include="Helpers\ProfileHelper.cs" />
     <Compile Include="Helpers\StringHelper.cs" />
     <Compile Include="Models\Database\DbCCS.cs" />
     <Compile Include="Models\Database\DbTapics.cs" />
     <Compile Include="Models\DetailModel.cs" />
     <Compile Include="Models\HomeModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
+    <Compile Include="Models\MailModel.cs" />
     <Compile Include="Models\RequestModel.cs" />
     <Compile Include="Models\ViewModels\ChangeItem.cs" />
     <Compile Include="Models\ViewModels\Confirm.cs" />
@@ -382,6 +385,7 @@
     <Content Include="Plugin\datepicker\datepicker.min.css" />
     <Content Include="Plugin\datepicker\datepicker.min.js" />
     <Content Include="Plugin\filepond\filepond-plugin-file-encode.js" />
+    <Content Include="Plugin\filepond\filepond-plugin-file-validate-size.js" />
     <Content Include="Plugin\filepond\filepond-plugin-image-preview.min.js" />
     <Content Include="Plugin\filepond\filepond.css" />
     <Content Include="Plugin\filepond\filepond.jquery.js" />
@@ -443,15 +447,17 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <Content Include="Scripts\Detail\ConfirmList.js" />
     <Content Include="Scripts\Detail\Detail.js" />
+    <Content Include="Scripts\Detail\ReviewList.js" />
+    <Content Include="Scripts\Detail\TrialList.js" />
     <Content Include="Scripts\Home\Home.js" />
-    <None Include="Scripts\jquery-3.4.1.intellisense.js" />
-    <Content Include="Scripts\jquery-3.4.1.js" />
+    <!-- <Content Include="Scripts\jquery-3.4.1.js" />
     <Content Include="Scripts\jquery-3.4.1.min.js" />
     <Content Include="Scripts\jquery-3.4.1.slim.js" />
     <Content Include="Scripts\jquery-3.4.1.slim.min.js" />
     <Content Include="Scripts\jquery-3.4.1.slim.min.map" />
-    <Content Include="Scripts\jquery-3.4.1.min.map" />
+    <Content Include="Scripts\jquery-3.4.1.min.map" /> -->
     <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery.modal-wizard.js" />
     <Content Include="Scripts\jquery.transit.min.js" />
@@ -464,10 +470,13 @@
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Scripts\Request\Request.js" />
     <Content Include="Scripts\Shared\FilePond.js" />
+    <Content Include="Scripts\Shared\FilePond_alt.js" />
     <Content Include="Scripts\Shared\Shared.js" />
     <Content Include="Plugin\SweetAlert\sweetalert-dev.js" />
     <Content Include="Plugin\SweetAlert\sweetalert.css" />
     <Content Include="Plugin\SweetAlert\sweetalert.min.js" />
+    <Content Include="Scripts\vue.js" />
+    <Content Include="Styles\404\style.css" />
     <Content Include="tmp\.gitignore" />
     <Content Include="tmp\build\config\postcss.config.js" />
     <Content Include="tmp\build\config\rollup.config.js" />
@@ -1456,6 +1465,11 @@
     <Content Include="tmp\plugins\ion-rangeslider\css\ion.rangeSlider.min.css" />
     <Content Include="tmp\plugins\ion-rangeslider\js\ion.rangeSlider.js" />
     <Content Include="tmp\plugins\ion-rangeslider\js\ion.rangeSlider.min.js" />
+    <None Include="tmp\plugins\jQuery-3.4.1\jquery-3.4.1.intellisense.js" />
+    <Content Include="tmp\plugins\jQuery-3.4.1\jquery-3.4.1.js" />
+    <Content Include="tmp\plugins\jQuery-3.4.1\jquery-3.4.1.min.js" />
+    <Content Include="tmp\plugins\jQuery-3.4.1\jquery-3.4.1.slim.js" />
+    <Content Include="tmp\plugins\jQuery-3.4.1\jquery-3.4.1.slim.min.js" />
     <Content Include="tmp\plugins\jquery-knob\jquery.knob.min.js" />
     <Content Include="tmp\plugins\jquery-mapael\jquery.mapael.js" />
     <Content Include="tmp\plugins\jquery-mapael\jquery.mapael.min.js" />
@@ -2220,7 +2234,6 @@
     <Content Include="Views\Detail\Review\PE_Process.cshtml" />
     <Content Include="Views\Detail\Review\QC.cshtml" />
     <Content Include="Views\Detail\Review\Other.cshtml" />
-    <Content Include="Views\Detail\Trial\TrialList.cshtml" />
     <Content Include="Views\Detail\Confirm\List.cshtml" />
     <Content Include="Views\Detail\Review\Edit.cshtml" />
     <Content Include="Views\Detail\Review\List.cshtml" />
@@ -2228,6 +2241,13 @@
     <Content Include="Views\Detail\Review\Edit_PE_Process.cshtml" />
     <Content Include="Views\Detail\Review\Edit_QC.cshtml" />
     <Content Include="Views\Detail\Trial\Edit.cshtml" />
+    <Content Include="Views\Shared\404\index.cshtml" />
+    <Content Include="Views\Mail\Default.cshtml" />
+    <Content Include="Views\Mail\Index.cshtml" />
+    <Content Include="Views\Mail\Body\EmailRequestor.cshtml" />
+    <Content Include="tmp\plugins\jQuery-3.4.1\jquery-3.4.1.min.map" />
+    <Content Include="tmp\plugins\jQuery-3.4.1\jquery-3.4.1.slim.min.map" />
+    <Content Include="Views\Detail\Confirm\Edit.cshtml" />
     <None Include="Web References\myAD\ADInfo.disco" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
@@ -2240,8 +2260,6 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\About.cshtml" />
-    <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Login\Index.cshtml" />
     <Content Include="tmp\.babelrc" />
@@ -2499,15 +2517,17 @@
       <LastGenOutput>Reference.cs</LastGenOutput>
     </Content>
     <None Include="Web References\myAD\ADInfo.wsdl" />
-    <Content Include="Web References\myAD\Reference.map">
+    <None Include="Web References\myAD\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
-    </Content>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="tmp\pages\" />
     <Folder Include="upload\" />
+    <Folder Include="Views\Shared\404\css\" />
+    <Folder Include="Views\Shared\404\img\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

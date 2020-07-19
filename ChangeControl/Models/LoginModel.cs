@@ -24,18 +24,23 @@ namespace ChangeControl.Models{
         public object CheckUser(string user, string password){
 
             dynamic response = new ExpandoObject();
-                    response.message = "error";
+                    response.status = "error";
                     response.data = null;
             try{
                 System.Net.ServicePointManager.Expect100Continue = false;
                 myAD.ADInfo conAD = new myAD.ADInfo();
                 bool FoundUser = conAD.ChkAuth(user,password);
                 if (FoundUser){
-                    User temp_user = new User(conAD.ChkFullName(user), conAD.ChkName(user), conAD.ChkSurName(user), conAD.ChkEmail(user),conAD.ChkDept(user), conAD.ChkPosition(user));
+                    User temp_user = new User(conAD.ChkFullName(user), conAD.ChkName(user), conAD.ChkSurName(user), conAD.ChkEmail(user),null, conAD.ChkPosition(user));
                     response.message = "success";
                     response.data = temp_user;
                     return response;
                 }else{
+                    if(conAD.ChkFullName(user) != ""){
+                        response.status = "wrong_pwd";
+                    }else{
+                        response.status = "wrong_us";
+                    }
                     return response;
                 }
              
@@ -47,6 +52,12 @@ namespace ChangeControl.Models{
 
         public Department GetDepartmentIdByDepartmentName(string Department){
             var sql = $"SELECT TOP (1) ID_Department AS Id FROM dbo.[Department] WHERE Department.Name = '{Department}' OR Department.Name LIKE '{Department}%'";
+            var result = _dbCCS.Database.SqlQuery<Department>(sql).First();
+            return result;
+        }
+
+        public Department GetDepartmentByDepartmentName(string Department){
+            var sql = $"SELECT TOP (1) ID_Department AS ID , Name FROM dbo.[Department] WHERE Department.Name = '{Department}' OR Department.Name LIKE '{Department}%'";
             var result = _dbCCS.Database.SqlQuery<Department>(sql).First();
             return result;
         }

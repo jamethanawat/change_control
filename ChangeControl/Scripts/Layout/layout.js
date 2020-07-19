@@ -4,9 +4,10 @@ $(document).ready(function () {
     // Search all columns
     console.log("layout");
 
-    window.onbeforeunload = function() {
-        // $('#loading').show('slow');
-        $('#loading').removeClass('hidden');
+    window.onbeforeunload = (e) => {
+        if(e.target.activeElement.name != "load"){
+            $('#loading').removeClass('hidden');
+        }
     };
 
     $(".nav-item .animsition-link").click(() => {

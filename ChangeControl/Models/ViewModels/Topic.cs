@@ -13,6 +13,7 @@ namespace ChangeControl.Models
         public int Change_item{ get; set; }
         public int Product_type{ get; set; }
         public int Revision{ get; set; }
+        public string Department{ get; set; }
         public string Model{ get; set; }
         public string PartNo{ get; set; } 
         public string PartName{ get; set; } 
@@ -25,13 +26,15 @@ namespace ChangeControl.Models
         public long Related{ get; set; }
         public string User_insert{ get; set; }
         public string Time_insert{ get; set; }
+        public string Date{ get; set; }
         
-        public Topic(string Code,string changeType,int changeItem,int productType,int revision ,string model,string partNo,string partName,string processName,int status,string appDescription,string subject,string detail,string timing, long related,string UserInsert,string TimeInsert){
+        public Topic(string Code,string changeType,int changeItem,int productType,int revision ,string department,string model,string partNo,string partName,string processName,int status,string appDescription,string subject,string detail,string timing, long related,string UserInsert,string TimeInsert){
             this.Code = Code;
             this.Type = changeType;
             this.Change_item = changeItem;
             this.Product_type = productType;
             this.Revision = revision;
+            this.Department = department;
             this.Model = model;
             this.PartNo = partNo;
             this.PartName = partName;
@@ -52,6 +55,8 @@ namespace ChangeControl.Models
             this.Change_item = 0;
             this.Product_type = 0;
             this.Revision = 0;
+            this.Department = null;
+            this.Model = null;
             this.PartNo = null;
             this.PartName = null;
             this.ProcessName = null;

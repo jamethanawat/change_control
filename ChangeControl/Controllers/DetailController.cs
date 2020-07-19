@@ -39,6 +39,9 @@ namespace ChangeControl.Controllers{
         private static long topic_id;
 
         public ActionResult Index(string id){
+            if((string)(Session["User"]) == null){
+                return RedirectToAction("Index", "Home");
+            }
             temp_user = Session["User"].ToString();
             temp_department = Session["Department"].ToString();
             if (temp_user == null){
@@ -54,14 +57,16 @@ namespace ChangeControl.Controllers{
             }
 
             Topic = M_Detail.GetTopicByCode(topic_code);
+            Topic.Profile = M_Detail.getUserByID(Topic.User_insert);
             topic_code = Topic.Code;
             topic_id = Topic.ID;
 
 
+
             ViewData["ViewReviewItem"] = this.GetReviewListByTopicID();
             ViewData["ResubmitList"] = this.GetResubmitListByTopicID();
-            ViewData["TrialList"] = this.GetTrialListByTopicID();
-            ViewData["ConfirmList"] = this.GetConfirmListByTopicID();
+            ViewData["TrialList"] = this.GetTrialListByTopicCode();
+            ViewData["ConfirmList"] = this.GetConfirmListByTopicCode();
 
             var DepartmentGroup = M_Detail.GetDepartmentGroup(); //Get raw group of departments
             List<DepartmentList> departmentList = new List<DepartmentList>();
@@ -74,7 +79,7 @@ namespace ChangeControl.Controllers{
             return View();
         }
 
-        public ActionResult InsertReview(){
+        public ActionResult SubmitReview(){
             // long temp_topic_id = Topic.ID;
             var temp_user = Session["User"].ToString();
             var temp_department = Session["Department"].ToString();
@@ -93,7 +98,7 @@ namespace ChangeControl.Controllers{
             return Json(new {code=1}, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult InsertReviewItem(string status, string description, int id){
+        public ActionResult SubmitReviewItem(string status, string description, int id){
             M_Detail.InsertReviewItem(status, description, id, review_id);
             return Json(new {code=1}, JsonRequestBehavior.AllowGet);
         }
@@ -164,7 +169,7 @@ namespace ChangeControl.Controllers{
             }
 
 
-            var Related = M_Req.GetRelatedByID(Topic.Related);
+            var Related = M_Detail.GetRelatedByID(Topic.Related);
             // var Related = M_Detail.GetRelatedByTopicID(tp_code);
             List<RelatedAlt> RelatedList = new List<RelatedAlt>();
             foreach (var prop in Related.GetType().GetProperties()){
@@ -223,10 +228,10 @@ namespace ChangeControl.Controllers{
             return temp_resubmit_list;
         }
 
-        public List<Trial> GetTrialListByTopicID(){
+        public List<Trial> GetTrialListByTopicCode(){
             List<Trial> trial_list = new List<Trial>();
             List<FileItem> file_list = new List<FileItem>();
-            trial_list = M_Detail.GetTrialByTopicID(Topic.Code);
+            trial_list = M_Detail.GetTrialByTopicCode(Topic.Code);
             foreach(Trial trial in trial_list){
                 var tr_file_list = M_Detail.GetFileByID(trial.ID, "Trial");
                 trial.FileList = tr_file_list;
@@ -238,10 +243,10 @@ namespace ChangeControl.Controllers{
             return trial_list;
         }
 
-        public List<Confirm> GetConfirmListByTopicID(){
+        public List<Confirm> GetConfirmListByTopicCode(){
             List<Confirm> Confirm_list = new List<Confirm>();
             List<FileItem> file_list = new List<FileItem>();
-            Confirm_list = M_Detail.GetConfirmByTopicID(Topic.Code);
+            Confirm_list = M_Detail.GetConfirmByTopicCode(Topic.Code);
             foreach(Confirm Confirm in Confirm_list){
                 var tr_file_list = M_Detail.GetFileByID(Confirm.ID, "Confirm");
                 Confirm.FileList = tr_file_list;
@@ -263,9 +268,9 @@ namespace ChangeControl.Controllers{
         }
 
         [HttpPost]
-        public ActionResult SubmitRelated(string IT,string MKT,string PC1,string PC2,string PT1,string PT2,string PT3A,string PT3M,string PT4,string PT5,string PT6,string PT7,string PE1,string PE2,string PE2_SMT,string PE2_PCB,string PE2_MT,string PE1_Process,string PE2_Process,string PCH1,string PCH2,string QC_IN1,string QC_IN2,string QC_IN3,string QC_FINAL1,string QC_FINAL2,string QC_FINAL3,string QC_NFM1,string QC_NFM2,string QC_NFM3,string QC1,string QC2,string QC3){
+        public ActionResult SubmitRelated(string IT,string MKT,string PC1,string PC2,string P1,string P2,string P3A,string P3M,string P4,string P5,string P6,string P7,string PE1,string PE2,string PE2_SMT,string PE2_PCB,string PE2_MT,string PE1_Process,string PE2_Process,string PCH1,string PCH2,string QC_IN1,string QC_IN2,string QC_IN3,string QC_FINAL1,string QC_FINAL2,string QC_FINAL3,string QC_NFM1,string QC_NFM2,string QC_NFM3,string QC1,string QC2,string QC3){
             try{
-                Related related = new Related(IT,MKT,PC1,PC2,PT1,PT2,PT3A,PT3M,PT4,PT5,PT6,PT7,PE1,PE2,PE2_SMT,PE2_PCB,PE2_MT,PE1_Process,PE2_Process,PCH1,PCH2,QC_IN1,QC_IN2,QC_IN3,QC_FINAL1,QC_FINAL2,QC_FINAL3,QC_NFM1,QC_NFM2,QC_NFM3,QC1,QC2,QC3);
+                Related related = new Related(IT,MKT,PC1,PC2,P1,P2,P3A,P3M,P4,P5,P6,P7,PE1,PE2,PE2_SMT,PE2_PCB,PE2_MT,PE1_Process,PE2_Process,PCH1,PCH2,QC_IN1,QC_IN2,QC_IN3,QC_FINAL1,QC_FINAL2,QC_FINAL3,QC_NFM1,QC_NFM2,QC_NFM3,QC1,QC2,QC3);
                 related_id = M_Detail.InsertRelated(related);
                 return Json(new { code = 1 },JsonRequestBehavior.AllowGet);
             }
@@ -336,7 +341,7 @@ namespace ChangeControl.Controllers{
 
         [HttpPost]
         public ActionResult UpdateConfirm(string desc){
-            review_id = M_Detail.UpdateTrial(topic_code, desc, temp_department, temp_user);
+            review_id = M_Detail.UpdateConfirm(topic_code, desc, temp_department, temp_user);
             return Json(new {code=1}, JsonRequestBehavior.AllowGet);
         }
 
@@ -408,6 +413,27 @@ namespace ChangeControl.Controllers{
             }catch(Exception err){
                 return Json(new {code=false}, JsonRequestBehavior.AllowGet);
             }
+        }
+
+        [HttpPost]
+        public ActionResult DownloadFile(){
+            var r = Request.Form["load"];
+            var temp = r.Split('^');
+            //string filePath = "km0024.txt";
+            //string fullName = Server.MapPath("~/upload/");
+            string filePath = temp[0];
+            string fullName = "D:/File/Topic/";
+            byte[] fileBytes = GetFile(fullName + filePath);
+            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, temp[1]);
+        }
+
+        byte[] GetFile(string s){
+            System.IO.FileStream fs = System.IO.File.OpenRead(s);
+            byte[] data = new byte[fs.Length];
+            int br = fs.Read(data, 0, data.Length);
+            if (br != fs.Length)
+                throw new System.IO.IOException(s);
+            return data;
         }
 
     }

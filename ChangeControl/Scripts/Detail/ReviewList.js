@@ -16,7 +16,7 @@
             icon: "warning",
         }).then((res) => {
             if(res){
-                $.post("/detail/ApproveReview", {review_id:rv_id}, (data) => {
+                $.post(ApproveReviewPath, {review_id:rv_id}, (data) => {
                     if(data){
                         swal("Success", "Change Status Success", "success").then(location.reload());
                     }else{
@@ -33,7 +33,7 @@
         $('#loading').removeClass('hidden')
         SerializeEditReviewForm();
 
-        $.post("/detail/UpdateReview", () => {
+        $.post(UpdateReviewPath, () => {
             var promises = [];
             files = file_list_alt;
             console.log("files",files);
@@ -49,7 +49,7 @@
                 Data.append("description",element.description);
                 promises.push($.ajax({
                     type: "POST",
-                    url: "/detail/SubmitFile",
+                    url: SubmitFilePath,
                     data: Data,
                     cache: false,
                     processData: false,
@@ -64,7 +64,7 @@
 
             optimized_edit_rv.forEach(element => {
                 promises.push(
-                    $.post("/detail/InsertReviewItem", {
+                    $.post(SubmitReviewItemPath, {
                         'status' : element.status,
                         'description' : element.description,
                         'id' : element.id,

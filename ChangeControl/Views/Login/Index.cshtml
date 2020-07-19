@@ -9,22 +9,30 @@
         @Scripts.Render("~/bundles/modernizr")
         @Scripts.Render("~/bundles/jquery")
         @Scripts.Render("~/bundles/bootstrap")
+        @Scripts.Render("~/bundles/sweetalert")
 
+        <script type="text/javascript">
+            var CheckUserPath = '@Url.Action("CheckUser", "Login")';
+            var CheckAdminPath = '@Url.Action("CheckAdmin", "Login")';
+            var GetDepartmentPath = '@Url.Action("GetDepartment", "Login")';
+            var SetDepartmentPath = '@Url.Action("SetDepartment", "Login")';
+            var SetDepartmentAltPath = '@Url.Action("SetDepartmentAlt", "Login")';
+            var NavigateToHome = '@Url.Action("Index", "Home")';
+        </script>
         <script src="~/Scripts/login/login.js"></script>
+        <script src="~/Scripts/Shared/Shared.js"></script>
 
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <title>Change Control System | Log in</title>
         <!-- Tell the browser to be responsive to screen width -->
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        @Styles.Render("~/Content/css")
 
-        <!-- Font Awesome -->
-        <link rel="stylesheet" href="~/tmp/plugins/fontawesome-free/css/all.min.css">
         <!-- Ionicons -->
         @*<link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">*@
         <link rel="stylesheet" href="~/tmp/icon-internet/icon-internet.css">
-        <!-- icheck bootstrap -->
-        <link rel="stylesheet" href="~/tmp/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
         <!-- Theme style -->
         <link rel="stylesheet" href="~/tmp/dist/css/adminlte.min.css">
         <!-- Google Font: Source Sans Pro -->
@@ -38,7 +46,8 @@
             <div class="login-box">
                 <div class="login-logo">
                     @*<a href="http://172.27.170.23/support/"><b>Change Control</b> System</a>*@
-                    <a href="http://172.27.170.23/support/">
+                    @* <a href="http://172.27.170.23/support/"> *@
+                    <a href="#">
                         <img src="~/tmp/dist/img/change_Black.png" alt="AdminLTE Logo" class="brand-image " style="opacity: .8">
                     </a>
                 </div>
@@ -82,10 +91,12 @@
 
 
                         <p class="mb-1">
-                            <a href="http://172.27.170.23/support/" target="_blank">I forgot my password</a>
+                            <a href="#" target="_blank">I forgot my password</a>
+                            @* <a href="http://172.27.170.23/support/" target="_blank">I forgot my password</a> *@
                         </p>
                         <p class="mb-0">
-                            <a href="http://172.27.170.23/support/" target="_blank" class="text-center">Register a new membership</a>
+                            <a href="#" target="_blank" class="text-center">Register a new membership</a>
+                            @* <a href="http://172.27.170.23/support/" target="_blank" class="text-center">Register a new membership</a> *@
                         </p>
                     </div>
                     <!-- /.login-card-body -->

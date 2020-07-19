@@ -9,14 +9,14 @@ namespace ChangeControl.Models{
         public int MKT { get; set; }
         public int PC1 { get; set; }
         public int PC2 { get; set; }
-        public int PT1 { get; set; }
-        public int PT2 { get; set; }
-        public int PT3A { get; set; }
-        public int PT3M { get; set; }
-        public int PT4 { get; set; }
-        public int PT5 { get; set; }
-        public int PT6 { get; set; }
-        public int PT7 { get; set; }
+        public int P1 { get; set; }
+        public int P2 { get; set; }
+        public int P3A { get; set; }
+        public int P3M { get; set; }
+        public int P4 { get; set; }
+        public int P5 { get; set; }
+        public int P6 { get; set; }
+        public int P7 { get; set; }
         public int PE1 { get; set; }
         public int PE2 { get; set; }
         public int PE2_MT { get; set; }
@@ -44,14 +44,14 @@ namespace ChangeControl.Models{
             MKT = 0;
             PC1 = 0;
             PC2 = 0;
-            PT1 = 0;
-            PT2 = 0;
-            PT3A = 0;
-            PT3M = 0;
-            PT4 = 0;
-            PT5 = 0;
-            PT6 = 0;
-            PT7 = 0;
+            P1 = 0;
+            P2 = 0;
+            P3A = 0;
+            P3M = 0;
+            P4 = 0;
+            P5 = 0;
+            P6 = 0;
+            P7 = 0;
             PE1 = 0;
             PE2 = 0;
             PE2_MT = 0;
@@ -74,19 +74,19 @@ namespace ChangeControl.Models{
             QC2 = 0;
             QC3 = 0;
         }
-        public Related(string IT,string MKT,string PC1,string PC2,string PT1,string PT2,string PT3A,string PT3M,string PT4,string PT5,string PT6,string PT7,string PE1,string PE2,string PE2_SMT,string PE2_PCB,string PE2_MT,string PE1_Process,string PE2_Process,string PCH1,string PCH2,string QC_IN1,string QC_IN2,string QC_IN3,string QC_FINAL1,string QC_FINAL2,string QC_FINAL3,string QC_NFM1,string QC_NFM2,string QC_NFM3,string QC1,string QC2,string QC3){
+        public Related(string IT,string MKT,string PC1,string PC2,string P1,string P2,string P3A,string P3M,string P4,string P5,string P6,string P7,string PE1,string PE2,string PE2_SMT,string PE2_PCB,string PE2_MT,string PE1_Process,string PE2_Process,string PCH1,string PCH2,string QC_IN1,string QC_IN2,string QC_IN3,string QC_FINAL1,string QC_FINAL2,string QC_FINAL3,string QC_NFM1,string QC_NFM2,string QC_NFM3,string QC1,string QC2,string QC3){
             this.IT = (IT != null)? int.Parse(IT) : 0;
             this.MKT = (MKT != null)? int.Parse(MKT) : 0;
             this.PC1 = (PC1 != null)? int.Parse(PC1) : 0;
             this.PC2 = (PC2 != null)? int.Parse(PC2) : 0;
-            this.PT1 = (PT1 != null)? int.Parse(PT1) : 0;
-            this.PT2 = (PT2 != null)? int.Parse(PT2) : 0;
-            this.PT3A = (PT3A != null)? int.Parse(PT3A) : 0;
-            this.PT3M = (PT3M != null)? int.Parse(PT3M) : 0;
-            this.PT4 = (PT4 != null)? int.Parse(PT4) : 0;
-            this.PT5 = (PT5 != null)? int.Parse(PT5) : 0;
-            this.PT6 = (PT6 != null)? int.Parse(PT6) : 0;
-            this.PT7 = (PT7 != null)? int.Parse(PT7) : 0;
+            this.P1 = (P1 != null)? int.Parse(P1) : 0;
+            this.P2 = (P2 != null)? int.Parse(P2) : 0;
+            this.P3A = (P3A != null)? int.Parse(P3A) : 0;
+            this.P3M = (P3M != null)? int.Parse(P3M) : 0;
+            this.P4 = (P4 != null)? int.Parse(P4) : 0;
+            this.P5 = (P5 != null)? int.Parse(P5) : 0;
+            this.P6 = (P6 != null)? int.Parse(P6) : 0;
+            this.P7 = (P7 != null)? int.Parse(P7) : 0;
             this.PE1 = (PE1 != null)? int.Parse(PE1) : 0;
             this.PE2 = (PE2 != null)? int.Parse(PE2) : 0;
             this.PE2_MT = (PE2 != null)? int.Parse(PE2) : 0;

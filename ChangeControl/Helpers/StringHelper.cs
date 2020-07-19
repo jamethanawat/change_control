@@ -5,6 +5,7 @@ using System.Linq;
 using System.Dynamic;
 using System.Web;
 using System.Web.Mvc;
+using System.Text.RegularExpressions;
 
 namespace StringHelper
 {
@@ -41,7 +42,17 @@ namespace StringHelper
         }
 
         public static string ReplaceNullWithDash(this string items) {
-            return items.AsNullIfWhiteSpace() ?? "-";
+            return items.Trim().AsNullIfWhiteSpace() ?? "-";
+        }
+
+        public static string test(this string items) {
+            return items;
+        }
+
+        public static string StripTagsRegex(this string source){
+            source = Regex.Replace(source, "<.*?>", string.Empty);
+            source = Regex.Replace(source, "&nbsp; ", " ");
+            return source;
         }
 
         

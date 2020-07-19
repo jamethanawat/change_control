@@ -37,16 +37,10 @@ $(document).ready(function () {
         if($(`.${val.Name}`).length == $(`.${val.Name}:checked`).length){
             $(`#${val.Name}`).prop('checked', true);
         }
-        $(`#${val.Name}`).change(function() {
-            if(this.checked) {
+        $(`#${val.Name}`).change(function(e) {
                 $(`.${val.Name}`).each(function() {
-                    this.checked=true;
+                    this.checked = (e.target.checked) ? true : false;
                 });
-            }else{
-                $(`.${val.Name}`).each(function() {
-                    this.checked=false; 
-                });
-            }
         });
     
         $(`.${val.Name}`).click(function () {
@@ -142,7 +136,17 @@ $(document).ready(function () {
                             }
                         }));
                     });
-                    
+                    promises.push(
+                        $.post(GeneratePath,{
+                            'mode':'EmailRequestor',
+                            'topic_code':inserted_id,
+                            'address_list':['pakawat.smutkun@email.thns.co.th']
+                        }).fail((error) => {
+                            console.err(error);
+                            swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                            return;
+                        })
+                    );
                     Promise.all(promises).then(() => {
                         $("#loading").addClass('hidden');
                         $("#ReviewSubmit").prop("disabled",true)
@@ -239,7 +243,47 @@ $(document).ready(function () {
     });
 
     function RedirectToDetail(id) {
-        window.location.replace(`/Detail/Index/?id=${id}`);
+        window.location.replace(`Detail/?id=${id}`);
+    }
+
+    $("#test").click(function () {
+
+        console.log($("#revision").html());
+        SendMail("Internal");
+        //var txt = $(".textarea2").val();
+        //console.log(txt);
+        let ul = $('#listshow');              
+        let length = ul.children().length;
+        console.log("ul", ul);
+        console.log("length", length);
+        for (var i = 0; i < length; i++) {
+           
+            console.log("value-text", $('#txt-file' + i +'').val());
+        }
+        var Odepartment = {
+
+            "Value": 1
+        };
+        var Odepartment2 = {
+
+            "Value": 2
+        };
+
+        var files = $("#files").get(0).files;
+        var fileData = new FormData();
+
+        for (var i = 0; i < files.length; i++) {
+            fileData.append('files', files[i]);
+        }
+        
+        var code = "5555";
+
+
+        swal("Success \n Change Control NO. " + code + "", "Complete Transaction", "success");
+    });
+
+    function SendMail(type) {
+        $.post(sendmail, JSON.stringify({ Type: type,}));
     }
 });
 

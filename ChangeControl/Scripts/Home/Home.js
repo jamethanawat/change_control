@@ -40,65 +40,31 @@ $(document).ready(function () {
             }
         });
     });
-    $("#search").click(function () {
-
-        //status
-        var status;
-        // if ($("#st_pending").prop("checked")) {
-        //     status = 7;
-        // } else if ($("#st_issued").prop("checked")) {
-        //     status = 1;
-        // } else if ($("#st_check").prop("checked")) {
-        //     status = 1;
-        // } else if ($("#st_approved").prop("checked")) {
-        //     status = 1;
-        // } else if ($("#st_finished").prop("checked")) {
-        //     status = 1;
-        // }
+    $("#search").click((e) => {
+        e.preventDefault();
         
-        if ($("#st_request").prop("checked")) {
-            status = 7;
-        } else if ($("#st_review").prop("checked")) {
-            status = 8;
-        } else if ($("#st_trial").prop("checked")) {
-            status = 9;
-        } else if ($("#st_confirm").prop("checked")) {
-            status = 10;
-        } else if ($("#st_closed").prop("checked")) {
-            status = 11;
-        } 
-
-        //over status
-        var overstatus;
-        if ($("#st_review_complete").prop("checked")) {
-            overstatus = 1;
-        } else if ($("#st_Confirm_complete").prop("checked")) {
-            overstatus = 1;
-        } else if ($("#st_allstatus").prop("checked")) {
-            overstatus = 1;
-        } 
         //changeitem
         var Chosechangeitem;
-        if ($("#changeitem_All").prop("checked")) {
+        if($("#changeitem_All").prop("checked")) {
             Chosechangeitem = 1;
-        } else if ($("#changeitem_Yes").prop("checked")) {
+        }else if($("#changeitem_Yes").prop("checked")) {
             Chosechangeitem = 1;
-        } else if ($("#changeitem_No").prop("checked")) {
+        }else if($("#changeitem_No").prop("checked")) {
             Chosechangeitem = 1;
         } 
      
         var temp_data = {
             'Type': $("#changeType").val(),
-            'Status': status,
+            'Status': $("input[name='status']:checked").val(),
             'ProductType': $("#productType").val(),
-            'Overstatus': overstatus,
+            'Overstatus': $("input[name='overstatus']:checked").val(),
             'Changeitem': $("#changeitem").val(),
             'ControlNo': $("#TNScontrolNo").val(),
             'Model': $("#Model").val(),
             'Chosechangeitem': Chosechangeitem,
             'Partno': $("#partno").val(),
             'Partname': $("#partname").val(),
-            'Related': $("#related").val(),
+            'Department': $("[name='dept']").val(),
             'Processname': $("#processname").val(),
             'Production': $("#Production").val(),
             'Line': $("#Line").val(),
@@ -122,49 +88,50 @@ $(document).ready(function () {
                 table_cr = $('#ChangeRequestTable').DataTable( {
                     data:response,
                     "order": [],
-                    columnDefs: [{
-                        "targets": 7,
-                        "render": function (data, type, row) {
-                            return `<span class="badge badge-warning">${data}</span>`;
+                    columnDefs: [
+                    {"targets": 3,
+                        createdCell: (td) => { 
+                            $(td).css('text-align', 'left'); 
                         }
-                    },{
-                        "targets": 8,
+                    },
+                    {"targets": 6,
                         "render": function (data, type, row) {
+                            return `${data}`;
+                            // return `<span class="badge badge-warning">${data}</span>`;
+                        }
+                    },{"targets": 7,
+                        "render": function (data, type, row) {
+                            let action_btn = `<div class="btn-group"><button type="button" name="detail" id="${row.Code}" class="btn btn-info btn-sm  mb-1" data-toggle="modal" data-target="#largeModal" onclick="RedirectToDetail(this)" style="margin-right: 4px;">`+
+                            `<i class="fas fa-external-link-alt"></i></button>`;
+                            console.log(row);
+                            console.log(SessionUser);
                             if(response === null){
                                 return null;
                             }else if(row.User_insert === SessionUser){
-                            // }else{
-                                return `<div class="btn-group-vertical"><button type="button" name="detail" id="${row. Code}" class="btn btn-info btn-sm mb-1" data-toggle="modal" data-target="#largeModal" onclick="RedirectToDetail(this)">`+
-                                `<i class="fas fa-external-link-alt"></i></button>` +
-                                `<button type="button" name="edit" id="${data}" class="btn btn-success btn-sm  mb-1" data-toggle="modal" data-target="#largeModal" onclick="EditTopic(this)">`+
+                                action_btn += `<button type="button" name="edit" id="${row.Code}" class="btn btn-success btn-sm  mb-1" data-toggle="modal" data-target="#largeModal" onclick="EditTopic(this)">`+
                                 `<i class="fas fa-pen"></i>`+
-                                `</button></div>`;
-                            }else{
-                                return `<div class="btn-group-vertical"><button type="button" name="detail" id="${row. Code}" class="btn btn-info btn-sm  mb-1" data-toggle="modal" data-target="#largeModal">`+
-                                `<i class="fas fa-external-link-alt"></i></button></div>`;
+                                `</button>`;
                             }
+                            action_btn += "</div>";
+                            return action_btn;
                         }
                     }],
                     columns: [
-                        { data: 'Type' },
                         { data: 'Code' },
-                        { data: 'Change_item' },
+                        { data: 'Date' },
+                        { data: 'Department' },
+                        { data: 'Detail' },
                         { data: 'Product_type' },
                         { data: 'Model' },
-                        { data: 'Revision' },
-                        { data: 'PartNo' },
-                        { data: 'PartName' },
-                        { data: 'Code' },
+                        { data: 'FullStatus' },
                     ],
                 });
-            
 
-                // $('#ChangeRequestTable').DataTable().fnClearTable();
+                $("body").addClass("sidebar-collapse")
 
-                // $('#ChangeRequestTable').DataTable().fnAddData(response);
-
-                // $('#loading').removeClass('hidden');
-                // $("#submit").click();
+                $("body, html").animate({
+                    scrollTop: $(document).height()
+                }, 100)
             },
             error: function () {
             }
@@ -175,10 +142,10 @@ $(document).ready(function () {
 
 function RedirectToDetail(e) {
     var id = $(e).attr("id");
-    window.open(`/Detail/Index/?id=${id}`);
+    window.open(`Detail/?id=${id}`);
 }
 
 function EditTopic(e) {
     var id = $(e).attr("id");
-    window.open(`/Request/Index/?id=${id}`);
+    window.open(`Request/?id=${id}`);
 }

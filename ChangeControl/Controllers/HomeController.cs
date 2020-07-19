@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using DateHelper;
+using StringHelper;
 
 namespace ChangeControl.Controllers{
     public class HomeController : Controller{
@@ -53,7 +55,7 @@ namespace ChangeControl.Controllers{
         [HttpPost]
         public ActionResult RedirectTo(string ID){
             var rs="";
-            rs = Url.Content("~/Detail/Index");
+            rs = Url.Content("~/Detail");
             Session["TopicCode"] = ID;
             return Json(new { redirecturl = rs, id = ID }, JsonRequestBehavior.AllowGet);
         }
@@ -63,10 +65,15 @@ namespace ChangeControl.Controllers{
             var result = M_Home.GetLine(Production);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
-        public ActionResult GetSearch(string Type,int Status,string ProductType,string Overstatus,string Changeitem,string ControlNo, string Model,string Chosechangeitem,string Partno,string Partname,string Related,string Processname ,string Production ,string Line){
-            var temp_search = new SearchAttribute(Type, Status, ProductType, Overstatus, Changeitem, ControlNo, Model, Chosechangeitem, Partno, Partname, Related, Processname, Production, Line);
-            var result = M_Home.GetSearch(temp_search);
-            return Json(result, JsonRequestBehavior.AllowGet);
+        public ActionResult GetSearch(string Type,int Status,string ProductType,string Overstatus,string Changeitem,string ControlNo, string Model,string Chosechangeitem,string Partno,string Partname,string Department,string Processname ,string Production ,string Line){
+            var temp_search = new SearchAttribute(Type, Status, ProductType, Overstatus, Changeitem, ControlNo, Model, Chosechangeitem, Partno, Partname, Department, Processname, Production, Line);
+            var TopicList = M_Home.GetSearch(temp_search);
+            TopicList.ForEach(Topic => { 
+                Topic.Date = Topic.Date.StringToDateTime(); 
+                Topic.Detail = Topic.Detail.StripTagsRegex();
+            });
+            
+            return Json(TopicList, JsonRequestBehavior.AllowGet);
         }
 
         public List<login> A = new List<login>();

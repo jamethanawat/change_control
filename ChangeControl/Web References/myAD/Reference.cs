@@ -43,6 +43,8 @@ namespace ChangeControl.myAD {
         
         private System.Threading.SendOrPostCallback ChkPositionOperationCompleted;
         
+        private System.Threading.SendOrPostCallback ChkSectionOperationCompleted;
+        
         private bool useDefaultCredentialsSetExplicitly;
         
         /// <remarks/>
@@ -101,6 +103,9 @@ namespace ChangeControl.myAD {
         
         /// <remarks/>
         public event ChkPositionCompletedEventHandler ChkPositionCompleted;
+        
+        /// <remarks/>
+        public event ChkSectionCompletedEventHandler ChkSectionCompleted;
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://tempuri.org/ChkAuth", RequestNamespace="http://tempuri.org/", ResponseNamespace="http://tempuri.org/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
@@ -308,6 +313,35 @@ namespace ChangeControl.myAD {
         }
         
         /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://tempuri.org/ChkSection", RequestNamespace="http://tempuri.org/", ResponseNamespace="http://tempuri.org/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string ChkSection(string username) {
+            object[] results = this.Invoke("ChkSection", new object[] {
+                        username});
+            return ((string)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void ChkSectionAsync(string username) {
+            this.ChkSectionAsync(username, null);
+        }
+        
+        /// <remarks/>
+        public void ChkSectionAsync(string username, object userState) {
+            if ((this.ChkSectionOperationCompleted == null)) {
+                this.ChkSectionOperationCompleted = new System.Threading.SendOrPostCallback(this.OnChkSectionOperationCompleted);
+            }
+            this.InvokeAsync("ChkSection", new object[] {
+                        username}, this.ChkSectionOperationCompleted, userState);
+        }
+        
+        private void OnChkSectionOperationCompleted(object arg) {
+            if ((this.ChkSectionCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.ChkSectionCompleted(this, new ChkSectionCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
         public new void CancelAsync(object userState) {
             base.CancelAsync(userState);
         }
@@ -495,6 +529,32 @@ namespace ChangeControl.myAD {
         private object[] results;
         
         internal ChkPositionCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public string Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((string)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void ChkSectionCompletedEventHandler(object sender, ChkSectionCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class ChkSectionCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal ChkSectionCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
                 base(exception, cancelled, userState) {
             this.results = results;
         }

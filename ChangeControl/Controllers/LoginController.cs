@@ -34,14 +34,14 @@ namespace ChangeControl.Controllers{
                 // Session["DepartmentRawName"] = "QC";
                 // Session["DepartmentID"] = 29;
 
-                Session["User"] = "63014";
-                Session["FullName"] = "Pakawat Smutkun";
-                Session["Name"] = "Pakwat";
-                Session["SurName"] = "Smutkun";
-                Session["Email"] = $"Pakwat@IT.com";
-                Session["Department"] = "IT";
-                Session["DepartmentRawName"] = "IT";
-                Session["DepartmentID"] = 9;
+                // Session["User"] = "63014";
+                // Session["FullName"] = "Pakawat Smutkun";
+                // Session["Name"] = "Pakwat";
+                // Session["SurName"] = "Smutkun";
+                // Session["Email"] = $"Pakwat@IT.com";
+                // Session["Department"] = "IT";
+                // Session["DepartmentRawName"] = "IT";
+                // Session["DepartmentID"] = 9;
             }
             
             if ((string)(Session["User"]) != null){
@@ -54,94 +54,52 @@ namespace ChangeControl.Controllers{
             var redirectUrl = "";
 
             dynamic res = new ExpandoObject();
-                    res.message = "error";
                     res.data = null;
 
-            res = M_Login.CheckUser(username, password);
-            if(res.message == "error"){
-                return Json("Error");
+            try{
+                res = M_Login.CheckUser(username, password);
+            }catch(Exception err){
+                return Json(new { status = "error" , data = "null" }, JsonRequestBehavior.AllowGet);
+            }
+            if(res.data == null){
+                return Json(new { status = $"{res.status}" , data = "null"  }, JsonRequestBehavior.AllowGet);
             }else{
-                if ((string)(Session["url"]) != null){
-                    redirectUrl = Url.Content("~/"+ Session["url"] + "/Index");
-                }
-                else{
-                    redirectUrl = Url.Content("~/Home/Index");
-                }
-
                 var response = res.data;
                 Session["User"] = username;
                 Session["FullName"] = response.FullName;
                 Session["Name"] = response.Name;
                 Session["SurName"] = response.SurName;
                 Session["Email"] = response.Email;
-
-                var CuttedDepartment = response.Department.Replace("TNS_", "");
-                var result_depart = this.CheckDepartment(CuttedDepartment).ToString();
-                if(result_depart == "Error" || result_depart == "Not found" ){
-                    // SweetAlert Select Department
-                    Session["Department"] = "ERROR";
-                }else{
-                    Session["Department"] = result_depart;
-                }
-                Session["DepartmentRawName"] = response.Department;
-                
-                var DepartmentResult = M_Login.GetDepartmentIdByDepartmentName(CuttedDepartment); 
-                var DepartmentID = DepartmentResult.ID;
-                Session["DepartmentID"] = DepartmentID;
                 Session["Position"] = response.Position;
-                return Json(new { Url = redirectUrl });
-            }
-        }
 
-        public ActionResult CheckAdmin(string username, string password, string department) {
-            var redirectUrl = "";
-            if(username == admin && (password == "OPERATOR" || password == "STAFF" || password == "MANAGER")){
-                if ((string)(Session["url"]) != null){
-                    redirectUrl = Url.Content("~/"+ Session["url"] + "/Index");
-                }
-                else{
-                    redirectUrl = Url.Content("~/Home/Index");
-                }
-
-                Session["User"] = "Admin";
-                Session["FullName"] = "Admin";
-                Session["Name"] = "Admin";
-                Session["SurName"] = department;
-                Session["Email"] = $"Admin@{department}.com";
-            
-                var result_depart = this.CheckDepartment(department);
-                if (result_depart != "Error" && result_depart != "Not found") {
-                    // SweetAlert Select Department
-                    Session["Department"] = result_depart;
-                } else {
-                    Session["Department"] = "ERROR";
-                }
-                Session["DepartmentRawName"] = department;
-
-                var DepartmentResult = M_Login.GetDepartmentIdByDepartmentName(department);
-
-                System.Diagnostics.Debug.WriteLine($"Department ID : {DepartmentResult}");
-
-                if (DepartmentResult != null){
-                    var DepartmentID = DepartmentResult.ID;
-                    Session["DepartmentID"] = DepartmentID;
+                var result = "error";
+                if(username == "62084"){
+                    result = "P1";
+                }else if(username == "60002"){
+                    result = "QC1";
+                }else if(username == "54032"){
+                    result = "QC2";
+                }else if(username == "60017"){
+                    result = "PE1";
+                }else if(username == "57010"){
+                    result = "MKT";
+                }else if(username == "63014"){
+                    result = "PE1_Process";
                 }else{
-                    Session["DepartmentID"] = -1;
+                    result = GetDepartment(username);
                 }
-                Session["Position"] = password;
-                return Json(new { Url = redirectUrl });
-            }else{
-                return this.CheckUser(username,password);
+                SetDepartmentAlt(result);
+                return Json(new { status = "success" ,data = result }, JsonRequestBehavior.AllowGet);
             }
         }
 
-        public string CheckDepartment(string Department){
+        public string CheckDepartment(string dept){
             string[] PE_Process = {"PE1_Process","PE2_Process"};
             string[] MKT = {"MKT","MKT1","MKT2"};
             string[] IT = {"IT","IT1","IT2"};
             string[] PE = {"PE","PE1","PE2","PE2_SMT","PE2_PCB","PE2_MT"};
             string[] PCH = {"PCH","PCH1","PCH2"};
-            string[] PT = {"PT","PT1","PT2","PT3A","PT3M","PT4","PT5","PT6","PT7"};
+            string[] P = {"P","P1","P2","P3A","P3M","P4","P5","P6","P7"};
             string[] PC = {"PC","PC1","PC2"};
             string[] QC = {"QC","QC1","QC2","QC3"};
             string[] QC_IN = {"QC_IN","QC_IN1","QC_IN2","QC_IN3"};
@@ -150,27 +108,74 @@ namespace ChangeControl.Controllers{
 
             var result = "Error";
             
-            if(PE_Process.Contains(Department)){
+            if(PE_Process.Contains(dept)){
                 result = "PE1_Process";
-            }else if(MKT.Contains(Department)){
+            }else if(MKT.Contains(dept)){
                 result = "MKT";
-            }else if (IT.Contains(Department)){ 
+            }else if (IT.Contains(dept)){ 
                 result = "IT";
-            }else if(PE.Contains(Department)){
+            }else if(PE.Contains(dept)){
                 result = "PE";
-            }else if(PCH.Contains(Department)){
+            }else if(PCH.Contains(dept)){
                 result = "PCH";
-            }else if(PT.Contains(Department)){
-                result = "PT";
-            }else if(PC.Contains(Department)){
+            }else if(P.Contains(dept)){
+                result = "P";
+            }else if(PC.Contains(dept)){
                 result = "PC";
-            }else if(QC.Contains(Department)){
+            }else if(QC.Contains(dept)){
                 result = "QC";
-            }else if(QC_IN.Contains(Department)){
+            }else if(QC_IN.Contains(dept)){
                 result = "QC_IN";
-            }else if(QC_NFM.Contains(Department)){
+            }else if(QC_NFM.Contains(dept)){
                 result = "QC_NFM";
-            }else if(QC_FINAL.Contains(Department)){
+            }else if(QC_FINAL.Contains(dept)){
+                result = "QC_FINAL";
+            }else{
+                result = "Not found";
+            }
+            return result;
+        }
+
+        public string GetDepartment(string us_id){
+            myAD.ADInfo conAD = new myAD.ADInfo();
+            var temp_dept = conAD.ChkSection(us_id);
+            Session["DepartmentRawName"] = temp_dept;
+
+            string[] PE_Process = {"PE1_Process","PE2_Process"};
+            string[] MKT = {"MKT","MKT1","MKT2"};
+            string[] IT = {"IT","IT1","IT2"};
+            string[] PE = {"PE","PE1","PE2","PE2_SMT","PE2_PCB","PE2_MT"};
+            string[] PCH = {"PCH","PCH1","PCH2"};
+            string[] P = {"P","P1","P2","P3A","P3M","P4","P5","P6","P7"};
+            string[] PC = {"PC","PC1","PC2"};
+            string[] QC = {"QC","QC1","QC2","QC3"};
+            string[] QC_IN = {"QC_IN","QC_IN1","QC_IN2","QC_IN3"};
+            string[] QC_NFM = {"QC_NFM","QC_NFM1","QC_NFM2","QC_NFM3"};
+            string[] QC_FINAL = {"QC_FINAL","QC_FINAL1","QC_FINAL2","QC_FINAL3"};
+
+            var result = "Error";
+            
+            if(PE_Process.Any(x => temp_dept.Contains(x))){
+                result = "PE1_Process";
+            }else if(MKT.Any(x => temp_dept.Contains(x))){
+                result = "MKT";
+            }else if (IT.Any(x => temp_dept.Contains(x))){ 
+                result = "IT";
+            }else if(PE.Any(x => temp_dept.Contains(x))){
+                result = "PE";
+            }else if(PCH.Any(x => temp_dept.Contains(x))){
+                result = "PCH";
+            }else if(P.Any(x => temp_dept.Contains(x))){
+                result = "P";
+            }else if(PC.Any(x => temp_dept.Contains(x))){
+                result = "PC";
+            }else if(QC.Any(x => temp_dept.Contains(x))){
+                result = "QC";
+            }else if(QC_IN.Any(x => temp_dept.Contains(x))){
+                result = "QC_IN";
+            }else if(QC_NFM.Any(x => temp_dept.Contains(x))){
+                result = "QC_NFM";
+            }else if(QC_FINAL.Any(x => temp_dept.Contains(x))){
                 result = "QC_FINAL";
             }else{
                 result = "Not found";
@@ -194,11 +199,34 @@ namespace ChangeControl.Controllers{
             Session["DepartmentRawName"] = DepartmentName;
             Session["DepartmentID"] = GetDepartmentIdByName(DepartmentName);
             return Json(1);
+                // return Json(new { Url = redirectUrl });
+        }
+
+        public ActionResult SetDepartmentAlt(string dept){
+            var result = M_Login.GetDepartmentByDepartmentName(dept); 
+            Session["Department"] = result.Name;
+            Session["DepartmentID"] = result.ID;
+            return Json(1);
+                // return Json(new { Url = redirectUrl });
         }
 
         public ActionResult SetPosition(string PositionName){
             Session["Position"] = PositionName;
             return Json(1);
+        }
+
+        public ActionResult SignOff(){
+            Session["User"] = null;
+            Session["FullName"] = null;
+            Session["Name"] = null;
+            Session["SurName"] = null;
+            Session["Email"] = null;
+            Session["Position"] = null;
+            Session["Department"]  = null;
+            Session["DepartmentRawName"]  = null;
+            Session["DepartmentID"]  = null;
+            return RedirectToAction("Index", "Login");
+
         }
     }
 }

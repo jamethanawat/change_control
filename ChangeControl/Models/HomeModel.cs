@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Web;
 using Newtonsoft.Json;
+using StringHelper;
 
 namespace ChangeControl.Models
 {
@@ -15,8 +16,7 @@ namespace ChangeControl.Models
             _dbtapics = new DbTapics();
             _dbCCS = new DbCCS();
         }
-        private class Line
-        {
+        private class Line{
             public string line { get; set; }
         }
         public object GetLine(string Production){
@@ -25,53 +25,26 @@ namespace ChangeControl.Models
             return result.ToList();  
         } 
         
-        public object GetSearch(SearchAttribute model){
+        public List<TopicAlt> GetSearch(SearchAttribute model){
             var where="";
             var sql = "";
-            var temp_product_type = 0;
-            var temp_change_item = 0;
-            if (model.Type != null)
-            {
+            if (model.Type != null){
                 where += (model.Type == "Internal Change") ? "WHERE Topic.Type='Internal'" : "WHERE Topic.Type='External'";
             }
                 where += (where.IndexOf("WHERE") == -1) ? "WHERE Topic.Status=" + model.Status+"" : " AND Topic.Status=" + model.Status + "";
                 // where += (where.IndexOf("WHERE") == -1) ? "WHERE Topic.Status=" + model.Status+"" : " AND Topic.Status=" + model.Status + "";
-            if (model.ProductType != null)
-            {
-               if (model.ProductType== "Meter 2R") temp_product_type = 1;
-                else if (model.ProductType == "Meter 4R") temp_product_type = 2;
-                else if (model.ProductType == "Agriculture") temp_product_type = 3;
-                else if (model.ProductType == "FU/SP") temp_product_type = 4;
-                else if(model.ProductType == "D/P") temp_product_type = 5;
-                else if(model.ProductType == "Pointer") temp_product_type = 6;
-                else if(model.ProductType == "Consumer") temp_product_type = 7;
-                else if(model.ProductType == "Others") temp_product_type = 8;
-                where += (where.IndexOf("WHERE") == -1) ? "WHERE Topic.Product_type=" + temp_product_type + "" : " AND Topic.Product_type=" + temp_product_type + "";
+            if(model.ProductType.AsNullIfWhiteSpace() != null){
+                where += (where.IndexOf("WHERE") == -1) ? "WHERE Topic.Product_type=" + model.ProductType + "" : " AND Topic.Product_type=" + model.ProductType + "";
             }
             //ยัง
            // where += (where.IndexOf("WHERE") == -1) ? "WHERE Status=" + Overstatus + "" : " AND Status=" + Overstatus + "";
-            if (model.Changeitem != null)
-            {
-                if (model.Changeitem == "New Part") temp_change_item = 1;
-                else if (model.Changeitem == "Material change") temp_change_item = 2;
-                else if (model.Changeitem == "Manufacturing Method change") temp_change_item = 3;
-                else if (model.Changeitem == "Inspection Method change") temp_change_item = 4;
-                else if (model.Changeitem == "Jig /Tool change") temp_change_item = 5;
-                else if (model.Changeitem == "Design Change") temp_change_item = 6;
-                else if (model.Changeitem == "New Supplier") temp_change_item = 7;
-                else if (model.Changeitem == "Machine change") temp_change_item = 8;
-                else if (model.Changeitem == "Manufacturing Process order change") temp_change_item = 9;
-                else if (model.Changeitem == "Packing ,Transportation change") temp_change_item = 10;
-                else if (model.Changeitem == "Die / Mold change") temp_change_item = 11;
-                else if (model.Changeitem == "Others") temp_change_item = 12;
-                where += (where.IndexOf("WHERE") == -1) ? "WHERE Topic.Change_item=" + temp_change_item + "" : " AND Topic.Change_item=" + temp_change_item + "";
+            if(model.Changeitem.AsNullIfWhiteSpace() != null){
+                where += (where.IndexOf("WHERE") == -1) ? "WHERE Topic.Change_item=" + model.Changeitem + "" : " AND Topic.Change_item=" + model.Changeitem + "";
             }
-            if (model.ControlNo != "")
-            {
+            if (model.ControlNo != ""){
                 where += (where.IndexOf("WHERE") == -1) ? "WHERE Topic.Code ='" + model.ControlNo + "'" : " AND Topic.Code ='" + model.ControlNo + "'";             
             }
-            if (model.Model != "")
-            {
+            if (model.Model != ""){
                 where += (where.IndexOf("WHERE") == -1) ? "WHERE Topic.Model ='" + model.Model + "'" : " AND Topic.Model ='" + model.Model + "'";
             }
             //ยัง
@@ -86,16 +59,14 @@ namespace ChangeControl.Models
             if(model.Processname != ""){
                where += (where.IndexOf("WHERE") == -1) ? "WHERE Topic.ProcessName ='" + model.Processname + "'" : " AND Topic.ProcessName ='" + model.Processname + "'";
             }
-            if(model.Related != null){
-                var remove = where.Replace("WHERE","");
-                sql = @"SELECT Topic.ID, Topic.Code, Topic.Type, Topic.Change_item, Topic.Product_type, Topic.Revision,Topic.Model, Topic.PartNo, Topic.PartName, 
-                       Topic.ProcessName, Topic.Status, Topic.Related, Topic.User_insert, Topic.Time_insert FROM Related INNER JOIN
-                       Topic ON Related.ID = Topic.Related , (SELECT MAX(Revision) as Version, Code FROM CCS.dbo.Topic Group by Code) lastest WHERE (Related." + model.Related + " <> 0) AND "+remove+" AND Topic.Revision  = lastest.Version AND Topic.Code = lastest.Code Topic.ID ORDER BY DESC";
-            }else{
-                sql = @"SELECT Topic.ID, Topic.Code, Topic.Type, Topic.Change_item, Topic.Product_type, Topic.Revision,Topic.Model, Topic.PartNo, Topic.PartName, 
-                       Topic.ProcessName, Topic.Status, Topic.Related, Topic.User_insert, Topic.Time_insert FROM Topic , (SELECT MAX(Revision) as Version, Code FROM CCS.dbo.Topic Group by Code) lastest "+where+ " AND Topic.Revision  = lastest.Version AND Topic.Code = lastest.Code ORDER BY Topic.ID DESC";
-            }
-            var result = _dbCCS.Database.SqlQuery<SearchResult>(sql).ToList();
+            sql = $@"SELECT Topic.Code, Topic.Type, Change_item.Name AS Change_item , Product_type.Name AS Product_type, Topic.Department, Topic.Revision,Topic.Model, Topic.PartNo, Topic.PartName, Topic.Detail,
+                    Topic.ProcessName, Status.Name AS FullStatus, Topic.Related, Topic.User_insert, Topic.Time_insert AS Date FROM Topic 
+                    LEFT JOIN Status ON Topic.Status = Status.id
+                    LEFT JOIN Change_Item ON Topic.Change_item = ID_Change_item
+                    LEFT JOIN Product_Type ON Topic.Product_Type = ID_Product_Type, 
+                    (SELECT MAX(Revision) as Version, Code FROM CCS.dbo.Topic Group by Code) lastest
+                    {where} AND Topic.Revision  = lastest.Version AND Topic.Code = lastest.Code" + (model.Department != "" ? $" AND Topic.Department LIKE '%{model.Department}%'" : " ") + "ORDER BY Topic.ID DESC";
+            var result = _dbCCS.Database.SqlQuery<TopicAlt>(sql).ToList();
             return result;
         } 
     }

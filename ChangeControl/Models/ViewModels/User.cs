@@ -19,6 +19,14 @@ namespace ChangeControl.Models{
             this.Department = Department;
             this.Position = Position;
         }
+        public User(){
+            this.FullName = "Pakawat Smutkun";
+            this.Name = "Pakawat";
+            this.SurName = "Smutkun";
+            this.Email = "pakawat.smutkun@email.thns.co.th";
+            this.Department = "IT";
+            this.Position = "Staff";
+        }
     }
 
 }

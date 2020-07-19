@@ -69,7 +69,10 @@
     }
 
     .hide-fab{
-        display:contents;
+        display:none;
+    }
+    .hide-fab i{
+        display:inherit;
     }
 
     body { padding-right: 0 !important }
@@ -118,7 +121,7 @@
                         </div>
                         <div class="row">
                             <div class="col-sm-12 col-form-label">
-                                <label>Request Re-Submit Document :</label>
+                                <label>Description :</label>
                                 <textarea name="desc" type="text" minlength="15" class="form-control" placeholder="ระบุอย่างต่ำ 15 ตัวอักษร" style="height: 26vh;"></textarea>
                             </div>
                         </div>
@@ -185,10 +188,10 @@
         "></i>
     </a>
     <ul class="zoom-menu">
-        <li><a class="zoom-fab zoom-btn-sm zoom-btn-tangram scale-transition scale-out" id="change_status">
+        <li style="top: 4px; right: 0px;"><a class="zoom-fab zoom-btn-sm zoom-btn-tangram scale-transition scale-out" id="change_status">
             <i class="fas fa-check"></i>
         </a></li>
-        <li><a class="zoom-fab zoom-btn-sm bg-warning scale-transition scale-out" id="resubmit" data-toggle="modal" data-target="#resubmit_modal">
+        <li style="top: 56px; right: 0px;"><a class="zoom-fab zoom-btn-sm bg-warning scale-transition scale-out" id="resubmit" data-toggle="modal" data-target="#resubmit_modal">
             <i class="fas fa-tasks"></i>
         </a></li>
     </ul>

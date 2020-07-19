@@ -15,7 +15,7 @@
             icon: "warning",
         }).then((res) => {
             if(res){
-                $.post("/detail/ApproveConfirm", {confirm_id:cf_id}, (data) => {
+                $.post(ApproveConfirmPath, {confirm_id:cf_id}, (data) => {
                     if(data){
                         swal("Success", "Change Status Success", "success").then(location.reload());
                     }else{
@@ -40,7 +40,7 @@
                 delete files[index].detail;
             }
 
-            promises.push($.post("/detail/UpdateConfirm",{ desc: confirm_form[0].value},() => {
+            promises.push($.post(UpdateConfirmPath,{ desc: confirm_form[0].value},() => {
                 console.log('Inserted confirm');
                 files.forEach(element => {
                     var Data = new FormData();
@@ -48,7 +48,7 @@
                     Data.append("description",element.description);
                     promises.push($.ajax({
                         type: "POST",
-                        url: "/detail/SubmitFileConfirm",
+                        url: SubmitFileConfirmPath,
                         data: Data,
                         cache: false,
                         processData: false,
@@ -68,7 +68,7 @@
             Promise.all(promises).then(() => {
                 $('#loading').addClass('hidden')
                 InsertReviewStatus = false;
-                $("#confirm_submit").prop("disabled",cfue)
+                $("#confirm_submit").prop("disabled",true)
                 swal("Success", "Insert Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
             })
     });

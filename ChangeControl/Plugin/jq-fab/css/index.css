@@ -69,6 +69,7 @@
 .zoom-menu li {
   display: block;
   margin-bottom: 10px;
+  position: absolute;
 }
 
 .zoom-card {

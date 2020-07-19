@@ -1,0 +1,266 @@
+﻿@using System.Data
+@using ChangeControl.Models
+
+@{
+  TopicAlt Topic = Model as TopicAlt;
+}
+
+@Scripts.Render("~/bundles/jquery")
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;1,100;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
+    <!--[if (gte mso 9)|(IE)]><style type="text/css">
+      table,td,b,a,strong,p,div {
+        font-family: 'Roboto', sans-serif !important;
+      }
+      span strong,span b {
+        font-family: 'Roboto', sans-serif !important;
+        font-weight: 400;
+        color: #1DBF73;
+        font-size: 15px;
+      }
+      td.content {
+        font: 16px/22px 'Roboto', sans-serif !important;
+        text-align: left;
+        padding: 50px 40px 0px 40px;
+        color: #555555;
+      }
+      #str_head{
+        font-size: 18px; font-weight: 500;  
+        font-family: 'Roboto', sans-serif !important;
+      }
+</style><![endif]-->
+
+    <style type="text/css">
+    /* thai */
+
+      .ReadMsgBody {
+        width: 100%;
+        background-color: #ffffff;
+      }
+      .ExternalClass {
+        width: 100%;
+        background-color: #ffffff;
+      }
+      body {
+        width: 100%;
+        background-color: #eeeeee;
+        margin: 0;
+        padding: 0;
+        -webkit-font-smoothing: antialiased;
+        font-family: 'Roboto', sans-serif !important;
+        -webkit-text-size-adjust: none !important;
+      }
+      table {
+        border-collapse: separate;
+      }
+      /* MOBILE STYLES */
+      @@media screen and (max-width: 525px) {
+        /* ALLOWS FOR FLUID TABLES */
+        .wrapper {
+          width: 100% !important;
+          max-width: 100% !important;
+        }
+        /* ADJUSTS LAYOUT OF LOGO IMAGE */
+        .logo img {
+          margin: 0 auto !important;
+        }
+        /* USE THESE CLASSES TO HIDE CONTENT ON MOBILE */
+        .mobile-hide {
+          display: none !important;
+        }
+        .img-max {
+          max-width: 100% !important;
+          width: 100% !important;
+          height: auto !important;
+        }
+        /* FULL-WIDTH TABLES */
+        .responsive-table {
+          width: 100% !important;
+        }
+        /* UTILITY CLASSES FOR ADJUSTING PADDING ON MOBILE */
+        .padding {
+          padding: 0px 5% 0px 5% !important;
+        }
+        .padding-meta {
+          padding: 30px 5% 0px 5% !important;
+          text-align: center;
+        }
+        .no-padding {
+          padding: 0 !important;
+        }
+        .section-padding {
+          padding: 0px 15px 0px 15px !important;
+        }
+        /* ADJUST BUTTONS ON MOBILE */
+        .mobile-button-container {
+          margin: 0 auto;
+          width: 100% !important;
+        }
+        .mobile-button {
+          padding: 15px !important;
+          border: 0 !important;
+          font-size: 16px !important;
+          display: block !important;
+        }
+      }
+      span a {
+        color: #1DBF73;
+        text-decoration: underline;
+        font-size: 16px;
+      }
+      /* ANDROID CENTER FIX */
+      div[style*="margin: 16px 0;"] {
+        margin: 0 !important;
+      }
+      a.fiverr-social-icon {
+        display: inline-block;
+        margin: 2px 5px;
+      }
+      .h_span{
+        color: #95979D; font-size: 14px;
+      }
+      .b_span{
+        color: #222325;
+      }
+
+      .text-danger {
+        color: red;
+      }
+      a.text-danger:hover,
+      a.text-danger:focus {
+        color: #843534;
+      }
+      table,td,b,a,strong,p,div {
+        font-family: 'Roboto', sans-serif !important;
+      }
+      span strong,span b {
+        font-family: 'Roboto', sans-serif !important;
+        font-weight: 400;
+        color: #1DBF73;
+        font-size: 15px;
+      }
+      td.content {
+        font: 16px/22px 'Roboto', sans-serif !important;
+        text-align: left;
+        padding: 50px 40px 0px 40px;
+        color: #555555;
+      }
+      #str_head{
+        font-size: 18px; font-weight: 500;  
+        font-family: 'Roboto', sans-serif !important;
+      }
+    </style>
+  </head>
+  <body style="margin: 0 !important; padding: 0 !important;">
+    <img style="display:none !important;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+
+      <!-- Spacer -->
+      <tr>
+        <td width="100%" align="center" valign="top" bgcolor="#eeeeee" height="20"></td>
+      </tr>
+      <tr>
+        <td bgcolor="#eeeeee" align="center" style="padding: 0px 15px 0px 15px;" class="section-padding">
+
+          <!--[if (gte mso 9)|(IE)]>
+                <table align="center" border="0" cellspacing="0" cellpadding="0" width="1000">
+                    <tr>
+                        <td align="center" valign="top" width="1000">
+                        <![endif]-->
+          <table bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;" class="responsive-table">
+            <tr>
+              <td>
+
+                <!-- TITLE SECTION AND COPY -->
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td align="center" style="padding: 40px 40px 0px 40px;">
+                      <a target="_blank">
+                        <img width="70" border="0" style="vertical-align: middle;">
+                      </a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td align="center" style="line-height: 28px; vertical-align: top; text-align:center; padding: 35px 40px 0px 40px;">
+                      <strong style="color: #212529d1" id="str_head">TNS Change Control System (CCR)</strong>
+                      @* <strong>@Model.Any(n => ((dynamic)n).text);</strong> *@
+                    </td>
+                  </tr>
+
+                  <!-- BORDER -->
+                  <tr>
+                    <td align="center" bgcolor="#ffffff" height="1" style="padding:40px 40px 5px;" valign="top" width="100%">
+                      <table cellpadding="0" cellspacing="0" width="100%">
+                        <tbody>
+                          <tr>
+                            <td style="border-top:1px solid #e4e4e4;">
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="content" style="font: 16px/22px 'Roboto', sans-serif; 'sans-serif' !important;text-align: left;color: #555555;padding: 40px 40px 0px 40px;">
+                      <span style="padding-bottom: 10px; font-size: 16px; color: #62646A; line-height: 24px; font-family: 'Roboto', sans-serif; ">
+                        @* "EmailRequestor" *@
+                        @* "EmailReviewed" *@
+                        @* "InformPE" *@
+                        @* "InformUser" *@
+                        @* "RequestTrial" *@
+                        @* "ReviewApproved" *@
+                        @* "StartTrial" *@
+                        @* "InformIPP" *@
+                        @* "TrialApproved" *@
+                        @* "StartConfirm" *@
+                        @* "ConfirmApproved" *@
+                        @* "TopicUpdate" *@
+                        @* "ReviewUpdate" *@
+                        @* "TopicReject" *@
+                        @* "RequestDocument" *@
+                        @try{
+                           @Html.Partial($"Body/{ViewBag.Mode}", Topic)
+                        }catch(Exception err){
+                          <script>
+                          $(() => {
+                              console.log('@err.Message');
+                          });
+                          </script>
+                          <div style="text-align: center">
+                            <h1 class="text-danger">404 Error</h1>
+                            <p>Please contact IT Admin</p>
+                          </div>
+                        }
+
+                      </span>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Spacer -->
+            <tr>
+              <td width="100%" align="center" valign="top" bgcolor="#ffffff" height="45"></td>
+            </tr>
+          </table>
+
+          <!--[if (gte mso 9)|(IE)]>
+                        </td>
+                    </tr>
+                </table>
+                <![endif]-->
+        </td>
+      </tr>
+      <tr>
+        <td bgcolor="#eeeeee" align="center" style="padding: 20px 0px;">
+
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
