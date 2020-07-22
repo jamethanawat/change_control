@@ -7,14 +7,14 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 
     List<FormReviewItem> ReviewItems = ViewData["FormReviewItem"] as List<FormReviewItem>;
-    List<Review> ReviewList = ViewData["ViewReviewItem"] as List<Review>;
+    List<Review> ReviewList = ViewBag.ReviewList as List<Review>;
     List<DepartmentList> DepartmentList = ViewData["DepartmentList"] as List<DepartmentList>;
-    List<Resubmit> ResubmitList = ViewData["ResubmitList"] as List<Resubmit>;
-    List<Trial> TrialList = ViewData["TrialList"] as List<Trial>;
-    List<Confirm> ConfirmList = ViewData["ConfirmList"] as List<Confirm>;
+    List<Resubmit> ResubmitList = ViewBag.ResubmitList as List<Resubmit>;
+    List<Trial> TrialList = ViewBag.TrialList as List<Trial>;
+    List<Confirm> ConfirmList = ViewBag.ConfirmList as List<Confirm>;
 
     TopicAlt Topic = ViewData["Topic"] as TopicAlt;
-    bool isManager = ((string)Session["Position"] == "Manager");
+    bool isApprover = ((string)Session["Position"] == "Approver");
 
     var isTrialable = (bool) ViewData["isTrialable"];
     string department = (string)Session["Department"];
@@ -32,14 +32,18 @@
     var isReview = (tc_list.Exists(Related => Related.status == 1 && Related.name == Session["Department"].ToString()));
     var isRelated = (tc_list.Exists(Related => Related.name == Session["Department"].ToString()));
     var isTrial = (TrialList.Exists(trial => trial.Department == Session["Department"].ToString()));
-    var isConfirm = (ConfirmList.Exists(confirm => confirm.Status == 3 && confirm.Department == Session["Department"].ToString()));
+    var isConfirm = (ConfirmList.Exists(confirm => confirm.Department == Session["Department"].ToString()));
+    @* var isConfirm = (ConfirmList.Exists(confirm => confirm.Status == 3 && confirm.Department == Session["Department"].ToString())); *@
     var Type = Topic.Type;
     var isInternal = (Type == "Internal");
     var isExternal = (Type == "External");
-
-
+    List<RelatedAlt> rv_related_list = ViewData["ReviewRelatedList"] as List<RelatedAlt>;
+    List<RelatedAlt> tr_related_list = ViewData["TrialRelatedList"] as List<RelatedAlt>;
+    List<RelatedAlt> cf_related_list = ViewData["ConfirmRelatedList"] as List<RelatedAlt>;
+    var QcReviewable = (rv_related_list != null) ? (rv_related_list.Exists(e => e.status == 0 && (e.name == "QC1" || e.name == "QC1" || e.name == "QC1") && rv_related_list.Count(d => d.status == 0) == 1)) : false;
+    var QcTrialable = (tr_related_list != null) ? (!tr_related_list.Exists(e => e.status == 0)) : false;
+    var QcConfirmable = (cf_related_list != null) ? (cf_related_list.Exists(e => e.status == 0 && (e.name == "QC1" || e.name == "QC1" || e.name == "QC1") && cf_related_list.Count(d => d.status == 0) == 1)) : false;
 }
-
 
 <script type="text/javascript">
     DepartmentLists = @Html.Raw(Json.Encode(DepartmentList));
@@ -49,12 +53,13 @@
     isQC = '@isQC'.toLowerCase() == 'true' ? true : false;
     isTrialable = '@isTrialable'.toLowerCase() == 'true' ? true : false;
     isReview = '@isReview'.toLowerCase() == 'true' ? true : false;
+    var GeneratePath = '@Url.Action("Generate", "Mail")';
+
 </script>
 
     @* @Styles.Render("~/Content/css") *@
 @* @Styles.Render("~/bundles/jquery") *@
 @Scripts.Render("~/bundles/jquery")
-@Scripts.Render("~/bundles/bootstrap")
 @Scripts.Render("~/bundles/sweetalert")
 @Scripts.Render("~/bundles/filepond")
 @Scripts.Render("~/bundles/vue")
@@ -172,7 +177,7 @@
 <script type="text/javascript">
     var ApproveConfirmPath = '@Url.Action("ApproveConfirm", "Detail")';
     var UpdateConfirmPath = '@Url.Action("UpdateConfirm", "Detail")';
-    var ApproveApproveReview = '@Url.Action("ApproveReview", "Detail")';
+    var ApproveReviewPath = '@Url.Action("ApproveReview", "Detail")';
     var UpdateReviewPath = '@Url.Action("UpdateReview", "Detail")';
     var ApproveTrialPath = '@Url.Action("ApproveTrial", "Detail")';
     var UpdateTrialPath = '@Url.Action("UpdateTrial", "Detail")';
@@ -232,37 +237,65 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-sm-12">
-                    @if(isQC || isPEProcess){ @Html.Partial("Fab",DepartmentList)}
+                    @if((isQC || isPEProcess) && isRelated){ @Html.Partial("Fab",DepartmentList)}
                 </div>
             </div>
             <div class="row mb-2">
                 <div class="col-sm-6">
                     <h1>TNS Control No. @Html.DisplayFor(model => Topic.Code)</h1>
-                    @if(Topic.Status >= 7){
-                        <span class='badge badge-pill badge-@(Topic.Status == 7?"warning":"primary")'>Request 
-                        <i class='fas @(Topic.Status == 7?"fa-clock":"fa-check")'></i>
+
+                    @{
+                        var rv_badge = "secondary";
+                        var rv_icon = "fa-lock";
+
+                        var tr_badge = "secondary";
+                        var tr_icon = "fa-lock";
+
+                        var cf_badge = "secondary";
+                        var cf_icon = "fa-lock";
+
+                        if(Topic.Status >= 8){
+                            if(Topic.Status == 8){
+                                rv_badge = (isReview) ? "primary" : "warning";
+                                rv_icon = (isReview) ? "fa-check" : "fa-clock";
+                            }
+
+                            if(Topic.Status == 9){
+                                rv_badge = "primary";
+                                rv_icon =  "fa-check";
+                                tr_badge = (isTrial) ? "primary" : "warning";
+                                tr_icon = (isTrial) ? "fa-check" : "fa-clock";
+                            }
+
+                            if(Topic.Status == 10){
+                                rv_badge = tr_badge = "primary";
+                                rv_icon = tr_icon =  "fa-check";
+                                cf_badge = (isConfirm) ? "primary" : "warning";
+                                cf_icon = (isConfirm) ? "fa-check" : "fa-clock";
+                            }
+
+                            if(Topic.Status == 11){
+                                rv_badge = tr_badge = cf_badge = "primary";
+                                rv_icon = tr_icon = cf_icon =  "fa-check";
+                            }
+                        }
+                    }
+
+
+                    <span class='badge badge-pill badge-@rv_badge'>Review
+                    <i class='fas @rv_icon'></i>
+                    </span>
+
+                    @if(isTrialable){
+                        <span class='badge badge-pill badge-@tr_badge'>Trial
+                        <i class='fas @tr_icon'></i>
                         </span>
                     }
-                    @if(Topic.Status >= 8){
-                        <span class='badge badge-pill badge-@(Topic.Status == 8?"warning":"primary")'>Review 
-                        <i class='fas @(Topic.Status == 8?"fa-clock":"fa-check")'></i>
-                        </span>
-                    }
-                    @if(Topic.Status >= 9){
-                        <span class='badge badge-pill badge-@(Topic.Status == 9?"warning":"primary")'>Trial 
-                        <i class='fas @(Topic.Status == 9?"fa-clock":"fa-check")'></i>
-                        </span>
-                    }
-                    @if(Topic.Status >= 10){
-                        <span class='badge badge-pill badge-@(Topic.Status == 10?"warning":"primary")'>Confirm 
-                        <i class='fas @(Topic.Status == 10?"fa-clock":"fa-check")'></i>
-                        </span>
-                    }
-                    @if(Topic.Status >= 11){
-                        <span class="badge badge-pill badge-primary">Closed 
-                        <i class='fas fa-check'></i>
-                        </span>
-                    }
+
+                    <span class='badge badge-pill badge-@cf_badge'>Confirm
+                    <i class='fas @cf_icon'></i>
+                    </span>
+                    
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
@@ -360,17 +393,17 @@
                                     <!-- /.mailbox-controls -->
                                     <div class="mailbox-read-message">
                                     <form class="form-horizontal">
-                                        <h3>Subject/Purpose for change</h3>
-                                        <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Subject.ReplaceNullWithDash()))</span>
-                                        <h3>Change Details</h3>
-                                        <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Detail.ReplaceNullWithDash()))</span>
-                                        <h3>Introduction Timing</h3>
-                                        <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Timing.ReplaceNullWithDash()))</span>
+                                        <h4>Subject/Purpose for change</h4>
+                                            &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Subject.ReplaceNullWithDash()))</span>
+                                        <h4 class="mt-3">Change Details</h4>
+                                            &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Detail.ReplaceNullWithDash()))</span>
+                                        <h4 class="mt-3">Introduction Timing</h4>
+                                            &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Timing.ReplaceNullWithDash()))</span>
                                     </form>
 
                                 @if(Topic.FileList.Count != 0){
                                     var FileList = Topic.FileList;
-                                    <h3>Attach File</h3>
+                                    <h4 class="mt-3">Attach File</h4>
                                     <!-- /.card-body -->
                                     <div class="card-footer bg-white">
                                         <ul class="mailbox-attachments d-flex flex-wrap align-items-stretch clearfix">
@@ -455,7 +488,8 @@
                                         @if(status == "Closed"){
                                         <div class="time-label">
                                             <span class="bg-primary">
-                                                Closed <br><span class="time"><i class="far fa-clock"></i> 2 days ago</span>
+                                                Closed 
+                                                @* <br><span class="time"><i class="far fa-clock"></i> 2 days ago</span> *@
                                             </span>
                                         </div>
                                         }
@@ -468,12 +502,12 @@
                                     if(isPEProcess && (status == "Request" || status == "Review")){
                                         Session["isIssued"] = true;
                                         @Html.Partial("Review/PE_Process") 
-                                    }else if(isQC && (!(isInternal && status == "Request"))){
+                                    }else if(isQC && QcReviewable && (!(isInternal && status == "Request"))){
                                         @Html.Partial("Review/QC")
                                     }else if(!isPEProcess && !isQC && ((isExternal && status == "Request") || (isInternal && status == "Review"))){
                                         @Html.Partial("Review/Other", ReviewItems) 
                                     }
-                                }else if(isTrialable && !isTrial && status == "Trial"){
+                                }else if((isTrialable || QcTrialable) && !isTrial && status == "Trial"){
                                     <hr><br>
                                     <h1>Trial</h1><br>
                                     <form class="form-horizontal"  action="javascript:void(0);" id="Trial">
@@ -496,7 +530,7 @@
                                             </div>
                                         </div>
                                     </form>                                    
-                                }else if(isRelated && !isConfirm && status == "Confirm"){
+                                }else if(((isRelated && !isQC) || (isQC && QcConfirmable)) && !isConfirm && status == "Confirm"){
                                     <hr><br>
                                     <h1>Confirm</h1><br>
                                     <form class="form-horizontal"  action="javascript:void(0);" id="Confirm">

@@ -16,7 +16,7 @@
     @* <link rel="preload" href="~/tmp/dist/css/adminlte.min.css" as="style" onload="this.rel='stylesheet'"> *@
 
     <!-- SweetAlert2 -->
-    <script src="~/tmp/plugins/sweetalert2/sweetalert2.all.js"></script>
+    @* <script src="~/tmp/plugins/sweetalert2/sweetalert2.all.js"></script> *@
 
     <!-- jq-fab -->
     <link rel="stylesheet" href="~/Plugin/jq-fab/css/index.css">
@@ -27,6 +27,7 @@
         var file_length = 0;
         var SetDepartmentPath = '@Url.Action("SetDepartment", "Login")';
         var SetPositionPath = '@Url.Action("SetPosition", "Login")';
+        var GetSessionPath = '@Url.Action("GetSession", "Login")';
 
     </script>    
     
@@ -229,7 +230,7 @@
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
                 <!-- Messages Dropdown Menu -->
-                <li class="nav-item dropdown">
+                <li class="nav-item dropdown" style="display:none">
                     <a class="nav-link" data-toggle="dropdown" href="#">
                         <i class="far fa-file"></i>
                         <ion-icon name="document-outline"></ion-icon>
@@ -289,7 +290,7 @@
                     </div>
                 </li>
                 <!-- Notifications Dropdown Menu -->
-                <li class="nav-item dropdown">
+                <li class="nav-item dropdown" style="display:none">
                     <a class="nav-link" data-toggle="dropdown" href="#">
                         <i class="fas fa-book"></i>
                         <span class="badge badge-info navbar-badge">3</span>
@@ -347,7 +348,7 @@
                     </div>
                 </li>
                 <!-- Notifications Dropdown Menu -->
-                <li class="nav-item dropdown">
+                <li class="nav-item dropdown" style="display:none">
                     <a class="nav-link" data-toggle="dropdown" href="#">
                         <i class="far fa-clipboard"></i>
                         <span class="badge badge-success navbar-badge">3</span>
@@ -406,10 +407,10 @@
                 </li>
                 <!-- Notifications Dropdown Menu -->
                 <li class="nav-item">
-                    <a class="nav-link" href='@Url.Action("SignOff", "Login")'>
+                    <a class="nav-link" href='@Url.Action("SignOut", "Login")'>
                         @* <i class="far fa-clipboard"></i> *@
                         @* <span class="badge badge-success navbar-badge">3</span> *@
-                        <input type="submit" class="btn btn-block btn-sm btn-danger" value="Sign off">
+                        <input type="submit" class="btn btn-block btn-sm btn-danger" value="Sign out">
                     </a>
                 </li>
             </ul>
@@ -434,7 +435,10 @@
                         <img src="~/tmp/dist/img/TNSavatar.png" class="img-circle elevation-2" alt="User Image">
                     </div>
                     <div class="info">
-                        <a href="#" class="d-block px-2">@Session["FullName"].ToString() (@Session["Department"])</a>
+                    @{
+                        var us_name = Session["FullName"].ToString() + " (" + Session["Department"] + ")";
+                    }
+                        <a href="#" class="d-block px-2" title="@us_name">@us_name</a>
                     </div>
                 </div>
           

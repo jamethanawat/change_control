@@ -86,24 +86,22 @@ var rsm_validator = $('#resubmit_form').validate({
                 relatedValidate();
             }else{
                 if(!resubmit_formIsEmpty){
-                    if(rsm_validator.form()){
-                        $(".btn-success").prop('disabled', false);
-                    }
+                    $(".btn-success").prop('disabled', (rsm_validator.form()) ? false : true); 
                 }
             }
         }
     });
-
-    $("#resubmit_form [name='desc'], #resubmit_form [name='due_date']").on("keydown keyup", () => {
+    
+/* ---------------------------- Resubmit's Validate ---------------------------- */
+    $("#resubmit_form [name='desc'], #resubmit_form [name='due_date']").on("keydown keyup click change", () => {
+        console.log("triggered");
         if($("#resubmit_form [name='desc']").val() != "" && $("#resubmit_form [name='due_date']").val() !== ""){
             resubmit_formIsEmpty = false;
         }else{
             resubmit_formIsEmpty = true;
         }
         if(!resubmit_formIsEmpty){
-            if(rsm_validator.form()){
-                $(".btn-success").prop('disabled', false);
-            }
+            $(".btn-success").prop('disabled', (rsm_validator.form()) ? false : true); 
         }
     });
 
@@ -192,7 +190,18 @@ var rsm_validator = $('#resubmit_form').validate({
         $('#loading').removeClass('hidden')
         SerializeReviewForm();
 
-        $.post(SubmitReviewPath, () => {
+        $.post(SubmitReviewPath, (result) => {
+            if(result.mail != ""){
+                $.post(GeneratePath,{
+                    'mode': result.mail,
+                    'topic_code':topic_code,
+                    'dept':result.dept,
+                }).fail((error) => {
+                    console.err(error);
+                    swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                    return;
+                })
+            }
             var promises = [];
             files = file_list;
             console.log("files",files);
@@ -378,7 +387,7 @@ $("form#Confirm").submit((e) => {
                     Data.append("description",element.description);
                     promises.push($.ajax({
                         type: "POST",
-                        url: SubmitFileResponse,
+                        url: SubmitFileResponsePath,
                         data: Data,
                         cache: false,
                         processData: false,
@@ -471,6 +480,7 @@ $("form#Confirm").submit((e) => {
         }
         swal({
             title: "Change Status", 
+            buttons: [true,"Confirm"],
             text: change_status, 
             icon:"warning",
         }).then((isChanged) => {

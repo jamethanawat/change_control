@@ -4,7 +4,7 @@ using System.Configuration;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
-
+using StringHelper;
 namespace ChangeControl.Models
 {
     public class DetailModel
@@ -67,10 +67,10 @@ namespace ChangeControl.Models
             string query = null;
             if (status == null || status == ""){
                 query = $@"INSERT INTO CCS.dbo.Review_Item (Description, FK_Item_Type, FK_Review_ID) 
-                VALUES('{desc}', {item_type}, {review_id});";
+                VALUES('{desc.ReplaceSingleQuote()}', {item_type}, {review_id});";
             }
             else{
-                query = $@"INSERT INTO CCS.dbo.Review_Item (Status, Description, FK_Item_Type, FK_Review_ID) VALUES('{status}', '{desc}', {item_type}, {review_id});";
+                query = $@"INSERT INTO CCS.dbo.Review_Item (Status, Description, FK_Item_Type, FK_Review_ID) VALUES('{status}', '{desc.ReplaceSingleQuote()}', {item_type}, {review_id});";
             }
             
             DB_CCS.Database.ExecuteSqlCommand(query);
@@ -182,7 +182,7 @@ namespace ChangeControl.Models
 
         public void InsertResubmit(string desc, string due_date, long related, string topic_code, string user_id, int status){
             var sql = $@"INSERT INTO CCS.dbo.Resubmit (Description, DueDate, [Date], Related, Topic, [User], Status) 
-            VALUES('{desc}', '{due_date}', '{date}', '{related}', '{topic_code}', '{user_id}', {status});";
+            VALUES('{desc.ReplaceSingleQuote()}', '{due_date}', '{date}', '{related}', '{topic_code}', '{user_id}', {status});";
             DB_CCS.Database.ExecuteSqlCommand(sql);
         }
         
@@ -233,7 +233,7 @@ namespace ChangeControl.Models
         public long InsertResponse(string desc, string department, string user, string date,long resubmit_id){
             string sql = $@"INSERT INTO CCS.dbo.Response (Description, Department, [User], [Date], Resubmit) 
             OUTPUT Inserted.ID 
-            VALUES('{desc}', '{department}', '{user}', '{date}', {resubmit_id});";
+            VALUES('{desc.ReplaceSingleQuote()}', '{department}', '{user}', '{date}', {resubmit_id});";
             var result = DB_CCS.Database.SqlQuery<long>(sql);
             return result.First(); 
         }
@@ -306,7 +306,7 @@ namespace ChangeControl.Models
             try{
                 var sql= $@"INSERT INTO CCS.dbo.Trial (Topic, Detail, [Date], [User], Revision, Department, Status, UpdateDate, UpdateBy) 
                 OUTPUT Inserted.ID 
-                VALUES('{topic_code}', '{desc}', '{date}','{user}', 1, '{department}', 3, '{date}', '{user}');";
+                VALUES('{topic_code}', '{desc.ReplaceSingleQuote()}', '{date}','{user}', 1, '{department}', 3, '{date}', '{user}');";
                 var result = DB_CCS.Database.SqlQuery<long>(sql).First();
                 return result;
             }catch(Exception ex){
@@ -318,7 +318,7 @@ namespace ChangeControl.Models
             try{
                 var sql= $@"INSERT INTO CCS.dbo.Trial (Topic, Detail, [Date], [User], Revision, Department, Status, UpdateDate, UpdateBy) 
                 OUTPUT Inserted.ID 
-                VALUES('{topic_code}', '{desc}', '{date}','{user}', (
+                VALUES('{topic_code}', '{desc.ReplaceSingleQuote()}', '{date}','{user}', (
                     SELECT Revision+1 FROM CCS.dbo.Trial,
                     (SELECT MAX(Revision) as Version, Department as dept FROM CCS.dbo.Trial WHERE Topic = '{topic_code}' AND Department = '{dept}' Group by Department) lastest
                     WHERE Topic = '{topic_code}' AND Department = '{dept}'
@@ -335,7 +335,7 @@ namespace ChangeControl.Models
             try{
                 var sql= $@"INSERT INTO CCS.dbo.Confirm (Topic, Detail, [Date], [User], Revision, Department, Status, UpdateDate, UpdateBy) 
                 OUTPUT Inserted.ID 
-                VALUES('{topic_code}', '{desc}', '{date}','{user}', (
+                VALUES('{topic_code}', '{desc.ReplaceSingleQuote()}', '{date}','{user}', (
                     SELECT Revision+1 FROM CCS.dbo.Confirm,
                     (SELECT MAX(Revision) as Version, Department as dept FROM CCS.dbo.Confirm WHERE Topic = '{topic_code}' AND Department = '{dept}' Group by Department) lastest
                     WHERE Topic = '{topic_code}' AND Department = '{dept}'
@@ -368,7 +368,7 @@ namespace ChangeControl.Models
             try{
                 var sql= $@"INSERT INTO CCS.dbo.Confirm (Topic, Detail, [Date], [User], Revision, Department, Status, UpdateDate, UpdateBy) 
                 OUTPUT Inserted.ID 
-                VALUES('{topic_code}', '{desc}', '{date}','{user}', 1, '{department}', 3, '{date}', '{user}');";
+                VALUES('{topic_code}', '{desc.ReplaceSingleQuote()}', '{date}','{user}', 1, '{department}', 3, '{date}', '{user}');";
                 var result = DB_CCS.Database.SqlQuery<long>(sql).First();
                 return result;
             }catch(Exception ex){

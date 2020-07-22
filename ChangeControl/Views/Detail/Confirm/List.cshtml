@@ -1,7 +1,7 @@
 @{
     var str_date = "05 มิถุนายน 2020";
     string department = (string)Session["Department"];
-    var isManager = ((string)Session["Position"] == "Manager");
+    var isApprover = ((string)Session["Position"] == "Approver");
 }
 
 @foreach(var Confirm in Model){
@@ -18,7 +18,22 @@
     }
     <div class="timeline-item card">
         <div class="timeline-header card-header d-flex" style="padding: 10px 10px 5px 10px;"  data-card-widget="collapse">
-                <h6 class="mr-auto" style="font-family:Kanit"> @Confirm.Department - @Confirm.Profile.Name @Confirm.Profile.SurName (@Confirm.Date) </h6>
+               @{
+                    @* var approve_status = (Review.ApprovedBy != null) ? "<span class='text-success'>APPROVED</span>": "<span class='text-secondary'>PENDING</span>"; *@
+                    var approve_status = 
+                            $@"<span class='badge badge-pill badge-warning'>WAITING FOR APPROVE
+                                    <i class='fas fa-clock'></i>
+                            </span>";
+                    if(Confirm.ApprovedBy != null){
+                    approve_status = 
+                            $@"<span class='badge badge-pill badge-success'>APPROVED
+                                    <i class='fas fa-check'></i>
+                            </span>";
+                    }
+
+                    var dept_status = (Confirm.Department == department) ? $"<span class='badge badge-primary' style='font-size: 0.9rem;'> {Confirm.Department} </span>" : Confirm.Department;
+                }
+                <h6 class="mr-auto" style="font-family:Kanit"> @Html.Raw(HttpUtility.HtmlDecode(@dept_status)) - @Confirm.Profile.Name @Confirm.Profile.SurName (@Confirm.Date) @Html.Raw(HttpUtility.HtmlDecode(@approve_status)) </h6>
                 <button type="button" class="btn btn-tool arrow-collapse" data-card-widget="collapse"><i class="fas fa-chevron-down"></i></button>
         </div>
 
@@ -32,14 +47,14 @@
                             <span>@Confirm.Detail</span>
                         </div>
                     </div>
-                    @if(Confirm.Approver.FullName != "" && Confirm.Approver.FullName != null){
+                    @if(Confirm.ApprovedBy != "" && Confirm.ApprovedBy != null){
                     <div class="row">
                         <label class="col-sm-4 col-form-label" style="text-align:right">
                             Approved By :
                         </label>
                         <div class="col-sm-8 col-form-label">
                             <span>
-                                @Confirm.Approver.FullName (@Confirm.ApprovedDate)
+                                @Confirm.Approver.FullName (@Confirm.ApprovedDate) <span class='badge badge-pill badge-success'><i class='fas fa-check'></i></span>
                             </span>
                         </div>
                     </div>
@@ -98,14 +113,13 @@
         </div>
         @{
             var isDepartment = (department == Confirm.Department);
-            if((isManager || isDepartment) && Confirm.Status != 1  && (string)Session["Status"] == "Confirm"){
+            @* if((isApprover || isDepartment) && Trial.Status != 1  && (string)Session["Status"] == "Trial"){ *@
+            if((isDepartment) && (string)Session["Status"] == "Confirm" && (Confirm.ApprovedBy == "" || Confirm.ApprovedBy == null)){
             <hr style="margin-top:0px !important">
             <div class="timeline-footer">
                 <div class="float-right ">
-                    @if(Confirm.Status !=1 && isDepartment){ 
-                        <a class="btn btn-warning btn-sm cf-edit" id="edit_cf" data-toggle="modal" data-target="#edit_confirm">Edit</a>
-                            if(Confirm.Status !=5 && Confirm.Status !=6 && isManager){ <a a href="#" class="btn btn-info btn-sm mr-1 cf-approve" >Approve</a> }
-                    }
+                    <a href="#" class="btn btn-warning btn-sm cf-edit"id="edit_cf" data-toggle="modal" data-target="#edit_confirm" value="@Confirm.ID" >Edit</a> 
+                    @if(Confirm.Status !=1 && Confirm.Status !=5 && Confirm.Status !=6 && isApprover ){ <button a href="#" class="btn btn-info btn-sm mr-1 cf-approve" value="@Confirm.ID">Approve</button> }
                 </div>
             </div>
             }

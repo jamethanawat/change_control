@@ -37,7 +37,7 @@
     SubmitFilePath = '@Url.Action("SaveFile", "Request")';
     DepartmentLists = @Html.Raw(Json.Encode(DepartmentLists));
     isEditMode = '@Session["isEditMode"]';
-    
+    var RedirectDetail = '@Url.Action("Index", "Detail")';
     var GeneratePath = '@Url.Action("Generate", "Mail")';
 </script>
 
@@ -369,7 +369,7 @@
                             <form class='form-horizontal @(isEditMode ? "Edit" : "Request")' action="javascript:void(0);" id='@(isEditMode ?  Topic.ID.ToString() : "Request")' >
                                 
                             <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">Change Type</label>
+                                <label class="col-sm-2 col-form-label">Change Type<span class="text-danger">*</span></label>
                                 <div class="col-sm-10">
                                     <div class="btn-group-custom">
                                         <input type="radio" id="type_internal" name="changeType" value="Internal" @(isInternal ? "checked" : "") @(isEditMode ? "disabled":"")>
@@ -406,7 +406,7 @@
                             <hr> *@
 
                             <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">Change Items</label>
+                                <label class="col-sm-2 col-form-label">Change Items<span class="text-danger">*</span></label>
                                 <div class="col-sm-10 col-form-label row" style="padding-left: 13px;">
                                 @{
                                     var i=0;
@@ -448,7 +448,7 @@
 
 
                             <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">Product Type</label>
+                                <label class="col-sm-2 col-form-label">Product Type<span class="text-danger">*</span></label>
                                 <div class="col-sm-10 col-form-label">
                                 @foreach(var Type in ProductTypes){
                                     <label style="margin-right: 15px;">
@@ -551,11 +551,24 @@
                                             <script>
                                                 $('.textareaSubject').summernote({
                                                     height: 140,
+                                                    toolbar: [
+                                                        ['font', ['bold', 'underline', 'clear']],
+                                                        ['fontsize', ['fontsize']],
+                                                        ['para', ['ul', 'ol', 'paragraph']],
+                                                        ['table', ['table']],
+                                                    ],
                                                 });
                                             </script>
                                             @if(isSubject){
                                             <script>
-                                                $(".textareaSubject").summernote('code', `@Html.Raw(Topic.Subject)`);
+                                                $(".textareaSubject").summernote('code' , `@Html.Raw(Topic.Subject)`,{
+                                                    toolbar: [
+                                                        ['font', ['bold', 'underline', 'clear']],
+                                                        ['fontsize', ['fontsize']],
+                                                        ['para', ['ul', 'ol', 'paragraph']],
+                                                        ['table', ['table']],
+                                                    ],
+                                                });
                                                 @* $(".textareaSubject").summernote('editor.pasteHTML', "@Html.Raw(Topic.Subject)"); *@
                                             </script>
                                             }
@@ -572,11 +585,24 @@
                                             <script>
                                                 $('.textareaDetails').summernote({
                                                     height: 140,
+                                                    toolbar: [
+                                                        ['font', ['bold', 'underline', 'clear']],
+                                                        ['fontsize', ['fontsize']],
+                                                        ['para', ['ul', 'ol', 'paragraph']],
+                                                        ['table', ['table']],
+                                                    ],
                                                 });
                                             </script>
                                             @if(isDetail){
                                             <script>
-                                                $(".textareaDetails").summernote('code', `@Html.Raw(Topic.Detail)`);
+                                                $(".textareaDetails").summernote('code' , `@Html.Raw(Topic.Detail)`,{
+                                                    toolbar: [
+                                                        ['font', ['bold', 'underline', 'clear']],
+                                                        ['fontsize', ['fontsize']],
+                                                        ['para', ['ul', 'ol', 'paragraph']],
+                                                        ['table', ['table']],
+                                                    ],
+                                                });
                                                 @* $(".textareaDetails").summernote('editor.pasteHTML', "@Html.Raw(Topic.Detail)"); *@
                                             </script>
                                             }
@@ -593,11 +619,24 @@
                                             <script>
                                                 $('.textareaTiming').summernote({
                                                     height: 140,
+                                                    toolbar: [
+                                                        ['font', ['bold', 'underline', 'clear']],
+                                                        ['fontsize', ['fontsize']],
+                                                        ['para', ['ul', 'ol', 'paragraph']],
+                                                        ['table', ['table']],
+                                                    ],
                                                 });
                                             </script>
                                             @if(isTiming){
                                             <script>
-                                                $(".textareaTiming").summernote('code', `@Html.Raw(Topic.Timing)`);
+                                                $(".textareaTiming").summernote('code', `@Html.Raw(Topic.Timing)`,{
+                                                    toolbar: [
+                                                        ['font', ['bold', 'underline', 'clear']],
+                                                        ['fontsize', ['fontsize']],
+                                                        ['para', ['ul', 'ol', 'paragraph']],
+                                                        ['table', ['table']],
+                                                    ],
+                                                });
                                                 @* $(".textareaTiming").summernote('editor.pasteHTML', "@Html.Raw(Topic.Timing)"); *@
                                             </script>
                                             }
@@ -627,7 +666,7 @@
                                                 }
                                                 
                                                 if('@item.Description' != null && '@item.Description' != ""){
-                                                    addFile('@item.ID',obj,'@item.Description');
+                                                    addFile('@item.ID',obj,'@item.Description'); 
                                                 }else{
                                                     addFile(obj);
                                                 }
@@ -644,7 +683,7 @@
                             <hr>
 
                             <div class="form-group row">
-                                <label for="inputSkills" class="col-sm-2 col-form-label">Review & Result Confirm Requirement</label>
+                                <label for="inputSkills" class="col-sm-2 col-form-label">Review & Result Confirm Requirement<span class="text-danger">*</span></label>
                                 <div class="col-sm-10">
                                 @foreach(var DepartmentGroup in DepartmentLists){
                                     <fieldset class="group border p-2"> 

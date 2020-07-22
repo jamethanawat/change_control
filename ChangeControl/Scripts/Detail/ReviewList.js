@@ -17,6 +17,15 @@
         }).then((res) => {
             if(res){
                 $.post(ApproveReviewPath, {review_id:rv_id}, (data) => {
+                    $.post(GeneratePath,{
+                        'mode': data.mail,
+                        'topic_code':topic_code,
+                    }).fail((error) => {
+                        console.err(error);
+                        swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                        return;
+                    });
+
                     if(data){
                         swal("Success", "Change Status Success", "success").then(location.reload());
                     }else{

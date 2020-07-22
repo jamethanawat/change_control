@@ -126,7 +126,7 @@ namespace ChangeControl.Models{
 
          public long UpdateTopic(Topic m){
             string query = $@"INSERT INTO Topic (Code, [Type], Change_item, Product_type, Revision , Department, Model, PartNo, PartName, ProcessName, Status, [APP/IPP], Subject, Detail, Timing ,Related, User_insert, Time_insert)  
-            OUTPUT Inserted.ID VALUES( '{m.Code}','{m.Type}', {m.Change_item} , '{m.Product_type}' , '{m.Department}','{m.Revision}' ,'{m.Model}', '{m.PartNo}', '{m.PartName}', '{m.ProcessName}', '{m.Status}', '{m.App}' , '{m.Subject}' , '{m.Detail}', '{m.Timing}','{m.Related}','{m.User_insert}','{m.Time_insert}' );";
+            OUTPUT Inserted.ID VALUES( '{m.Code}','{m.Type}', {m.Change_item} , '{m.Product_type}' , '{m.Revision}' ,'{m.Department}' ,'{m.Model}', '{m.PartNo}', '{m.PartName}', '{m.ProcessName}', '{m.Status}', '{m.App}' , '{m.Subject}' , '{m.Detail}', '{m.Timing}','{m.Related}','{m.User_insert}','{m.Time_insert}' );";
             var result = DB_CCS.Database.SqlQuery<long>(query).First();
             return result;
         }

@@ -77,24 +77,24 @@ $(document).ready(function () {
 
         if(isInternal){
             if(!(PE1_Process || PE2_Process) || !(QC1 || QC2 || QC3)){ //Need to select PE_Process or QC as Auditor at lease one
-                swal("Error", "Please select PE_Process and QC at least one", "error");
+                swal("Warning", "Please select PE_Process and QC at least one", "warning");
                 return;
             }else if(Number(QC1) + Number(QC2) + Number(QC3) != 1 && ((PE1_Process ^ PE2_Process)) == false){ //When select QC and PE_Process more than one
-                swal("Error", "Please select one QC and one PE_Process", "error");
+                swal("Warning", "Please select one QC and one PE_Process", "warning");
                 return
             }else if(Number(QC1) + Number(QC2) + Number(QC3) != 1 ){ //When select QC more than one
-                swal("Error", "Please select one QC", "error");
+                swal("Warning", "Please select one QC", "warning");
                 return
             }else if(((PE1_Process ^ PE2_Process)) == false){ //When select PE_Process more than one
-                swal("Error", "Please select one PE_Process", "error");
+                swal("Warning", "Please select one PE_Process", "warning");
                 return
             }
         }else if(isExternal){
             if(!(QC1 || QC2 || QC3)){ //Need to select QC as Auditor at lease one
-                swal("Error", "Please select QC at least one", "error");
+                swal("Warning", "Please select QC at least one", "warning");
                 return;
             }else if(Number(QC1) + Number(QC2) + Number(QC3) != 1 ){ //When select QC more than one
-                swal("Error", "Please select one QC", "error");
+                swal("Warning", "Please select one QC", "warning");
                 return
             }
         }
@@ -140,7 +140,6 @@ $(document).ready(function () {
                         $.post(GeneratePath,{
                             'mode':'EmailRequestor',
                             'topic_code':inserted_id,
-                            'address_list':['pakawat.smutkun@email.thns.co.th']
                         }).fail((error) => {
                             console.err(error);
                             swal("Error", "Cannot send email to Requestor, Please try again", "error");
@@ -243,7 +242,7 @@ $(document).ready(function () {
     });
 
     function RedirectToDetail(id) {
-        window.location.replace(`Detail/?id=${id}`);
+        window.location.replace(`${RedirectDetail}/?id=${id}`);
     }
 
     $("#test").click(function () {

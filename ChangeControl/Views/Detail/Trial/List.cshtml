@@ -1,7 +1,7 @@
 @{
     var str_date = "05 มิถุนายน 2020";
     string department = (string)Session["Department"];
-    var isManager = ((string)Session["Position"] == "Manager");
+    var isApprover = ((string)Session["Position"] == "Approver");
 }
 
 @foreach(var Trial in Model){
@@ -18,7 +18,22 @@
     }
     <div class="timeline-item card">
         <div class="timeline-header card-header d-flex" style="padding: 10px 10px 5px 10px;"  data-card-widget="collapse">
-                <h6 class="mr-auto" style="font-family:Kanit"> @Trial.Department - @Trial.Profile.Name @Trial.Profile.SurName (@Trial.Date) </h6>
+                @{
+                    @* var approve_status = (Review.ApprovedBy != null) ? "<span class='text-success'>APPROVED</span>": "<span class='text-secondary'>PENDING</span>"; *@
+                    var approve_status = 
+                            $@"<span class='badge badge-pill badge-warning'>WAITING FOR APPROVE
+                                    <i class='fas fa-clock'></i>
+                            </span>";
+                    if(Trial.ApprovedBy != null){
+                    approve_status = 
+                            $@"<span class='badge badge-pill badge-success'>APPROVED
+                                    <i class='fas fa-check'></i>
+                            </span>";
+                    }
+
+                    var dept_status = (Trial.Department == department) ? $"<span class='badge badge-primary' style='font-size: 0.9rem;'> {Trial.Department} </span>" : Trial.Department;
+                }
+                <h6 class="mr-auto" style="font-family:Kanit"> @Html.Raw(HttpUtility.HtmlDecode(@dept_status)) - @Trial.Profile.Name @Trial.Profile.SurName (@Trial.Date) @Html.Raw(HttpUtility.HtmlDecode(@approve_status)) </h6>
                 <button type="button" class="btn btn-tool arrow-collapse" data-card-widget="collapse"><i class="fas fa-chevron-down"></i></button>
         </div>
 
@@ -32,14 +47,14 @@
                             <span>@Trial.Detail</span>
                         </div>
                     </div>
-                    @if(Trial.Approver.FullName != "" && Trial.Approver.FullName != null){
+                    @if(Trial.ApprovedBy != "" && Trial.ApprovedBy != null){
                     <div class="row">
                         <label class="col-sm-4 col-form-label" style="text-align:right">
                             Approved By :
                         </label>
                         <div class="col-sm-8 col-form-label">
                             <span>
-                                @Trial.Approver.FullName (@Trial.ApprovedDate)
+                                @Trial.Approver.FullName (@Trial.ApprovedDate) <span class='badge badge-pill badge-success'><i class='fas fa-check'></i></span>
                             </span>
                         </div>
                     </div>
@@ -98,13 +113,13 @@
         </div>
         @{
             var isDepartment = (department == Trial.Department);
-            @* if((isManager || isDepartment) && Trial.Status != 1  && (string)Session["Status"] == "Trial"){ *@
-            if((isDepartment) && (string)Session["Status"] == "Trial"){
+            @* if((isApprover || isDepartment) && Trial.Status != 1  && (string)Session["Status"] == "Trial"){ *@
+            if((isDepartment) && (string)Session["Status"] == "Trial" && (Trial.ApprovedBy == "" || Trial.ApprovedBy == null)){
             <hr style="margin-top:0px !important">
             <div class="timeline-footer">
                 <div class="float-right ">
                     <a href="#" class="btn btn-warning btn-sm tr-edit"id="edit_tr" data-toggle="modal" data-target="#edit_trial" value="@Trial.ID" >Edit</a> 
-                    @if(Trial.Status !=1 && Trial.Status !=5 && Trial.Status !=6 && isManager ){ <button a href="#" class="btn btn-info btn-sm mr-1 tr-approve" value="@Trial.ID">Approve</button> }
+                    @if(Trial.Status !=1 && Trial.Status !=5 && Trial.Status !=6 && isApprover ){ <button a href="#" class="btn btn-info btn-sm mr-1 tr-approve" value="@Trial.ID">Approve</button> }
                 </div>
             </div>
             }

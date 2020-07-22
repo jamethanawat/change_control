@@ -11,6 +11,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Net.Mail;
 using System.IO;
+using System.Reflection;
 using System.Text;
 
 namespace ChangeControl.Controllers{
@@ -29,34 +30,65 @@ namespace ChangeControl.Controllers{
 
         public static string DevMode = "on";
 
-        public ActionResult Index(string Mode,TopicAlt Topic){
-            if((string)(Session["User"]) == null){
-                return RedirectToAction("Index", "Home");
-            }
-            ViewBag.Mode = Mode;
-            ViewBag.Url = $"https://{Request.Url.Host}:{Request.Url.Port}/Detail/Index/?id={Topic.Code}";
-            ViewBag.Topic = Topic;
-
-            Topic = new TopicAlt();
-            var email = RenderView("~/Views/Mail/index.cshtml",Topic);
-            List<string> address_list = new List<string>();
-            address_list.Add("pakawat.smutkun@email.thns.co.th");
-            AddListMail(email,address_list);
-            return View(Topic);
-        }
-
-        public ActionResult Generate(string mode,string topic_code,List<string> address_list){
+        public ActionResult Index(string mode,string topic_code , string dept = null){
             try{
                 ViewBag.Mode = mode;
-                if(Topic.Type == "ERR0R"){
+                // if(Topic.Type == "ERR0R"){
                     Topic = M_Mail.GetTopicByCode(topic_code);
-                }
-                // ViewBag.Url = $"https://{Request.Url.Host}:{Request.Url.Port}/Detail/Index/?id={Topic.Code}";
+                // }
+                // ViewBag.Url = $"https://17.27.170.19/ChangeControl/Detail/Index/?id={Topic.Code}";
                 ViewBag.Url = $"{Request.Url.Host}:{Request.Url.Port}/{Request.ApplicationPath}/Detail/Index/?id={Topic.Code}";
                 ViewBag.Topic = Topic;
 
                 var email = RenderView("~/Views/Mail/index.cshtml",Topic);
-                AddListMail(email,address_list);
+                var related_list = M_Mail.GetRelatedByTopicCode(topic_code);
+
+                Type type = related_list.GetType();
+                PropertyInfo[] props = type.GetProperties();
+                
+                var address_list = new List<string>();
+                foreach (var prop in props){
+                    if((int) prop.GetValue(related_list) == 1 ){
+                        address_list.AddRange(M_Mail.GetEmailByDept(prop.Name));
+                    }
+                }
+
+                SendMail(email,address_list);
+                // return Json(new {status = true}, JsonRequestBehavior.AllowGet);
+                return View(Topic);
+            }catch(Exception err){
+                return Json(new {error = err}, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public ActionResult Generate(string mode,string topic_code, string dept = null){
+            try{
+                ViewBag.Mode = mode;
+                // if(Topic.Type == "ERR0R"){
+                    Topic = M_Mail.GetTopicByCode(topic_code);
+                // }
+                // ViewBag.Url = $"http://172.27.170.19/ChangeControl/Detail/Index/?id={Topic.Code}";
+                ViewBag.Url = $"{Request.Url.Host}:{Request.Url.Port}/{Request.ApplicationPath}/Detail/Index/?id={Topic.Code}";
+                ViewBag.Topic = Topic;
+
+                var email = RenderView("~/Views/Mail/index.cshtml",Topic);
+                var address_list = new List<string>();
+
+                if(dept == null){
+                    var related_list = M_Mail.GetRelatedByTopicCode(topic_code);
+                    Type type = related_list.GetType();
+                    PropertyInfo[] props = type.GetProperties();
+                    
+                    foreach (var prop in props){
+                        if((int) prop.GetValue(related_list) == 1 ){
+                            address_list.AddRange(M_Mail.GetEmailByDept(prop.Name));
+                        }
+                    }
+                }else{
+                    address_list.AddRange(M_Mail.GetEmailByDept(dept));
+                }
+
+                SendMail(email,address_list);
                 return Json(new {status = true}, JsonRequestBehavior.AllowGet);
             // return View(Topic);
             }catch(Exception err){
@@ -88,43 +120,23 @@ namespace ChangeControl.Controllers{
         [HttpPost]
         public ActionResult AddListMail(string email_body,List<string> address_list)
         {
-            List <string> email = new List<string>();
             List <ListMail> temp_email = new List<ListMail>();
-            foreach(string address in address_list){
-
-            var sql = "";
-            // temp_email = M_Req.GetEmail((string)(Session["User"]));
-            // if(temp_email.Count != 0){
-              // Email.Add(temp_email[0].Email);
-              email.Add(address);
-
-              // if (Type == "Internal"){
-              //     sql = "SELECT Email FROM Department WHERE ID_Department ='11'";
-              // }
-              // else{
-              //     sql = "SELECT Email FROM Department WHERE ID_Department ='32'";
-              // }
-          
-              //item = _dbCCS.Database.SqlQuery<GetMail>(sql);
-              //mail = item.ToList();
-              //Email.Add(mail[0].Email);
-            }
-              SendMail(email_body,email);
+              SendMail(email_body,address_list);
               return Json(new { code = 1 }, JsonRequestBehavior.AllowGet);
             // }else{
             //   return Json(new { code = -1 }, JsonRequestBehavior.AllowGet);
             // }
         }
-        public void SendMail(string email_body,List<string> mail){
-            foreach(var item in mail){
+        public void SendMail(string email_body,List<string> address_list){
+            foreach(var address in address_list){
                 var datemail = DateTime.Now.ToString("dd/MM/yyy HH:mm:ss");
-                string FromName = "Control Revision System";
-                string FromEmail = "ControlRevisionSystem@thns.co.th";
+                string FromName = "Change Control System";
+                string FromEmail = "ccs@email.thns.co.th";
                 System.Net.Mail.SmtpClient smtp = new SmtpClient("172.27.170.11");
                 smtp.EnableSsl = false;
                 System.Net.Mail.MailMessage mailMessage = new System.Net.Mail.MailMessage();
                 mailMessage.From = new System.Net.Mail.MailAddress(FromEmail, FromName);
-                mailMessage.To.Add(new System.Net.Mail.MailAddress(item));
+                mailMessage.To.Add(new System.Net.Mail.MailAddress(address));
                 var MNo = "1";
                 var Msub = "1";
                 var Mdetail = "1";

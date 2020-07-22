@@ -55,6 +55,16 @@ namespace StringHelper
             return source;
         }
 
+        public static string ReplaceSingleQuote(this string source){
+            if(source != null){
+                source = Regex.Replace(source, "'", "\"");
+                return source;
+            }else{
+                return null;
+            }
+        }
+
+
         
     }
 }

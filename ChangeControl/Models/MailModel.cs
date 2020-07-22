@@ -65,6 +65,31 @@ namespace ChangeControl.Models{
                 return blank_topic;
             }
         }
-        
+
+        public List<string> GetEmailByDept(string dept){
+            try{
+                var sql = $@"SELECT Email FROM CCS.dbo.[User] where Dept = '{dept}';";
+                var result = DB_CCS.Database.SqlQuery<string>(sql).ToList();
+                return result;
+            }catch(Exception ex){
+                return null;
+            }
+
+        }
+
+        public Related GetRelatedByTopicCode(string topic_code){
+            try{
+                var sql = $@"SELECT P1, P2, P3A, P3M, P4, P5, P6, P7, IT, MKT, PC1, PC2, PCH1, PCH2, PE1, PE2, PE2_SMT, PE2_PCB, PE2_MT, QC_IN1, QC_IN2, QC_IN3, QC_FINAL1, QC_FINAL2, QC_FINAL3, QC_NFM1, QC_NFM2, QC_NFM3, QC1, QC2, QC3, PE1_Process, PE2_Process 
+                FROM CCS.dbo.Related 
+                LEFT JOIN Topic ON Related.ID = Topic.Related 
+                WHERE Topic.Code = '{topic_code}';";
+                var result = DB_CCS.Database.SqlQuery<Related>(sql).First();
+                return result;
+            }catch(Exception ex){
+                Related blank_related = new Related();
+                return blank_related;
+            }
+        }
     }
+        
 }

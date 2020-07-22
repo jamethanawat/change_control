@@ -1,7 +1,7 @@
 @{
     var str_date = "05 มิถุนายน 2020";
     string department = (string)Session["Department"];
-    var isManager = ((string)Session["Position"] == "Manager");
+    var isApprover = ((string)Session["Position"] == "Approver");
 }
 
 @foreach(var Review in Model){
@@ -19,7 +19,22 @@ if(Review.Item.Count != 0){
     }
     <div class="timeline-item card">
         <div class="timeline-header card-header d-flex" style="padding: 10px 10px 5px 10px;"  data-card-widget="collapse">
-                <h6 class="mr-auto" style="font-family:Kanit"> @Review.Department - @Review.Profile.Name @Review.Profile.SurName (@Review.Date) </h6>
+                @{
+                    @* var approve_status = (Review.ApprovedBy != null) ? "<span class='text-success'>APPROVED</span>": "<span class='text-secondary'>PENDING</span>"; *@
+                    var approve_status = 
+                            $@"<span class='badge badge-pill badge-warning'>WAITING FOR APPROVE
+                                    <i class='fas fa-clock'></i>
+                            </span>";
+                    if(Review.ApprovedBy != null){
+                    approve_status = 
+                            $@"<span class='badge badge-pill badge-success'>APPROVED
+                                    <i class='fas fa-check'></i>
+                            </span>";
+                    }
+
+                    var dept_status = (Review.Department == department) ? $"<span class='badge badge-primary' style='font-size: 0.9rem;'> {Review.Department} </span>" : Review.Department;
+                }
+                <h6 class="mr-auto" style="font-family:Kanit"> @Html.Raw(HttpUtility.HtmlDecode(@dept_status)) - @Review.Profile.Name @Review.Profile.SurName (@Review.Date) @Html.Raw(HttpUtility.HtmlDecode(@approve_status)) </h6>
                 <button type="button" class="btn btn-tool arrow-collapse" data-card-widget="collapse"><i class="fas fa-chevron-down"></i></button>
         </div>
 
@@ -52,14 +67,14 @@ if(Review.Item.Count != 0){
                         </div>
                     </div>
                     }
-                    @if(Review.Approver.FullName != "" && Review.Approver.FullName != null){
+                    @if(Review.ApprovedBy != "" && Review.ApprovedBy != null){
                     <div class="row">
                         <label class="col-sm-4 col-form-label" style="text-align:right">
-                            Approved By :
+                                Approved By :
                         </label>
                         <div class="col-sm-8 col-form-label">
                             <span>
-                                @Review.Approver.FullName (@Review.ApprovedDate)
+                                @Review.Approver.FullName (@Review.ApprovedDate) <span class='badge badge-pill badge-success'><i class='fas fa-check'></i></span>
                             </span>
                         </div>
                     </div>
@@ -119,13 +134,13 @@ if(Review.Item.Count != 0){
         @{
             var isDepartment = (department == Review.Department);
             @* if((isDepartment) && Review.Status != 1 && ((string)Session["Status"] == "Request" || (string)Session["Status"] == "Review")){ //Disable edit and approve button when Review have approved *@
-            if((isDepartment) && ((string)Session["Status"] == "Request" || (string)Session["Status"] == "Review")){
+            if((isDepartment) && ((string)Session["Status"] == "Request" || (string)Session["Status"] == "Review" && (Review.ApprovedBy == "" || Review.ApprovedBy == null))){
             <hr style="margin-top:0px !important">
             <div class="timeline-footer">
                 <div class="float-right ">
                     @* @if(Review.Status !=1 && isDepartment){ //Disable edit button when Review have approved*@ 
                     <a class="btn btn-warning btn-sm rv-edit" id="edit_rv" data-toggle="modal" data-target="#edit_review" value="@Review.ID_Review">Edit</a>
-                    @if(Review.Status !=1 && Review.Status !=5 && Review.Status !=6 && isManager ){ <button class="btn btn-info btn-sm mr-1 rv-approve" value="@Review.ID_Review">Approve</button>}
+                    @if(Review.Status !=1 && Review.Status !=5 && Review.Status !=6 && isApprover ){ <button class="btn btn-info btn-sm mr-1 rv-approve" value="@Review.ID_Review">Approve</button>}
                 </div>
             </div>
             }

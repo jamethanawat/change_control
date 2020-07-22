@@ -11,7 +11,7 @@ using System.Net.Mail;
 using System.Web;
 using System.Web.Mvc;
 using System.Text.Json;
-
+using StringHelper;
 namespace ChangeControl.Controllers{
     public class RequestController : Controller{
         // GET: Request
@@ -84,14 +84,19 @@ namespace ChangeControl.Controllers{
                 if(ID != null){ // In case of edit mode
                     isEditMode = true;
                     Topic = M_Req.GetTopicByID(ID);
-                    var temp_topic = Topic;
-                    var TopicRelatedList = M_Req.GetRelatedByID(temp_topic.Related);
-                    temp_topic.RelatedList = TopicRelatedList;
-                    
-                    var topic_file_list = M_Req.GetFileByID(temp_topic.ID, "Topic");
-                    if(topic_file_list != null){
-                      temp_topic.FileList = topic_file_list;
-                      ViewData["Topic"] = temp_topic;
+                    if(Topic.Status != 7){
+                        return View("~/Views/Shared/404/index.cshtml");
+                    }else{
+                        var temp_topic = Topic;
+                        var TopicRelatedList = M_Req.GetRelatedByID(temp_topic.Related);
+                        temp_topic.RelatedList = TopicRelatedList;
+                        
+
+                        var topic_file_list = M_Req.GetFileByID(temp_topic.ID, "Topic");
+                        if(topic_file_list != null){
+                        temp_topic.FileList = topic_file_list;
+                        ViewData["Topic"] = temp_topic;
+                        }
                     }
                 }
                 return View();
@@ -128,7 +133,7 @@ namespace ChangeControl.Controllers{
               Session["Foreignkey"] = topic_code;
               Session["Revision"] = revision;
               status = 7;
-              var temp_topic = new Topic((string)(Session["Foreignkey"]), changeType, changeItem, productType, revision , (string) Session["Department"], model,partNo, partName, processName, status, appDescription, subject, detail, timing, related_id,(string)(Session["User"]), date );
+              var temp_topic = new Topic((string)(Session["Foreignkey"]), changeType, changeItem, productType, revision , (string) Session["Department"], model.ReplaceSingleQuote(),partNo.ReplaceSingleQuote(), partName.ReplaceSingleQuote(), processName.ReplaceSingleQuote(), status, appDescription.ReplaceSingleQuote() , subject.ReplaceSingleQuote(), detail.ReplaceSingleQuote(), timing.ReplaceSingleQuote(), related_id,(string)(Session["User"]), date );
 
               topic_id = M_Req.InsertTopic(temp_topic);
               M_Req.InsertTopicApprove(topic_code);
@@ -149,7 +154,7 @@ namespace ChangeControl.Controllers{
 
           Session["Mode"] = mode;
           try{
-                var new_topic = new Topic(Topic.Code, Topic.Type, changeItem, productType, revision,(string) Session["Department"], model,partNo, partName, processName, status, appDescription, subject, detail, timing, related_id,(string)(Session["User"]), date );
+                var new_topic = new Topic(Topic.Code, Topic.Type, changeItem, productType, revision,(string) Session["Department"], model.ReplaceSingleQuote(),partNo.ReplaceSingleQuote(), partName.ReplaceSingleQuote(), processName.ReplaceSingleQuote(), status, appDescription.ReplaceSingleQuote(), subject.ReplaceSingleQuote(), detail.ReplaceSingleQuote(), timing.ReplaceSingleQuote(), related_id,(string)(Session["User"]), date );
                 topic_id = M_Req.UpdateTopic(new_topic);
 
                 return Json(Topic.Code, JsonRequestBehavior.AllowGet);
@@ -249,7 +254,8 @@ namespace ChangeControl.Controllers{
             //string filePath = "km0024.txt";
             //string fullName = Server.MapPath("~/upload/");
             string filePath = temp[0];
-            string fullName = "D:/File/Topic/";
+            // string fullName = "D:/File/Topic/";
+            string fullName = Server.MapPath("~/topic_file/");
             byte[] fileBytes = GetFile(fullName + filePath);
             return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, temp[1]);
         }

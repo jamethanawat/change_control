@@ -75,6 +75,12 @@
         display:inherit;
     }
 
+    .disable-fab{
+        pointer-events: none;
+        cursor: default;
+        color: grey
+    }
+
     body { padding-right: 0 !important }
 
 </style>
@@ -114,7 +120,7 @@
                                         <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
                                         </div>
-                                        <input type="text" name="due_date" data-toggle="datepicker" autocomplete="off" name="desc-32" class="form-control mb-0 pb-0 rounded" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask="" im-insert="false">
+                                        <input type="text" name="due_date" data-toggle="datepicker" autocomplete="off" class="form-control mb-0 pb-0 rounded" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask="" im-insert="false">
                                         <div data-toggle="datepicker"></div>
                                     </div>
                             </div>
@@ -181,18 +187,11 @@
     
 
 <div class="zoom">
-    <a class="zoom-fab zoom-btn-large" id="zoomBtn">
-        <i class="fas fa-pen" style="
+    <a class="zoom-fab zoom-btn-large bg-warning" id="resubmit" data-toggle="modal" data-target="#resubmit_modal">
+        <i class="fas fa-tasks" style="
             color: white;
             transform: scale(1.4);
         "></i>
+        
     </a>
-    <ul class="zoom-menu">
-        <li style="top: 4px; right: 0px;"><a class="zoom-fab zoom-btn-sm zoom-btn-tangram scale-transition scale-out" id="change_status">
-            <i class="fas fa-check"></i>
-        </a></li>
-        <li style="top: 56px; right: 0px;"><a class="zoom-fab zoom-btn-sm bg-warning scale-transition scale-out" id="resubmit" data-toggle="modal" data-target="#resubmit_modal">
-            <i class="fas fa-tasks"></i>
-        </a></li>
-    </ul>
 </div>

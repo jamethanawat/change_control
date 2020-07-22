@@ -13,13 +13,13 @@ using System.Configuration;
 
 namespace ChangeControl.Models{
     public class LoginModel{
-        private DbTapics _dbtapics;
-        private DbCCS _dbCCS;
+        private DbTapics DB_Tapics;
+        private DbCCS DB_CCS;
         public List<Department> A = new List<Department>();
         private SqlConnection cn = new SqlConnection(ConfigurationManager.ConnectionStrings["CCS"].ConnectionString);
         public LoginModel(){
-            _dbtapics = new DbTapics();
-            _dbCCS = new DbCCS();
+            DB_Tapics = new DbTapics();
+            DB_CCS = new DbCCS();
         }
         public object CheckUser(string user, string password){
 
@@ -52,15 +52,16 @@ namespace ChangeControl.Models{
 
         public Department GetDepartmentIdByDepartmentName(string Department){
             var sql = $"SELECT TOP (1) ID_Department AS Id FROM dbo.[Department] WHERE Department.Name = '{Department}' OR Department.Name LIKE '{Department}%'";
-            var result = _dbCCS.Database.SqlQuery<Department>(sql).First();
+            var result = DB_CCS.Database.SqlQuery<Department>(sql).First();
             return result;
         }
 
         public Department GetDepartmentByDepartmentName(string Department){
             var sql = $"SELECT TOP (1) ID_Department AS ID , Name FROM dbo.[Department] WHERE Department.Name = '{Department}' OR Department.Name LIKE '{Department}%'";
-            var result = _dbCCS.Database.SqlQuery<Department>(sql).First();
+            var result = DB_CCS.Database.SqlQuery<Department>(sql).First();
             return result;
         }
+
         
     }
 }

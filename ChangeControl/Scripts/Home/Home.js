@@ -20,7 +20,6 @@ $(document).ready(function () {
 
     $("#Production").change(function () {
         var temp = $("#Production").val();
-        console.log(temp);
         $("#Line").empty();
         $.ajax({
             type: "POST",
@@ -82,7 +81,6 @@ $(document).ready(function () {
                 $("#loading").addClass('hidden');
             },
             success: function (response) {
-                console.log(response);
                 table_cr.clear();
                 table_cr.destroy();
                 table_cr = $('#ChangeRequestTable').DataTable( {
@@ -101,19 +99,23 @@ $(document).ready(function () {
                         }
                     },{"targets": 7,
                         "render": function (data, type, row) {
-                            let action_btn = `<div class="btn-group"><button type="button" name="detail" id="${row.Code}" class="btn btn-info btn-sm  mb-1" data-toggle="modal" data-target="#largeModal" onclick="RedirectToDetail(this)" style="margin-right: 4px;">`+
-                            `<i class="fas fa-external-link-alt"></i></button>`;
-                            console.log(row);
-                            console.log(SessionUser);
+                            let action_btn = '';
                             if(response === null){
                                 return null;
-                            }else if(row.User_insert === SessionUser){
-                                action_btn += `<button type="button" name="edit" id="${row.Code}" class="btn btn-success btn-sm  mb-1" data-toggle="modal" data-target="#largeModal" onclick="EditTopic(this)">`+
-                                `<i class="fas fa-pen"></i>`+
-                                `</button>`;
+                            }else{
+                                    var btn_badge = `secondary`;
+                                    var editable = `disabled`;
+                                    if(row.User_insert === SessionUser && row.FullStatus == "Request"){
+                                        btn_badge = `success`;
+                                        editable = `onclick="EditTopic(this)"`;
+                                    }
+                                    return `<div class="btn-group"><a href="Detail/?id=${row.Code}"><button type="button" name="detail" id="${row.Code}" class="btn btn-info btn-sm mb-1 mr-1" data-toggle="modal" data-target="#largeModal" >`+
+                                    `<i class="fas fa-external-link-alt"></i></button></a><button type="button" name="edit" id="${row.Code}" class="btn btn-`+
+                                    btn_badge + ` btn-sm  mb-1" data-toggle="modal" data-target="#largeModal"` +
+                                    editable + `>`+
+                                    `<i class="fas fa-pen"></i>`+
+                                    `</button></div>`;
                             }
-                            action_btn += "</div>";
-                            return action_btn;
                         }
                     }],
                     columns: [
@@ -130,7 +132,7 @@ $(document).ready(function () {
                 $("body").addClass("sidebar-collapse")
 
                 $("body, html").animate({
-                    scrollTop: $(document).height()
+                    scrollTop: 700
                 }, 100)
             },
             error: function () {
