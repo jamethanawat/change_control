@@ -13,6 +13,7 @@ using System.Net.Mail;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using ChangeControl.Helpers;
 
 namespace ChangeControl.Controllers{
     public class MailController : Controller{
@@ -39,6 +40,7 @@ namespace ChangeControl.Controllers{
                 // ViewBag.Url = $"https://17.27.170.19/ChangeControl/Detail/Index/?id={Topic.Code}";
                 ViewBag.Url = $"{Request.Url.Host}:{Request.Url.Port}/{Request.ApplicationPath}/Detail/Index/?id={Topic.Code}";
                 ViewBag.Topic = Topic;
+                ViewBag.DueDate = DateTime.Now.DueDateOn(10);
 
                 var email = RenderView("~/Views/Mail/index.cshtml",Topic);
                 var related_list = M_Mail.GetRelatedByTopicCode(topic_code);
@@ -61,20 +63,25 @@ namespace ChangeControl.Controllers{
             }
         }
 
-        public ActionResult Generate(string mode,string topic_code, string dept = null){
+        public ActionResult GenerateMail(string mode,string topic_code, string dept = null, string[] dept_arry=null, string due_date=""){
             try{
                 ViewBag.Mode = mode;
                 // if(Topic.Type == "ERR0R"){
                     Topic = M_Mail.GetTopicByCode(topic_code);
                 // }
-                // ViewBag.Url = $"http://172.27.170.19/ChangeControl/Detail/Index/?id={Topic.Code}";
-                ViewBag.Url = $"{Request.Url.Host}:{Request.Url.Port}/{Request.ApplicationPath}/Detail/Index/?id={Topic.Code}";
+                ViewBag.Url = $"http://172.27.170.19/ChangeControl/Detail/Index/?id={Topic.Code}";
+                // ViewBag.Url = $"{Request.Url.Host}:{Request.Url.Port}/{Request.ApplicationPath}/Detail/Index/?id={Topic.Code}";
                 ViewBag.Topic = Topic;
+                ViewBag.DueDate = due_date;
 
                 var email = RenderView("~/Views/Mail/index.cshtml",Topic);
                 var address_list = new List<string>();
 
-                if(dept == null){
+                if(dept_arry != null){
+                    foreach(var temp_dept in dept_arry){
+                        address_list.AddRange(M_Mail.GetEmailByDept(temp_dept));
+                    }
+                }else if(dept == "" || dept == null){
                     var related_list = M_Mail.GetRelatedByTopicCode(topic_code);
                     Type type = related_list.GetType();
                     PropertyInfo[] props = type.GetProperties();
@@ -94,6 +101,10 @@ namespace ChangeControl.Controllers{
             }catch(Exception err){
                 return Json(new {error = err}, JsonRequestBehavior.AllowGet);
             }
+        }
+
+        public ActionResult SendEmailOnDueDate(){
+            return Content(DateTime.Now.ToString());
         }
 
 
@@ -181,7 +192,8 @@ namespace ChangeControl.Controllers{
                         mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} {ViewBag.Topic.Department} Revised review data to Rev{ViewBag.Topic.Revision}.";
                         break;
                     case "ReviewUpdate" :
-                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} {ViewBag.Topic.Profile.FullName} Revised review data to Rev{ViewBag.Topic.Revision}.";
+                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} {ViewBag.Topic.Profile.FullName} Revised review data.";
+                        // mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} {ViewBag.Topic.Profile.FullName} Revised review data to Rev{ViewBag.Topic.Revision}.";
                         break;
                     case "TopicReject" :
                         mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Not approve.";

@@ -4,7 +4,7 @@ using System.Configuration;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
-using StringHelper;
+using ChangeControl.Helpers;
 namespace ChangeControl.Models
 {
     public class DetailModel
@@ -126,7 +126,7 @@ namespace ChangeControl.Models
         
         public TopicAlt GetTopicByCode(string topic_code){
             try{
-                var sql = $@"SELECT  Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, Timing, Related, User_insert, Time_insert, 
+                var sql = $@"SELECT  Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Department, Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, Timing, Related, User_insert, Time_insert, 
                 ID FROM CCS.dbo.Topic 
                 LEFT JOIN Change_Item ON Topic.Change_item = ID_Change_item 
                 LEFT JOIN Product_Type ON Topic.Product_Type = ID_Product_Type 
@@ -407,6 +407,59 @@ namespace ChangeControl.Models
             var sql = $@"UPDATE CCS.dbo.Confirm SET Status=1, ApprovedBy='{user}', ApprovedDate='{date}' 
             WHERE ID={confirm_id};";
             DB_CCS.Database.ExecuteSqlCommand(sql);
+        }
+
+        public List<Review> CheckAllReviewBeforeApprove(string topic_code){
+            try{
+                var sql = $@"SELECT ID_Review , Topic,Department, Status FROM CCS.dbo.Review,
+                (SELECT MAX(Revision) as Version, Department as dept FROM CCS.dbo.Review WHERE Topic = '{topic_code}' Group by Department ) lastest
+                WHERE Topic = '{topic_code}'                    
+                AND Review.Revision  = lastest.Version AND Review.Department  = lastest.dept 
+                AND Review.Department != 'QC1' AND Review.Department != 'QC2' AND Review.Department != 'QC3';";
+                var result = DB_CCS.Database.SqlQuery<Review>(sql).ToList();
+                return result;
+            }catch(Exception ex){
+                return new List<Review>();
+            }
+        }
+
+        public List<Trial> CheckAllTrialBeforeApprove(string topic_code){
+            try{
+                var sql = $@"SELECT ID, Topic,Department, Status FROM CCS.dbo.Trial ,
+                (SELECT MAX(Revision) as Version, Department as dept FROM CCS.dbo.Trial WHERE Topic = '{topic_code}' Group by Department ) lastest
+                WHERE Topic = '{topic_code}'                    
+                AND Trial.Revision  = lastest.Version AND Trial.Department  = lastest.dept 
+                AND Trial.Department != 'QC1' AND Trial.Department != 'QC2' AND Trial.Department != 'QC3';";
+                var result = DB_CCS.Database.SqlQuery<Trial>(sql).ToList();
+                return result;
+            }catch(Exception ex){
+                return new List<Trial>();
+            }
+        }
+
+        public List<Confirm> CheckAllConfirmBeforeApprove(string topic_code){
+            try{
+                var sql = $@"SELECT ID, Topic,Department, Status FROM CCS.dbo.Confirm ,
+                (SELECT MAX(Revision) as Version, Department as dept FROM CCS.dbo.Confirm WHERE Topic = '{topic_code}' Group by Department ) lastest
+                WHERE Topic = '{topic_code}'                    
+                AND Confirm.Revision  = lastest.Version AND Confirm.Department  = lastest.dept 
+                AND Confirm.Department != 'QC1' AND Confirm.Department != 'QC2' AND Confirm.Department != 'QC3';";
+                var result = DB_CCS.Database.SqlQuery<Confirm>(sql).ToList();
+                return result;
+            }catch(Exception ex){
+                return new List<Confirm>();
+            }
+        }
+
+        public void RejectTopic(string topic_code, string desc, string user, string dept){
+            var sql = $@"INSERT INTO CCS.dbo.Topic_Reject (Topic, Description, [User], Department, [Date]) VALUES('{topic_code}', '{desc}', '{user}', '{dept}', '{date}');";
+            DB_CCS.Database.ExecuteSqlCommand(sql);
+        }
+
+        public Reject GetRejectMessageByTopicCode(string topic_code){
+            var sql = $@"SELECT Top(1) Topic, Description, [User], Department, [Date] FROM CCS.dbo.Topic_Reject WHERE Topic = '{topic_code}';";
+            var result = DB_CCS.Database.SqlQuery<Reject>(sql).First();
+            return result;
         }
     }
 }

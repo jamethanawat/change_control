@@ -5,40 +5,27 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using DateHelper;
-using StringHelper;
+using ChangeControl.Helpers;
 
 namespace ChangeControl.Controllers{
     public class HomeController : Controller{
 
         private HomeModel M_Home;
-        public static List<SearchResult> searchResult = new List<SearchResult>();
-  
         public class Line{
             public string line { get; set; }
         }
         public HomeController(){
             M_Home = new HomeModel();
-
         }
         public ActionResult Index(){
+            ViewBag.Departments = GetDepartmentList();
             if ((string)(Session["User"]) == null || (string)(Session["Department"]) == null){
                 Session["url"] = "Home";
                 return RedirectToAction("Index", "Login");
             }
-            return View(searchResult);
-        }
-
-
-        public ActionResult About(){
-            ViewBag.Message = "Your application description page.";
             return View();
         }
 
-        public ActionResult Contact(){
-            ViewBag.Message = "Your contact page.";
-            return View();
-        }
         public ActionResult Search(string user, string password){
             try{
                 System.Net.ServicePointManager.Expect100Continue = false;
@@ -52,14 +39,6 @@ namespace ChangeControl.Controllers{
             }
 
         }
-        [HttpPost]
-        public ActionResult RedirectTo(string ID){
-            var rs="";
-            rs = Url.Content("~/Detail");
-            Session["TopicCode"] = ID;
-            return Json(new { redirecturl = rs, id = ID }, JsonRequestBehavior.AllowGet);
-        }
-
         [HttpPost]
         public ActionResult GetLine(string Production){
             var result = M_Home.GetLine(Production);
@@ -77,5 +56,10 @@ namespace ChangeControl.Controllers{
         }
 
         public List<login> A = new List<login>();
+
+        [HttpPost]
+        public List<String> GetDepartmentList(){
+            return M_Home.GetDepartmentList();
+        }
     }
 }

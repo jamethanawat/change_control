@@ -2,13 +2,10 @@
     //ViewBag.Title = "Home Page";
     ViewBag.Title = "Change Control System | Home";
 }
-@model IEnumerable<ChangeControl.Models.SearchResult>
-
 <script type="text/javascript">
     Search = '@Url.Action("Search", "Home")';
     GetLine = '@Url.Action("GetLine", "Home")';
     GetSearch = '@Url.Action("GetSearch", "Home")';
-    RedirectTo = '@Url.Action("RedirectTo", "Home")';
     SessionUser = '@Session["User"].ToString()';
 </script>
 
@@ -45,6 +42,14 @@
 
     span.info-box-number {
         font-size: 16.5px;
+    }
+
+    .btn-left{
+        border-radius: 5px 0px 0px 5px;
+    }
+
+    .btn-right{
+        border-radius: 0px 5px 5px 0px;
     }
 </style>
 <!-- Content Wrapper. Contains page content -->
@@ -165,7 +170,7 @@
                                     <!-- select2 -->
                                     <div class="form-group">
                                         <div class="row">
-                                            <div class="col-md-6">
+                                            <div class="col-md-2">
                                                 <label>Change Type :</label>
                                                 <select class="form-control select2" id="changeType" style="width: 100%;">
                                                     <option disabled="disabled" selected="selected">Select Type</option>
@@ -173,6 +178,10 @@
                                                     <option>Internal Change</option>
                                                     <option>External Change</option>
                                                 </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                    <label>TNS Control No. :</label>
+                                                    <input type="text" class="form-control" id="TNScontrolNo" placeholder="Enter ...">
                                             </div>
                                             <div class="col-md-6">
 
@@ -216,7 +225,11 @@
                                                 </label>
                                                 <label class="setcheckbox">
                                                     <input type="radio" name="status" value="11" class="flat-red">
-                                                    Closed
+                                                    Finished
+                                                </label>
+                                                <label class="setcheckbox">
+                                                    <input type="radio" name="status" value="12" class="flat-red">
+                                                    Rejected
                                                 </label>
                                             </div>
                                         </div>
@@ -243,17 +256,22 @@
                                             <div class="col-md-6">
                                                 <label>Over All Status :</label><br>
                                                 <label class="setcheckbox">
-                                                    <input type="radio" name="h3" name="overstatus" value="1" class="flat-red" checked>
+                                                    <input type="radio" name="overstatus" value="1" class="flat-red" checked>
+                                                    All status
+                                                </label>
+                                                <label class="setcheckbox">
+                                                    <input type="radio" name="overstatus" value="2" class="flat-red">
                                                     Review complete
                                                 </label>
                                                 <label class="setcheckbox">
-                                                    <input type="radio" name="h3" name="overstatus" value="2" class="flat-red">
-                                                    Confirm Complete
+                                                    <input type="radio" name="overstatus" value="3" class="flat-red">
+                                                    Trial complete
                                                 </label>
                                                 <label class="setcheckbox">
-                                                    <input type="radio" name="h3" name="overstatus" value="3" class="flat-red">
-                                                    All status
+                                                    <input type="radio" name="overstatus" value="4" class="flat-red">
+                                                    Confirm Complete
                                                 </label>
+                                                
                                             </div>
                                         </div>
                                     </div>
@@ -279,120 +297,64 @@
                                                     <option value="12">Others</option>
                                                 </select>
                                             </div>
-                                            <div class="col-md-6">
-                                                <div class="row">
-                                                    <div class="col-6">
-                                                        <!-- /.form-group -->
-                                                        <div class="form-group">
-                                                            <label>TNS Control No. :</label>
-                                                            <input type="text" class="form-control" id="TNScontrolNo" placeholder="Enter ...">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-6">
-                                                        <div class="form-group">
-                                                            <label>Model :</label>
-                                                            <input type="text" class="form-control" id="Model" placeholder="Enter ...">
-                                                        </div>
-                                                    </div>
+                                            <div class="col-3">
+                                                <div class="form-group">
+                                                    <label>Part No :</label>
+                                                    <input type="text" class="form-control" id="partno" placeholder="Enter ...">
+                                                </div>
+                                            </div>
+                                            <div class="col-3">
+                                                <div class="form-group">
+                                                    <label>Part Name :</label>
+                                                    <input type="text" class="form-control" id="partname" placeholder="Enter ...">
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-
-                                    <!-- radio -->
-                                    <div class="form-group">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <label>Change Items :</label><br>
-
-                                                <label class="setcheckbox" style="margin-right: 30px;">
-                                                    <input type="radio" name="h1" id="changeitem_All" class="flat-red" checked>
-                                                    All
-                                                </label>
-                                                <label class="setcheckbox" style="margin-right: 30px;">
-                                                    <input type="radio" name="h1" id="changeitem_Yes" class="flat-red">
-                                                    Yes
-                                                </label>
-                                                <label class="setcheckbox" style="margin-right: 30px;">
-                                                    <input type="radio" name="h1" id="changeitem_No" class="flat-red">
-                                                    No
-                                                </label>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="row">
-                                                    <div class="col-6">
-                                                        <div class="form-group">
-                                                            <label>Part No :</label>
-                                                            <input type="text" class="form-control" id="partno" placeholder="Enter ...">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-6">
-                                                        <div class="form-group">
-                                                            <label>Part Name :</label>
-                                                            <input type="text" class="form-control" id="partname" placeholder="Enter ...">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- select2 -->
-                                    <div class="form-group">
+                                    <div>
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <label>Related Section :</label>
                                                 <select class="form-control select2" name="dept" style="width: 100%;">
                                                     <option disabled="disabled" selected="selected">Department</option>
                                                     <option value="">--- Blank ---</option>
-                                                    <option>IT</option>
-                                                    <option>PCH</option>
-                                                    <option>PE</option>
-                                                    <option>PE_Process</option>
-                                                    <option>MKT</option>
-                                                    <option>QC</option>
+                                                    @foreach(var dept in ViewBag.Departments){
+                                                        <option>@dept</option>
+                                                    }
                                                 </select>
                                             </div>
-                                            <div class="col-md-6">
-                                                <div class="row">
-                                                    <div class="col-4">
-                                                        <div class="form-group">
-                                                            <label>Process Name :</label>
-                                                            <input type="text" id="processname" class="form-control" placeholder="Enter ...">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <label>Production :</label>
-                                                        <select class="form-control select2" id="Production" style="width: 100%;">
-                                                            <option disabled="disabled" selected="selected">Production</option>
-                                                            <option>P1</option>
-                                                            <option>P2</option>
-                                                            <option>P3</option>
-                                                            <option>P4</option>
-                                                            <option>P5</option>
-                                                            <option>P6</option>
-                                                            <option>P7</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-4">
-                                                        <!-- select2 -->
-                                                        <div class="form-group">
-                                                            <label>Line :</label>
-                                                            <select class="form-control select2" id="Line" style="width: 100%;">
-                                                                <option disabled="disabled" selected="selected">Line</option>
-                                                                @*<option>FN1</option>
-                                                                    <option>FN2</option>
-                                                                    <option>FN3</option>
-                                                                    <option>FN4</option>
-                                                                    <option>FN5</option>
-                                                                    <option>FN6</option>
-                                                                    <option>FN7</option>*@
-                                                            </select>
-                                                        </div>
-                                                    </div>
+                                            <div class="col-3">
+                                                <div class="form-group">
+                                                    <label>Process Name :</label>
+                                                    <input type="text" id="processname" class="form-control" placeholder="Enter ...">
+                                                </div>
+                                            </div>
+                                            <div class="col-3">
+                                                <div class="form-group">
+                                                    <label>Model :</label>
+                                                    <input type="text" class="form-control" id="Model" placeholder="Enter ...">
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+                                    @* <div class="form-group">
+                                        <div class="row">
+                                                <div class="col-md-4">
+                                                    <label>Production :</label>
+                                                    <select class="form-control select2" id="Production" style="width: 100%;">
+                                                        <option disabled="disabled" selected="selected">Production</option>
+                                                        <option>P1</option>
+                                                        <option>P2</option>
+                                                        <option>P3M</option>
+                                                        <option>P3A</option>
+                                                        <option>P4</option>
+                                                        <option>P5</option>
+                                                        <option>P6</option>
+                                                        <option>P7</option>
+                                                    </select>
+                                                </div>
+                                        </div>
+                                    </div> *@
 
 
                                 </div>
@@ -401,7 +363,7 @@
                         </div>
                         <!-- /.card-body -->
                         <div class="card-footer">
-                            <button type="submit" class="btn btn-default">Clear</button>
+                            <button type="submit" class="btn btn-default" id="clear_btn">Clear</button>
                             @* <button type="submit" class="btn btn-primary float-right" style="margin-left: 5px;"><i class="fa fa-file-archive-o"></i>&nbsp;&nbsp;Report</button> *@
                             <button id="search" type="submit" value="search" class="btn btn-info float-right"><i class="fa  fa-search"></i>&nbsp;&nbsp;Search</button>
                         </div>

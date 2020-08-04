@@ -171,13 +171,13 @@ namespace ChangeControl.Models{
         }
 
         public List<ChangeItem> GetChangeItem(){
-            var sql = "SELECT ID_Change_item as ID, Name as Name FROM CCS.dbo.Change_Item;";
+            var sql = "SELECT ID_Change_item as ID, Name as Name FROM CCS.dbo.Change_Item WHERE ID_Change_item BETWEEN 1 AND 12;";
             var result = DB_CCS.Database.SqlQuery<ChangeItem>(sql);
             return result.ToList();
         }
         
         public List<ProductType> GetProductType(){
-            var sql = "SELECT ID_Product_Type as ID, Name as Name FROM CCS.dbo.Product_Type;";
+            var sql = "SELECT ID_Product_Type as ID, Name as Name FROM CCS.dbo.Product_Type WHERE ID_Product_Type BETWEEN 1 AND 8;";
             var result = DB_CCS.Database.SqlQuery<ProductType>(sql);
             return result.ToList();
         }
@@ -212,6 +212,18 @@ namespace ChangeControl.Models{
         public void InsertTopicApprove(string topic_code){
             var sql = $"INSERT INTO CCS.dbo.Topic_Approve (Topic, RequestBy, RequestDate, ReviewBy, ReviewDate, TrialBy, TrialDate, CloseBy, CloseDate) VALUES('{topic_code}', '', '', '', '', '', '', '', ''); ";
             DB_CCS.Database.ExecuteSqlCommand(sql);
+        }
+
+        public int InsertOtherChangeItem(string desc){
+            var sql = $"INSERT INTO CCS.dbo.Change_Item (Name) OUTPUT Inserted.ID_Change_Item VALUES('{desc}');";
+            var result = DB_CCS.Database.SqlQuery<int>(sql).First();
+            return result;
+        }
+
+        public int InsertOtherProductType(string desc){
+            var sql = $"INSERT INTO CCS.dbo.Product_Type (Name) OUTPUT Inserted.ID_Product_Type VALUES('{desc}');";
+            var result = DB_CCS.Database.SqlQuery<int>(sql).First();
+            return result;
         }
 
     }

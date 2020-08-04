@@ -1,47 +1,101 @@
+@using ChangeControl.Models
 @{
     var str_date = "05 มิถุนายน 2020";
     string department = (string)Session["Department"];
     var isApprover = ((string)Session["Position"] == "Approver");
+    var isQC = ((string)Session["Department"] == "QC1" || (string)Session["Department"] == "QC2" || (string)Session["Department"] == "QC3");
+    List<Review> ElementList = Model;
+}
+@if(ElementList.Exists(e => e.Department == department)){
+        Review Element = ElementList.Find(e => e.Department == department);
+        if(Element.Item.Count != 0){
+            @DefaultList(ElementList, Element, department, isApprover, isQC)
+        }
 }
 
-@foreach(var Review in Model){
-if(Review.Item.Count != 0){
+@foreach(var Element in ViewBag.ReviewRelatedList){
+    if(Element.status == 0){
+    <div>
+        <i class="fa fa-hourglass-half  bg-secondary blue-tooltip"></i>
+        <div class="timeline-item card">
+            <div class="timeline-header card-header d-flex" style="padding: 10px 10px 5px 10px;"  data-card-widget="collapse">
+                    <h6 class="mr-auto" style="font-family:Kanit"> 
+                        @Element.name
+                        <span class='badge badge-pill badge-secondary'>PENDING
+                                <i class='fa fa-hourglass-half'></i>
+                        </span> </h6>
+            </div>
+        </div>  
+    </div>
+    }
+}
+@foreach(var Element in Model){
+    if(Element.Department != department){
+        if(Element.Item.Count != 0){
+            @DefaultList(ElementList, Element, department, isApprover, isQC)
+        }
+    }
+}
+
+@helper DefaultList(List<Review> ElementList, Review Element, string department, bool isApprover, bool isQC){
 <div>
-    @* <i class="fas bg-primary" style="font-family:Kanit !important">@Html.DisplayFor(model => Review.Department)</i> *@
-    @if(Review.Status == 1){
-        <i class="fas fa-check bg-primary blue-tooltip" data-toggle="tooltip" data-placement="top" title="Approved"></i>
-    }else if(Review.Status == 3){
-        <i class="far fa-clock bg-warning blue-tooltip" data-toggle="tooltip" data-placement="top" title="Waiting for approve"></i>
-    }else if(Review.Status == 4){
-        <i class="fas fa-info bg-warning blue-tooltip" data-toggle="tooltip" data-placement="top" title="Need more information"></i>
+    @* <i class="fas bg-primary" style="font-family:Kanit !important">@Html.DisplayFor(model => Element.Department)</i> *@
+    @if(Element.Status == 1){
+        <i class="fas fa-check bg-primary blue-tooltip"></i>
+    }else if(Element.Status == 3){
+        <i class="fas fa-file-signature bg-warning blue-tooltip"></i>
+    }else if(Element.Status == 4){
+        <i class="fas fa-info bg-warning blue-tooltip"></i>
     }else{
-        <i class="fas fa-question bg-error blue-tooltip" data-toggle="tooltip" data-placement="top" title="Unknown"></i>
+        <i class="fas fa-question bg-error blue-tooltip"></i>
     }
     <div class="timeline-item card">
         <div class="timeline-header card-header d-flex" style="padding: 10px 10px 5px 10px;"  data-card-widget="collapse">
                 @{
-                    @* var approve_status = (Review.ApprovedBy != null) ? "<span class='text-success'>APPROVED</span>": "<span class='text-secondary'>PENDING</span>"; *@
+                    @* var approve_status = (Element.ApprovedBy != null) ? "<span class='text-success'>APPROVED</span>": "<span class='text-secondary'>PENDING</span>"; *@
                     var approve_status = 
                             $@"<span class='badge badge-pill badge-warning'>WAITING FOR APPROVE
-                                    <i class='fas fa-clock'></i>
+                                    <i class='fas fa-file-signature '></i>
                             </span>";
-                    if(Review.ApprovedBy != null){
+                    if(Element.ApprovedBy != null && Element.ApprovedBy != ""){
                     approve_status = 
                             $@"<span class='badge badge-pill badge-success'>APPROVED
                                     <i class='fas fa-check'></i>
                             </span>";
                     }
 
-                    var dept_status = (Review.Department == department) ? $"<span class='badge badge-primary' style='font-size: 0.9rem;'> {Review.Department} </span>" : Review.Department;
+                    var dept_status = (Element.Department == department) ? $"<span class='badge badge-pill badge-primary'> YOUR DEPARTMENT <i class='fas fa-pencil-alt'></i> </span>" : "";
                 }
-                <h6 class="mr-auto" style="font-family:Kanit"> @Html.Raw(HttpUtility.HtmlDecode(@dept_status)) - @Review.Profile.Name @Review.Profile.SurName (@Review.Date) @Html.Raw(HttpUtility.HtmlDecode(@approve_status)) </h6>
+                <h6 class="mr-auto" style="font-family:Kanit"> @Element.Department @Html.Raw(HttpUtility.HtmlDecode(@dept_status)) @Html.Raw(HttpUtility.HtmlDecode(@approve_status)) </h6>
                 <button type="button" class="btn btn-tool arrow-collapse" data-card-widget="collapse"><i class="fas fa-chevron-down"></i></button>
         </div>
 
         <div class="timeline-body card-body">
                 <form class="form-horizontal">
-                    @{var ReviewItem = Review.Item;}
-                    @foreach(var Item in ReviewItem){
+                    @{var ElementItem = Element.Item;}
+                    <div class="row">
+                        <label class="col-sm-4 col-form-label" style="text-align:right">
+                                Reviewed By :
+                        </label>
+                        <div class="col-sm-8 col-form-label">
+                            <span>
+                                @Element.Profile.FullName (@Element.Date)
+                            </span>
+                        </div>
+                    </div>
+                    @if(Element.ApprovedBy != "" && Element.ApprovedBy != null){
+                    <div class="row">
+                        <label class="col-sm-4 col-form-label" style="text-align:right">
+                                Approved By :
+                        </label>
+                        <div class="col-sm-8 col-form-label">
+                            <span>
+                                @Element.Approver.FullName (@Element.ApprovedDate) <span class='badge badge-pill badge-success'><i class='fas fa-check'></i></span>
+                            </span>
+                        </div>
+                    </div>
+                    }
+                    @foreach(var Item in ElementItem){
                         var temp_status = (String)null;
                         if(Item.Status == true){
                             temp_status = "Yes";
@@ -67,25 +121,14 @@ if(Review.Item.Count != 0){
                         </div>
                     </div>
                     }
-                    @if(Review.ApprovedBy != "" && Review.ApprovedBy != null){
-                    <div class="row">
-                        <label class="col-sm-4 col-form-label" style="text-align:right">
-                                Approved By :
-                        </label>
-                        <div class="col-sm-8 col-form-label">
-                            <span>
-                                @Review.Approver.FullName (@Review.ApprovedDate) <span class='badge badge-pill badge-success'><i class='fas fa-check'></i></span>
-                            </span>
-                        </div>
-                    </div>
-                    }
+                    
                 </form>
 
-            @if(Review.FileList != null){
-                if(Review.FileList.Count != 0){
+            @if(Element.FileList != null){
+                if(Element.FileList.Count != 0){
                 <div class="col-sm-12 d-flex mt-4 file-list">
                 <ul class="mailbox-attachments d-flex flex-wrap align-items-stretch clearfix">
-                    @{var FileList = Review.FileList;
+                    @{var FileList = Element.FileList;
                         foreach(var File in FileList){
                             var FileSize = "0 Bytes";
                             var file_desc = (File.Description.Trim() == null || File.Description.Trim() == "") ? "<i>No information</i>" : File.Description;
@@ -132,20 +175,21 @@ if(Review.Item.Count != 0){
             }
         </div>
         @{
-            var isDepartment = (department == Review.Department);
-            @* if((isDepartment) && Review.Status != 1 && ((string)Session["Status"] == "Request" || (string)Session["Status"] == "Review")){ //Disable edit and approve button when Review have approved *@
-            if((isDepartment) && ((string)Session["Status"] == "Request" || (string)Session["Status"] == "Review" && (Review.ApprovedBy == "" || Review.ApprovedBy == null))){
+            var isDepartment = (department == Element.Department);
+            @* if((isDepartment) && Element.Status != 1 && ((string)Session["Status"] == "Request" || (string)Session["Status"] == "Element")){ //Disable edit and approve button when Element have approved *@
+            if((isDepartment) && ((string)Session["Status"] == "Request" || (string)Session["Status"] == "Review")){
             <hr style="margin-top:0px !important">
             <div class="timeline-footer">
                 <div class="float-right ">
-                    @* @if(Review.Status !=1 && isDepartment){ //Disable edit button when Review have approved*@ 
-                    <a class="btn btn-warning btn-sm rv-edit" id="edit_rv" data-toggle="modal" data-target="#edit_review" value="@Review.ID_Review">Edit</a>
-                    @if(Review.Status !=1 && Review.Status !=5 && Review.Status !=6 && isApprover ){ <button class="btn btn-info btn-sm mr-1 rv-approve" value="@Review.ID_Review">Approve</button>}
+                    @* @if(Element.Status !=1 && isDepartment){ //Disable edit button when Element have approved*@ 
+                    <a class="btn btn-warning btn-sm rv-edit" id="edit_rv" data-toggle="modal" data-target="#edit_review" value="@Element.ID_Review">Edit</a>
+                        @if(isApprover && ((Element.Status !=1 && !isQC) || (!ElementList.Exists(e => e.Status == 3 && e.Department != "QC1" && e.Department != "QC2" && e.Department != "QC3") && isQC))){ 
+                            <button class="btn btn-info btn-sm mr-1 rv-approve" value="@Element.ID_Review">Approve</button>
+                        }
                 </div>
             </div>
             }
         }
     </div>  
 </div>
-}
 }

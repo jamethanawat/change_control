@@ -7,7 +7,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Text.RegularExpressions;
 
-namespace StringHelper
+namespace ChangeControl.Helpers
 {
     public static class StringHelper{
         

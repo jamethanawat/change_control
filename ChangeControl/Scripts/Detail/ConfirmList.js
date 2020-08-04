@@ -13,15 +13,32 @@
             title: "Approve Confirm", 
             buttons: [true,"Approve"],
             icon: "warning",
-        }).then((res) => {
-            if(res){
-                $.post(ApproveConfirmPath, {confirm_id:cf_id}, (data) => {
-                    if(data){
-                        swal("Success", "Change Status Success", "success").then(location.reload());
+        }).then((apr) => {
+            if(apr){
+                $.post(CheckAllConfirmBeforeApprovePath, {topic_code:topic_code}, (res) => {
+                    if(res == "True"){
+                        $.post(ApproveConfirmPath, {confirm_id:cf_id}, (result) => {
+                            if(result){
+                                if(result.mail != ""){
+                                    $.post(GenerateMailPath,{
+                                        'mode': result.mail,
+                                        'topic_code':topic_code,
+                                        'dept': result.dept,
+                                    }).fail((error) => {
+                                        console.error(error);
+                                        swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                                        return;
+                                    });
+                                }
+                                swal("Success", "Change Status Success", "success").then(location.reload());
+                            }else{
+                                swal("Error", "User Password Not Correct", "error");
+                            }
+                        },"json");
                     }else{
-                        swal("Error", "User Password Not Correct", "error");
+                        swal("Error", "Confirm status has been changed , Refresh in 2 Second.", "error").then(setTimeout(() => { location.reload(); }, 1500));
                     }
-                },"json");
+                })
             }
         });
     });
@@ -69,6 +86,7 @@
                 $('#loading').addClass('hidden')
                 InsertReviewStatus = false;
                 $("#confirm_submit").prop("disabled",true)
+                $("#edit_confirm").modal("hide")
                 swal("Success", "Insert Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
             })
     });

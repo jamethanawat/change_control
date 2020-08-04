@@ -11,6 +11,12 @@
         @Scripts.Render("~/bundles/bootstrap")
         @Scripts.Render("~/bundles/sweetalert")
 
+        <style>
+            .swal-button--confirm, .btn-info {
+                background-color: #007bff;
+                border-color: #007bff;
+            }
+        </style>
         <script type="text/javascript">
             var CheckUserPath = '@Url.Action("CheckUser", "Login")';
             var CheckAdminPath = '@Url.Action("CheckAdmin", "Login")';
@@ -37,6 +43,10 @@
         <link rel="stylesheet" href="~/tmp/icon-internet/icon-internet.css">
         <!-- Theme style -->
         <link rel="stylesheet" href="~/tmp/dist/css/adminlte.min.css">
+        
+        <script src="~/Plugin/ldLoader/ldld.min.js"></script>
+        <link rel="stylesheet" href="~/Plugin/ldLoader/ldbtn.min.css">
+        <link rel="stylesheet" href="~/Plugin/ldLoader/loading.min.css">
         <!-- Google Font: Source Sans Pro -->
         @*<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">*@
 
@@ -76,7 +86,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-8">
+                            <div class="col-7">
                                 <div class="icheck-primary">
                                     <input type="checkbox" id="remember">
                                     <label for="remember">
@@ -85,19 +95,18 @@
                                 </div>
                             </div>
                             <!-- /.col -->
-                            <div class="col-4">
-                                <button id="click" class="btn btn-primary btn-block">Sign In</button>
+                            <div class="col-5">
+                                <button id="signin-btn" class="btn btn-primary btn-block ld-ext-right">
+                                    Submit
+                                    <div class="ld ld-spin ld-ring"></div>
+                                </button>
+                                @* <button id="click" class="btn btn-primary btn-block">Sign In</button> *@
                             </div>
                             <!-- /.col -->
                         </div>
 
-
-                        <p class="mb-1">
-                            <a href="#" target="_blank">I forgot my password</a>
-                            @* <a href="http://172.27.170.23/support/" target="_blank">I forgot my password</a> *@
-                        </p>
                         <p class="mb-0">
-                            <a href="#" target="_blank" class="text-center">Register a new membership</a>
+                        <note>*Not support internet explorer <br>Suggest chrome</note>
                             @* <a href="http://172.27.170.23/support/" target="_blank" class="text-center">Register a new membership</a> *@
                         </p>
                     </div>
@@ -105,12 +114,6 @@
                 </div>
             </div>
             <!-- /.login-box -->
-            <!-- jQuery -->
-            @*<script src="~/tmp/plugins/jquery/jquery.min.js"></script>
-        <!-- Bootstrap 4 -->
-        <script src="~/tmp/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-        <!-- AdminLTE App -->
-        <script src="~/tmp/dist/js/adminlte.min.js"></script>*@
         </div>
     </body>
 

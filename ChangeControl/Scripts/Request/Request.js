@@ -20,6 +20,7 @@ $(document).ready(function () {
         $(this).submit();
     });
 
+/* ------------------------ Department checkbox list ------------------------ */
     $('input[name="changeType"]').change((e) => {
         let val = e.target.value;
         console.log(`changeType val : ${val}`);
@@ -60,7 +61,7 @@ $(document).ready(function () {
         });
     });
     
-
+/* ----------------------------- Submit Request ----------------------------- */
     $("form.Request").submit((e) => {
         e.preventDefault();
         
@@ -99,7 +100,6 @@ $(document).ready(function () {
             }
         }
         
-
         let form = SerializeReviewForm();
 
         files = file_list;
@@ -136,12 +136,14 @@ $(document).ready(function () {
                             }
                         }));
                     });
+                    
                     promises.push(
-                        $.post(GeneratePath,{
-                            'mode':'EmailRequestor',
-                            'topic_code':inserted_id,
-                        }).fail((error) => {
-                            console.err(error);
+                            $.post(GenerateMailPath,{
+                                'mode':(id.substring(0,2) == "EX") ? 'InformUser' : 'InformPE',
+                                'topic_code':inserted_id,
+                                'dept':(id.substring(0,2) == "IN") ? $(".Production_Engineer_Process:checked").attr("name") : null,
+                            }).fail((error) => {
+                            console.error(error);
                             swal("Error", "Cannot send email to Requestor, Please try again", "error");
                             return;
                         })
@@ -167,6 +169,7 @@ $(document).ready(function () {
         })
     });
 
+/* ------------------------------ Edit Request ------------------------------ */
     $("form.Edit").submit((e) => {
         e.preventDefault();
             let form = SerializeReviewForm();
@@ -241,45 +244,63 @@ $(document).ready(function () {
                 });
     });
 
+/* ---------------------------- Other Change item --------------------------- */
+    $("input[name='changeItem'].other,input[name='productType'].other").click((e) => {
+        console.log(e);
+        if(e.target.checked){
+            let path = title = "";
+            if(e.target.name == "changeItem"){
+                path = InsertOtherChangeItemPath;
+                title = "Please enter new Change Item";
+            }else if(e.target.name == "productType"){
+                path = InsertOtherProductTypePath;
+                title = "Please enter new Product type";
+            }
+            swal({
+                title: title, 
+                buttons: {
+                    cancel: true,
+                    confirm: true,
+                    closeModal: false,
+                },
+                content: "input", 
+                icon:"warning",
+            }).then((res) => {
+                if(res != null){
+                    if(res.trim().length != 0){
+                        
+                        $.post(path, {desc:res}, (data) => {
+                            if(data){
+                                e.target.value = data;
+                                e.target.nextElementSibling.textContent = `(${res})`;
+                                swal.stopLoading();
+                                swal.close();
+                            }else{
+                                throw err;
+                            }
+                        },"json").fail(() => {
+                            throw err;
+                        });
+                    }else{
+                        swal("Something wrong", "Please enter the text", "error");
+                        e.target.nextElementSibling.textContent = null;
+                        e.target.checked = false;    
+                    }
+                }else{
+                    e.target.nextElementSibling.textContent = null;
+                    e.target.checked = false;
+                }
+            }).catch(err => {
+                e.target.nextElementSibling.textContent = null;
+                e.target.checked = false;
+                swal("Something wrong", "Please contact admin", "error");
+            });
+        }
+    });
+
     function RedirectToDetail(id) {
         window.location.replace(`${RedirectDetail}/?id=${id}`);
     }
-
-    $("#test").click(function () {
-
-        console.log($("#revision").html());
-        SendMail("Internal");
-        //var txt = $(".textarea2").val();
-        //console.log(txt);
-        let ul = $('#listshow');              
-        let length = ul.children().length;
-        console.log("ul", ul);
-        console.log("length", length);
-        for (var i = 0; i < length; i++) {
-           
-            console.log("value-text", $('#txt-file' + i +'').val());
-        }
-        var Odepartment = {
-
-            "Value": 1
-        };
-        var Odepartment2 = {
-
-            "Value": 2
-        };
-
-        var files = $("#files").get(0).files;
-        var fileData = new FormData();
-
-        for (var i = 0; i < files.length; i++) {
-            fileData.append('files', files[i]);
-        }
-        
-        var code = "5555";
-
-
-        swal("Success \n Change Control NO. " + code + "", "Complete Transaction", "success");
-    });
 
     function SendMail(type) {
         $.post(sendmail, JSON.stringify({ Type: type,}));

@@ -1,4 +1,5 @@
 using ChangeControl.Models;
+using ChangeControl.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -11,7 +12,6 @@ using System.Net.Mail;
 using System.Web;
 using System.Web.Mvc;
 using System.Text.Json;
-using StringHelper;
 namespace ChangeControl.Controllers{
     public class RequestController : Controller{
         // GET: Request
@@ -65,11 +65,8 @@ namespace ChangeControl.Controllers{
                     ViewData["eTopic_id"] = "EX-" + date.Substring(2, 4) + "" + e_id.ToString("000") + ""; //Then new ID = last Topic ID +1
                 }
                 
-                var formChangeItem = M_Req.GetChangeItem(); //Get list of change items radio
-                ViewData["FormChangeItem"] = formChangeItem;
-
-                var formProductType = M_Req.GetProductType(); //Get list of product type radio
-                ViewData["FormProductType"] = formProductType;
+                ViewData["FormChangeItem"] = M_Req.GetChangeItem(); //Get list of change items radio
+                ViewData["FormProductType"] = M_Req.GetProductType(); //Get list of product type radio
 
                 var DepartmentGroup = M_Req.GetDepartmentGroup(); //Get raw group of departments
 
@@ -212,6 +209,15 @@ namespace ChangeControl.Controllers{
             catch (Exception ex){
                 return Json(new { code = -1 }, JsonRequestBehavior.AllowGet);
             }
+        }
+
+        [HttpPost]
+        public int InsertOtherChangeItem(string desc){
+            return M_Req.InsertOtherChangeItem(desc);
+        }
+
+        public int InsertOtherProductType(string desc){
+            return M_Req.InsertOtherProductType(desc);
         }
 
         public void SendMail(List<string> mail){

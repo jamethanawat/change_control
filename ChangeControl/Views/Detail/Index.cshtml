@@ -1,6 +1,6 @@
 ﻿@using System.Data
 @using ChangeControl.Models
-@using StringHelper
+@using ChangeControl.Helpers
 @model DataSet
 @{
     ViewBag.Title = "Change Control System | Detail";
@@ -23,7 +23,7 @@
     var isQC = (department == "QC1" || department == "QC2" || department == "QC3");
 
 
-    string[] status_define = {"-","Approved","Rejected","Waiting","Need more document","Re-submit"," ","Request","Review","Trial", "Confirm", "Closed" };
+    string[] status_define = {"-","Approved","Rejected","Waiting","Need more document","Re-submit"," ","Request","Review","Trial", "Confirm", "Finished", "Rejected" };
     var status = status_define[Topic.Status];
     Session["Status"] = status;
 
@@ -40,21 +40,24 @@
     List<RelatedAlt> rv_related_list = ViewData["ReviewRelatedList"] as List<RelatedAlt>;
     List<RelatedAlt> tr_related_list = ViewData["TrialRelatedList"] as List<RelatedAlt>;
     List<RelatedAlt> cf_related_list = ViewData["ConfirmRelatedList"] as List<RelatedAlt>;
-    var QcReviewable = (rv_related_list != null) ? (rv_related_list.Exists(e => e.status == 0 && (e.name == "QC1" || e.name == "QC1" || e.name == "QC1") && rv_related_list.Count(d => d.status == 0) == 1)) : false;
-    var QcTrialable = (tr_related_list != null) ? (!tr_related_list.Exists(e => e.status == 0)) : false;
-    var QcConfirmable = (cf_related_list != null) ? (cf_related_list.Exists(e => e.status == 0 && (e.name == "QC1" || e.name == "QC1" || e.name == "QC1") && cf_related_list.Count(d => d.status == 0) == 1)) : false;
+    var QcReviewable = (rv_related_list != null) ? (rv_related_list.Exists(e => e.status == 0 && (e.name == "QC1" || e.name == "QC2" || e.name == "QC3") && rv_related_list.Count(d => d.status == 0) == 1) && !ReviewList.Exists(rv => rv.Status == 3)) : false;
+    var QcTrialable = (tr_related_list != null) ? (!tr_related_list.Exists(e => e.status == 0) && !TrialList.Exists(tr => tr.Status == 3)) : false;
+    var QcConfirmable = (cf_related_list != null) ? (cf_related_list.Exists(e => e.status == 0 && (e.name == "QC1" || e.name == "QC2" || e.name == "QC3") && cf_related_list.Count(d => d.status == 0) == 1)  && !ConfirmList.Exists(cf => cf.Status == 3)) : false;
 }
 
 <script type="text/javascript">
-    DepartmentLists = @Html.Raw(Json.Encode(DepartmentList));
-    topic_status = '@status';
-    topic_id = '@Topic.ID';
-    topic_code = '@Topic.Code';
-    isQC = '@isQC'.toLowerCase() == 'true' ? true : false;
-    isTrialable = '@isTrialable'.toLowerCase() == 'true' ? true : false;
-    isReview = '@isReview'.toLowerCase() == 'true' ? true : false;
-    var GeneratePath = '@Url.Action("Generate", "Mail")';
-
+    var DepartmentLists = @Html.Raw(Json.Encode(DepartmentList));
+    var topic_status = '@status';
+    var topic_id = '@Topic.ID';
+    var topic_code = '@Topic.Code';
+    var isQC = '@isQC'.toLowerCase() == 'true' ? true : false;
+    var isTrialable = '@isTrialable'.toLowerCase() == 'true' ? true : false;
+    var isReview = '@isReview'.toLowerCase() == 'true' ? true : false;
+    var GenerateMailPath = '@Url.Action("GenerateMail", "Mail")';
+    var CheckAllReviewBeforeApprovePath = '@Url.Action("CheckAllReviewBeforeApprove", "Detail")';
+    var CheckAllTrialBeforeApprovePath = '@Url.Action("CheckAllTrialBeforeApprove", "Detail")';
+    var CheckAllConfirmBeforeApprovePath = '@Url.Action("CheckAllConfirmBeforeApprove", "Detail")';
+    var RejectTopicPath = '@Url.Action("RejectTopic", "Detail")';
 </script>
 
     @* @Styles.Render("~/Content/css") *@
@@ -163,9 +166,13 @@
         transition: transform 0.5s !important;
     }
 
-    .badge-warning{
-        color: white;
-        background: #ff9900;
+    .badge-warning, .bg-warning, .btn-warning{
+        color: white !important;
+        background: #ff9900 !important;
+    }
+
+    p.text-muted {
+        margin-bottom: -8px;
     }
 
 </style>
@@ -237,7 +244,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-sm-12">
-                    @if((isQC || isPEProcess) && isRelated){ @Html.Partial("Fab",DepartmentList)}
+                    @if((isQC || isPEProcess) && isRelated && (status != "Finshed" || status != "Rejected")){ @Html.Partial("Fab",DepartmentList)}
                 </div>
             </div>
             <div class="row mb-2">
@@ -286,7 +293,7 @@
                     <i class='fas @rv_icon'></i>
                     </span>
 
-                    @if(isTrialable){
+                    @if(isTrialable || (isQC && isRelated)){
                         <span class='badge badge-pill badge-@tr_badge'>Trial
                         <i class='fas @tr_icon'></i>
                         </span>
@@ -311,65 +318,29 @@
                 <div class="col-md-3">
 
                     <!-- Profile Image -->
-                    <div class="card card-primary card-outline">
+                    <div class="card card-primary card-outline card-sticky">
                         <div class="card-body box-profile">
 
                             <div class="card-body">
-                                <strong> Change Type</strong>
-                                <p class="text-muted">
-                                    @Html.DisplayFor(model => Topic.Code)
-                                </p>
+                                <strong> Change NO.</strong>
+                                <p class="text-muted">@Html.DisplayFor(model => Topic.Code) </p>
                                 <hr>
                                 <strong> Change Items</strong>
-                                <p class="text-muted">
-                                    @Html.DisplayFor(model => Topic.Change_item)
-                                </p>
+                                <p class="text-muted">@Html.DisplayFor(model => Topic.Change_item) </p>
                                 <hr>
-                                @* <strong> Approve</strong>
-                                <p class="text-muted">
-                                    @Html.DisplayFor(model => Topic.Change_item)
-                                </p>
-                                <hr> *@
-                                <strong> Related Department</strong>
-                                <p class="text-muted">
-                                @{
-                                    var RelatedList = Topic.RelatedListAlt;
-                                    var j=0;
-                                    foreach (var Related in RelatedList){
-                                        var isResponsed = (Related.status == 1) ? true : false;
-                                        @(j>0?" , ":"")@Related.name
-                                        j++;
-                                    }
-                                }
-                                </p>
-                                <hr>
-                            </div>
-                            <!-- /.card-body -->
-                            <a href="#" class="btn btn-primary btn-block"><b>Status : @status</b></a>
-                        </div>
-                        <!-- /.card-body -->
-                    </div>
-                    <!-- /.card -->
-                    <!-- About Me Box -->
-                    <div class="card card-primary card-outline card-sticky">
-                        <div class="card-body box-profile">
-                            <!-- /.card-header -->
-                            <div class="card-body">
                                 <strong> Product Type</strong>
                                 <p class="text-muted"> @Html.DisplayFor(model => Topic.Product_type) </p>
                                 <hr>
                                 <strong> Model :</strong>
                                 <p class="text-muted"> @Html.DisplayFor(model => Topic.Model) </p>
                                 <hr>
-                                <strong> Part No :</strong>
-                                <p class="text-muted"> @Html.DisplayFor(model => Topic.PartNo) </p>
+                                <strong> Part No / Part Name :</strong>
+                                <p class="text-muted"> @Html.DisplayFor(model => Topic.PartNo) / @Html.DisplayFor(model => Topic.PartName) </p>
                                 <hr>
-                                <strong> Part Name :</strong>
+                                @* <strong> Part Name :</strong>
                                 <p class="text-muted"> @Html.DisplayFor(model => Topic.PartName) </p>
-                                <hr>
-                                <strong> Process Name :</strong>
-                                <p class="text-muted"> @Html.DisplayFor(model => Topic.ProcessName) </p>
-                                <hr>
+                                <hr> *@
+                                <a href="#" class="btn @(status != "Rejected"? "btn-primary" :"btn-danger") btn-block"><b>Status : @status</b></a>
                             </div>
                             <!-- /.card-body -->
                         </div>
@@ -393,12 +364,31 @@
                                     <!-- /.mailbox-controls -->
                                     <div class="mailbox-read-message">
                                     <form class="form-horizontal">
-                                        <h4>Subject/Purpose for change</h4>
-                                            &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Subject.ReplaceNullWithDash()))</span>
+                                    @if(ViewBag.RejectMessage != null){
+                                        var rj_msg = ViewBag.RejectMessage;
+                                        <h4 class="text-danger">Rejected By</h4>
+                                            @:&nbsp; <i class="fas fa-angle-right text-danger"></i>&nbsp; <span class="text-danger"> @rj_msg.Department - @rj_msg.Profile.FullName (@rj_msg.Date) : @rj_msg.Description</span> 
+                                    }
+                                        <h4 class="@(@ViewBag.RejectMessage != null ? "mt-3":"")">Author</h4>
+                                            &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span> @Topic.Department -  @Topic.Profile.FullName (@Topic.Time_insert)</span>
+                                        <h4 class="mt-3">Subject/Purpose for change</h4>
+                                            &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Subject.ReplaceNullWithDash().TrimStart()))</span>
                                         <h4 class="mt-3">Change Details</h4>
-                                            &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Detail.ReplaceNullWithDash()))</span>
+                                            &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Detail.ReplaceNullWithDash().TrimStart()))</span>
                                         <h4 class="mt-3">Introduction Timing</h4>
-                                            &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Timing.ReplaceNullWithDash()))</span>
+                                            &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Timing.ReplaceNullWithDash().TrimStart()))</span>
+                                        <h4 class="mt-3">Related Department</h4>
+                                            &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>
+                                            @{
+                                                var RelatedList = Topic.RelatedListAlt;
+                                                var j=0;
+                                                foreach (var Related in RelatedList){
+                                                    var isResponsed = (Related.status == 1) ? true : false;
+                                                    @(j>0?" , ":"")@Related.name
+                                                    j++;
+                                                }
+                                            }
+                                            </span>
                                     </form>
 
                                 @if(Topic.FileList.Count != 0){
@@ -467,16 +457,18 @@
                                         </div>
                                             @Html.Partial("Review/List",ReviewList) 
 
-                                        @if(status == "Trial" || status == "Confirm" || status == "Closed"){
+                                        @if(status == "Trial" || status == "Confirm" || status == "Finished"){
                                         <div class="time-label">
-                                            <span class="bg-primary">
-                                                Trail and following
-                                            </span>
+                                            @if(tr_related_list.Count() > 0){ //Request trial not exist
+                                                <span class="bg-primary">
+                                                    Trail and following
+                                                </span>
+                                            }
                                         </div>
                                             @Html.Partial("Trial/List",TrialList) 
                                         }
 
-                                        @if(status == "Confirm" || status == "Closed"){
+                                        @if(status == "Confirm" || status == "Finished"){
                                         <div class="time-label">
                                             <span class="bg-primary">
                                                 Confirm status
@@ -485,7 +477,7 @@
                                             @Html.Partial("Confirm/List",ConfirmList) 
                                         }
 
-                                        @if(status == "Closed"){
+                                        @if(status == "Finished" || status == "Rejected"){
                                         <div class="time-label">
                                             <span class="bg-primary">
                                                 Closed 
@@ -502,9 +494,9 @@
                                     if(isPEProcess && (status == "Request" || status == "Review")){
                                         Session["isIssued"] = true;
                                         @Html.Partial("Review/PE_Process") 
-                                    }else if(isQC && QcReviewable && (!(isInternal && status == "Request"))){
+                                    }else if(isQC && QcReviewable && (status == "Review")){
                                         @Html.Partial("Review/QC")
-                                    }else if(!isPEProcess && !isQC && ((isExternal && status == "Request") || (isInternal && status == "Review"))){
+                                    }else if(((!isQC && !isPEProcess && status == "Review" && isInternal) || (status == "Request" && isExternal && !isQC ))){
                                         @Html.Partial("Review/Other", ReviewItems) 
                                     }
                                 }else if((isTrialable || QcTrialable) && !isTrial && status == "Trial"){
@@ -580,7 +572,7 @@
                                 <!-- /.tab-pane -->
                                 <div class ="tab-pane" id="timeline">
                                     <!-- The timeline -->
-                                    @Html.Partial("Resubmit",ResubmitList) 
+                                        @Html.Partial("Resubmit",ResubmitList) 
                                 </div>
                                 <!-- /.tab-pane -->
                                 

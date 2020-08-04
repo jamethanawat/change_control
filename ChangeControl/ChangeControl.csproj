@@ -352,6 +352,7 @@
     <Compile Include="Models\ViewModels\ListMail.cs" />
     <Compile Include="Models\ViewModels\login.cs" />
     <Compile Include="Models\ViewModels\ProductType.cs" />
+    <Compile Include="Models\ViewModels\Reject.cs" />
     <Compile Include="Models\ViewModels\Related.cs" />
     <Compile Include="Models\ViewModels\RelatedAlt.cs" />
     <Compile Include="Models\ViewModels\Response.cs" />
@@ -462,6 +463,9 @@
     <Content Include="Plugin\input-animate\style.css" />
     <Content Include="Plugin\jq-fab\css\index.css" />
     <Content Include="Plugin\jq-fab\js\index.js" />
+    <Content Include="Plugin\ldLoader\ldbtn.min.css" />
+    <Content Include="Plugin\ldLoader\ldld.min.js" />
+    <Content Include="Plugin\ldLoader\loading.min.css" />
     <Content Include="Plugin\loading.css" />
     <Content Include="Plugin\SweetAlert\sweetalert-dev.js" />
     <Content Include="Plugin\SweetAlert\sweetalert.css" />

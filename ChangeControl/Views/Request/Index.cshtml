@@ -38,7 +38,9 @@
     DepartmentLists = @Html.Raw(Json.Encode(DepartmentLists));
     isEditMode = '@Session["isEditMode"]';
     var RedirectDetail = '@Url.Action("Index", "Detail")';
-    var GeneratePath = '@Url.Action("Generate", "Mail")';
+    var GenerateMailPath = '@Url.Action("GenerateMail", "Mail")';
+    var InsertOtherChangeItemPath = '@Url.Action("InsertOtherChangeItem", "Request")';
+    var InsertOtherProductTypePath = '@Url.Action("InsertOtherProductType", "Request")';
 </script>
 
 <script>
@@ -430,8 +432,9 @@
                                                             isChecked = true;    
                                                         }
                                                     }
-                                                    <input type="radio" name="changeItem" value="@Item.ID" class="flat-red" @(isChecked ? "checked" : "")>
-                                                    @Html.DisplayFor(model => Item.Name)
+                                                    <input type="radio" name="changeItem" value="@Item.ID" class='flat-red @(Item.ID == 12?"other":"")' @(isChecked || Item.ID > 12 ? "checked" : "")>
+                                                    @Html.DisplayFor(model => Item.Name) 
+                                                    <span class="changeItem-desc"></span>
                                                 </label>
                                             </div>
                                         if(i==3){
@@ -458,8 +461,9 @@
                                                 isChecked = true;    
                                             }
                                         }
-                                        <input type="radio" name="productType" value="@Type.ID" class="flat-red" @(isChecked ? "checked" : "") required>
+                                        <input type="radio" name="productType" value="@Type.ID" class="flat-red @(Type.ID == 8?"other":"")" @(isChecked || Type.ID > 8 ? "checked" : "") required>
                                         @Html.DisplayFor(model => Type.Name)
+                                        <span class="productType-desc"></span>
                                     </label>
                                 }
                                 </div>
@@ -555,7 +559,6 @@
                                                         ['font', ['bold', 'underline', 'clear']],
                                                         ['fontsize', ['fontsize']],
                                                         ['para', ['ul', 'ol', 'paragraph']],
-                                                        ['table', ['table']],
                                                     ],
                                                 });
                                             </script>
@@ -566,7 +569,6 @@
                                                         ['font', ['bold', 'underline', 'clear']],
                                                         ['fontsize', ['fontsize']],
                                                         ['para', ['ul', 'ol', 'paragraph']],
-                                                        ['table', ['table']],
                                                     ],
                                                 });
                                                 @* $(".textareaSubject").summernote('editor.pasteHTML', "@Html.Raw(Topic.Subject)"); *@
@@ -589,7 +591,6 @@
                                                         ['font', ['bold', 'underline', 'clear']],
                                                         ['fontsize', ['fontsize']],
                                                         ['para', ['ul', 'ol', 'paragraph']],
-                                                        ['table', ['table']],
                                                     ],
                                                 });
                                             </script>
@@ -600,7 +601,6 @@
                                                         ['font', ['bold', 'underline', 'clear']],
                                                         ['fontsize', ['fontsize']],
                                                         ['para', ['ul', 'ol', 'paragraph']],
-                                                        ['table', ['table']],
                                                     ],
                                                 });
                                                 @* $(".textareaDetails").summernote('editor.pasteHTML', "@Html.Raw(Topic.Detail)"); *@
@@ -623,7 +623,6 @@
                                                         ['font', ['bold', 'underline', 'clear']],
                                                         ['fontsize', ['fontsize']],
                                                         ['para', ['ul', 'ol', 'paragraph']],
-                                                        ['table', ['table']],
                                                     ],
                                                 });
                                             </script>
@@ -634,7 +633,6 @@
                                                         ['font', ['bold', 'underline', 'clear']],
                                                         ['fontsize', ['fontsize']],
                                                         ['para', ['ul', 'ol', 'paragraph']],
-                                                        ['table', ['table']],
                                                     ],
                                                 });
                                                 @* $(".textareaTiming").summernote('editor.pasteHTML', "@Html.Raw(Topic.Timing)"); *@
@@ -730,6 +728,5 @@
             <!-- /.container-fluid -->
         </section>
         <!-- /.content -->
-        <button id="test">test</button>
     </div>
 

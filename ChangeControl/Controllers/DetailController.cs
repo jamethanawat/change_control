@@ -7,8 +7,7 @@ using System.IO;
 using System.Web;
 using System.Web.Mvc;
 using System.Reflection;
-using DateHelper;
-using StringHelper;
+using ChangeControl.Helpers;
 
 namespace ChangeControl.Controllers{
     public class DetailController : Controller{
@@ -55,6 +54,7 @@ namespace ChangeControl.Controllers{
 
             Topic = M_Detail.GetTopicByCode(Session["TopicCode"] as string as string);
             Topic.Profile = M_Detail.getUserByID(Topic.User_insert);
+            Topic.Time_insert = Topic.Time_insert.StringToDateTime();
             Session["TopicCode"] = Topic.Code;
             Session["TopicID"] = Topic.ID;
 
@@ -74,34 +74,35 @@ namespace ChangeControl.Controllers{
 
             var Related = M_Detail.GetRelatedByID(Topic.Related);
             List<RelatedAlt> TrialRelatedList = new List<RelatedAlt>();
-            ViewData["ReviewRelatedList"] = Session["ReviewRelatedList"] = FilterReviewRelated(Related, Session["ReviewList"] as List<Review>);
+            ViewData["ReviewRelatedList"] = Session["ReviewRelatedList"] = ViewBag.ReviewRelatedList = FilterReviewRelated(Related, Session["ReviewList"] as List<Review>);
             ViewData["TrialRelatedList"] = Session["TrialRelatedList"] = ViewBag.TrialRelatedList = FilterTrialRelated(Session["ReviewList"] as List<Review>, Session["TrialList"] as List<Trial>);
             ViewData["ConfirmRelatedList"] = Session["ConfirmRelatedList"] = ViewBag.ConfirmRelatedList = FilterConfirmRelated(Related,Session["ConfirmList"] as List<Confirm>);
 
-            // if(CheckAllReviewApproved(Session["ReviewRelatedList"], C_ReviewList) || CheckAllTrialApproved(Session["TrialRelatedList"], C_TrialList) || CheckAllConfirmApproved(Session["ConfirmRelatedList"], C_ConfirmList)){
-            //     return RedirectToAction("Index", "Detail" , new {@id=topic_code});
-            // }
-            
+            if(Topic.Status == 12){
+                var RejectMessage = GetRejectMessageByTopicCode(Topic.Code);
+                RejectMessage.Profile =  M_Detail.getUserByID(RejectMessage.User);
+                RejectMessage.Date =  RejectMessage.Date.StringToDateTime();
+                ViewBag.RejectMessage = RejectMessage;
+            }
+
             return View();
         }
 
         public ActionResult SubmitReview(){
-            // long temp_Session["TopicID"] = Topic.ID;
             var mail = "";
             if(Topic.Status == 7 && Topic.Type == "External"){
                 M_Detail.UpdateTopicStatus(Session["TopicCode"] as string, 8);
-                mail = "InformUser";
-                // C_Mail.Generate("InformUser",topic_code);
             }
+            mail = "EmailReviewed";
             Session["ReviewID"] = M_Detail.InsertReview(Session["TopicCode"] as string, Session["User"].ToString(), Session["Department"].ToString());
-            CheckAllReviewApproved(Session["ReviewRelatedList"] as List<RelatedAlt>, Session["ReviewList"] as List<Review>);
+            // CheckAllReviewApproved(Session["ReviewRelatedList"] as List<RelatedAlt>, Session["ReviewList"] as List<Review>);
 
             return Json(new {code=1,mail,dept=Session["Department"].ToString()}, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult UpdateReview(){
             Session["ReviewID"] = M_Detail.UpdateReview(Session["TopicCode"] as string, Session["User"].ToString(), Session["Department"].ToString());
-            return Json(new {code=1}, JsonRequestBehavior.AllowGet);
+            return Json(new {code=1,dept=Session["Department"].ToString()}, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult SubmitReviewItem(string status, string description, int id){
@@ -190,7 +191,7 @@ namespace ChangeControl.Controllers{
                     }
             }
             new_tp.RelatedListAlt = RelatedList;
-            ViewData["Topic"] = new_tp;
+            Session["Topic"] = ViewData["Topic"] = new_tp;
             return rv_list;
         }
 
@@ -320,7 +321,7 @@ namespace ChangeControl.Controllers{
                     M_Detail.UpdateTopicApproveReview(Session["User"].ToString(), Topic.Code);
                 }else if(status == 10){
                     M_Detail.UpdateTopicApproveTrial(Session["User"].ToString(), Topic.Code);
-                }else if(status == 11){
+                }else if(status == 11 || status == 12){
                     M_Detail.UpdateTopicApproveClose(Session["User"].ToString(), Topic.Code);
                 }
                 return Json(new {code=true}, JsonRequestBehavior.AllowGet);
@@ -334,7 +335,7 @@ namespace ChangeControl.Controllers{
             try{
                 Session["TrialID"] = M_Detail.InsertTrial(Topic.Code ,desc, Session["Department"].ToString(), Session["User"].ToString());
                 // CheckAllTrialApproved(Session["TrialRelatedList"], C_TrialList);
-                return Json(new { code = true },JsonRequestBehavior.AllowGet);
+                return Json(new { code = true, mail = "EmailReviewed" },JsonRequestBehavior.AllowGet);
             }catch (Exception ex){
                 return Json(new { code = false }, JsonRequestBehavior.AllowGet);
             }
@@ -373,7 +374,7 @@ namespace ChangeControl.Controllers{
                 Session["ConfirmID"] = M_Detail.InsertConfirm(Topic.Code ,desc, Session["Department"].ToString(), Session["User"].ToString());
                 // CheckAllConfirmApproved(Session["ConfirmRelatedList"], C_ConfirmList);
 
-                return Json(new { code = true },JsonRequestBehavior.AllowGet);
+                return Json(new { code = true ,mail = "EmailReviewed"},JsonRequestBehavior.AllowGet);
             }catch (Exception ex){
                 return Json(new { code = false }, JsonRequestBehavior.AllowGet);
             }
@@ -398,17 +399,31 @@ namespace ChangeControl.Controllers{
         public ActionResult ApproveReview(long review_id){
             try{
                 var mail = "";
+                var dept = "";
                 M_Detail.ApproveReview(review_id,(string) Session["User"]);
-                // if(Topic.Status == 7 && Topic.Type == "Internal" && (int)Session["DepartmentID"] == 32 || (int)Session["DepartmentID"] == 33 ){ //PE_Process open review case
-                if(Topic.Status == 7 && (int)Session["DepartmentID"] == 32 || (int)Session["DepartmentID"] == 33 ){ //PE_Process open review case
+                if(Topic.Status == 7 && (int)Session["DepartmentID"] == 32 || (int)Session["DepartmentID"] == 33 && Topic.Type == "Internal"){ //PE_Process open review case
                     M_Detail.UpdateTopicStatus(Session["TopicCode"] as string, 8);
                     M_Detail.UpdateTopicApproveRequest(Session["User"].ToString(),Topic.Code);
                     mail = "InformUser";
                 }else if(Topic.Status == 8 && Session["Department"].ToString() == "QC1" || Session["Department"].ToString() == "QC2" || Session["Department"].ToString() == "QC3" ){
-                    M_Detail.UpdateTopicStatus(Session["TopicCode"] as string, 9);
+                    var rv_list = Session["ReviewList"] as List<Review>;
+                    if(rv_list.Exists(e => e.Item.Exists(d => d.Type == 24 && d.Status == true))){ //Request trial not exist
+                        M_Detail.UpdateTopicStatus(Session["TopicCode"] as string, 9);
+                        mail = "StartTrial";
+                    }else{
+                        M_Detail.UpdateTopicStatus(Session["TopicCode"] as string, 10);
+                        mail = "StartConfirm";
+                    }
                     M_Detail.UpdateTopicApproveReview(Session["User"].ToString(),Topic.Code);
+                }else if(Topic.Status == 7 ||Topic.Status == 8){
+                    List<RelatedAlt> rv_related_list = Session["ReviewRelatedList"] as List<RelatedAlt>;
+                    var qc_audit = rv_related_list.Find(e => e.status == 0 && (e.name == "QC1" || e.name == "QC2" || e.name == "QC2"));
+                    if(rv_related_list.Count(e => e.status == 0) == 1){
+                        mail = "ReviewApproved";
+                        dept = qc_audit.name;
+                    }
                 }
-                return Json(new {code=true,mail}, JsonRequestBehavior.AllowGet);
+                return Json(new {code=true,mail,dept}, JsonRequestBehavior.AllowGet);
             }catch(Exception err){
                 return Json(new {code=false}, JsonRequestBehavior.AllowGet);
             }
@@ -417,12 +432,23 @@ namespace ChangeControl.Controllers{
         [HttpPost]
         public ActionResult ApproveTrial(long trial_id){
             try{
+                var mail = "";
+                var dept = "";
                 M_Detail.ApproveTrial(trial_id,(string) Session["User"]);
                 if(Topic.Status == 9 && Session["Department"].ToString() == "QC1" || Session["Department"].ToString() == "QC2" || Session["Department"].ToString() == "QC3" ){
                     M_Detail.UpdateTopicStatus(Session["TopicCode"] as string, 10);
                     M_Detail.UpdateTopicApproveTrial(Session["User"].ToString(),Topic.Code);
+                    mail = "StartConfirm";
+                }else if(Topic.Status == 9){
+                    List<RelatedAlt> rv_related_list = Session["ReviewRelatedList"] as List<RelatedAlt>;
+                    var qc_audit = rv_related_list.Find(e => (e.name == "QC1" || e.name == "QC2" || e.name == "QC2"));
+                    List<RelatedAlt> tr_related_list = Session["TrialRelatedList"] as List<RelatedAlt>;
+                    if(!tr_related_list.Exists(e => e.status == 0)){
+                        mail = "TrialApproved";
+                        dept = qc_audit.name;
+                    }
                 }
-                return Json(new {code=true}, JsonRequestBehavior.AllowGet);
+                return Json(new {code=true,mail,dept}, JsonRequestBehavior.AllowGet);
             }catch(Exception err){
                 return Json(new {code=false}, JsonRequestBehavior.AllowGet);
             }
@@ -431,12 +457,21 @@ namespace ChangeControl.Controllers{
         [HttpPost]
         public ActionResult ApproveConfirm(long confirm_id){
             try{
+                var mail = "";
+                var dept = "ConfirmApproved";
                 M_Detail.ApproveConfirm(confirm_id,(string) Session["User"]);
                 if(Topic.Status == 10 && Session["Department"].ToString() == "QC1" || Session["Department"].ToString() == "QC2" || Session["Department"].ToString() == "QC3" ){
                     M_Detail.UpdateTopicStatus(Session["TopicCode"] as string, 11);
                     M_Detail.UpdateTopicApproveClose(Session["User"].ToString(),Topic.Code);
+                }else if(Topic.Status == 10){
+                    List<RelatedAlt> cf_related_list = Session["ConfirmRelatedList"] as List<RelatedAlt>;
+                    var qc_audit = cf_related_list.Find(e => e.status == 0);
+                    if(cf_related_list.Count(e => e.status == 0) == 1){
+                        mail = "ConfirmApproved";
+                        dept = qc_audit.name;
+                    }
                 }
-                return Json(new {code=true}, JsonRequestBehavior.AllowGet);
+                return Json(new {code=true,mail,dept}, JsonRequestBehavior.AllowGet);
             }catch(Exception err){
                 return Json(new {code=false}, JsonRequestBehavior.AllowGet);
             }
@@ -520,7 +555,7 @@ namespace ChangeControl.Controllers{
         public List<RelatedAlt> FilterTrialRelated(List<Review> review_list, List<Trial> trial_list){
             List<RelatedAlt> TrialRelatedList = new List<RelatedAlt>();
             foreach (var review in review_list){
-                if(review.Item.Exists(e => e.Type == 24)){
+                if(review.Item.Exists(e => e.Type == 24 && (bool) e.Status)){
                     var isResponsed = trial_list.Exists( e => e.Department == review.Department);
                     var status = (isResponsed)? 1 : 0 ;
                     TrialRelatedList.Add(new RelatedAlt{name = review.Department, status = status});
@@ -544,5 +579,65 @@ namespace ChangeControl.Controllers{
             }
             return ConfirmRelatedList;
         }
+
+        public bool CheckAllReviewBeforeApprove(string topic_code){
+            var dept = (string) Session["Department"];
+            var result = true;
+            if(dept == "PE1_Process" || dept == "PE1_Process" || dept == "QC1" || dept == "QC2" || dept == "QC3"){
+                List<Review> rv_list = M_Detail.CheckAllReviewBeforeApprove(topic_code);
+                TopicAlt topic = Session["Topic"] as TopicAlt;
+                    if(rv_list.Count != 0){
+                        if(topic.Type == "Internal" && (string) Session["Department"] == "PE1_Process" || (string)  Session["Department"] == "PE2_Process" ){
+                            var rv_pe_process = rv_list.Find(x => x.Department == "PE1_Process" || x.Department == "PE2_Process");
+                            if(rv_pe_process != null) rv_list.Remove(rv_pe_process);
+                            result = (rv_list.Count != 0) ? !rv_list.Exists(e => e.Status == 3 && e.Department != "PE1_Process" || e.Department != "PE2_Process") : true;
+                        }else{
+                            result = !rv_list.Exists(e => e.Status == 3);
+                        }
+                    }else{
+                        result = false;
+                    }
+            }
+            return result;
+        }
+
+        public bool CheckAllTrialBeforeApprove(string topic_code){
+            var dept = (string) Session["Department"];
+            if(dept == "QC1" || dept == "QC2" || dept == "QC3"){
+                List<Trial> result = M_Detail.CheckAllTrialBeforeApprove(topic_code);
+                return (result.Count != 0) ? !result.Exists(e => e.Status == 3) : false;
+            }else{
+                return true;
+            }
+        }
+
+        public bool CheckAllConfirmBeforeApprove(string topic_code){
+            var dept = (string) Session["Department"];
+            if(dept == "QC1" || dept == "QC2" || dept == "QC3"){
+                List<Confirm> result = M_Detail.CheckAllConfirmBeforeApprove(topic_code);
+                return (result.Count != 0) ? !result.Exists(e => e.Status == 3) : false;
+            }else{
+                return true;
+            }
+        }
+
+        public bool RejectTopic(string topic_code,string desc){
+            try{
+                this.UpdateTopicStatus(topic_code,12);
+                M_Detail.RejectTopic(topic_code,desc,(string) Session["User"], (string) Session["Department"]);
+                return true;
+            }catch(Exception err){
+                return false;
+            }
+        }
+
+        public Reject GetRejectMessageByTopicCode(string topic_code){
+            try{
+                return M_Detail.GetRejectMessageByTopicCode(topic_code);
+            }catch(Exception err){
+                return null;
+            }
+        }
+
     }
 }

@@ -1,11 +1,6 @@
 ﻿$(() => {
     var optimized_edit_rv = [];
 
-    $(".rv-edit").click(function (e) { 
-        e.preventDefault();
-        
-    });
-    
     $(".rv-approve").click(function (e) { 
         e.preventDefault();
         console.log("review",e);
@@ -14,24 +9,32 @@
             title: "Approve Review", 
             buttons: [true,"Approve"],
             icon: "warning",
-        }).then((res) => {
-            if(res){
-                $.post(ApproveReviewPath, {review_id:rv_id}, (data) => {
-                    $.post(GeneratePath,{
-                        'mode': data.mail,
-                        'topic_code':topic_code,
-                    }).fail((error) => {
-                        console.err(error);
-                        swal("Error", "Cannot send email to Requestor, Please try again", "error");
-                        return;
-                    });
-
-                    if(data){
-                        swal("Success", "Change Status Success", "success").then(location.reload());
+        }).then((apr) => {
+            if(apr){
+                $.post(CheckAllReviewBeforeApprovePath, {topic_code:topic_code}, (res) => {
+                    if(res == "True"){
+                        $.post(ApproveReviewPath, {review_id:rv_id}, (result) => {
+                            if(result){
+                                if(result.mail != ""){
+                                    $.post(GenerateMailPath,{
+                                        'mode': result.mail,
+                                        'topic_code':topic_code,
+                                        'dept': result.dept,
+                                    }).fail((error) => {
+                                        console.error(error);
+                                        swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                                        return;
+                                    });
+                                }
+                                swal("Success", "Change Status Success", "success").then(location.reload());
+                            }else{
+                                swal("Error", "User Password Not Correct", "error");
+                            }
+                        },"json");
                     }else{
-                        swal("Error", "User Password Not Correct", "error");
+                        swal("Error", "Review status has been changed , Refresh in 2 Second.", "error").then(setTimeout(() => { location.reload(); }, 1500));
                     }
-                },"json");
+                })
             }
         });
     });
@@ -42,7 +45,7 @@
         $('#loading').removeClass('hidden')
         SerializeEditReviewForm();
 
-        $.post(UpdateReviewPath, () => {
+        $.post(UpdateReviewPath, (result) => {
             var promises = [];
             files = file_list_alt;
             console.log("files",files);
@@ -84,10 +87,22 @@
                     })
                 )
             });
-            
+
+            promises.push($.post(GenerateMailPath,{
+                    'mode': 'ReviewUpdate',
+                    'topic_code':topic_code,
+                    'dept':result.dept,
+                }).fail((error) => {
+                    console.error(error);
+                    swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                    return;
+                })
+            );
+
             Promise.all(promises).then(() => {
                 $('#loading').addClass('hidden')
                 $("#ReviewSubmit").prop("disabled",true)
+                $("#edit_review").modal("hide")
                 swal("Success", "Insert Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
             })
         });

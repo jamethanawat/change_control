@@ -1,20 +1,54 @@
 ﻿var InsertReviewStatus = false;
 var optimized_arr = [];
 var ReviewStatus = false;
-var DepartmentLists;
 var file_list = [];
 var file_list_alt = [];
-var isQC;
-var isTrialable;
-var isReview;
+var due_date;
+var rsm_id = 0;
 var resubmit_formIsEmpty = true;
 var TrialIsEmpty = true;
+var rsm_related_list = [];
 
 $(() => {
     
     if(topic_status == "Request" || !isQC || !isReview){
         $(".zoom-fab#change_status").addClass("hide-fab");
     }
+
+/* ------------------------------ Reject Topic ------------------------------ */
+    $("#reject").click(() => {
+        swal({
+            title: "Warning", 
+            text: "Do you want to reject this Topic?", 
+            // closeOnClickOutside: false,
+            content: "input",
+            buttons : [true,true],
+            icon:"warning",
+        }).then((res) => {
+            if(res != null){
+                if(res.trim().length != 0){
+                    $.post(RejectTopicPath, {topic_code:topic_code,desc:res}, () => { 
+                            $.post(GenerateMailPath,{
+                                'mode': 'TopicReject',
+                                'topic_code':topic_code,
+                            }).fail((error) => {
+                                console.error(error);
+                                swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                                return;
+                            })
+                            swal("Success", "Reject Success", "success").then(location.reload());
+                    }).fail( function(xhr, textStatus, errorThrown) {
+                        console.error(xhr.responseText);
+                        swal("Something wrong", "Please contact admin", "error");
+                    });
+                }else{
+                    swal("Something wrong", "Please enter the text", "error");
+                }
+            }else{
+                alert("res abnormal");
+            }
+        });
+    });
 
 /* -------------------------------- Go to top ------------------------------- */
     $('[data-toggle="tooltip"]').tooltip();
@@ -62,11 +96,8 @@ var rsm_validator = $('#resubmit_form').validate({
             
             quick_form.forEach(item => {
                 if(item.value == "1"){
-                    if(related == ""){
-                        related = item.name;
-                    }else{
-                        related = related + " , " + item.name;
-                    }
+                        rsm_related_list.push(item.name);
+                        related = (related == "") ? item.name : related + " , " + item.name;
                 }else if(item.name == "desc"){
                     desc = item.value;
                 }else if(item.name == "due_date"){
@@ -75,8 +106,7 @@ var rsm_validator = $('#resubmit_form').validate({
             });
 
             moment.locale("th");
-            due_date = moment(due_date,"DD-MM-YYYY").format('LL');
-            $("#related_date").val(due_date);
+            $("#related_date").val(moment(due_date,"DD-MM-YYYY").format('LL'));
             $("#related_dept").html(related);
             $("#related_desc").html(desc);
             console.log("related: ",related);
@@ -94,7 +124,6 @@ var rsm_validator = $('#resubmit_form').validate({
     
 /* ---------------------------- Resubmit's Validate ---------------------------- */
     $("#resubmit_form [name='desc'], #resubmit_form [name='due_date']").on("keydown keyup click change", () => {
-        console.log("triggered");
         if($("#resubmit_form [name='desc']").val() != "" && $("#resubmit_form [name='due_date']").val() !== ""){
             resubmit_formIsEmpty = false;
         }else{
@@ -152,23 +181,28 @@ var rsm_validator = $('#resubmit_form').validate({
     $.each(DepartmentLists, (key,val) => {
         if($(`.${val.Name}`).length == $(`.${val.Name}:checked`).length){
             $(`#${val.Name}`).prop('checked', true);
-            relatedValidate();
-        }
-        // console.log(DepartmentLists);
+        relatedValidate();
+    }
         $(`#${val.Name}`).change(function(e) {
                 $(`.${val.Name}`).each(function() {
                     this.checked = (e.target.checked) ? true : false;
                 });
             relatedValidate();
         });
-    
+
         $(`.${val.Name}`).click(function () {
-            if ($(this).is(":checked")) {
+            if($(this).is(":checked")) {
                 var isAllChecked = 0;
-                $(`.${val.Name}`).each(() => { if(!this.checked) isAllChecked = 1; });
-                if(isAllChecked == 0) $(`#${val.Name}`).prop("checked", true);     
+
+                $(`.${val.Name}`).each(function() {
+                    if (!this.checked) isAllChecked = 1;
+                });
+
+                if(isAllChecked == 0) {
+                $(`#${val.Name}`).prop("checked", true);
+                }     
             }else{
-                $(`#${val.Name}`).prop("checked", false);
+                $(`#${val.Name}`).prop("checked", false); 
             }
             relatedValidate();
         });
@@ -192,12 +226,12 @@ var rsm_validator = $('#resubmit_form').validate({
 
         $.post(SubmitReviewPath, (result) => {
             if(result.mail != ""){
-                $.post(GeneratePath,{
+                $.post(GenerateMailPath,{
                     'mode': result.mail,
                     'topic_code':topic_code,
                     'dept':result.dept,
                 }).fail((error) => {
-                    console.err(error);
+                    console.error(error);
                     swal("Error", "Cannot send email to Requestor, Please try again", "error");
                     return;
                 })
@@ -355,6 +389,17 @@ $("form#Confirm").submit((e) => {
             $.post(RequestResubmitPath, quick_form, (res) =>{
                 console.log('Resubmit created');
                 if(res){
+                    moment.locale('en');
+                    $.post(GenerateMailPath,{
+                        'mode': 'RequestDocument',
+                        'topic_code':topic_code,
+                        'due_date': moment(due_date,"DD-MM-YYYY").format('D MMMM YYYY'),
+                        'dept_arry': rsm_related_list,
+                    }).fail((error) => {
+                        console.error(error);
+                        swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                        return;
+                    })
                     swal("Success", "Resubmit Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
                 }else{
                     swal("Error", "Resubmit Not Success, Please Try Again", "error");
@@ -517,4 +562,8 @@ $("form#Confirm").submit((e) => {
     });
 
 });
+
+function SetResubmitID(rsm_id){
+    this.rsm_id = rsm_id;
+}
 

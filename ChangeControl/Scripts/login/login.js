@@ -1,5 +1,7 @@
-﻿$(document).ready(function () {
+﻿var loader;
 
+$(document).ready(function () {
+    loader = new ldLoader({ root: document.getElementById("signin-btn") });
     document.getElementById("user").addEventListener("keyup", function(event) {
         if (event.keyCode === 13) {
             event.preventDefault();
@@ -10,11 +12,11 @@
     document.getElementById("pass").addEventListener("keyup", function(event) {
         if (event.keyCode === 13) {
             event.preventDefault();
-            $("#click").click();
+            $("#signin-btn").click();
         }
     });
 
-    $("#click").click(function (event) {
+    $("#signin-btn").click(function (event) {
         event.preventDefault();
 
         var Iuser = $('#user').val();
@@ -53,17 +55,22 @@
 
 
             function ajaxUser(Iuser, Ipass){
+                loader.toggle();
                 $.post(CheckUserPath,({ username:Iuser,password:Ipass }) ,(res) => {
                     if(res.status == "success"){
                         var select = CreateDepartmentOption(res.data);
                         select.onchange = function selectChanged(e) { value = e.target.value }
+                        loader.toggle();
+
                         swal({
                             title: "Confirm Department", 
                             text: "Please select your Department",
                             closeOnClickOutside: false,
+                            // buttons : [true,true],
                             content: select,
                             icon:"warning",
                         }).then(() => {
+                            loader.toggle();
                             let selected_dept = $(".select-custom").children("option:selected").text();
                             $.post(SetDepartmentAltPath,{dept:selected_dept},(success) => {
                                 if(success){
@@ -72,6 +79,8 @@
                             });
                         });
                     }else{
+                        loader.toggle();
+
                         if(res.status == "wrong_us"){
                             swal("Error", "Username is wrong.", "error");
                         }else if(res.status == "wrong_pwd"){

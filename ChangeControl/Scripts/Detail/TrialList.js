@@ -13,15 +13,32 @@
             title: "Approve Trial", 
             buttons: [true,"Approve"],
             icon: "warning",
-        }).then((res) => {
-            if(res){
-                $.post(ApproveTrialPath, {trial_id:tr_id}, (data) => {
-                    if(data){
-                        swal("Success", "Change Status Success", "success").then(location.reload());
+        }).then((apr) => {
+            if(apr){
+                $.post(CheckAllTrialBeforeApprovePath, {topic_code:topic_code}, (res) => {
+                    if(res == "True"){
+                        $.post(ApproveTrialPath, {trial_id:tr_id}, (result) => {
+                            if(result){
+                                if(result.mail != ""){
+                                    $.post(GenerateMailPath,{
+                                        'mode': result.mail,
+                                        'topic_code':topic_code,
+                                        'dept': result.dept,
+                                    }).fail((error) => {
+                                        console.error(error);
+                                        swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                                        return;
+                                    });
+                                }
+                                swal("Success", "Change Status Success", "success").then(location.reload());
+                            }else{
+                                swal("Error", "User Password Not Correct", "error");
+                            }
+                        },"json");
                     }else{
-                        swal("Error", "User Password Not Correct", "error");
+                        swal("Error", "Trial status has been changed , Refresh in 2 Second.", "error").then(setTimeout(() => { location.reload(); }, 1500));
                     }
-                },"json");
+                })
             }
         });
     });
@@ -69,6 +86,7 @@
                 $('#loading').addClass('hidden')
                 InsertReviewStatus = false;
                 $("#trial_submit").prop("disabled",true)
+                $("#edit_trial").modal("hide")
                 swal("Success", "Insert Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
             })
     });

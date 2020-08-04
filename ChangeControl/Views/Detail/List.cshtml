@@ -1,0 +1,19 @@
+@using ChangeControl.Models
+
+@foreach(var Element in Model){
+    if(Element.status == 0){
+    <div>
+        <i class="fas fa-lock bg-error blue-tooltip" data-toggle="tooltip" data-placement="top" title="Pending"></i>
+        <div class="timeline-item card">
+            <div class="timeline-header card-header d-flex" style="padding: 10px 10px 5px 10px;"  data-card-widget="collapse">
+                    <h6 class="mr-auto" style="font-family:Kanit"> 
+                        @Element.name
+                        <span class='badge badge-pill badge-success'>APPROVED
+                                <i class='fas fa-check'></i>
+                        </span> </h6>
+                    <button type="button" class="btn btn-tool arrow-collapse" data-card-widget="collapse"><i class="fas fa-chevron-down"></i></button>
+            </div>
+        </div>  
+    </div>
+    }
+}

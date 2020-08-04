@@ -1,39 +1,73 @@
+@using ChangeControl.Models
 @{
     var str_date = "05 มิถุนายน 2020";
     string department = (string)Session["Department"];
     var isApprover = ((string)Session["Position"] == "Approver");
+    var isQC = ((string)Session["Department"] == "QC1" || (string)Session["Department"] == "QC2" || (string)Session["Department"] == "QC3");
+    List<Confirm> ElementList = Model as List<Confirm>;
 }
 
-@foreach(var Confirm in Model){
-<div>
-    @* <i class="fas bg-primary" style="font-family:Kanit !important">@Html.DisplayFor(model => Confirm.Department)</i> *@
-    @if(Confirm.Status == 1){
+@if(ElementList.Exists(e => e.Department == department)){
+        Confirm Element = ElementList.Find(e => e.Department == department);
+        if(Element != null){
+            @DefaultList(ElementList, Element, department, isApprover, isQC)
+        }
+}
+
+@foreach(var Element in ViewBag.ConfirmRelatedList){
+    if(Element.status == 0){
+    <div>
+        <i class="fa fa-hourglass-half  bg-secondary blue-tooltip"></i>
+        <div class="timeline-item card">
+            <div class="timeline-header card-header d-flex" style="padding: 10px 10px 5px 10px;"  data-card-widget="collapse">
+                    <h6 class="mr-auto" style="font-family:Kanit"> 
+                        @Element.name
+                        <span class='badge badge-pill badge-secondary'>PENDING
+                                <i class='fa fa-hourglass-half '></i>
+                        </span> </h6>
+            </div>
+        </div>  
+    </div>
+    }
+}
+@foreach(var Element in Model){
+    if(Element != null){
+        if(Element.Department != department){
+            @DefaultList(ElementList, Element, department, isApprover, isQC)
+        }
+    }
+}
+
+@helper DefaultList(List<Confirm> ElementList, Confirm Element, string department, bool isApprover, bool isQC){
+    <div>
+    @* <i class="fas bg-primary" style="font-family:Kanit !important">@Html.DisplayFor(model => Element.Department)</i> *@
+    @if(Element.Status == 1){
         <i class="fas fa-check bg-primary blue-tooltip" data-toggle="tooltip" data-placement="top" title="Approved"></i>
-    }else if(Confirm.Status == 3){
+    }else if(Element.Status == 3){
         <i class="far fa-clock bg-warning blue-tooltip" data-toggle="tooltip" data-placement="top" title="Waiting for approve"></i>
-    }else if(Confirm.Status == 4){
+    }else if(Element.Status == 4){
         <i class="fas fa-info bg-warning blue-tooltip" data-toggle="tooltip" data-placement="top" title="Need more information"></i>
     }else{
         <i class="fas fa-question bg-error blue-tooltip" data-toggle="tooltip" data-placement="top" title="Unknown"></i>
     }
     <div class="timeline-item card">
         <div class="timeline-header card-header d-flex" style="padding: 10px 10px 5px 10px;"  data-card-widget="collapse">
-               @{
-                    @* var approve_status = (Review.ApprovedBy != null) ? "<span class='text-success'>APPROVED</span>": "<span class='text-secondary'>PENDING</span>"; *@
+                @{
+                    @* var approve_status = (Confirm.ApprovedBy != null) ? "<span class='text-success'>APPROVED</span>": "<span class='text-secondary'>PENDING</span>"; *@
                     var approve_status = 
                             $@"<span class='badge badge-pill badge-warning'>WAITING FOR APPROVE
                                     <i class='fas fa-clock'></i>
                             </span>";
-                    if(Confirm.ApprovedBy != null){
+                    if(Element.ApprovedBy != null && Element.ApprovedBy != ""){
                     approve_status = 
                             $@"<span class='badge badge-pill badge-success'>APPROVED
                                     <i class='fas fa-check'></i>
                             </span>";
                     }
 
-                    var dept_status = (Confirm.Department == department) ? $"<span class='badge badge-primary' style='font-size: 0.9rem;'> {Confirm.Department} </span>" : Confirm.Department;
+                    var dept_status = (Element.Department == department) ? $"<span class='badge badge-pill badge-primary'> YOUR DEPARTMENT <i class='fas fa-pencil-alt'></i> </span>" : "";
                 }
-                <h6 class="mr-auto" style="font-family:Kanit"> @Html.Raw(HttpUtility.HtmlDecode(@dept_status)) - @Confirm.Profile.Name @Confirm.Profile.SurName (@Confirm.Date) @Html.Raw(HttpUtility.HtmlDecode(@approve_status)) </h6>
+                <h6 class="mr-auto" style="font-family:Kanit"> @Element.Department @Html.Raw(HttpUtility.HtmlDecode(@dept_status)) @Html.Raw(HttpUtility.HtmlDecode(@approve_status)) </h6>
                 <button type="button" class="btn btn-tool arrow-collapse" data-card-widget="collapse"><i class="fas fa-chevron-down"></i></button>
         </div>
 
@@ -41,31 +75,41 @@
                 <form class="form-horizontal">
                     <div class="row">
                         <label class="col-sm-4 col-form-label" style="text-align:right">
-                            Detail : 
-                        </label>
-                        <div class="col-sm-8 col-form-label">
-                            <span>@Confirm.Detail</span>
-                        </div>
-                    </div>
-                    @if(Confirm.ApprovedBy != "" && Confirm.ApprovedBy != null){
-                    <div class="row">
-                        <label class="col-sm-4 col-form-label" style="text-align:right">
-                            Approved By :
+                                Confirmed By :
                         </label>
                         <div class="col-sm-8 col-form-label">
                             <span>
-                                @Confirm.Approver.FullName (@Confirm.ApprovedDate) <span class='badge badge-pill badge-success'><i class='fas fa-check'></i></span>
+                                @Element.Profile.FullName (@Element.Date)
+                            </span>
+                        </div>
+                    </div>
+                    @if(Element.ApprovedBy != "" && Element.ApprovedBy != null){
+                    <div class="row">
+                        <label class="col-sm-4 col-form-label" style="text-align:right">
+                                Approved By :
+                        </label>
+                        <div class="col-sm-8 col-form-label">
+                            <span>
+                                @Element.Approver.FullName (@Element.ApprovedDate) <span class='badge badge-pill badge-success'><i class='fas fa-check'></i></span>
                             </span>
                         </div>
                     </div>
                     }
+                    <div class="row">
+                        <label class="col-sm-4 col-form-label" style="text-align:right">
+                            Detail : 
+                        </label>
+                        <div class="col-sm-8 col-form-label">
+                            <span>@Element.Detail</span>
+                        </div>
+                    </div>
                 </form>
 
-                @if(Confirm.FileList != null){
-                    if(Confirm.FileList.Count != 0){
+                @if(Element.FileList != null){
+                    if(Element.FileList.Count != 0){
                 <div class="col-sm-12 d-flex mt-4 file-list">
                 <ul class="mailbox-attachments d-flex flex-wrap align-items-stretch clearfix">
-                    @{var FileList = Confirm.FileList;
+                    @{var FileList = Element.FileList;
                         foreach(var File in FileList){
                             var FileSize = "0 Bytes";
                             var file_desc = (File.Description.Trim() == null || File.Description.Trim() == "") ? "<i>No information</i>" : File.Description;
@@ -112,14 +156,16 @@
                 }
         </div>
         @{
-            var isDepartment = (department == Confirm.Department);
-            @* if((isApprover || isDepartment) && Trial.Status != 1  && (string)Session["Status"] == "Trial"){ *@
-            if((isDepartment) && (string)Session["Status"] == "Confirm" && (Confirm.ApprovedBy == "" || Confirm.ApprovedBy == null)){
+            var isDepartment = (department == Element.Department);
+            @* if((isApprover || isDepartment) && Element.Status != 1  && (string)Session["Status"] == "Element"){ *@
+            if((isDepartment) && (string)Session["Status"] == "Confirm"){
             <hr style="margin-top:0px !important">
             <div class="timeline-footer">
                 <div class="float-right ">
-                    <a href="#" class="btn btn-warning btn-sm cf-edit"id="edit_cf" data-toggle="modal" data-target="#edit_confirm" value="@Confirm.ID" >Edit</a> 
-                    @if(Confirm.Status !=1 && Confirm.Status !=5 && Confirm.Status !=6 && isApprover ){ <button a href="#" class="btn btn-info btn-sm mr-1 cf-approve" value="@Confirm.ID">Approve</button> }
+                    <a href="#" class="btn btn-warning btn-sm cf-edit"id="edit_cf" data-toggle="modal" data-target="#edit_confirm" value="@Element.ID" >Edit</a>
+                        @if(isApprover && ((Element.Status !=1 && !isQC) || (!ElementList.Exists(e => e.Status == 3 && e.Department != "QC1" && e.Department != "QC2" && e.Department != "QC3") && isQC))){ 
+                            <button a href="#" class="btn btn-info btn-sm mr-1 cf-approve" value="@Element.ID">Approve</button> 
+                        }
                 </div>
             </div>
             }

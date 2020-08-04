@@ -1,10 +1,10 @@
 ﻿var Search;
 var GetLine;
 var GetSearch;
-var RedirectTo;
 var GetTopicDetail;
 var SessionUser;
 $(document).ready(function () {
+    $("body").addClass("sidebar-collapse", 1000);
     $('#ChangeRequestTable').DataTable( {
         "paging": true,
         "lengthChange": true,
@@ -15,6 +15,30 @@ $(document).ready(function () {
         "pageLength": 10,
     });
 
+    $("#TNScontrolNo").mask('SS-0000000', {placeholder: "__-_______"});
+    $("#changeType").on("change",(e) => {
+        $("#TNScontrolNo").val("");
+        var placeholder = "__-_______";
+        if(e.target.value == "Internal Change"){
+            placeholder = "IN-_______";
+        }else if(e.target.value == "External Change"){
+            placeholder = "EX-_______";
+        }else{
+            placeholder = "__-_______";
+        }
+        $("#TNScontrolNo").attr("placeholder",placeholder);
+    });
+    $("#TNScontrolNo").on("click",(e) => {
+        let chang_type_val = $("#changeType").val();
+        if(chang_type_val  == "Internal Change"){
+            e.target.value = "IN-";
+        }else if(chang_type_val  == "External Change"){
+            e.target.value = "EX-";
+        }else{
+            e.target.value = "";
+        }
+
+    });
     var table_cr;
     table_cr = $('#ChangeRequestTable').DataTable();
 
@@ -39,19 +63,28 @@ $(document).ready(function () {
             }
         });
     });
+
+    $("#clear_btn").click(() => {
+        $("#changeType").val("");
+        $("#productType").val("");
+        $("#changeitem").val("");
+        $("#TNScontrolNo").val("");
+        $("#Model").val("");
+        $("[name = 'dept']").val("");
+        $("#partno").val("");
+        $("#partname").val("");
+        $("[name='dept']").val("");
+        $("#processname").val("");
+        $("[name='overstatus'][value=1]").prop("checked",true)
+        $("[name='status'][value=7]").prop("checked",true)
+        $("#TNScontrolNo").val("");
+        $("#TNScontrolNo").attr("placeholder","__-_______");
+
+
+    });
+
     $("#search").click((e) => {
         e.preventDefault();
-        
-        //changeitem
-        var Chosechangeitem;
-        if($("#changeitem_All").prop("checked")) {
-            Chosechangeitem = 1;
-        }else if($("#changeitem_Yes").prop("checked")) {
-            Chosechangeitem = 1;
-        }else if($("#changeitem_No").prop("checked")) {
-            Chosechangeitem = 1;
-        } 
-     
         var temp_data = {
             'Type': $("#changeType").val(),
             'Status': $("input[name='status']:checked").val(),
@@ -60,11 +93,11 @@ $(document).ready(function () {
             'Changeitem': $("#changeitem").val(),
             'ControlNo': $("#TNScontrolNo").val(),
             'Model': $("#Model").val(),
-            'Chosechangeitem': Chosechangeitem,
             'Partno': $("#partno").val(),
             'Partname': $("#partname").val(),
             'Department': $("[name='dept']").val(),
             'Processname': $("#processname").val(),
+            'Line': $("#line").val(),
             'Production': $("#Production").val(),
             'Line': $("#Line").val(),
         };
@@ -107,14 +140,14 @@ $(document).ready(function () {
                                     var editable = `disabled`;
                                     if(row.User_insert === SessionUser && row.FullStatus == "Request"){
                                         btn_badge = `success`;
-                                        editable = `onclick="EditTopic(this)"`;
+                                        var editable = ``;
                                     }
-                                    return `<div class="btn-group"><a href="Detail/?id=${row.Code}"><button type="button" name="detail" id="${row.Code}" class="btn btn-info btn-sm mb-1 mr-1" data-toggle="modal" data-target="#largeModal" >`+
-                                    `<i class="fas fa-external-link-alt"></i></button></a><button type="button" name="edit" id="${row.Code}" class="btn btn-`+
-                                    btn_badge + ` btn-sm  mb-1" data-toggle="modal" data-target="#largeModal"` +
+                                    return `<div class="btn-group"><a href="Detail/?id=${row.Code}"><button type="button" name="detail" id="${row.Code}" class="btn btn-info btn-left btn-sm mb-1 mr-1" data-toggle="modal" data-target="#largeModal" >`+
+                                    `<i class="fas fa-external-link-alt"></i></button></a><a href="Request/?id=${row.Code}"><button type="button" name="edit" id="${row.Code}" class="btn btn-`+
+                                    btn_badge + ` btn-right btn-sm  mb-1" data-toggle="modal" data-target="#largeModal"` +
                                     editable + `>`+
                                     `<i class="fas fa-pen"></i>`+
-                                    `</button></div>`;
+                                    `</button></a></div>`;
                             }
                         }
                     }],
@@ -129,8 +162,6 @@ $(document).ready(function () {
                     ],
                 });
 
-                $("body").addClass("sidebar-collapse")
-
                 $("body, html").animate({
                     scrollTop: 700
                 }, 100)
@@ -141,13 +172,3 @@ $(document).ready(function () {
     });
 
 });
-
-function RedirectToDetail(e) {
-    var id = $(e).attr("id");
-    window.open(`Detail/?id=${id}`);
-}
-
-function EditTopic(e) {
-    var id = $(e).attr("id");
-    window.open(`Request/?id=${id}`);
-}

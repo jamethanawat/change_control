@@ -14,6 +14,7 @@ function SetDepartment(){
     swal({
         title: "Developer Mode", 
         text: "Please enter password", 
+        closeOnClickOutside: false,
         buttons : [true,true],
         content: {
             element: "input",
@@ -28,6 +29,7 @@ function SetDepartment(){
                 swal({
                     title: "Developer Mode", 
                     text: "Please submit Department", 
+                    closeOnClickOutside: false,
                     content: department_list,
                     buttons : [true,true],
                     icon:"warning",
@@ -85,6 +87,7 @@ function SetPosition(){
     swal({
         title: "Developer Mode", 
         text: "Please enter password", 
+        closeOnClickOutside: false,
         buttons : [true,true],
         content: {
             element: "input",
@@ -99,6 +102,8 @@ function SetPosition(){
                 swal({
                     title: "Developer Mode", 
                     text: "Please select Position", 
+                    closeOnClickOutside: false,
+                    buttons : [true,true],
                     content: position_list,
                     icon:"warning",
                 }).then(() => {

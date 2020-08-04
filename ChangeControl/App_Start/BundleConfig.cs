@@ -13,6 +13,7 @@ namespace ChangeControl
                         // "~/tmp/plugins/jquery/jquery.min.js",
                         "~/tmp/plugins/jQuery-3.4.1/jquery-3.4.1.js",
                         // "~/tmp/plugins/jquery/jquery.js",
+                        "~/Plugin/jquery.mask.min.js",
                         "~/tmp/plugins/jquery-ui/jquery-ui.min.js"
                         ));
 

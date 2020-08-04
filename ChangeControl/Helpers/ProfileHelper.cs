@@ -7,8 +7,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Configuration;
 using System.Data.SqlClient;
-using StringHelper;
-namespace ChangeControl.ProfileHelper{
+namespace ChangeControl.Helpers{
     public static class ProfileHelper{
         
         public static string ToFullName(this string user){
