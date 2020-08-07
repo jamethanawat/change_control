@@ -10,7 +10,7 @@ namespace ChangeControl.Models
         public string Type{ get; set; }
         public int Status{ get; set; }
         public string ProductType{ get; set; }
-        public string Overstatus{ get; set; }
+        public int Overstatus{ get; set; }
         public string Changeitem{ get; set; }
         public string ControlNo{ get; set; }
         public  string Model{ get; set; }
@@ -21,7 +21,7 @@ namespace ChangeControl.Models
         public string Department{ get; set; }
         public string Processname{ get; set; }
         public string Production{ get; set; }
-        public SearchAttribute(string Type,int Status,string ProductType,string Overstatus,string Changeitem,string ControlNo, string Model,string Chosechangeitem,string Partno,string Partname,string Department,string Processname ,string Production ,string Line){
+        public SearchAttribute(string Type,int Status,string ProductType,int Overstatus,string Changeitem,string ControlNo, string Model,string Chosechangeitem,string Partno,string Partname,string Department,string Processname ,string Production ,string Line){
             this.Type = Type;
             this.Status = Status;
             this.ProductType = ProductType;

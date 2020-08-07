@@ -17,21 +17,22 @@ namespace ChangeControl.Models{
         private DbCCS DB_CCS;
         public List<Department> A = new List<Department>();
         private SqlConnection cn = new SqlConnection(ConfigurationManager.ConnectionStrings["CCS"].ConnectionString);
+        public dynamic response = new ExpandoObject();
         public LoginModel(){
             DB_Tapics = new DbTapics();
             DB_CCS = new DbCCS();
+            
+            response.status = "error";
+            response.data = null;
         }
         public object CheckUser(string user, string password){
 
-            dynamic response = new ExpandoObject();
-                    response.status = "error";
-                    response.data = null;
             try{
                 System.Net.ServicePointManager.Expect100Continue = false;
                 myAD.ADInfo conAD = new myAD.ADInfo();
                 bool FoundUser = conAD.ChkAuth(user,password);
                 if (FoundUser){
-                    User temp_user = new User(conAD.ChkFullName(user), conAD.ChkName(user), conAD.ChkSurName(user), conAD.ChkEmail(user),null, conAD.ChkPosition(user));
+                    User temp_user = new User(conAD.ChkFullName(user), conAD.ChkName(user), conAD.ChkSurName(user), conAD.ChkEmail(user),null, null);
                     response.message = "success";
                     response.data = temp_user;
                     return response;
@@ -62,6 +63,16 @@ namespace ChangeControl.Models{
             return result;
         }
 
-        
+        public object GetPositionByUserID(string us_id){
+            try{
+                var sql = $"SELECT [Position] FROM CCS.dbo.[User] WHERE Code = '{us_id}';";
+                var result = DB_CCS.Database.SqlQuery<string>(sql).First();
+                response.data = result;
+                response.status = "success";
+            }catch(Exception err){
+                response.status = "false";
+            }
+            return response;
+        }
     }
 }

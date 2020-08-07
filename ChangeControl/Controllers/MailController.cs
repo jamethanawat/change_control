@@ -65,10 +65,8 @@ namespace ChangeControl.Controllers{
 
         public ActionResult GenerateMail(string mode,string topic_code, string dept = null, string[] dept_arry=null, string due_date=""){
             try{
+                Topic = M_Mail.GetTopicByCode(topic_code);
                 ViewBag.Mode = mode;
-                // if(Topic.Type == "ERR0R"){
-                    Topic = M_Mail.GetTopicByCode(topic_code);
-                // }
                 ViewBag.Url = $"http://172.27.170.19/ChangeControl/Detail/Index/?id={Topic.Code}";
                 // ViewBag.Url = $"{Request.Url.Host}:{Request.Url.Port}/{Request.ApplicationPath}/Detail/Index/?id={Topic.Code}";
                 ViewBag.Topic = Topic;

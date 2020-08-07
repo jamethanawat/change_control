@@ -202,6 +202,8 @@
     var SubmitConfirmPath = '@Url.Action("SubmitConfirm", "Detail")';
     var SubmitFileConfirmPath = '@Url.Action("SubmitFileConfirm", "Detail")';
     
+    var CheckApproveIPPPath = '@Url.Action("CheckApproveIPP", "Detail")';
+    
     var UpdateTopicStatusPath = '@Url.Action("UpdateTopicStatus", "Detail")';
 </script>
 
@@ -249,7 +251,7 @@
             </div>
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>TNS Control No. @Html.DisplayFor(model => Topic.Code)</h1>
+                    <h1>TNS Control No. @Html.DisplayFor(model => Topic.Code) <span class="badge badge-primary">Rev @Topic.Revision</span></h1> 
 
                     @{
                         var rv_badge = "secondary";
@@ -490,16 +492,20 @@
                                         </div>
                                     </div>
                                 }
+
+                                @* /* ----------------------------- Review section ----------------------------- */ *@
                                 @if(isRelated && !isReview && (status == "Request" || status == "Review")){
                                     if(isPEProcess && (status == "Request" || status == "Review")){
                                         Session["isIssued"] = true;
                                         @Html.Partial("Review/PE_Process") 
                                     }else if(isQC && QcReviewable && (status == "Review")){
                                         @Html.Partial("Review/QC")
-                                    }else if(((!isQC && !isPEProcess && status == "Review" && isInternal) || (status == "Request" && isExternal && !isQC ))){
+                                    }else if(((!isQC && !isPEProcess && status == "Review" && isInternal) || (isExternal && !isQC))){
                                         @Html.Partial("Review/Other", ReviewItems) 
                                     }
+
                                 }else if((isTrialable || QcTrialable) && !isTrial && status == "Trial"){
+                                @* /* ----------------------------- Trial section ----------------------------- */ *@
                                     <hr><br>
                                     <h1>Trial</h1><br>
                                     <form class="form-horizontal"  action="javascript:void(0);" id="Trial">
@@ -523,6 +529,7 @@
                                         </div>
                                     </form>                                    
                                 }else if(((isRelated && !isQC) || (isQC && QcConfirmable)) && !isConfirm && status == "Confirm"){
+                                @* /* ----------------------------- Confirm section ----------------------------- */ *@
                                     <hr><br>
                                     <h1>Confirm</h1><br>
                                     <form class="form-horizontal"  action="javascript:void(0);" id="Confirm">

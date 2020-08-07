@@ -639,5 +639,22 @@ namespace ChangeControl.Controllers{
             }
         }
 
+        public ActionResult CheckApproveIPP(string topic_code){
+            try{
+                List<RelatedAlt> temp_related_rv_list = (List<RelatedAlt>) Session["ReviewRelatedList"];
+                List<Review> temp_rv_list = (List<Review>) Session["ReviewList"];
+                if(temp_rv_list.Exists(rv => rv.Item.Exists(rv_item => rv_item.Type == 26 && rv_item.Status == true))){
+                    string[] pt_list = {"P1","P2","P3A","P3M","P4","P5","P6","P7"};
+                    string[] qcf_list = {"QC_FINAL1", "QC_FINAL2", "QC_FINAL3"};
+                    var related_pt_qcf = temp_related_rv_list.FindAll(e => e.status == 1 && (pt_list.Contains(e.name) || qcf_list.Contains(e.name)));
+                    return Json(new {status="success",data=related_pt_qcf.Select(s => s.name).ToList()}, JsonRequestBehavior.AllowGet);
+                }else{
+                    return Json(new {status="error"}, JsonRequestBehavior.AllowGet);
+                }
+            }catch(Exception err){
+                return Json(new {status="error"}, JsonRequestBehavior.AllowGet);
+            }
+        }
+
     }
 }

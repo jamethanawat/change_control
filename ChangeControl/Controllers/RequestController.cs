@@ -31,16 +31,12 @@ namespace ChangeControl.Controllers{
             public HttpPostedFileBase file {get; set;}
             public string description {get; set;}
         }
-        public static TopicAlt Topic;
-        public static string topic_code;
-        public static long topic_id, related_id;
-        public static bool isEditMode = false;
         public List<GetID> topic_detail = new List<GetID>();
         private string date = DateTime.Now.ToString("yyyyMMddHHmmss");
         private string date_ff = DateTime.Now.ToString("yyyyMMddHHmmss.fff");
         public ActionResult Index(string ID)    {
             if(ID == null || M_Req.CheckTopicOwner((string) Session["User"], ID)){
-                Topic = null;
+                Session["Topic"] = null;
                 ViewBag.mode = "Insert";
                 if ((string)(Session["User"]) == null || (string)(Session["Department"]) == null){
                     Session["url"] = "Request";
@@ -79,12 +75,12 @@ namespace ChangeControl.Controllers{
                 ViewData["DepartmentList"] = departmentList;
 
                 if(ID != null){ // In case of edit mode
-                    isEditMode = true;
-                    Topic = M_Req.GetTopicByID(ID);
-                    if(Topic.Status != 7){
+                    Session["isEditMode"] = true;
+                    TopicAlt temp_topic = M_Req.GetTopicByID(ID);
+                    Session["Topic"] = temp_topic;
+                    if(temp_topic.Status != 7){
                         return View("~/Views/Shared/404/index.cshtml");
                     }else{
-                        var temp_topic = Topic;
                         var TopicRelatedList = M_Req.GetRelatedByID(temp_topic.Related);
                         temp_topic.RelatedList = TopicRelatedList;
                         
@@ -120,21 +116,20 @@ namespace ChangeControl.Controllers{
                   topic_detail = M_Req.GetExternalTopicId();
               }
               if (topic_detail.Count == 0){
-                  if (changeType == "Internal") topic_code = "IN-" + date.Substring(2, 4) + "001";
-                  else topic_code = "EX-" + date.Substring(2, 4) + "001";
+                  if (changeType == "Internal") Session["TopicCode"] = "IN-" + date.Substring(2, 4) + "001";
+                  else Session["TopicCode"] = "EX-" + date.Substring(2, 4) + "001";
               }else{
                   int id = Int32.Parse(topic_detail[0].Code.Substring(7, 3)) + 1;
-                  if (changeType == "Internal") topic_code = "IN-" + date.Substring(2, 4) + "" + id.ToString("000") + "";
-                  else topic_code = "EX-" + date.Substring(2, 4) + "" + id.ToString("000") + "";
+                  if (changeType == "Internal") Session["TopicCode"] = "IN-" + date.Substring(2, 4) + "" + id.ToString("000") + "";
+                  else Session["TopicCode"] = "EX-" + date.Substring(2, 4) + "" + id.ToString("000") + "";
               }
-              Session["Foreignkey"] = topic_code;
               Session["Revision"] = revision;
               status = 7;
-              var temp_topic = new Topic((string)(Session["Foreignkey"]), changeType, changeItem, productType, revision , (string) Session["Department"], model.ReplaceSingleQuote(),partNo.ReplaceSingleQuote(), partName.ReplaceSingleQuote(), processName.ReplaceSingleQuote(), status, appDescription.ReplaceSingleQuote() , subject.ReplaceSingleQuote(), detail.ReplaceSingleQuote(), timing.ReplaceSingleQuote(), related_id,(string)(Session["User"]), date );
+              var temp_topic = new Topic((string)(Session["TopicCode"]), changeType, changeItem, productType, revision , (string) Session["Department"], model.ReplaceSingleQuote(),partNo.ReplaceSingleQuote(), partName.ReplaceSingleQuote(), processName.ReplaceSingleQuote(), status, appDescription.ReplaceSingleQuote() , subject.ReplaceSingleQuote(), detail.ReplaceSingleQuote(), timing.ReplaceSingleQuote(), (long)Session["RelatedID"],(string)(Session["User"]), date );
 
-              topic_id = M_Req.InsertTopic(temp_topic);
-              M_Req.InsertTopicApprove(topic_code);
-              return Json(topic_code,JsonRequestBehavior.AllowGet);
+              Session["TopicID"] = M_Req.InsertTopic(temp_topic);
+              M_Req.InsertTopicApprove((string)Session["TopicCode"]);
+              return Json((string)Session["TopicCode"],JsonRequestBehavior.AllowGet);
           }
           catch (Exception ex){
               System.Diagnostics.Debug.WriteLine("Exception");
@@ -146,15 +141,16 @@ namespace ChangeControl.Controllers{
         [HttpPost, ValidateInput(false)]
         public ActionResult UpdateRequest(int changeItem,int productType,string model,string partNo, string partName, string processName,string appRadio, string appDescription,string subject,string detail,string timing){
           var mode = "Edit";
-          var revision = Topic.Revision + 1;
-          var status = Topic.Status;
+          var temp_topic = (TopicAlt) Session["Topic"];
+          var revision = temp_topic.Revision + 1;
+          var status = temp_topic.Status;
 
           Session["Mode"] = mode;
           try{
-                var new_topic = new Topic(Topic.Code, Topic.Type, changeItem, productType, revision,(string) Session["Department"], model.ReplaceSingleQuote(),partNo.ReplaceSingleQuote(), partName.ReplaceSingleQuote(), processName.ReplaceSingleQuote(), status, appDescription.ReplaceSingleQuote(), subject.ReplaceSingleQuote(), detail.ReplaceSingleQuote(), timing.ReplaceSingleQuote(), related_id,(string)(Session["User"]), date );
-                topic_id = M_Req.UpdateTopic(new_topic);
+                var new_topic = new Topic(temp_topic.Code, temp_topic.Type, changeItem, productType, revision,(string) Session["Department"], model.ReplaceSingleQuote(),partNo.ReplaceSingleQuote(), partName.ReplaceSingleQuote(), processName.ReplaceSingleQuote(), status, appDescription.ReplaceSingleQuote(), subject.ReplaceSingleQuote(), detail.ReplaceSingleQuote(), timing.ReplaceSingleQuote(), (long)Session["RelatedID"],(string)(Session["User"]), date );
+                Session["TopicID"] = M_Req.UpdateTopic(new_topic);
 
-                return Json(Topic.Code, JsonRequestBehavior.AllowGet);
+                return Json(temp_topic.Code, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex){
 
@@ -170,7 +166,7 @@ namespace ChangeControl.Controllers{
         public ActionResult SubmitRelated(string IT,string MKT,string PC1,string PC2,string P1,string P2,string P3A,string P3M,string P4,string P5,string P6,string P7,string PE1,string PE2,string PE2_SMT,string PE2_PCB,string PE2_MT,string PE1_Process,string PE2_Process,string PCH1,string PCH2,string QC_IN1,string QC_IN2,string QC_IN3,string QC_FINAL1,string QC_FINAL2,string QC_FINAL3,string QC_NFM1,string QC_NFM2,string QC_NFM3,string QC1,string QC2,string QC3){
             try{
                 Related related = new Related(IT,MKT,PC1,PC2,P1,P2,P3A,P3M,P4,P5,P6,P7,PE1,PE2,PE2_SMT,PE2_PCB,PE2_MT,PE1_Process,PE2_Process,PCH1,PCH2,QC_IN1,QC_IN2,QC_IN3,QC_FINAL1,QC_FINAL2,QC_FINAL3,QC_NFM1,QC_NFM2,QC_NFM3,QC1,QC2,QC3);
-                related_id = M_Req.InsertRelated(related);
+                Session["RelatedID"] = M_Req.InsertRelated(related);
                 return Json(new { code = 1 },JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex){
@@ -189,9 +185,9 @@ namespace ChangeControl.Controllers{
                 var ServerSavePath = Path.Combine("D:/File/Topic/" + InputFileName);
                 file_item.file.SaveAs(ServerSavePath);
                 if(file_item.description == "null" || file_item.description == null) file_item.description = " ";
-                M_Req.InsertFile(file_item.file, topic_id, "Topic", file_item.description, Session["User"]);
+                M_Req.InsertFile(file_item.file, (long) Session["TopicID"], "Topic", file_item.description, Session["User"]);
             }
-            return Json(topic_code);
+            return Json((string)Session["TopicCode"]);
         }
 
         [HttpPost]

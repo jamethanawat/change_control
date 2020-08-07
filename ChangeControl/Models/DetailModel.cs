@@ -461,5 +461,20 @@ namespace ChangeControl.Models
             var result = DB_CCS.Database.SqlQuery<Reject>(sql).First();
             return result;
         }
+
+        public bool CheckApproveIPP(string topic_code){
+            var sql = $@"SELECT CASE WHEN EXISTS (
+                        SELECT * FROM CCS.dbo.Topic
+                        LEFT JOIN Review ON Review.Topic = Topic.Code
+                        LEFT JOIN Review_Item ON Review_Item.FK_Review_ID  = Review.ID_Review 
+                        WHERE Topic.Revision  = (SELECT MAX(t.Revision) FROM Topic t WHERE t.Code = Topic.Code) 
+                        AND Review.Revision  = (SELECT MAX(r.Revision) FROM Review r WHERE r.Topic = Review.Topic)
+                        AND FK_Item_Type = 26 AND Review_Item.Status = 1 
+                        AND Code = '{topic_code}')
+                    THEN CAST(1 AS BIT)
+                    ELSE CAST(0 AS BIT) END;";
+            var result = DB_CCS.Database.SqlQuery<bool>(sql).First();
+            return result;
+        }
     }
 }

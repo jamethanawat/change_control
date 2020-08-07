@@ -19,7 +19,10 @@ namespace ChangeControl.Controllers{
         private string admin = "63014";
         public LoginController(){
             M_Login = new LoginModel();
+            res.data = null;
+            res.status = null;
         }
+        public dynamic res = new ExpandoObject();
 
         public static string DevMode = "on";
 
@@ -52,15 +55,11 @@ namespace ChangeControl.Controllers{
         }
         public ActionResult CheckUser(string username,string password){
             var redirectUrl = "";
-
-            dynamic res = new ExpandoObject();
-                    res.data = null;
+            var status = "error";
+            var result = "error";
             if(password != "Admin"){
                 try{
                     res = M_Login.CheckUser(username, password);
-                }catch(Exception err){
-                    return Json(new { status = "error" , data = "null" }, JsonRequestBehavior.AllowGet);
-                }
                 if(res.data == null){
                     return Json(new { status = $"{res.status}" , data = "null"  }, JsonRequestBehavior.AllowGet);
                 }else{
@@ -70,27 +69,36 @@ namespace ChangeControl.Controllers{
                     Session["Name"] = response.Name;
                     Session["SurName"] = response.SurName;
                     Session["Email"] = response.Email;
-                    Session["Position"] = response.Position;
+                    response = M_Login.GetPositionByUserID(username);
+                    Session["Position"] = (response.status == "success") ? response.data : "Staff";
 
-                    var result = "error";
                     if(username == "62084"){
-                        result = "P1";
+                        result = "QC2";
                     }else if(username == "60002"){
                         result = "QC1";
                     }else if(username == "54032"){
-                        result = "QC2";
+                        result = "PC2";
                     }else if(username == "60017"){
                         result = "PE1";
                     }else if(username == "57010"){
                         result = "MKT";
                     }else if(username == "63014"){
-                        result = "PE1_Process";
+                        result = "PE2_Process";
                     }else{
                         result = GetDepartment(username);
                     }
-                    // SetDepartmentAlt(result);
-                    return Json(new { status = "success" ,data = result }, JsonRequestBehavior.AllowGet);
+
+                    if(result == "Not found"){
+                        status = "missdept";
+                    }else{
+                        SetDepartment(result);
+                        status = "success";
+                    }
                 }
+                }catch(Exception err){
+
+                }
+                return Json(new { status = status ,data = result }, JsonRequestBehavior.AllowGet);
             }else{
                 Session["User"] = "63014";
                 Session["FullName"] = "Admin";
@@ -240,16 +248,16 @@ namespace ChangeControl.Controllers{
         }
 
         public ActionResult GetSession(){
-                return Json(new { 
-                    us = Session["User"],
-                    f_name = Session["FullName"],
-                    name = Session["Name"],
-                    s_name = Session["SurName"],
-                    email = Session["Email"],
-                    dept = Session["Department"],
-                    dept_raw = Session["DepartmentRawName"],
-                    dept_id = Session["DepartmentID"]
-                }, JsonRequestBehavior.AllowGet);
+            return Json(new { 
+                us = Session["User"],
+                f_name = Session["FullName"],
+                name = Session["Name"],
+                s_name = Session["SurName"],
+                email = Session["Email"],
+                dept = Session["Department"],
+                dept_raw = Session["DepartmentRawName"],
+                dept_id = Session["DepartmentID"]
+            }, JsonRequestBehavior.AllowGet);
         }
     }
 }

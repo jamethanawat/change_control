@@ -26,6 +26,20 @@
                                         return;
                                     });
                                 }
+                                $.post(CheckApproveIPPPath, {topic_code:topic_code}, (res) => {
+                                    if(res.status == "success"){
+                                        $.post(GenerateMailPath,{
+                                            'mode': 'InformIPP',
+                                            'topic_code':topic_code,
+                                            'dept_arry': res.data,
+                                        }).fail((error) => {
+                                            console.error(error);
+                                            console.error("err: ipp");
+                                            swal("Error", "Cannot send email to IPP, Please try again", "error");
+                                            return;
+                                        });
+                                    }
+                                })
                                 swal("Success", "Change Status Success", "success").then(location.reload());
                             }else{
                                 swal("Error", "User Password Not Correct", "error");

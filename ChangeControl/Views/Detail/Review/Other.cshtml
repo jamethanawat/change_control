@@ -13,13 +13,13 @@
                     Yes
                 </label>
                 <label style="margin-right: 15px;">
-                    <input type="radio" name="@temp_rd" value="0" class="flat-red">
+                    <input type="radio" name="@temp_rd" value="0" class="flat-red" >
                     No
                 </label>
             </div>
             <div class="col-sm-7 col-form-label">
                 <label>Details :</label>
-                <textarea class="form-control" name="@temp_desc" placeholder=""></textarea>
+                <textarea class="form-control" name="@temp_desc" placeholder="" ></textarea>
             </div>
         </div>
         }
@@ -34,6 +34,7 @@
     <hr>
     <br>
     <div class="form-group row">
+        <span class="text-danger" id="validate-warning" style="display:none">กรุณาระบุข้อมูล/รายละเอียดให้ครบถ้วน</span>
         <div class="col-sm-12">
             <button type="submit" id="ReviewSubmit" class="btn btn-info float-right">Submit</button>
         </div>

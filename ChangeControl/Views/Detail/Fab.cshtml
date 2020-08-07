@@ -81,6 +81,156 @@
         color: grey
     }
 
+    .w-actions {
+        -webkit-box-align: end;
+        -ms-flex-align: end;
+        align-items: flex-end;
+        bottom: 24px;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        position: fixed;
+        right: 24px;
+        z-index: 100
+    }
+
+    .w-actions>* {
+        margin-top: 20px
+    }
+
+    .w-actions__fab {
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center;
+        background-color: #3740ff;
+        border: 0;
+        border-radius: 50%;
+        -webkit-box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12);
+        box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12);
+        color: #fff;
+        cursor: pointer;
+        display: -webkit-inline-box;
+        display: -ms-inline-flexbox;
+        display: inline-flex;
+        font-family: "Roboto", sans-serif;
+        font-size: .875em;
+        font-weight: 600;
+        height: 56px;
+        letter-spacing: 1px;
+        overflow: hidden;
+        padding: 0;
+        position: relative;
+        text-indent: -9999px;
+        text-overflow: initial;
+        text-transform: uppercase;
+        width: 56px
+    }
+
+    @@media (min-width: 1264px) {
+        .w-actions__fab {
+            border-radius: 28px;
+            padding: 0 24px 0 52px;
+            text-indent: 0;
+            width: auto
+        }
+    }
+
+    .w-actions__fab:hover {
+        background-color: #3740ff;
+    }
+
+    .w-actions__fab:active {
+        background-color: #3740ff;
+        -webkit-box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+        box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12)
+    }
+
+    .w-actions__fab:hover,
+    .w-actions__fab:focus,
+    .w-actions__fab:active {
+        outline: 0;
+        text-decoration: none
+    }
+
+    .w-actions__fab::before {
+        background-size: 24px 24px;
+        content: '';
+        height: 24px;
+        left: 16px;
+        position: absolute;
+        top: 16px;
+        width: 24px
+    }
+
+    .w-actions__fab::after {
+        bottom: 0;
+        content: '';
+        left: 0;
+        pointer-events: none;
+        position: absolute;
+        right: 0;
+        top: 0;
+        -webkit-transition: background-color .2s, border .2s;
+        transition: background-color .2s, border .2s;
+        z-index: 1
+    }
+
+    .w-actions__fab:hover::after {
+        background-color: rgba(255, 255, 255, 0.08)
+    }
+
+    .w-actions__fab:focus::after {
+        background-color: rgba(255, 255, 255, 0.24)
+    }
+
+    .w-actions__fab:active::after {
+        background-color: rgba(255, 255, 255, 0.32)
+    }
+
+    .w-actions__fab--share::before {
+        background-image: href("https://web.dev/images/icons/subscribe.svg")
+    }
+    .w-actions__fab--resubmit::before {
+        background-image: url("@Url.Content("~/tmp/docs/assets/plugins/fontawesome-free/svgs/solid/tasks.svg")");
+    }
+
+    .w-actions__fab--subscribe {
+        background-color: #fff;
+        color: #3740ff
+    }
+
+    .w-actions__fab--subscribe:hover {
+        background-color: #fff
+    }
+
+    .w-actions__fab--subscribe:active {
+        background-color: #fff
+    }
+
+    .w-actions__fab--subscribe::before {
+        background-image: url("https://web.dev/images/icons/subscribe.svg")
+    }
+    
+    .w-actions__fab--resubmit::before {
+        background-image: url("@Url.Content("~/tmp/docs/assets/plugins/fontawesome-free/svgs/solid/tasks.svg")");
+    }
+
+    .w-actions__fab--subscribe:hover::after {
+        background-color: rgba(55, 64, 255, 0.04)
+    }
+
+    .w-actions__fab--subscribe:focus::after {
+        background-color: rgba(55, 64, 255, 0.12)
+    }
+
+    .w-actions__fab--subscribe:active::after {
+        background-color: rgba(55, 64, 255, 0.16)
+    }
+
     body { padding-right: 0 !important }
 
 </style>
@@ -187,12 +337,16 @@
 
     
 
-<div class="zoom">
-    <a class="zoom-fab zoom-btn-large bg-warning" id="resubmit" data-toggle="modal" data-target="#resubmit_modal">
+    @* <a class="zoom-fab zoom-btn-large bg-warning" id="resubmit" data-toggle="modal" data-target="#resubmit_modal">
         <i class="fas fa-tasks" style="
             color: white;
             transform: scale(1.4);
         "></i>
-        
+    </a> *@
+
+    <div class="w-actions">
+        <a class="w-actions__fab w-actions__fab--resubmit bg-warning" id="resubmit" data-toggle="modal" data-target="#resubmit_modal">
+    <span>Resubmit</span>
     </a>
-</div>
+
+    </div>

@@ -5,7 +5,7 @@ var GetTopicDetail;
 var SessionUser;
 $(document).ready(function () {
     $("body").addClass("sidebar-collapse", 1000);
-    $('#ChangeRequestTable').DataTable( {
+    $('#ChangeRequestTable').DataTable( { 
         "paging": true,
         "lengthChange": true,
         "searching": true,
@@ -15,7 +15,9 @@ $(document).ready(function () {
         "pageLength": 10,
     });
 
-    $("#TNScontrolNo").mask('SS-0000000', {placeholder: "__-_______"});
+/* ----------------------- Add pleaceholder to TNS No ----------------------- */
+
+    $("#TNScontrolNo").mask('SS-0000000', {placeholder: "__-_______"});  
     $("#changeType").on("change",(e) => {
         $("#TNScontrolNo").val("");
         var placeholder = "__-_______";
@@ -28,19 +30,37 @@ $(document).ready(function () {
         }
         $("#TNScontrolNo").attr("placeholder",placeholder);
     });
-    $("#TNScontrolNo").on("click",(e) => {
-        let chang_type_val = $("#changeType").val();
-        if(chang_type_val  == "Internal Change"){
-            e.target.value = "IN-";
-        }else if(chang_type_val  == "External Change"){
-            e.target.value = "EX-";
-        }else{
-            e.target.value = "";
-        }
 
+/* ------------------------------ Add pre-word ------------------------------ */
+
+    $("#TNScontrolNo").on("click",(e) => {
+        $("input[name='status']").prop("checked",false);
+        let chang_type_val = $("#changeType").val();
+        if(chang_type_val  == "Internal"){
+            e.target.value = "IN-";
+        }else if(chang_type_val  == "External"){
+            e.target.value = "EX-";
+        }
     });
     var table_cr;
     table_cr = $('#ChangeRequestTable').DataTable();
+
+/* ----------------------- Overstatus relate to status ---------------------- */
+    $("[name='overstatus'").change((e) => {
+        if(e.target.value != 1) {
+            let selected_st = 6 + Number(e.target.value);
+            $("[name='status").val([`${selected_st}`]);
+        }
+    })
+
+/* ---------------------- Status related to overstatus ---------------------- */
+
+    $("[name='status'").change((e) => {
+            $("[name='overstatus").val(['1']);
+    })
+
+
+/* ---------------------- Get line relate to production --------------------- */
 
     $("#Production").change(function () {
         var temp = $("#Production").val();
@@ -64,6 +84,10 @@ $(document).ready(function () {
         });
     });
 
+/* -------------------------------------------------------------------------- */
+/*                            Clear radio and input                           */
+/* -------------------------------------------------------------------------- */
+
     $("#clear_btn").click(() => {
         $("#changeType").val("");
         $("#productType").val("");
@@ -79,15 +103,18 @@ $(document).ready(function () {
         $("[name='status'][value=7]").prop("checked",true)
         $("#TNScontrolNo").val("");
         $("#TNScontrolNo").attr("placeholder","__-_______");
-
-
     });
+
+/* -------------------------------------------------------------------------- */
+/*                                Search topic                                */
+/* -------------------------------------------------------------------------- */
 
     $("#search").click((e) => {
         e.preventDefault();
+        let status = $("input[name='status']:checked").val() || 0;
         var temp_data = {
             'Type': $("#changeType").val(),
-            'Status': $("input[name='status']:checked").val(),
+            'Status': status,
             'ProductType': $("#productType").val(),
             'Overstatus': $("input[name='overstatus']:checked").val(),
             'Changeitem': $("#changeitem").val(),

@@ -44,7 +44,7 @@ namespace ChangeControl.Controllers{
             var result = M_Home.GetLine(Production);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
-        public ActionResult GetSearch(string Type,int Status,string ProductType,string Overstatus,string Changeitem,string ControlNo, string Model,string Chosechangeitem,string Partno,string Partname,string Department,string Processname ,string Production ,string Line){
+        public ActionResult GetSearch(string Type,int Status,string ProductType,int Overstatus,string Changeitem,string ControlNo, string Model,string Chosechangeitem,string Partno,string Partname,string Department,string Processname ,string Production ,string Line){
             var temp_search = new SearchAttribute(Type, Status, ProductType, Overstatus, Changeitem, ControlNo, Model, Chosechangeitem, Partno, Partname, Department, Processname, Production, Line);
             var TopicList = M_Home.GetSearch(temp_search);
             TopicList.ForEach(Topic => { 

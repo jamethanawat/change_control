@@ -8,15 +8,31 @@ var rsm_id = 0;
 var resubmit_formIsEmpty = true;
 var TrialIsEmpty = true;
 var rsm_related_list = [];
+var rv_submit;
+
+/* -------------------------------------------------------------------------- */
+/*                          For check radio and input                         */
+/* -------------------------------------------------------------------------- */
+
+var findDuplicates = arr => arr.filter((item, index) => arr.indexOf(item) != index)
+var removeDuplicates = (names) => names.filter((v,i) => names.indexOf(v) === i)
+var new_rv = [];
 
 $(() => {
-    
+    var rv_form = $('form#review').serializeArray();
+    rv_form.forEach(function(rv){
+        new_rv.push(rv.name.split("-")[1]);
+    });
+
     if(topic_status == "Request" || !isQC || !isReview){
         $(".zoom-fab#change_status").addClass("hide-fab");
     }
 
-/* ------------------------------ Reject Topic ------------------------------ */
-    $("#reject").click(() => {
+/* -------------------------------------------------------------------------- */
+/*                                Reject Topic                                */
+/* -------------------------------------------------------------------------- */
+
+$("#reject").click(() => {
         swal({
             title: "Warning", 
             text: "Do you want to reject this Topic?", 
@@ -50,7 +66,10 @@ $(() => {
         });
     });
 
-/* -------------------------------- Go to top ------------------------------- */
+/* -------------------------------------------------------------------------- */
+/*                                  Go to top                                 */
+/* -------------------------------------------------------------------------- */
+
     $('[data-toggle="tooltip"]').tooltip();
     var btn = $('#Top');
     $(window).scroll(() => {
@@ -66,7 +85,10 @@ $(() => {
         $('html, body').animate({ scrollTop: 0 }, '300');
     });
 
-/* --------------------------- Resubmit's Validate -------------------------- */
+/* -------------------------------------------------------------------------- */
+/*                             Resubmit's Validate                            */
+/* -------------------------------------------------------------------------- */
+
 var rsm_validator = $('#resubmit_form').validate({
     rules: {
         desc: {required: true,},
@@ -85,7 +107,11 @@ var rsm_validator = $('#resubmit_form').validate({
     highlight: function (element, errorClass, validClass) {$(element).addClass('is-invalid');},
     unhighlight: function (element, errorClass, validClass) {$(element).removeClass('is-invalid');}
 });
-/* ------------------------- Resubmit's Wizard modal ------------------------ */
+
+/* -------------------------------------------------------------------------- */
+/*                           Resubmit's Wizard modal                          */
+/* -------------------------------------------------------------------------- */
+
     $("#resubmit_modal").modalWizard();
     $("#resubmit_modal").on("navigate", (e, navDir, stepNumber) => {
         if($("#resubmit_modal").attr("data-current-step") == 3){
@@ -122,7 +148,10 @@ var rsm_validator = $('#resubmit_form').validate({
         }
     });
     
-/* ---------------------------- Resubmit's Validate ---------------------------- */
+/* -------------------------------------------------------------------------- */
+/*                             Resubmit's Validate                            */
+/* -------------------------------------------------------------------------- */
+
     $("#resubmit_form [name='desc'], #resubmit_form [name='due_date']").on("keydown keyup click change", () => {
         if($("#resubmit_form [name='desc']").val() != "" && $("#resubmit_form [name='due_date']").val() !== ""){
             resubmit_formIsEmpty = false;
@@ -134,7 +163,10 @@ var rsm_validator = $('#resubmit_form').validate({
         }
     });
 
-/* ---------------------------- Trial's Validate ---------------------------- */
+/* -------------------------------------------------------------------------- */
+/*                              Trial's Validate                              */
+/* -------------------------------------------------------------------------- */
+
     var tr_validator = $('#Trial').validate({
         rules: { 
           tr_desc: {required: true,},
@@ -177,7 +209,10 @@ var rsm_validator = $('#resubmit_form').validate({
         $("#cf_submit").prop('disabled', (cf_validator.form()) ? false : true); 
     });
     
-/* --------------------------- Department checkbox -------------------------- */
+/* -------------------------------------------------------------------------- */
+/*                             Department checkbox                            */
+/* -------------------------------------------------------------------------- */
+
     $.each(DepartmentLists, (key,val) => {
         if($(`.${val.Name}`).length == $(`.${val.Name}:checked`).length){
             $(`#${val.Name}`).prop('checked', true);
@@ -217,9 +252,18 @@ var rsm_validator = $('#resubmit_form').validate({
         format: 'dd-mm-yyyy'
     });
     
-   
-/* ------------------------------ Submit review topic ------------------------------ */
+/* -------------------------------------------------------------------------- */
+/*                             Submit review topic                            */
+/* -------------------------------------------------------------------------- */
+
     $("form#review").submit((e) => {
+        rv_submit = true;
+        let RadioNotValidate = checkRadioAndInput();
+        let InputNotValidate = checkInputRequired();
+        if(RadioNotValidate || InputNotValidate){
+            return; 
+        }
+
         e.preventDefault();
         $('#loading').removeClass('hidden')
         SerializeReviewForm();
@@ -284,7 +328,11 @@ var rsm_validator = $('#resubmit_form').validate({
         });
 
     });
-/* --------------------------- Submit trial topic --------------------------- */
+
+/* -------------------------------------------------------------------------- */
+/*                             Submit trial topic                             */
+/* -------------------------------------------------------------------------- */
+
 $("form#Trial").submit((e) => {
     e.preventDefault();
     $('#loading').removeClass('hidden')
@@ -332,7 +380,10 @@ $("form#Trial").submit((e) => {
         })
 });
 
-/* -------------------------- Submit confirm topic -------------------------- */
+/* -------------------------------------------------------------------------- */
+/*                            Submit confirm topic                            */
+/* -------------------------------------------------------------------------- */
+
 $("form#Confirm").submit((e) => {
     e.preventDefault();
     $('#loading').removeClass('hidden')
@@ -379,7 +430,11 @@ $("form#Confirm").submit((e) => {
             swal("Success", "Insert Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
         })
 });
-/* ------------------------------ Apply resubmit ----------------------------- */
+
+/* -------------------------------------------------------------------------- */
+/*                               Apply resubmit                               */
+/* -------------------------------------------------------------------------- */
+
     $("form#resubmit_form").submit((e) => {
         e.preventDefault();
         let quick_form = $("form#resubmit_form").serialize();
@@ -408,7 +463,10 @@ $("form#Confirm").submit((e) => {
         });
     });
 
-/* ---------------------------- Response resubmit --------------------------- */
+/* -------------------------------------------------------------------------- */
+/*                              Response resubmit                             */
+/* -------------------------------------------------------------------------- */
+
     $("#submit_reply_form").click((e) => {
         e.preventDefault();
         $('#loading').removeClass('hidden')
@@ -456,7 +514,10 @@ $("form#Confirm").submit((e) => {
             })
     });
 
-/* ----------- Identify and seperate beween description and radio ----------- */
+/* -------------------------------------------------------------------------- */
+/*             Identify and seperate beween description and radio             */
+/* -------------------------------------------------------------------------- */
+
     function SerializeReviewForm(){
         var datastring = $("form#review").serializeArray();
         console.log(datastring);
@@ -509,7 +570,10 @@ $("form#Confirm").submit((e) => {
         console.log("optimized",optimized_arr);
     }
 
-/* --------------------------- Change topic status -------------------------- */
+/* -------------------------------------------------------------------------- */
+/*                             Change topic status                            */
+/* -------------------------------------------------------------------------- */
+
     $(".zoom-fab#change_status").click(() => {
         var change_status = "Change status from";
         var new_status = 0;
@@ -561,9 +625,82 @@ $("form#Confirm").submit((e) => {
         }
     });
 
+/* ----------------- Disable textbox when radio is not check ---------------- */
+$('form#review').on('keyup change paste', 'input, select, textarea', (e) => {
+    checkRadioAndInput();
+    /* --------------- and check is valid or not after submit once -------------- */
+        if(rv_submit) checkInputRequired();
+    });
+    checkRadioAndInput();
 });
 
 function SetResubmitID(rsm_id){
     this.rsm_id = rsm_id;
 }
 
+
+/* -------------------------------------------------------------------------- */
+/*                 Validate input that hvae same id with radio                */
+/* -------------------------------------------------------------------------- */
+
+function checkRadioAndInput(){
+    var isNotfilled = false;
+    removeDuplicates(findDuplicates(new_rv)).forEach(d => {
+        $(`[name="desc-${d}"]`).attr("disabled",($(`[name="rd-${d}"]:checked`).val() == 1) ? false : true);
+        if($(`[name="rd-${d}"]:checked`).val() == 1 && $(`[name="desc-${d}"]`).val().length < 1){
+            isNotfilled = true;
+            if(rv_submit) $(`[name="desc-${d}"]`).addClass("is-invalid");
+        }else if($(`[name="rd-${d}"]:checked`).val() == 0){
+            $(`[name="desc-${d}"]`).val("");
+            $(`[name="desc-${d}"]`).removeClass("is-invalid");
+        }else{
+            $(`[name="desc-${d}"]`).removeClass("is-invalid");
+
+        }
+    });
+
+/* ----------------------------- PE_Process case ---------------------------- */
+    if($("[name='rd-3']").length > 0){
+        $("[name='desc-29'] , [name='desc-30']").attr("disabled",($("[name='rd-3']:checked").val() == 1) ? false : true);
+        if($("[name='rd-3']:checked").val() == 1){
+            if($("[name='desc-29']").val().length < 1){
+                isNotfilled = true;
+                if(rv_submit) $(`[name="desc-29"]`).addClass("is-invalid");
+            }else{
+                $(`[name="desc-29"]`).removeClass("is-invalid");
+            }
+            if($("[name='desc-30']").val().length < 1){
+                isNotfilled = true;
+                if(rv_submit) $(`[name="desc-30"]`).addClass("is-invalid");
+            }else{
+                $(`[name="desc-30"]`).removeClass("is-invalid");
+            }
+        }else{
+            $("[name='desc-30']").val("");
+            $("[name='desc-29']").val("");
+            $(`[name="desc-29"] , [name="desc-30"]`).removeClass("is-invalid");
+        }
+    }
+    return isNotfilled;
+}
+
+function checkInputRequired(){
+    var isNotfilled = false;
+
+    $("input.required , textarea.required").each(function(i, value) {
+        if(this.value == 0){
+            isNotfilled = true;
+            $(`[name="${this.name}"]`).addClass("is-invalid");
+        }else{
+            $(`[name="${this.name}"]`).removeClass("is-invalid");
+        }
+    });
+
+    // $('form#review').find(':submit').attr("disabled",(!isNotfilled) ? false : true);
+    (!isNotfilled) ? $("#validate-warning").hide() : $("#validate-warning").show();
+    return isNotfilled;
+}
+
+function SerializeReviewFormExpirment(){
+    
+}
