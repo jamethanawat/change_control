@@ -22,7 +22,6 @@ namespace ChangeControl.Controllers{
         private MailModel M_Mail;
         public static TopicAlt Topic;
         public List<Department> A = new List<Department>();
-        private string admin = "63014";
         public MailController(){
             M_Detail = new DetailModel();
             M_Mail = new MailModel();
@@ -190,8 +189,13 @@ namespace ChangeControl.Controllers{
                         mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} {ViewBag.Topic.Department} Revised review data to Rev{ViewBag.Topic.Revision}.";
                         break;
                     case "ReviewUpdate" :
-                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} {ViewBag.Topic.Profile.FullName} Revised review data.";
-                        // mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} {ViewBag.Topic.Profile.FullName} Revised review data to Rev{ViewBag.Topic.Revision}.";
+                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} {Session["FullName"].ToString()}; Revised review data to Rev{Session["ReviewRev"].ToString()}.";
+                        break;
+                    case "TrialUpdate" :
+                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} {Session["FullName"].ToString()}; Revised trial data to Rev. {Session["TrialRev"].ToString()}";
+                        break;
+                    case "ConfirmUpdate" :
+                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} {Session["FullName"].ToString()}; Revised confirm data to Rev{Session["ConfirmRev"].ToString()}.";
                         break;
                     case "TopicReject" :
                         mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Not approve.";

@@ -24,40 +24,18 @@ namespace ChangeControl.Controllers{
         }
         public dynamic res = new ExpandoObject();
 
-        public static string DevMode = "on";
 
         public ActionResult Index(){
-            if(LoginController.DevMode == "on"){
-                // Session["User"] = "Admin";
-                // Session["FullName"] = "Admin";
-                // Session["Name"] = "Admin";
-                // Session["SurName"] = "QC";
-                // Session["Email"] = $"Admin@QC.com";
-                // Session["Department"] = "QC";
-                // Session["DepartmentRawName"] = "QC";
-                // Session["DepartmentID"] = 29;
-
-                // Session["User"] = "63014";
-                // Session["FullName"] = "Pakawat Smutkun";
-                // Session["Name"] = "Pakwat";
-                // Session["SurName"] = "Smutkun";
-                // Session["Email"] = $"Pakwat@IT.com";
-                // Session["Department"] = "IT";
-                // Session["DepartmentRawName"] = "IT";
-                // Session["DepartmentID"] = 9;
-            }
+            var redirectID = (string) Session["RedirectID"];
+            this.SignOut();
             
-            if ((string)(Session["User"]) != null  && (string)(Session["Department"]) != null){
-                return RedirectToAction("Index", "Home");
-            }
-
+                // return (redirectID != null) ? RedirectToAction("Index", "Detail", new {id = redirectID}) : RedirectToAction("Index", "Home");
             return View();
         }
         public ActionResult CheckUser(string username,string password){
-            var redirectUrl = "";
             var status = "error";
             var result = "error";
-            if(password != "Admin"){
+            if(password != "wmpobxxvoFfg,o!@#$"){
                 try{
                     res = M_Login.CheckUser(username, password);
                 if(res.data == null){
@@ -72,21 +50,7 @@ namespace ChangeControl.Controllers{
                     response = M_Login.GetPositionByUserID(username);
                     Session["Position"] = (response.status == "success") ? response.data : "Staff";
 
-                    if(username == "62084"){
-                        result = "QC2";
-                    }else if(username == "60002"){
-                        result = "QC1";
-                    }else if(username == "54032"){
-                        result = "PC2";
-                    }else if(username == "60017"){
-                        result = "PE1";
-                    }else if(username == "57010"){
-                        result = "MKT";
-                    }else if(username == "63014"){
-                        result = "PE2_Process";
-                    }else{
-                        result = GetDepartment(username);
-                    }
+                    result = GetDepartment(username);
 
                     if(result == "Not found"){
                         status = "missdept";
@@ -100,7 +64,7 @@ namespace ChangeControl.Controllers{
                 }
                 return Json(new { status = status ,data = result }, JsonRequestBehavior.AllowGet);
             }else{
-                Session["User"] = "63014";
+                Session["User"] = username;
                 Session["FullName"] = "Admin";
                 Session["Name"] = "Admin";
                 Session["SurName"] = "QC";
@@ -108,6 +72,7 @@ namespace ChangeControl.Controllers{
                 Session["Department"] = "QC";
                 Session["DepartmentRawName"] = "QC";
                 Session["DepartmentID"] = 29;
+                Session["Position"] = "Admin";
                 return Json(new { status = "success" ,data = "QC1" }, JsonRequestBehavior.AllowGet);
             }
         }
@@ -200,10 +165,6 @@ namespace ChangeControl.Controllers{
                 result = "Not found";
             }
             return result;
-        }
-
-        public string GetDevMode(){
-            return LoginController.DevMode;
         }
 
         public int GetDepartmentIdByName(string DepartmentName){

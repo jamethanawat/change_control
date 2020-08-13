@@ -1,8 +1,8 @@
 ﻿var InsertReviewStatus = false;
-var optimized_arr = [];
 var ReviewStatus = false;
 var file_list = [];
 var file_list_alt = [];
+var file_list_rd = [];
 var due_date;
 var rsm_id = 0;
 var resubmit_formIsEmpty = true;
@@ -44,15 +44,12 @@ $("#reject").click(() => {
             if(res != null){
                 if(res.trim().length != 0){
                     $.post(RejectTopicPath, {topic_code:topic_code,desc:res}, () => { 
-                            $.post(GenerateMailPath,{
-                                'mode': 'TopicReject',
-                                'topic_code':topic_code,
-                            }).fail((error) => {
-                                console.error(error);
-                                swal("Error", "Cannot send email to Requestor, Please try again", "error");
-                                return;
-                            })
-                            swal("Success", "Reject Success", "success").then(location.reload());
+                        $.post(GenerateMailPath,{ 'mode': 'TopicReject', 'topic_code':topic_code, }).fail((error) => {
+                            console.error(error);
+                            swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                            return;
+                        })
+                        swal("Success", "Reject Success", "success").then(location.reload());
                     }).fail( function(xhr, textStatus, errorThrown) {
                         console.error(xhr.responseText);
                         swal("Something wrong", "Please contact admin", "error");
@@ -258,7 +255,7 @@ var rsm_validator = $('#resubmit_form').validate({
 
     $("form#review").submit((e) => {
         rv_submit = true;
-        let RadioNotValidate = checkRadioAndInput();
+        let RadioNotValidate = checkRadioAndInput(new_rv,rv_submit);
         let InputNotValidate = checkInputRequired();
         if(RadioNotValidate || InputNotValidate){
             return; 
@@ -266,15 +263,10 @@ var rsm_validator = $('#resubmit_form').validate({
 
         e.preventDefault();
         $('#loading').removeClass('hidden')
-        SerializeReviewForm();
-
+        let rv_form = SerializeReviewForm();
         $.post(SubmitReviewPath, (result) => {
             if(result.mail != ""){
-                $.post(GenerateMailPath,{
-                    'mode': result.mail,
-                    'topic_code':topic_code,
-                    'dept':result.dept,
-                }).fail((error) => {
+                $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept':result.dept, }).fail((error) => {
                     console.error(error);
                     swal("Error", "Cannot send email to Requestor, Please try again", "error");
                     return;
@@ -306,11 +298,12 @@ var rsm_validator = $('#resubmit_form').validate({
                 }));
             });
 
-            optimized_arr.forEach(element => {
+            rv_form.forEach(element => {
+                console.log(element);
                 promises.push(
                     $.post(SubmitReviewItemPath, {
                         'status' : element.status,
-                        'description' : element.description,
+                        'description' : element.desc,
                         'id' : element.id,
                     },(data) => {
                         console.log('Inserted item');
@@ -325,6 +318,8 @@ var rsm_validator = $('#resubmit_form').validate({
                 $("#ReviewSubmit").prop("disabled",true)
                 swal("Success", "Insert Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
             })
+        }).fail(() => {
+            setTimeout(() => { location.reload(); }, 1500);
         });
 
     });
@@ -443,14 +438,9 @@ $("form#Confirm").submit((e) => {
             console.log('Related created');
             $.post(RequestResubmitPath, quick_form, (res) =>{
                 console.log('Resubmit created');
-                if(res){
+                if(res.code){
                     moment.locale('en');
-                    $.post(GenerateMailPath,{
-                        'mode': 'RequestDocument',
-                        'topic_code':topic_code,
-                        'due_date': moment(due_date,"DD-MM-YYYY").format('D MMMM YYYY'),
-                        'dept_arry': rsm_related_list,
-                    }).fail((error) => {
+                    $.post(GenerateMailPath,{ 'mode': 'RequestDocument', 'topic_code':topic_code, 'due_date': moment(due_date,"DD-MM-YYYY").format('D MMMM YYYY'), 'dept_arry': rsm_related_list, }).fail((error) => {
                         console.error(error);
                         swal("Error", "Cannot send email to Requestor, Please try again", "error");
                         return;
@@ -471,10 +461,11 @@ $("form#Confirm").submit((e) => {
         e.preventDefault();
         $('#loading').removeClass('hidden')
             let form_response = $("form.reply_form").serializeArray();
-            var response_id = $("form.reply_form").attr("id");
+            // var response_id = $("form.reply_form").attr("id");
+            // var response_id = $("form.reply_form").attr("id");
             var promises = [];
 
-            files = file_list_alt;
+            files = file_list_rd;
             console.log("files",files);
             
             for(var index in files){
@@ -482,7 +473,7 @@ $("form#Confirm").submit((e) => {
                 delete files[index].detail;
             }
 
-            promises.push($.post(SubmitResponsePath,{ desc: form_response[0].value, resubmit_id: response_id },() => {
+            promises.push($.post(SubmitResponsePath,{ desc: form_response[0].value, resubmit_id: rsm_id},() => {
                 console.log('Inserted item');
                 files.forEach(element => {
                     var Data = new FormData();
@@ -510,65 +501,11 @@ $("form#Confirm").submit((e) => {
                 $('#loading').addClass('hidden')
                 InsertReviewStatus = false;
                 $("#ResponseSubmit").prop("disabled",true)
+                $("#reply_modal").modal("hide")
                 swal("Success", "Insert Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
             })
     });
 
-/* -------------------------------------------------------------------------- */
-/*             Identify and seperate beween description and radio             */
-/* -------------------------------------------------------------------------- */
-
-    function SerializeReviewForm(){
-        var datastring = $("form#review").serializeArray();
-        console.log(datastring);
-        for(var i=0 ; i<datastring.length ; i++){
-            
-            if(datastring[i].name != "filepond"){
-                let new_item = {};
-                new_item.id = 999;
-                new_item.status = null;
-                new_item.description = null;
-                
-                if(!datastring[i].hasOwnProperty('splitted_value')){
-                    datastring[i].splitted_value = datastring[i].name.split('-');
-                }
-                if(i+1 != datastring.length){
-                    if(!datastring[i+1].hasOwnProperty('splitted_value')){
-                        datastring[i+1].splitted_value = datastring[i+1].name.split('-'); //split desc-1234 to [0]desc, [1]1234
-                    }
-                    if(datastring[i].splitted_value[0] == "rd"){
-                        new_item.id = datastring[i].splitted_value[1];
-                        new_item.status = datastring[i].value; // rd -> radio equal status
-                        if(datastring[i+1].splitted_value[0] == "desc" && datastring[i].splitted_value[1] == datastring[i+1].splitted_value[1]){
-                            new_item.description = datastring[i+1].value;
-                        }
-                    }else if(datastring[i].splitted_value[0] == "desc"){
-                        new_item.id = datastring[i].splitted_value[1];
-                        new_item.description = datastring[i].value; // desc -> description
-                        if(datastring[i+1].splitted_value[0] == "rd" && datastring[i].splitted_value[1] == datastring[i+1].splitted_value[1]){
-                            new_item.status = datastring[i+1].value;
-                        }
-                    }
-                    if(datastring[i].splitted_value[1] == datastring[i+1].splitted_value[1]){
-                        i++;
-                    }
-                }else{
-                    new_item.id = datastring[i].splitted_value[1];
-                    if(datastring[i].splitted_value[0] == "rd"){
-                        new_item.status = datastring[i].value;
-                    }else if(datastring[i].splitted_value[0] == "desc"){
-                        new_item.description = datastring[i].value;
-                    }
-                }
-                if(new_item.id == 999 && new_item.status == null && new_item.description == null){ // exception case
-                    console.error("optimized_arr error");                
-                }else{
-                    this.optimized_arr.push(new_item);
-                }
-            }
-        }
-        console.log("optimized",optimized_arr);
-    }
 
 /* -------------------------------------------------------------------------- */
 /*                             Change topic status                            */
@@ -613,11 +550,11 @@ $("form#Confirm").submit((e) => {
             console.log("id not matched");
             $(".reply_form textarea").val('');
             reply_id = new_reply_id;
-            if(file_list_alt.length > 0){
-                file_list_alt.forEach(e => {
+            if(file_list_rd.length > 0){
+                file_list_rd.forEach(e => {
                     alt_removeFile(e.detail.id);
                 });
-                file_list_alt = [];
+                file_list_rd = [];
             }
             $("form.reply_form").attr("id", new_reply_id);
         }else{
@@ -627,11 +564,11 @@ $("form#Confirm").submit((e) => {
 
 /* ----------------- Disable textbox when radio is not check ---------------- */
 $('form#review').on('keyup change paste', 'input, select, textarea', (e) => {
-    checkRadioAndInput();
+    checkRadioAndInput(new_rv,rv_submit);
     /* --------------- and check is valid or not after submit once -------------- */
         if(rv_submit) checkInputRequired();
     });
-    checkRadioAndInput();
+    checkRadioAndInput(new_rv,rv_submit);
 });
 
 function SetResubmitID(rsm_id){
@@ -643,13 +580,13 @@ function SetResubmitID(rsm_id){
 /*                 Validate input that hvae same id with radio                */
 /* -------------------------------------------------------------------------- */
 
-function checkRadioAndInput(){
+function checkRadioAndInput(radio_input_list,submit_once){
     var isNotfilled = false;
-    removeDuplicates(findDuplicates(new_rv)).forEach(d => {
+    removeDuplicates(findDuplicates(radio_input_list)).forEach(d => {
         $(`[name="desc-${d}"]`).attr("disabled",($(`[name="rd-${d}"]:checked`).val() == 1) ? false : true);
         if($(`[name="rd-${d}"]:checked`).val() == 1 && $(`[name="desc-${d}"]`).val().length < 1){
             isNotfilled = true;
-            if(rv_submit) $(`[name="desc-${d}"]`).addClass("is-invalid");
+            if(submit_once) $(`[name="desc-${d}"]`).addClass("is-invalid");
         }else if($(`[name="rd-${d}"]:checked`).val() == 0){
             $(`[name="desc-${d}"]`).val("");
             $(`[name="desc-${d}"]`).removeClass("is-invalid");
@@ -665,13 +602,13 @@ function checkRadioAndInput(){
         if($("[name='rd-3']:checked").val() == 1){
             if($("[name='desc-29']").val().length < 1){
                 isNotfilled = true;
-                if(rv_submit) $(`[name="desc-29"]`).addClass("is-invalid");
+                if(submit_once) $(`[name="desc-29"]`).addClass("is-invalid");
             }else{
                 $(`[name="desc-29"]`).removeClass("is-invalid");
             }
             if($("[name='desc-30']").val().length < 1){
                 isNotfilled = true;
-                if(rv_submit) $(`[name="desc-30"]`).addClass("is-invalid");
+                if(submit_once) $(`[name="desc-30"]`).addClass("is-invalid");
             }else{
                 $(`[name="desc-30"]`).removeClass("is-invalid");
             }
@@ -681,6 +618,7 @@ function checkRadioAndInput(){
             $(`[name="desc-29"] , [name="desc-30"]`).removeClass("is-invalid");
         }
     }
+    (!isNotfilled) ? $("#validate-warning").hide() : $("#validate-warning").show();
     return isNotfilled;
 }
 
@@ -701,6 +639,17 @@ function checkInputRequired(){
     return isNotfilled;
 }
 
-function SerializeReviewFormExpirment(){
-    
+function SerializeReviewForm(){
+    var f_list = [];
+    $("form#review [data-id]:not(:disabled)").each(function (i,v) {
+        let rv_id = $(this).data('id');
+        if(f_list[`${rv_id}`] == null) f_list[`${rv_id}`] = {id:rv_id, status: null, desc: null}
+        
+        if($(this).data('type') == "status" && $(this)[0].checked == true){
+            f_list[`${rv_id}`].status = this.value;
+        }else if($(this).data('type') == "desc"){
+            f_list[`${rv_id}`].desc = this.value;
+        }
+    });
+    return f_list.filter(Boolean);
 }

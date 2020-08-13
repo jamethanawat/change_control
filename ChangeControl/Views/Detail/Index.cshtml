@@ -14,7 +14,7 @@
     List<Confirm> ConfirmList = ViewBag.ConfirmList as List<Confirm>;
 
     TopicAlt Topic = ViewData["Topic"] as TopicAlt;
-    bool isApprover = ((string)Session["Position"] == "Approver");
+    bool isApprover = ((string)Session["Position"] == "Approver") || ((string)Session["Position"] == "Admin") ;
 
     var isTrialable = (bool) ViewData["isTrialable"];
     string department = (string)Session["Department"];
@@ -175,6 +175,11 @@
         margin-bottom: -8px;
     }
 
+    .tab-nav:not(.active) {
+        color: #007bff !important;
+        border: 1px solid #007bff;
+    }
+
 </style>
 
 
@@ -209,18 +214,19 @@
 
 
 
-<script src="~/Scripts/Detail/Detail.js"></script>
-<script src="~/Scripts/Detail/ReviewList.js"></script>
-<script src="~/Scripts/Detail/TrialList.js"></script>
-<script src="~/Scripts/Detail/ConfirmList.js"></script>
+<script src="~/Scripts/Detail/Detail.js?date='@DateTime.Now.ToString("yyMMddHH")'"></script>
+<script src="~/Scripts/Detail/ReviewList.js?date='@DateTime.Now.ToString("yyMMddHH")'"></script>
+<script src="~/Scripts/Detail/TrialList.js?date='@DateTime.Now.ToString("yyMMddHH")'"></script>
+<script src="~/Scripts/Detail/ConfirmList.js?date='@DateTime.Now.ToString("yyMMddHH")'"></script>
 
 <script src="~/Plugin/filepond/filepond.min.js"></script>
 <script src="~/Plugin/filepond/filepond.jquery.js"></script>
 <script src="~/Plugin/filepond/filepond-plugin-file-encode.js"></script>
 <script src="~/Plugin/filepond/filepond-plugin-image-preview.min.js"></script>
 <script src="~/Plugin/filepond/filepond-plugin-file-validate-size.js"></script>
-<script src="~/Scripts/Shared/FilePond.js"></script>
-<script src="~/Scripts/Shared/FilePond_alt.js"></script>
+<script src="~/Scripts/Shared/FilePond.js?date='@DateTime.Now.ToString("yyMMddHH")'"></script>
+<script src="~/Scripts/Shared/FilePond_alt.js?date='@DateTime.Now.ToString("yyMMddHH")'"></script>
+<script src="~/Scripts/Shared/FilePond_rd.js?date='@DateTime.Now.ToString("yyMMddHH")'"></script>
 
 <script>
     $(() => {
@@ -246,7 +252,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-sm-12">
-                    @if((isQC || isPEProcess) && isRelated && (status != "Finshed" || status != "Rejected")){ @Html.Partial("Fab",DepartmentList)}
+                    @if((isQC || isPEProcess) && isRelated && (status != "Finished" || status != "Rejected")){ @Html.Partial("Fab",DepartmentList)}
                 </div>
             </div>
             <div class="row mb-2">
@@ -355,8 +361,8 @@
                     <div class="card">
                         <div class="card-header p-2">
                             <ul class="nav nav-pills">
-                                <li class="nav-item"><a class="nav-link active" href="#Detail" data-toggle="tab">Detail</a></li>
-                                <li class='nav-item @(ResubmitList.Count == 0 ? "hidden" : "")' ><a class="nav-link" href="#timeline" data-toggle="tab">Request Re-submit</a></li>
+                                <li class="nav-item"><a class="nav-link tab-nav mr-2 active" href="#Detail" data-toggle="tab">Detail</a></li>
+                                <li class='nav-item @(ResubmitList.Count == 0 ? "hidden" : "")' ><a class="nav-link tab-nav" href="#timeline" data-toggle="tab">Request Re-submit</a></li>
                             </ul>
                         </div>
                         <!-- /.card-header -->
@@ -504,7 +510,7 @@
                                         @Html.Partial("Review/Other", ReviewItems) 
                                     }
 
-                                }else if((isTrialable || QcTrialable) && !isTrial && status == "Trial"){
+                                }else if((isTrialable || (QcTrialable && isQC)) && !isTrial && status == "Trial"){
                                 @* /* ----------------------------- Trial section ----------------------------- */ *@
                                     <hr><br>
                                     <h1>Trial</h1><br>

@@ -123,6 +123,16 @@ $(document).ready(function () {
                     var promises = [];
                     console.log('files: ',files);
                     
+                    promises.push($.post(GenerateMailPath,{
+                            'mode':(id.substring(0,2) == "EX") ? 'InformUser' : 'InformPE',
+                            'topic_code':inserted_id,
+                            'dept':(id.substring(0,2) == "IN") ? $(".Production_Engineer_Process:checked").attr("name") : null,
+                        }).fail((error) => {
+                        console.error(error);
+                        swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                        return;
+                    }));
+
                     files.forEach(element => {
                         var Data = new FormData();
                         Data.append("file",element.file);
@@ -143,17 +153,6 @@ $(document).ready(function () {
                         }));
                     });
                     
-                    promises.push(
-                            $.post(GenerateMailPath,{
-                                'mode':(id.substring(0,2) == "EX") ? 'InformUser' : 'InformPE',
-                                'topic_code':inserted_id,
-                                'dept':(id.substring(0,2) == "IN") ? $(".Production_Engineer_Process:checked").attr("name") : null,
-                            }).fail((error) => {
-                            console.error(error);
-                            swal("Error", "Cannot send email to Requestor, Please try again", "error");
-                            return;
-                        })
-                    );
                     Promise.all(promises).then(() => {
                         $("#loading").addClass('hidden');
                         $("#ReviewSubmit").prop("disabled",true)

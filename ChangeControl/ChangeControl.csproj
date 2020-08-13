@@ -510,6 +510,11 @@
     <Content Include="Plugin\animsition\README.md" />
     <Content Include="Plugin\animsition\sandbox\data.json" />
     <Content Include="Plugin\jq-fab\scss\index.scss" />
+    <Content Include="webpack.common.js" />
+    <Content Include="webpack.dev.js" />
+    <Content Include="webpack.prod.js" />
+    <Content Include="package-lock.json" />
+    <Content Include="package.json" />
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -539,6 +544,7 @@
     <Content Include="Scripts\Request\Request.js" />
     <Content Include="Scripts\Shared\FilePond.js" />
     <Content Include="Scripts\Shared\FilePond_alt.js" />
+    <Content Include="Scripts\Shared\FilePond_rd.js" />
     <Content Include="Scripts\Shared\Shared.js" />
     <Content Include="Plugin\SweetAlert\sweetalert-dev.js" />
     <Content Include="Plugin\SweetAlert\sweetalert.css" />
@@ -3931,6 +3937,9 @@
     <Content Include="Views\Mail\Body\TopicReject.cshtml" />
     <Content Include="Views\Mail\Body\TopicUpdate.cshtml" />
     <Content Include="Views\Mail\Body\TrialApproved.cshtml" />
+    <Content Include="Views\Mail\Body\ConfirmUpdate.cshtml" />
+    <Content Include="Views\Mail\Body\TrialUpdate.cshtml" />
+    <Content Include="tsconfig.json" />
     <None Include="Web References\myAD\ADInfo.disco" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
@@ -4257,6 +4266,7 @@
     </WebReferenceUrl>
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="src\index.ts" />
     <TypeScriptCompile Include="tmp\plugins\filterizr\ActiveFilter.d.ts" />
     <TypeScriptCompile Include="tmp\plugins\filterizr\animate.d.ts" />
     <TypeScriptCompile Include="tmp\plugins\filterizr\BrowserWindow.d.ts" />

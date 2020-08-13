@@ -38,15 +38,13 @@ namespace ChangeControl.Controllers{
 
         public ActionResult Index(string id){
             if((string)(Session["User"]) == null || (string)(Session["Department"]) == null){
+                Session["RedirectID"] = (id != null) ? id : null;
                 return RedirectToAction("Index", "LogIn");
             }
-            if (Session["User"].ToString() == null){
-                Session["url"] = "Detail";
-                return RedirectToAction("Index", "Login");
-            }
+
+            Session["RedirectID"] = null;
 
             if(id != null){
-                Session["TopicCode"] = id;
                 Session["TopicCode"] = id;
             }else{
                 Session["TopicCode"] = M_Detail.GetFirstTopic();
@@ -98,11 +96,6 @@ namespace ChangeControl.Controllers{
             // CheckAllReviewApproved(Session["ReviewRelatedList"] as List<RelatedAlt>, Session["ReviewList"] as List<Review>);
 
             return Json(new {code=1,mail,dept=Session["Department"].ToString()}, JsonRequestBehavior.AllowGet);
-        }
-
-        public ActionResult UpdateReview(){
-            Session["ReviewID"] = M_Detail.UpdateReview(Session["TopicCode"] as string, Session["User"].ToString(), Session["Department"].ToString());
-            return Json(new {code=1,dept=Session["Department"].ToString()}, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult SubmitReviewItem(string status, string description, int id){
@@ -342,15 +335,27 @@ namespace ChangeControl.Controllers{
         }
 
         [HttpPost]
+        public ActionResult UpdateReview(){
+            var updated_rv = M_Detail.UpdateReview(Session["TopicCode"] as string, Session["User"].ToString(), Session["Department"].ToString());
+            Session["ReviewID"] = updated_rv.ID_Review;
+            Session["ReviewRev"] = updated_rv.Revision;
+            return Json(new {code = 1,dept = Session["Department"].ToString()}, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
         public ActionResult UpdateTrial(string desc){
-            Session["TrialID"] = M_Detail.UpdateTrial(Session["TopicCode"] as string, desc, Session["Department"].ToString(), Session["User"].ToString());
-            return Json(new {code=1}, JsonRequestBehavior.AllowGet);
+            var updated_tr = M_Detail.UpdateTrial(Session["TopicCode"] as string, desc, Session["Department"].ToString(), Session["User"].ToString());
+            Session["TrialID"] = updated_tr.ID;
+            Session["TrialRev"] = updated_tr.Revision;
+            return Json(new {code = 1, dept = Session["Department"].ToString()}, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
         public ActionResult UpdateConfirm(string desc){
-            Session["ConfirmID"] = M_Detail.UpdateConfirm(Session["TopicCode"] as string, desc, Session["Department"].ToString(), Session["User"].ToString());
-            return Json(new {code=1}, JsonRequestBehavior.AllowGet);
+            var updated_cf = M_Detail.UpdateConfirm(Session["TopicCode"] as string, desc, Session["Department"].ToString(), Session["User"].ToString());
+            Session["ConfirmID"] = updated_cf.ID;
+            Session["ConfirmRev"] = updated_cf.Revision;
+            return Json(new {code = 1, dept = Session["Department"].ToString()}, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]

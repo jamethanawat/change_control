@@ -83,22 +83,22 @@ namespace ChangeControl.Models
             return review_id;
         }
 
-        public long UpdateReview(string topic_code, string us_id, string dept){
+        public Review UpdateReview(string topic_code, string us_id, string dept){
             string query = null;
-            query = $@"INSERT INTO CCS.dbo.Review (Topic, [Date], [User], Department, Revision, UpdateBy, UpdateDate) OUTPUT Inserted.ID_Review 
+            query = $@"INSERT INTO CCS.dbo.Review (Topic, [Date], [User], Department, Revision, UpdateBy, UpdateDate) OUTPUT Inserted.ID_Review , Inserted.Revision 
             VALUES('{topic_code}', {date}, '{us_id}', '{dept}', (
                 SELECT Revision+1 FROM CCS.dbo.Review,
                 (SELECT MAX(Revision) as Version, Department as dept FROM CCS.dbo.Review WHERE Topic = '{topic_code}' AND Department = '{dept}' Group by Department) lastest
                 WHERE Topic = '{topic_code}' AND Department = '{dept}'
                 AND Review.Revision  = lastest.Version AND Review.Department = lastest.dept 
             ), '{us_id}', {date});";
-            var review_id = DB_CCS.Database.SqlQuery<long>(query).First();
+            var review_id = DB_CCS.Database.SqlQuery<Review>(query).First();
             return review_id;
         }
 
         public long InsertFile(HttpPostedFileBase file, long fk_id, string type, string desc, object session_user){
             string query = $@"INSERT INTO [File] (FK_ID, [Type], Name, Size, Name_Format, Description, Time_Insert, User_Insert) 
-            OUTPUT Inserted.ID VALUES({fk_id}, '{type}', '{file.FileName.ToString()}','{file.ContentLength}','{date_ff}','{desc}','{date}','{session_user}');";
+            OUTPUT Inserted.ID VALUES({fk_id}, '{type}', '{file.FileName.ToString().ReplaceSingleQuote()}','{file.ContentLength}','{date_ff}','{desc}','{date}','{session_user}');";
             long result = DB_CCS.Database.SqlQuery<long>(query).First();
             return result;
         }
@@ -314,37 +314,37 @@ namespace ChangeControl.Models
             }
         }
 
-        public long UpdateTrial(string topic_code,string desc, string dept, string user){
+        public Trial UpdateTrial(string topic_code,string desc, string dept, string user){
             try{
                 var sql= $@"INSERT INTO CCS.dbo.Trial (Topic, Detail, [Date], [User], Revision, Department, Status, UpdateDate, UpdateBy) 
-                OUTPUT Inserted.ID 
+                OUTPUT Inserted.ID, Inserted.Revision
                 VALUES('{topic_code}', '{desc.ReplaceSingleQuote()}', '{date}','{user}', (
                     SELECT Revision+1 FROM CCS.dbo.Trial,
                     (SELECT MAX(Revision) as Version, Department as dept FROM CCS.dbo.Trial WHERE Topic = '{topic_code}' AND Department = '{dept}' Group by Department) lastest
                     WHERE Topic = '{topic_code}' AND Department = '{dept}'
                     AND Trial.Revision  = lastest.Version AND Trial.Department = lastest.dept)
                 , '{dept}', 3, '{date}', '{user}');";
-                var result = DB_CCS.Database.SqlQuery<long>(sql).First();
+                var result = DB_CCS.Database.SqlQuery<Trial>(sql).First();
                 return result;
             }catch(Exception ex){
-                return 0;
+                return new Trial();
             }
         }
 
-        public long UpdateConfirm(string topic_code,string desc, string dept, string user){
+        public Confirm UpdateConfirm(string topic_code,string desc, string dept, string user){
             try{
                 var sql= $@"INSERT INTO CCS.dbo.Confirm (Topic, Detail, [Date], [User], Revision, Department, Status, UpdateDate, UpdateBy) 
-                OUTPUT Inserted.ID 
+                OUTPUT Inserted.ID ,Inserted.Revision 
                 VALUES('{topic_code}', '{desc.ReplaceSingleQuote()}', '{date}','{user}', (
                     SELECT Revision+1 FROM CCS.dbo.Confirm,
                     (SELECT MAX(Revision) as Version, Department as dept FROM CCS.dbo.Confirm WHERE Topic = '{topic_code}' AND Department = '{dept}' Group by Department) lastest
                     WHERE Topic = '{topic_code}' AND Department = '{dept}'
                     AND Confirm.Revision  = lastest.Version AND Confirm.Department = lastest.dept)
                 , '{dept}', 3, '{date}', '{user}');";
-                var result = DB_CCS.Database.SqlQuery<long>(sql).First();
+                var result = DB_CCS.Database.SqlQuery<Confirm>(sql).First();
                 return result;
             }catch(Exception ex){
-                return 0;
+                return new Confirm();
             }
         }
 

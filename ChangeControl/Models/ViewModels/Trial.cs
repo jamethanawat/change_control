@@ -14,6 +14,7 @@ namespace ChangeControl.Models{
         public string ApprovedDate { get; set;}
         public string Department { get; set; }
         public int Status { get; set; }
+        public int Revision { get; set; }
         public List<FileItem> FileList { get; set; }
         public User Profile {get; set;} 
         public User Approver {get; set;} 

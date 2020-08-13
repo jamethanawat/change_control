@@ -1,4 +1,4 @@
-<br><hr>
+﻿<br><hr>
 <h1>Review Items</h1><br>
 <form class="form-horizontal" action="javascript:void(0);" id="review" >
     @if(Model != null){
@@ -9,17 +9,17 @@
             <label for="inputProDesRe" class="col-sm-2 col-form-label">@Item.Name</label>
             <div class="col-sm-3 col-form-label">
                 <label style="margin-right: 15px;">
-                    <input type="radio" name="@temp_rd" value="1" class="flat-red" checked>
+                    <input data-type="status" data-id="@Item.ID" type="radio" name="@temp_rd" value="1" class="flat-red" checked>
                     Yes
                 </label>
                 <label style="margin-right: 15px;">
-                    <input type="radio" name="@temp_rd" value="0" class="flat-red" >
+                    <input data-type="status" data-id="@Item.ID" type="radio" name="@temp_rd" value="0" class="flat-red" >
                     No
                 </label>
             </div>
             <div class="col-sm-7 col-form-label">
                 <label>Details :</label>
-                <textarea class="form-control" name="@temp_desc" placeholder="" ></textarea>
+                <textarea data-type="desc" data-id="@Item.ID" class="form-control" name="@temp_desc" placeholder="" ></textarea>
             </div>
         </div>
         }

@@ -1,6 +1,4 @@
 
-var password = "63014@tnsadmin";
-var DevMode = "on";
 var department_list = CreateDepartmentOption();
 var position_list = CreatePositionOption();
 department_list.onchange = function selectChanged(e) {
@@ -9,51 +7,53 @@ department_list.onchange = function selectChanged(e) {
 position_list.onchange = function selectChanged(e) {
     value = e.target.value
 }
-
-function SetDepartment(){
-    swal({
-        title: "Developer Mode", 
-        text: "Please enter password", 
-        closeOnClickOutside: false,
-        buttons : [true,true],
-        content: {
-            element: "input",
-            attributes: {
-                placeholder: "Type your password",
-                type: "password",
-            },
-        },icon:"warning",
-    }).then((password) => {
-        if(password != null){
-            if(password == this.password || DevMode == "on"){
-                swal({
-                    title: "Developer Mode", 
-                    text: "Please submit Department", 
-                    closeOnClickOutside: false,
-                    content: department_list,
-                    buttons : [true,true],
-                    icon:"warning",
-                }).then((res) => {
-                    if(res){
-                        let typedDepartment = $(".select-custom").children("option:selected").text();
-                        if(typedDepartment != null){
-                            console.log(typedDepartment);
-                            $.post(SetDepartmentPath, {DepartmentName:typedDepartment}, (data) => {
-                                if(data == 1){
-                                    swal("Success", "Set Department Complete", "success").then(location.reload());
-                                }else{
-                                    swal("Error", "User Password Not Correct", "error");
+$(() => {
+    $("#change_dept_btn").click(() => {
+        //     swal({
+        //         title: "Developer Mode", 
+        //         text: "Please enter password", 
+        //         closeOnClickOutside: false,
+        //         buttons : [true,true],
+        //         content: {
+        //             element: "input",
+        //             attributes: {
+        //                 placeholder: "Type your password",
+        //                 type: "password",
+        //             },
+        //         },icon:"warning",
+        //     }).then((password) => {
+        //         if(password != null){
+        //             if(password == this.password || DevMode == "on"){
+                        swal({
+                            title: "Developer Mode", 
+                            text: "Please submit Department", 
+                            closeOnClickOutside: false,
+                            content: department_list,
+                            buttons : [true,true],
+                            icon:"warning",
+                        }).then((res) => {
+                            if(res){
+                                let typedDepartment = $(".select-custom").children("option:selected").text();
+                                if(typedDepartment != null){
+                                    console.log(typedDepartment);
+                                    $.post(SetDepartmentPath, {DepartmentName:typedDepartment}, (data) => {
+                                        if(data == 1){
+                                            swal("Success", "Set Department Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
+                                        }else{
+                                            swal("Error", "User Password Not Correct", "error");
+                                        }
+                                    },"json");
                                 }
-                            },"json");
-                        }
-                    }
-                });
-            }else{
-                swal("Error", "User Password Not Correct", "error");
-            }
-        }
+                            }
+                        });
+            //         }else{
+            //             swal("Error", "User Password Not Correct", "error");
+            //         }
+            //     }
+            // });
     });
-}
+
+})
 
 function CreateDepartmentOption(dept){
     var value;
@@ -98,7 +98,7 @@ function SetPosition(){
         },icon:"warning",
     }).then((password) => {
         if(password != null){
-            if(password == this.password || DevMode == "on"){
+            if(password == "wmpobxxvoFfg,o!@#$"){
                 swal({
                     title: "Developer Mode", 
                     text: "Please select Position", 
@@ -126,7 +126,7 @@ function SetPosition(){
 
 function CreatePositionOption(){
     var value;
-    var position = [ "Staff","Approver","TopicApprover"];
+    var position = [ "Staff","Approver","Admin"];
 
     const select = document.createElement('select');
     select.className = 'select-custom'

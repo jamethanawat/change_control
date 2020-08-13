@@ -58,7 +58,7 @@ $(document).ready(function () {
                 loader.toggle();
                 $.post(CheckUserPath,({ username:Iuser,password:Ipass }) ,(res) => {
                     if(res.status == "success"){
-                        swal("Success", "Sign in complete", "success").then( window.location.href = NavigateToHome );
+                        swal("Success", "Sign in complete", "success").then( window.location.href = (DetailID.length > 8 ) ? NavigateToDetail : NavigateToHome );
                     }else if(res.status == "missdept"){
                         var select = CreateDepartmentOption(res.data);
                         select.onchange = function selectChanged(e) { value = e.target.value }
@@ -76,7 +76,7 @@ $(document).ready(function () {
                             let selected_dept = $(".select-custom").children("option:selected").text();
                             $.post(SetDepartmentAltPath,{dept:selected_dept},(success) => {
                                 if(success){
-                                    swal("Success", "Sign in complete", "success").then( window.location.href = NavigateToHome );
+                                    swal("Success", "Sign in complete", "success").then( window.location.href = (DetailID.length > 8 ) ? NavigateToDetail : NavigateToHome );
                                 }
                             });
                         });

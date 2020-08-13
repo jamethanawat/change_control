@@ -58,6 +58,7 @@ namespace ChangeControl
                         "~/Plugin/filepond/filepond-plugin-image-preview.min.js",
                         "~/Plugin/filepond/filepond-plugin-file-validate-size.js",
                         "~/Scripts/Shared/FilePond.js",
+                        "~/Scripts/Shared/FilePond_rd.js",
                         "~/Scripts/Shared/FilePond_alt.js"));
 
         }

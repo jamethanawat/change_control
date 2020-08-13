@@ -1,4 +1,5 @@
-﻿$(() => {
+﻿var tr_edit_submit;
+$(() => {
 
     $(".tr-edit").click(function (e) { 
         e.preventDefault();
@@ -20,11 +21,7 @@
                         $.post(ApproveTrialPath, {trial_id:tr_id}, (result) => {
                             if(result){
                                 if(result.mail != ""){
-                                    $.post(GenerateMailPath,{
-                                        'mode': result.mail,
-                                        'topic_code':topic_code,
-                                        'dept': result.dept,
-                                    }).fail((error) => {
+                                    $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept': result.dept, }).fail((error) => {
                                         console.error(error);
                                         swal("Error", "Cannot send email to Requestor, Please try again", "error");
                                         return;
@@ -44,7 +41,14 @@
     });
 
     $("form#edit_trial_form").submit((e) => {
+        tr_edit_submit = true;
+        let InputNotValidate = checkInputRequired();
+        if(InputNotValidate){
+            return false; 
+        }
+        $("#edit_trial").modal("hide")
         e.preventDefault();
+
         $('#loading').removeClass('hidden')
             let trial_form = $("form#edit_trial_form").serializeArray();
             var promises = [];
@@ -57,7 +61,7 @@
                 delete files[index].detail;
             }
 
-            promises.push($.post(UpdateTrialPath,{ desc: trial_form[0].value},() => {
+            promises.push($.post(UpdateTrialPath,{ desc: trial_form[0].value},(result) => {
                 console.log('Inserted trial');
                 files.forEach(element => {
                     var Data = new FormData();
@@ -76,19 +80,32 @@
                             swal("Error", "Upload file not success", "error");
                         }
                     }));
+                    
+                    
                 });
+                
+                promises.push($.post(GenerateMailPath,{ 'mode': 'TrialUpdate', 'topic_code':topic_code, 'dept':result.dept, }).fail((error) => {
+                    console.error(error);
+                    swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                    return;
+                }));
             }).fail(() => {
                 swal("Error", "Trial is not succes, Please contact admin", "error");
                 $('#loading').addClass('hidden')
             }));
+
             
             Promise.all(promises).then(() => {
                 $('#loading').addClass('hidden')
                 InsertReviewStatus = false;
                 $("#trial_submit").prop("disabled",true)
-                $("#edit_trial").modal("hide")
                 swal("Success", "Insert Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
             })
+        
+        $('form#edit_trial_form').on('keyup change paste', 'input, select, textarea', (e) => {
+            /* --------------- and check is valid or not after submit once -------------- */
+            if(tr_edit_submit) checkInputRequired();
+        });
     });
 
 });

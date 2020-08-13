@@ -1,5 +1,9 @@
-﻿@{
+﻿@using ChangeControl.Models
+
+@{
     List<Review> rv_list = (List<Review>) Session["ReviewList"];
+    Review temp_rv = rv_list.Where(e => e.Item.Any(d => d.Type == 26  && d.Status == true)).First();
+    var ipp = temp_rv.Item.Find(d => d.Type == 26  && d.Status == true);
 }
     <p> 
       <strong>Subject : </strong>
@@ -8,7 +12,7 @@
     <p>Dear all concernings,</p>
     <p>
       According to  <b>@Model.Code</b> of model <b>@Model.Model</b> Part no. <b>@Model.PartNo</b> QA Required to attach IPP detail
-       @* : <b><u>Test Program change control</u></b>. *@
+       : <b>@ipp.Description</b>.
     </p>
     <p>For more details, please click this <a href="@ViewBag.Url">Link.</a></p>
     <p>Best Regards</p>

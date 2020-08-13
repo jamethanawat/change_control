@@ -225,6 +225,7 @@
                         @try{
                            @Html.Partial($"Body/{ViewBag.Mode}", Topic)
                         }catch(Exception err){
+                          Console.WriteLine(err);
                           <script>
                           $(() => {
                               console.log('@err.Message');

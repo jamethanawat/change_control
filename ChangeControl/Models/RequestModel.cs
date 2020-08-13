@@ -10,6 +10,7 @@ using System.Dynamic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
+using ChangeControl.Helpers;
 
 namespace ChangeControl.Models{
     public class RequestModel{
@@ -95,7 +96,7 @@ namespace ChangeControl.Models{
 
         public long InsertFile(HttpPostedFileBase file, long fk_id, string type, string description, object session_user){
             string query = $@"INSERT INTO [File] (FK_ID, [Type], Name, Size, Name_Format, Description, Time_Insert, User_Insert) 
-            OUTPUT Inserted.ID VALUES({fk_id}, '{type}', '{file.FileName.ToString()}','{file.ContentLength}','{date_ff}','{description}','{date}','{session_user}');";
+            OUTPUT Inserted.ID VALUES({fk_id}, '{type}', '{file.FileName.ToString().ReplaceSingleQuote()}','{file.ContentLength}','{date_ff}','{description}','{date}','{session_user}');";
             long result = DB_CCS.Database.SqlQuery<long>(query).First();
             return result;
         }

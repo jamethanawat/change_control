@@ -1,4 +1,4 @@
-@using ChangeControl.Models;
+﻿@using ChangeControl.Models;
 <!-- Modal -->
 <div class="modal fade" id="edit_review" tabindex="-1" role="dialog" aria-labelledby="edit_review" aria-modal="true" style="z-index:1200">
     <div class="modal-dialog modal-lg" role="document">
@@ -21,22 +21,22 @@
 
                             <div class="col-sm-3 col-form-label">
                                 <label style="margin-right: 15px;">
-                                    <input type="radio" name="@temp_rd" value="1" class="flat-red" @(Item.Status ? "checked" : "")>
+                                    <input data-type="status" data-id="@Item.Type" type="radio" name="@temp_rd" value="1" class="flat-red" @(Item.Status ? "checked" : "")>
                                     Yes
                                 </label>
                                 <label style="margin-right: 15px;">
-                                    <input type="radio" name="@temp_rd" value="0" class="flat-red" @(Item.Status ? "" : "checked")>
+                                    <input data-type="status" data-id="@Item.Type" type="radio" name="@temp_rd" value="0" class="flat-red" @(Item.Status ? "" : "checked")>
                                     No
                                 </label>
                             </div>
                             <div class="col-sm-7 col-form-label">
                                 <label>Details :</label>
-                                <textarea class="form-control" name="@temp_desc" placeholder="">@Item.Description</textarea>
+                                <textarea data-type="desc" data-id="@Item.Type" class="form-control" name="@temp_desc" placeholder="">@(Item != null ? Item.Description : "")</textarea>
                             </div>
                             }else{
                             <div class="col-sm-10 col-form-label">
                                 <label>Details :</label>
-                                <textarea class="form-control" name="@temp_desc" placeholder="">@Item.Description</textarea>
+                                <textarea data-type="desc" data-id="@Item.Type" class="form-control" name="@temp_desc" placeholder="">@(Item != null ? Item.Description : "")</textarea>
                             </div>
                             }
                         </div>
@@ -53,6 +53,8 @@
             </div>
         </div>
         </div>
+        <span class="text-danger mr-auto" id="validate-warning" style="display:none">กรุณาระบุข้อมูล/รายละเอียดให้ครบถ้วน</span>
+
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">
                 Close

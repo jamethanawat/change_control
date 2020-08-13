@@ -24,6 +24,8 @@
             var SetDepartmentPath = '@Url.Action("SetDepartment", "Login")';
             var SetDepartmentAltPath = '@Url.Action("SetDepartmentAlt", "Login")';
             var NavigateToHome = '@Url.Action("Index", "Home")';
+            var DetailID = '@((string) Session["RedirectID"] != null ? Session["RedirectID"].ToString() : "")';
+            var NavigateToDetail = `@((string) Session["RedirectID"] != null ? @Url.Action("Index", "Detail" , new { id = Session["RedirectID"].ToString()}) : @Url.Action("Index", "Detail"))`;
 
         </script>
 

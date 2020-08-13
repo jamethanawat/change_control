@@ -7,7 +7,7 @@
     <p>
       According to  <b>@Model.Code</b> of model <b>@Model.Model</b> Part no. <b>@Model.PartNo</b> <br> 
       @* review by <b>@Model.Profile.FullName</b>  *@
-      within <b>@Model.Time_insert</b> Please review data.
+      within <b>@DateTime.Now.AddDays(10).ToString("d MMMM yyyy")</b> Please review data.
     </p>
     <p>For more details, please click this <a href="@ViewBag.Url">Link.</a></p>
     <p>Best Regards</p>

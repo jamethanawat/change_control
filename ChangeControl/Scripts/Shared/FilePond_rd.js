@@ -1,12 +1,12 @@
 $(() => {
     FilePond.registerPlugin(FilePondPluginFileEncode);
     FilePond.registerPlugin(FilePondPluginFileValidateSize);
-    const inputElement = document.querySelector('input[name="filepond"]');
+    const inputElement = document.querySelector('input[name="filepond_rd"]');
     var file_length = 0;
     var file_arry = [];
     var file_detail = [];
-    var st_bad_file = 0;
-    var pond = FilePond.create( inputElement,{
+    var rd_bad_file = 0;
+    var pond_rd = FilePond.create( inputElement,{
         maxFiles: 20,
         allowMultiple: true,
         required: false,
@@ -15,11 +15,11 @@ $(() => {
     });
 
     var count = 0;
-    pond.on('addfile', (error, item) => {
+    pond_rd.on('addfile', (error, item) => {
         file_length = $(".filepond--file").length - $(".filepond--item[data-filepond-item-state='load-invalid'] > fieldset > .filepond--file").length;
         var file_obj = {id : null, detail : null,description : null};
         if(item.status == 8){
-            st_bad_file++;
+            rd_bad_file++;
             $(".btn-info").prop("disabled",true);
             swal("File too large!!", `${item.filename} is bigger than 10MB. \n Please delete and upload smaller file. \n\n *This file will not upload to server`, "error");
         }
@@ -54,38 +54,40 @@ $(() => {
             }
                 
         file_obj.detail = item;
-        file_list.push(file_obj);
+        file_list_rd.push(file_obj);
         
         // count++;
-        // if(file_list.length == file_length){
+        // console.log("compared: ",file_list_rd.length);
+        // if(file_list_rd.length == file_length){
             $(".filepond-add-desc").off("click");
             $(".filepond-add-desc").on("click",(e) => {
                 add_description(e.target.id);
             })
-        //     count = 0;
-        //     file_detail = [];
-        //     file_arry = [];
+            // count = 0;
+            // origin_file = file_arry;
+            // file_detail = [];
+            // file_arry = [];
         // }
-         console.log(file_list);
+        console.log(file_list_rd);
     });
 
-    pond.on('removefile', (error,item) =>{
+    pond_rd.on('removefile', (error,item) =>{
         if(item.status == 8){
-            st_bad_file--;
-            if(st_bad_file == 0) $(".btn-info").prop("disabled",false);
+            rd_bad_file--;
+            if(rd_bad_file == 0) $(".btn-info").prop("disabled",false);
         }
         if (error) {
             console.log('Oh no');
             return;
         }
 
-        file_list = file_list.filter(e => e.detail.id != item.id);
+        file_list_rd = file_list_rd.filter(e => e.detail.id != item.id);
     });
 
     function add_description(update_id){
         $(".modal").not("#resubmit_modal").modal("hide")
         update_id = update_id.slice(1);
-        update_i = file_list.findIndex(item => item.detail.id == update_id);
+        update_i = file_list_rd.findIndex(item => item.detail.id == update_id);
         swal({
             title: "Please provide a description.", 
             text: "โปรดระบุคำอธิบายของไฟล์หรือเอกสารดังกล่าว", 
@@ -93,7 +95,7 @@ $(() => {
                 element: "input",
                 attributes: {
                     placeholder: "คำอธิบาย",
-                    value: file_list[update_i].description,
+                    value: file_list_rd[update_i].description,
                 },
                
             },
@@ -111,9 +113,9 @@ $(() => {
         }).then((result) => {
             $(".modal").not("#resubmit_modal").modal("show");
             if(result != null && result != "" && result != "clear"){
-                 console.log(`${update_id}`);
+                console.log(`${update_id}`);
                 $(`.filepond--file-status-main#s${update_id}`).html(result).show("slow");
-                file_list[update_i].description = result;
+                file_list_rd[update_i].description = result;
                 swal({
                     title: "สำเร็จ", 
                     text: "เพิ่มคำอธิบายสำเร็จ", 
@@ -121,7 +123,7 @@ $(() => {
                 });
             }else if(result == "clear"){
                 $(`.filepond--file-status-main#s${update_id}`).hide("slow");
-                file_list[update_i].description = null;
+                file_list_rd[update_i].description = null;
                 // swal({
                 //     title: "สำเร็จ", 
                 //     text: "เพิ่มคำอธิบายสำเร็จ", 
@@ -131,19 +133,15 @@ $(() => {
         });
     }
 
-    // window.pondAddFile = (path = "/nature.jpg") => {
-    //     pond.addFile(path, {options: {
+    // window.rd_pondAddFile = (path = "/nature.jpg") => {
+    //     pond_rd.addFile(path, {options: {
     //         file: {
     //             name: 'my-file.png',
     //         }
     //     }});
     // };
 
-    // window.addPondFile = () => {
-
-    // }
-
-    // window.addFile = (id = null,file,description = null) => {
+    // window.rd_addFile = (id = null,file,description = null) => {
     //     file_arry.push(file);
     //     let detail = {
     //         id: id,
@@ -153,14 +151,18 @@ $(() => {
     //     file_length++;
     // }
 
-    // window.getFile = () => {
-    //     return file_arry;
+    // window.rd_getFile = () => {
+    //     return file_list_rd;
     // }
 
-    // window.pondSetOptions = () => {
-    //     pond.setOptions({
+    // window.rd_pondSetOptions = () => {
+    //     pond_rd.setOptions({
     //         files:file_arry
     //     });
+    // }
+
+    // window.rd_removeFile = (id) => {
+    //     pond_rd.removeFile(id);
     // }
 
 });

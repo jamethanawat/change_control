@@ -1,4 +1,4 @@
-@using ChangeControl.Models;
+﻿@using ChangeControl.Models;
 <!-- Modal -->
 <div class="modal fade" id="edit_confirm" tabindex="-1" role="dialog" aria-labelledby="edit_confirm" aria-modal="true" style="z-index:1200">
     <div class="modal-dialog modal-lg" role="document">
@@ -19,7 +19,7 @@
                             Description:
                         </label>
                         <div class="col-sm-10 col-form-label">
-                            <textarea class="form-control" name="desc" placeholder="" style="height:20vh">@Model.Detail</textarea>
+                            <textarea class="form-control required" name="desc" placeholder="" style="height:20vh">@Model.Detail</textarea>
                         </div>
                     </div>
                     <div class="row">

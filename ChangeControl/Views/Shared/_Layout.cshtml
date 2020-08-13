@@ -160,6 +160,10 @@
             padding-right: 0px !important;
         }
 
+        .swal-modal .swal-text {
+            text-align: center;
+        }
+
     </style>
     
 
@@ -372,6 +376,16 @@
                     </div>
                 </li>
                 <!-- Notifications Dropdown Menu -->
+                @if((string) Session["Position"] == "Admin"){
+                <li class="nav-item">
+                    <a class="nav-link pr-0" id="change_dept_btn">
+                        @* <i class="far fa-clipboard"></i> *@
+                        @* <span class="badge badge-success navbar-badge">3</span> *@
+                        <input type="submit" class="btn btn-block btn-sm btn-primary" value="Change Department">
+                    </a>
+                </li>
+                }
+
                 <li class="nav-item">
                     <a class="nav-link" href='@Url.Action("SignOut", "Login")'>
                         @* <i class="far fa-clipboard"></i> *@

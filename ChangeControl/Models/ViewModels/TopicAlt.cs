@@ -71,9 +71,9 @@ namespace ChangeControl.Models{
             this.Time_insert = DateTime.Now.ToString("d MMMM yyyy");
             this.ID = 9999;
             this.Profile = new User();
-            this.Profile.FullName = "Pakawat Smutkun";
-            this.Profile.Name = "Pakawat";
-            this.Profile.SurName = "Smutkun";
+            this.Profile.FullName = "John Doe";
+            this.Profile.Name = "John";
+            this.Profile.SurName = "Doe";
         }
     }
 }

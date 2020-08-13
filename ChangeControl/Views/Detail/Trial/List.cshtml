@@ -1,8 +1,8 @@
-@using ChangeControl.Models
+﻿@using ChangeControl.Models
 @{
     var str_date = "05 มิถุนายน 2020";
     string department = (string)Session["Department"];
-    var isApprover = ((string)Session["Position"] == "Approver");
+    var isApprover = ((string)Session["Position"] == "Approver" || (string)Session["Position"] == "Admin");
     var isQC = ((string)Session["Department"] == "QC1" || (string)Session["Department"] == "QC2" || (string)Session["Department"] == "QC3");
     List<Trial> ElementList = Model as List<Trial>;
 }

@@ -7,23 +7,23 @@
 
         <div class="col-sm-3 col-form-label">
             <label style="margin-right: 15px;">
-                <input type="radio" name="rd-0" value="1" class="flat-red" checked>
+                <input type="radio" data-type="status" data-id="0" name="rd-0" value="1" class="flat-red" checked>
                 Acceptance
             </label>
             <label style="margin-right: 15px;">
-                <input type="radio" name="rd-0" value="0" class="flat-red" >
+                <input type="radio" data-type="status" data-id="0" name="rd-0" value="0" class="flat-red" >
                 Not, Acceptance
             </label>
         </div>
         <div class="col-sm-7 col-form-label">
             <label>Not Approve reason :</label>
-            <input type="text" name="desc-0" class="form-control" placeholder="200 character limit">
+            <input type="text" data-type="desc" data-id="0" name="desc-0" class="form-control" placeholder="200 character limit">
         </div>
     </div>
     <div class="form-group row">
         <label for="inputChangeDetails" class="col-sm-2 col-form-label">Change date</label>
         <div class="col-sm-10 col-form-label">
-            <input data-toggle="datepicker" class="form-control required" placeholder="Select Date " autocomplete="off" name="desc-32" >
+            <input data-toggle="datepicker" data-type="desc" data-id="32" class="form-control required" placeholder="Select Date " autocomplete="off" name="desc-32" >
             <div data-toggle="datepicker"></div>
             @* <input type="text" name="desc-32" class="form-control" placeholder="Enter Date "> *@
         </div>
@@ -31,51 +31,51 @@
     <div class="form-group row">
         <label for="inputChangeDetails" class="col-sm-2 col-form-label">Change details</label>
         <div class="col-sm-10 col-form-label">
-            <input type="text" name="desc-1" class="form-control required" placeholder="500 character limit" >
+            <input type="text"data-type="desc" data-id="1"  name="desc-1" class="form-control required" placeholder="500 character limit" >
         </div>
     </div>
     <div class="form-group row">
         <label for="inputProDesRe" class="col-sm-2 col-form-label">Process design review</label>
         <div class="col-sm-3 col-form-label">
             <label style="margin-right: 15px;">
-                <input type="radio" name="rd-2" value="1" class="flat-red" checked>
+                <input type="radio" data-type="status" data-id="2" name="rd-2" value="1" class="flat-red" checked>
                 Yes
             </label>
             <label style="margin-right: 15px;">
-                <input type="radio" name="rd-2" value="0" class="flat-red" >
+                <input type="radio" data-type="status" data-id="2" name="rd-2" value="0" class="flat-red" >
                 No, Acceptance
             </label>
         </div>
         <div class="col-sm-7 col-form-label">
             <label>if yes,inform to NS   Due date :</label>
-            <textarea name="desc-2" class="form-control required" placeholder=""></textarea>
+            <textarea data-type="desc" data-id="2" name="desc-2" class="form-control" placeholder=""></textarea>
         </div>
     </div>
     <div class="form-group row">
         <label for="inputEffeDoc" class="col-sm-2 col-form-label">Effected to Document (Control Plan ,FMEA)</label>
         <div class="col-sm-3 col-form-label">
             <label style="margin-right: 15px;">
-                <input type="radio" name="rd-3" value="1" class="flat-red" checked>
+                <input type="radio" data-type="status" data-id="3" name="rd-3" value="1" class="flat-red" checked>
                 Yes
             </label>
             <label style="margin-right: 15px;">
-                <input type="radio" name="rd-3" value="0" class="flat-red" >
+                <input type="radio" data-type="status" data-id="3" name="rd-3" value="0" class="flat-red" >
                 No, Acceptance
             </label>
         </div>
         <div class="col-sm-4 col-form-label">
             <label>Control Plan no. :</label>
-            <textarea name="desc-29" class="form-control required" placeholder=""></textarea>
+            <textarea name="desc-29" data-type="desc" data-id="29" class="form-control" placeholder=""></textarea>
         </div>
         <div class="col-sm-3 col-form-label">
             <label>FMEA No. :</label>
-            <textarea name="desc-30" class="form-control required" placeholder=""></textarea>
+            <textarea name="desc-30" data-type="desc" data-id="30" class="form-control" placeholder=""></textarea>
         </div>
     </div>
     <div class="form-group row">
         <label for="inputSkills" class="col-sm-2 col-form-label">Due Date</label>
         <div class="col-sm-10 col-form-label">
-            <input data-toggle="datepicker" class="form-control required" placeholder="Select Date " autocomplete="off" name="desc-31" >
+            <input data-toggle="datepicker" data-type="desc" data-id="31" class="form-control required" placeholder="Select Date " autocomplete="off" name="desc-31" >
             <div data-toggle="datepicker"></div>
             @* <input type="text" name="desc-32" class="form-control" placeholder="Enter Date "> *@
         </div>
@@ -83,24 +83,24 @@
     <div class="form-group row">
         <label for="inputSkills" class="col-sm-2 col-form-label">Others  (Please specify)</label>
         <div class="col-sm-10 col-form-label">
-            <input name="desc-22" type="text" class="form-control required" placeholder="500 character limit" >
+            <input name="desc-22" data-type="desc" data-id="22" type="text" class="form-control required" placeholder="500 character limit" >
         </div>
     </div>
     <div class="form-group row">
         <label for="inputReqReTrial" class="col-sm-2 col-form-label">Request Trial</label>
         <div class="col-sm-3 col-form-label">
             <label style="margin-right: 15px;">
-                <input type="radio" name="rd-24" value="1" class="flat-red" checked>
+                <input type="radio" data-type="status" data-id="24" name="rd-24" value="1" class="flat-red" checked>
                 Yes
             </label>
             <label style="margin-right: 15px;">
-                <input type="radio" name="rd-24" value="0" class="flat-red" >
+                <input type="radio" data-type="status" data-id="24" name="rd-24" value="0" class="flat-red" >
                 No, Acceptance
             </label>
         </div>
         <div class="col-sm-7 col-form-label">
             <label>Details :</label>
-            <textarea class="form-control required" name="desc-24" placeholder=""></textarea>
+            <textarea data-type="desc" data-id="24" class="form-control" name="desc-24" placeholder=""></textarea>
         </div>
     </div>
     <div class="form-group row">

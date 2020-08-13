@@ -1,4 +1,5 @@
-﻿$(() => {
+﻿var cf_edit_submit;
+$(() => {
 
     $(".cf-edit").click(function (e) { 
         e.preventDefault();
@@ -20,11 +21,7 @@
                         $.post(ApproveConfirmPath, {confirm_id:cf_id}, (result) => {
                             if(result){
                                 if(result.mail != ""){
-                                    $.post(GenerateMailPath,{
-                                        'mode': result.mail,
-                                        'topic_code':topic_code,
-                                        'dept': result.dept,
-                                    }).fail((error) => {
+                                    $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept': result.dept, }).fail((error) => {
                                         console.error(error);
                                         swal("Error", "Cannot send email to Requestor, Please try again", "error");
                                         return;
@@ -44,6 +41,12 @@
     });
 
     $("form#edit_confirm_form").submit((e) => {
+        cf_edit_submit = true;
+        let InputNotValidate = checkInputRequired();
+        if(InputNotValidate){
+            return false; 
+        }
+        $("#edit_confirm").modal("hide")
         e.preventDefault();
         $('#loading').removeClass('hidden')
             let confirm_form = $("form#edit_confirm_form").serializeArray();
@@ -57,8 +60,15 @@
                 delete files[index].detail;
             }
 
-            promises.push($.post(UpdateConfirmPath,{ desc: confirm_form[0].value},() => {
+            promises.push($.post(UpdateConfirmPath,{ desc: confirm_form[0].value},(result) => {
                 console.log('Inserted confirm');
+
+                promises.push($.post(GenerateMailPath,{ 'mode': 'ConfirmUpdate', 'topic_code':topic_code, 'dept':result.dept }).fail((error) => {
+                    console.error(error);
+                    swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                    return;
+                }));
+
                 files.forEach(element => {
                     var Data = new FormData();
                     Data.append("file",element.file);
@@ -76,11 +86,14 @@
                             swal("Error", "Upload file not success", "error");
                         }
                     }));
+                    
                 });
+                
             }).fail(() => {
                 swal("Error", "Confirm is not succes, Please contact admin", "error");
                 $('#loading').addClass('hidden')
             }));
+
             
             Promise.all(promises).then(() => {
                 $('#loading').addClass('hidden')
@@ -89,6 +102,11 @@
                 $("#edit_confirm").modal("hide")
                 swal("Success", "Insert Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
             })
+
+        $('form#edit_confirm_form').on('keyup change paste', 'input, select, textarea', (e) => {
+            /* --------------- and check is valid or not after submit once -------------- */
+            if(cf_edit_submit) checkInputRequired();
+        });
     });
 
 });
