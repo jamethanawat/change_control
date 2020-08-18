@@ -61,7 +61,7 @@
         if (step === 1) {
             $modal.find('[data-step-to=prev]').hide().end().find('[data-step-to=next]').show().end().find('[data-submit], [type=submit]').hide();
         } else if (step === stepsLength) {
-            $modal.find('[data-step-to=next]').hide().end().find('[data-submit], [type=submit]').show();
+            $modal.find('[data-step-to=next]').hide().end().find('[data-step-to=prev]').show().end().find('[data-submit], [type=submit]').show();
         } else if (step > stepsLength && step < 0) {
             return;
         } else {

@@ -57,28 +57,36 @@ $(() => {
 
 function CreateDepartmentOption(dept){
     var value;
-    var position = ["PE1_Process","PE2_Process",
-                    "MKT",
-                    "IT",
-                    "PE1","PE2","PE2_SMT","PE2_PCB","PE2_MT",
-                    "PCH1","PCH2",
-                    "P1","P2","P3A","P3M","P4","P5","P6","P7",
-                    "PC1","PC2",
-                    "QC1","QC2","QC3",
-                    "QC_IN1","QC_IN2","QC_IN3",
-                    "QC_NFM1","QC_NFM2","QC_NFM3",
-                    "QC_FINAL1","QC_FINAL2","QC_FINAL3",]
+    // var position = ["PE1_Process","PE2_Process",
+    //                 "MKT",
+    //                 "IT",
+    //                 "PE1","PE2","PE2_SMT","PE2_PCB","PE2_MT",
+    //                 "PCH",
+    //                 "P1","P2","P3A","P3M","P4","P5","P6","P7",
+    //                 "PC1","PC2",
+    //                 "QC1","QC2","QC3",
+    //                 "QC_IN1","QC_IN2","QC_IN3",
+    //                 "QC_NFM1","QC_NFM2","QC_NFM3",
+    //                 "QC_FINAL1","QC_FINAL2","QC_FINAL3",]
+
+    var position;
+    var promises = [];
+
+    promises.push($.post(GetDepartmentListPath,(result) => {
+        position = result.data;
+    }));
 
     const select = document.createElement('select');
     select.className = 'select-custom'
     let i=1;
-    position.forEach(element => {
-        let option = document.createElement('option');
-        option.selected = (element == dept) ? true : false;
-        option.innerHTML = element;
-        option.value = i;
-        select.appendChild(option);
-        i++;
+    Promise.all(promises).then(() => {position.forEach(element => {
+            let option = document.createElement('option');
+            option.selected = (element == dept) ? true : false;
+            option.innerHTML = element;
+            option.value = i;
+            select.appendChild(option);
+            i++;
+        })
     });
     return select;
 }

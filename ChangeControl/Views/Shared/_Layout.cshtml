@@ -22,6 +22,7 @@
         var file_array = [];
         var file_length = 0;
         var SetDepartmentPath = '@Url.Action("SetDepartment", "Login")';
+        var GetDepartmentListPath = '@Url.Action("GetDepartment", "Request")';
         var SetPositionPath = '@Url.Action("SetPosition", "Login")';
         var GetSessionPath = '@Url.Action("GetSession", "Login")';
 
@@ -431,7 +432,7 @@
                             <a id="menu1-1" href="@Url.Action("Index", "Home")" class="nav-link animsition-link">
                                 <i class="nav-icon fas fa-tachometer-alt"></i>
                                 <p>
-                                    Search
+                                    Main menu
                                     <span class="right badge badge-danger">New</span>
                                 </p>
                             </a>
@@ -441,7 +442,7 @@
                                 <i class="nav-icon fas fa-edit"></i>
 
                                 <p>
-                                    Request
+                                    Request change item
                                 </p>
                             </a>
                         </li>

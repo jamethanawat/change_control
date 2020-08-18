@@ -32,7 +32,7 @@ namespace ChangeControl.Models{
                 myAD.ADInfo conAD = new myAD.ADInfo();
                 bool FoundUser = conAD.ChkAuth(user,password);
                 if (FoundUser){
-                    User temp_user = new User(conAD.ChkFullName(user), conAD.ChkName(user), conAD.ChkSurName(user), conAD.ChkEmail(user),null, null);
+                    User temp_user = new User(conAD.ChkFullName(user), conAD.ChkName(user), conAD.ChkSurName(user),null, null);
                     response.message = "success";
                     response.data = temp_user;
                     return response;
@@ -71,6 +71,19 @@ namespace ChangeControl.Models{
                 response.status = "success";
             }catch(Exception err){
                 response.status = "false";
+            }
+            return response;
+        }
+
+        public object GetDepartmentByUserID(string us_id){
+            try{
+                var sql = $"SELECT TOP(1) Dept FROM CCS.dbo.[User] WHERE Code = '{us_id}';";
+                var result = DB_CCS.Database.SqlQuery<string>(sql).First();
+                response.data = result;
+                response.status = "success";
+            }catch(Exception err){
+                response.status = "false";
+                response.data = null;
             }
             return response;
         }

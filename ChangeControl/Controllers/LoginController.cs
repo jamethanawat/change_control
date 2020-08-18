@@ -46,17 +46,18 @@ namespace ChangeControl.Controllers{
                     Session["FullName"] = response.FullName;
                     Session["Name"] = response.Name;
                     Session["SurName"] = response.SurName;
-                    Session["Email"] = response.Email;
-                    response = M_Login.GetPositionByUserID(username);
-                    Session["Position"] = (response.status == "success") ? response.data : "Staff";
+                    
+                    res = M_Login.GetPositionByUserID(username);
+                    Session["Position"] = (res.status == "success") ? res.data : "Staff";
 
-                    result = GetDepartment(username);
+                    res = M_Login.GetDepartmentByUserID(username);
+                    result = (res.status == "success") ? res.data : GetDepartment(username);
 
-                    if(result == "Not found"){
-                        status = "missdept";
-                    }else{
+                    if(result != "Not found"){
                         SetDepartment(result);
                         status = "success";
+                    }else{
+                        status = "missdept";
                     }
                 }
                 }catch(Exception err){
@@ -78,11 +79,11 @@ namespace ChangeControl.Controllers{
         }
 
         public string CheckDepartment(string dept){
-            string[] PE_Process = {"PE1_Process","PE2_Process"};
+            string[] PE_Process = {"PE1_Process","PE2_Process","P5_ProcessDesign","P6_ProcessDesign"};
             string[] MKT = {"MKT","MKT1","MKT2"};
             string[] IT = {"IT","IT1","IT2"};
             string[] PE = {"PE","PE1","PE2","PE2_SMT","PE2_PCB","PE2_MT"};
-            string[] PCH = {"PCH","PCH1","PCH2"};
+            string[] PCH = {"PCH"};
             string[] P = {"P","P1","P2","P3A","P3M","P4","P5","P6","P7"};
             string[] PC = {"PC","PC1","PC2"};
             string[] QC = {"QC","QC1","QC2","QC3"};
@@ -125,11 +126,11 @@ namespace ChangeControl.Controllers{
             var temp_dept = conAD.ChkSection(us_id);
             Session["DepartmentRawName"] = temp_dept;
 
-            string[] PE_Process = {"PE1_Process","PE2_Process"};
+            string[] PE_Process = {"PE1_Process","PE2_Process","P5_ProcessDesign","P6_ProcessDesign"};
             string[] MKT = {"MKT"};
             string[] IT = {"IT"};
             string[] PE = {"PE1","PE2","PE2_SMT","PE2_PCB","PE2_MT"};
-            string[] PCH = {"PCH","PCH1","PCH2"};
+            string[] PCH = {"PCH"};
             string[] P = {"P1","P2","P3A","P3M","P4","P5","P6","P7"};
             string[] PC = {"PC1","PC2"};
             string[] QC = {"QC1","QC2","QC3"};

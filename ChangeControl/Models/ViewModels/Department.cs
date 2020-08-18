@@ -14,6 +14,7 @@ namespace ChangeControl.Models
         public string Dept { get; set; }
         public string Name { get; set; }
         public string NameRaw { get; set; }
+        public int Status { get; set; }
         public List<int> Value { get; set;}        
     }
 }

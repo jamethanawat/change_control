@@ -78,7 +78,7 @@ namespace ChangeControl.Models
 
         public long InsertReview(string topic_code, string us_id, string dept){
             string query = null;
-            query = $"INSERT INTO CCS.dbo.Review (Topic,  [Date], [User], Department, Revision, UpdateBy, UpdateDate) OUTPUT Inserted.ID_Review VALUES('{topic_code}', {date}, '{us_id}', '{dept}', 1, '{us_id}', {date});";
+            query = $"INSERT INTO CCS.dbo.Review (Topic,  [Date], [User], Department, Revision, UpdateBy, UpdateDate) OUTPUT Inserted.ID_Review VALUES('{topic_code}', {date}, '{us_id}', '{dept}', 0, '{us_id}', {date});";
             var review_id = DB_CCS.Database.SqlQuery<long>(query).First();
             return review_id;
         }
@@ -111,7 +111,7 @@ namespace ChangeControl.Models
         }
         public TopicAlt GetTopicByOriginID(string topic_code){ //every file review confirm is related to 
             try{
-                var sql = $@"SELECT Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, Timing, Related, User_insert, Time_insert, 
+                var sql = $@"SELECT Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, Timing, Related, User_insert, Time_insert, ApprovedBy, ApprovedDate, 
                 ID FROM CCS.dbo.Topic 
                 LEFT JOIN Change_Item ON Topic.Change_item = ID_Change_item 
                 LEFT JOIN Product_Type ON Topic.Product_Type = ID_Product_Type 
@@ -126,7 +126,7 @@ namespace ChangeControl.Models
         
         public TopicAlt GetTopicByCode(string topic_code){
             try{
-                var sql = $@"SELECT  Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Department, Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, Timing, Related, User_insert, Time_insert, 
+                var sql = $@"SELECT  Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Department, Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, Timing, Related, User_insert, Time_insert , ApprovedBy, ApprovedDate, 
                 ID FROM CCS.dbo.Topic 
                 LEFT JOIN Change_Item ON Topic.Change_item = ID_Change_item 
                 LEFT JOIN Product_Type ON Topic.Product_Type = ID_Product_Type 
@@ -171,11 +171,11 @@ namespace ChangeControl.Models
 
         public User getUserByID(string id){
             if(id == null){
-                return new User(null, null, null, null, null, null);
+                return new User(null, null, null, null, null);
             }else{
                 System.Net.ServicePointManager.Expect100Continue = false;
                 myAD.ADInfo conAD = new myAD.ADInfo();
-                User temp_user = new User(conAD.ChkFullName(id), conAD.ChkName(id), conAD.ChkSurName(id), conAD.ChkEmail(id),conAD.ChkDept(id), conAD.ChkPosition(id));
+                User temp_user = new User(conAD.ChkFullName(id), conAD.ChkName(id), conAD.ChkSurName(id), conAD.ChkDept(id), conAD.ChkPosition(id));
                 return temp_user;
             }
         }
@@ -202,7 +202,7 @@ namespace ChangeControl.Models
         }
 
         public Related GetRelatedByResubmitTopicID(string topic_code){
-            var sql = $@"SELECT P1, P2, P3A, P3M, P4, P5, P6, P7, IT, MKT, PC1, PC2, PCH1, PCH2, PE1, PE2, PE2_SMT, PE2_PCB, PE2_MT, QC_IN1, QC_IN2, QC_IN3, QC_FINAL1, QC_FINAL2, QC_FINAL3, QC_NFM1, QC_NFM2, QC_NFM3, QC1, QC2, QC3, PE1_Process, PE2_Process 
+            var sql = $@"SELECT P1, P2, P3A, P3M, P4, P5, P6, P7, IT, MKT, PC1, PC2, PCH, PE1, PE2, PE2_SMT, PE2_PCB, PE2_MT, QC_IN1, QC_IN2, QC_IN3, QC_FINAL1, QC_FINAL2, QC_FINAL3, QC_NFM1, QC_NFM2, QC_NFM3, QC1, QC2, QC3, PE1_Process, PE2_Process , P5_ProcessDesign, P6_ProcessDesign
             FROM CCS.dbo.Related 
             LEFT JOIN Resubmit ON Related.ID = Resubmit.Related 
             WHERE Resubmit.Topic = '{topic_code}';";
@@ -210,10 +210,10 @@ namespace ChangeControl.Models
             return result;
         }
 
-        public long InsertRelated(Related obj){
-            string query = $@"INSERT INTO Related (P1, P2, P3A, P3M, P4, P5, P6, P7, IT, MKT, PC1, PC2, PCH1, PCH2, PE1, PE2, PE2_SMT, PE2_PCB, PE2_MT, QC_IN1, QC_IN2, QC_IN3, QC_FINAL1, QC_FINAL2, QC_FINAL3, QC_NFM1, QC_NFM2, QC_NFM3, QC1, QC2, QC3, PE1_Process, PE2_Process) 
+        public long InsertRelated(Related obj, string us_id){
+            string query = $@"INSERT INTO Related (P1, P2, P3A, P3M, P4, P5, P6, P7, IT, MKT, PC1, PC2, PCH, PE1, PE2, PE2_SMT, PE2_PCB, PE2_MT, QC_IN1, QC_IN2, QC_IN3, QC_FINAL1, QC_FINAL2, QC_FINAL3, QC_NFM1, QC_NFM2, QC_NFM3, QC1, QC2, QC3, PE1_Process, PE2_Process, P5_ProcessDesign, P6_ProcessDesign, UpdatedBy) 
             OUTPUT Inserted.ID 
-            VALUES('{obj.P1}', '{obj.P2}', '{obj.P3A}', '{obj.P3M}', '{obj.P4}', '{obj.P5}', '{obj.P6}', '{obj.P7}', '{obj.IT}', '{obj.MKT}', '{obj.PC1}', '{obj.PC2}', '{obj.PCH1}', '{obj.PCH2}', '{obj.PE1}', '{obj.PE2}', '{obj.PE2_SMT}', '{obj.PE2_PCB}', '{obj.PE2_MT}', '{obj.QC_IN1}', '{obj.QC_IN2}', '{obj.QC_IN3}', '{obj.QC_FINAL1}', '{obj.QC_FINAL2}', '{obj.QC_FINAL3}', '{obj.QC_NFM1}', '{obj.QC_NFM2}', '{obj.QC_NFM3}', '{obj.QC1}', '{obj.QC2}', '{obj.QC3}', '{obj.PE1_Process}', '{obj.PE2_Process}');";
+            VALUES('{obj.P1}', '{obj.P2}', '{obj.P3A}', '{obj.P3M}', '{obj.P4}', '{obj.P5}', '{obj.P6}', '{obj.P7}', '{obj.IT}', '{obj.MKT}', '{obj.PC1}', '{obj.PC2}', '{obj.PCH}', '{obj.PE1}', '{obj.PE2}', '{obj.PE2_SMT}', '{obj.PE2_PCB}', '{obj.PE2_MT}', '{obj.QC_IN1}', '{obj.QC_IN2}', '{obj.QC_IN3}', '{obj.QC_FINAL1}', '{obj.QC_FINAL2}', '{obj.QC_FINAL3}', '{obj.QC_NFM1}', '{obj.QC_NFM2}', '{obj.QC_NFM3}', '{obj.QC1}', '{obj.QC2}', '{obj.QC3}', '{obj.PE1_Process}', '{obj.PE2_Process}', '{obj.P5_ProcessDesign}', '{obj.P6_ProcessDesign}','{us_id}');";
             var result = DB_CCS.Database.SqlQuery<long>(query);
             return result.First();   
         }
@@ -225,7 +225,7 @@ namespace ChangeControl.Models
         }
 
         public List<Department> GetDepartmentByGroup(string DepartmentGroup){
-            var sql = $"SELECT ID_Department as ID, Name, Email, [Group] FROM CCS.dbo.Department WHERE [Group] = '{DepartmentGroup}';";
+            var sql = $"SELECT ID_Department as ID, Name, [Group] FROM CCS.dbo.Department WHERE [Group] = '{DepartmentGroup}';";
             var result = DB_CCS.Database.SqlQuery<Department>(sql);
             return result.ToList();    
         }
@@ -240,7 +240,7 @@ namespace ChangeControl.Models
         
         public Related GetRelatedByTopicID(string topic_code){
             try{
-                var sql = $@"SELECT P1, P2, P3A, P3M, P4, P5, P6, P7, IT, MKT, PC1, PC2, PCH1, PCH2, PE1, PE2, PE2_SMT, PE2_PCB, PE2_MT, QC_IN1, QC_IN2, QC_IN3, QC_FINAL1, QC_FINAL2, QC_FINAL3, QC_NFM1, QC_NFM2, QC_NFM3, QC1, QC2, QC3, PE1_Process, PE2_Process 
+                var sql = $@"SELECT P1, P2, P3A, P3M, P4, P5, P6, P7, IT, MKT, PC1, PC2, PCH, PE1, PE2, PE2_SMT, PE2_PCB, PE2_MT, QC_IN1, QC_IN2, QC_IN3, QC_FINAL1, QC_FINAL2, QC_FINAL3, QC_NFM1, QC_NFM2, QC_NFM3, QC1, QC2, QC3, PE1_Process, PE2_Process , P5_ProcessDesign, P6_ProcessDesign
                 FROM CCS.dbo.Related 
                 LEFT JOIN Topic ON Related.ID = Topic.Related 
                 WHERE Topic.Code = '{topic_code}';";
@@ -258,7 +258,7 @@ namespace ChangeControl.Models
         }
 
         public Related GetRelatedByID(long related_id){
-            var sql=$@"SELECT ID, P1, P2, P3A, P3M, P4, P5, P6, P7, IT, MKT, PC1, PC2, PCH1, PCH2, PE1, PE2, PE2_SMT, PE2_PCB, PE2_MT, QC_IN1, QC_IN2, QC_IN3, QC_FINAL1, QC_FINAL2, QC_FINAL3, QC_NFM1, QC_NFM2, QC_NFM3, QC1, QC2, QC3, PE1_Process, PE2_Process 
+            var sql=$@"SELECT ID, P1, P2, P3A, P3M, P4, P5, P6, P7, IT, MKT, PC1, PC2, PCH, PE1, PE2, PE2_SMT, PE2_PCB, PE2_MT, QC_IN1, QC_IN2, QC_IN3, QC_FINAL1, QC_FINAL2, QC_FINAL3, QC_NFM1, QC_NFM2, QC_NFM3, QC1, QC2, QC3, PE1_Process, PE2_Process , P5_ProcessDesign, P6_ProcessDesign
             FROM CCS.dbo.Related 
             WHERE ID = {related_id};";
             var result = DB_CCS.Database.SqlQuery<Related>(sql).First();
@@ -306,7 +306,7 @@ namespace ChangeControl.Models
             try{
                 var sql= $@"INSERT INTO CCS.dbo.Trial (Topic, Detail, [Date], [User], Revision, Department, Status, UpdateDate, UpdateBy) 
                 OUTPUT Inserted.ID 
-                VALUES('{topic_code}', '{desc.ReplaceSingleQuote()}', '{date}','{user}', 1, '{department}', 3, '{date}', '{user}');";
+                VALUES('{topic_code}', '{desc.ReplaceSingleQuote()}', '{date}','{user}', 0, '{department}', 3, '{date}', '{user}');";
                 var result = DB_CCS.Database.SqlQuery<long>(sql).First();
                 return result;
             }catch(Exception ex){
@@ -368,7 +368,7 @@ namespace ChangeControl.Models
             try{
                 var sql= $@"INSERT INTO CCS.dbo.Confirm (Topic, Detail, [Date], [User], Revision, Department, Status, UpdateDate, UpdateBy) 
                 OUTPUT Inserted.ID 
-                VALUES('{topic_code}', '{desc.ReplaceSingleQuote()}', '{date}','{user}', 1, '{department}', 3, '{date}', '{user}');";
+                VALUES('{topic_code}', '{desc.ReplaceSingleQuote()}', '{date}','{user}', 0, '{department}', 3, '{date}', '{user}');";
                 var result = DB_CCS.Database.SqlQuery<long>(sql).First();
                 return result;
             }catch(Exception ex){
@@ -475,6 +475,31 @@ namespace ChangeControl.Models
                     ELSE CAST(0 AS BIT) END;";
             var result = DB_CCS.Database.SqlQuery<bool>(sql).First();
             return result;
+        }
+
+        public long GetTopicStatusByCode(string topic_code){
+            try{
+                var sql = $@"SELECT TOP(1) Status FROM CCS.dbo.Topic 
+                WHERE  Code = '{topic_code}' ORDER BY Revision DESC;";
+                var result = DB_CCS.Database.SqlQuery<long>(sql).First();
+                return result;
+            }catch(Exception ex){
+                return 0;
+            }
+        }
+
+        public void ApproveTopicByCode(string topic_code,string us_id){
+                var sql = $@"UPDATE CCS.dbo.Topic SET ApprovedBy = '{us_id}', ApprovedDate = '{date}', Status = 7 WHERE Topic.Code = '{topic_code}';";
+                DB_CCS.Database.ExecuteSqlCommand(sql);
+        }
+
+        public void UpdateTopicRelated(string topic_code, long new_related_id){
+                var sql = $@"INSERT INTO CCS.dbo.Topic 
+                            SELECT TOP(1) Code, [Type], Change_item, Product_type, Revision+1 as Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP], Subject, Detail, Timing, {new_related_id}, User_insert, Time_insert, Department, ApprovedBy, ApprovedDate 
+                            FROM CCS.dbo.Topic
+                            WHERE Code = '{topic_code}'
+                            ORDER BY Revision DESC;";
+                DB_CCS.Database.ExecuteSqlCommand(sql);
         }
     }
 }

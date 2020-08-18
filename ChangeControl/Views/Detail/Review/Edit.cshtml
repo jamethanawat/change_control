@@ -20,11 +20,11 @@
                             @if(Item.Status != null){
 
                             <div class="col-sm-3 col-form-label">
-                                <label style="margin-right: 15px;">
+                                <label class="mr-3">
                                     <input data-type="status" data-id="@Item.Type" type="radio" name="@temp_rd" value="1" class="flat-red" @(Item.Status ? "checked" : "")>
                                     Yes
                                 </label>
-                                <label style="margin-right: 15px;">
+                                <label class="mr-3">
                                     <input data-type="status" data-id="@Item.Type" type="radio" name="@temp_rd" value="0" class="flat-red" @(Item.Status ? "" : "checked")>
                                     No
                                 </label>

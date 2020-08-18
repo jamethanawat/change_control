@@ -24,8 +24,9 @@ namespace ChangeControl.Models{
         public int PE2_SMT { get; set; }
         public int PE1_Process { get; set; }
         public int PE2_Process { get; set; }
-        public int PCH1 { get; set; }
-        public int PCH2 { get; set; }
+        public int P5_ProcessDesign { get; set; }
+        public int P6_ProcessDesign { get; set; }
+        public int PCH { get; set; }
         public int QC_IN1 { get; set; }
         public int QC_IN2 { get; set; }
         public int QC_IN3 { get; set; }
@@ -59,8 +60,9 @@ namespace ChangeControl.Models{
             PE2_SMT = 0;
             PE1_Process = 0;
             PE2_Process = 0;
-            PCH1 = 0;
-            PCH2 = 0;
+            P5_ProcessDesign = 0;
+            P6_ProcessDesign = 0;
+            PCH = 0;
             QC_IN1 = 0;
             QC_IN2 = 0;
             QC_IN3 = 0;
@@ -74,7 +76,7 @@ namespace ChangeControl.Models{
             QC2 = 0;
             QC3 = 0;
         }
-        public Related(string IT,string MKT,string PC1,string PC2,string P1,string P2,string P3A,string P3M,string P4,string P5,string P6,string P7,string PE1,string PE2,string PE2_SMT,string PE2_PCB,string PE2_MT,string PE1_Process,string PE2_Process,string PCH1,string PCH2,string QC_IN1,string QC_IN2,string QC_IN3,string QC_FINAL1,string QC_FINAL2,string QC_FINAL3,string QC_NFM1,string QC_NFM2,string QC_NFM3,string QC1,string QC2,string QC3){
+        public Related(string IT,string MKT,string PC1,string PC2,string P1,string P2,string P3A,string P3M,string P4,string P5,string P6,string P7,string PE1,string PE2,string PE2_SMT,string PE2_PCB,string PE2_MT,string PE1_Process,string PE2_Process,string PCH,string QC_IN1,string QC_IN2,string QC_IN3,string QC_FINAL1,string QC_FINAL2,string QC_FINAL3,string QC_NFM1,string QC_NFM2,string QC_NFM3,string QC1,string QC2,string QC3, string P5_ProcessDesign, string P6_ProcessDesign){
             this.IT = (IT != null)? int.Parse(IT) : 0;
             this.MKT = (MKT != null)? int.Parse(MKT) : 0;
             this.PC1 = (PC1 != null)? int.Parse(PC1) : 0;
@@ -94,8 +96,9 @@ namespace ChangeControl.Models{
             this.PE2_SMT = (PE2_SMT != null)? int.Parse(PE2_SMT) : 0;
             this.PE1_Process = (PE1_Process != null)? int.Parse(PE1_Process) : 0;
             this.PE2_Process = (PE2_Process != null)? int.Parse(PE2_Process) : 0;
-            this.PCH1 = (PCH1 != null)? int.Parse(PCH1) : 0;
-            this.PCH2 = (PCH2 != null)? int.Parse(PCH2) : 0;
+            this.P5_ProcessDesign = (P5_ProcessDesign != null)? int.Parse(P5_ProcessDesign) : 0;
+            this.P6_ProcessDesign = (P6_ProcessDesign != null)? int.Parse(P6_ProcessDesign) : 0;
+            this.PCH = (PCH != null)? int.Parse(PCH) : 0;
             this.QC_IN1 = (QC_IN1 != null)? int.Parse(QC_IN1) : 0;
             this.QC_IN2 = (QC_IN2 != null)? int.Parse(QC_IN2) : 0;
             this.QC_IN3 = (QC_IN3 != null)? int.Parse(QC_IN3) : 0;

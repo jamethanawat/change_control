@@ -78,7 +78,7 @@ namespace ChangeControl.Controllers{
                     Session["isEditMode"] = true;
                     TopicAlt temp_topic = M_Req.GetTopicByID(ID);
                     Session["Topic"] = temp_topic;
-                    if(temp_topic.Status != 7){
+                    if(temp_topic.Status != 3 && temp_topic.Status != 7 ){
                         return View("~/Views/Shared/404/index.cshtml");
                     }else{
                         var TopicRelatedList = M_Req.GetRelatedByID(temp_topic.Related);
@@ -101,7 +101,7 @@ namespace ChangeControl.Controllers{
         public ActionResult Submit(string changeType,int changeItem,int productType,string model,string partNo, string partName, string processName,string appRadio, string appDescription,string subject,string detail,string timing){
           int status;
           var mode = "Insert";
-          var revision = 1;
+          var revision = 0;
 
           Session["Mode"] = mode;
           Session["Foreignkey"] = null;
@@ -124,7 +124,7 @@ namespace ChangeControl.Controllers{
                   else Session["TopicCode"] = "EX-" + date.Substring(2, 4) + "" + id.ToString("000") + "";
               }
               Session["Revision"] = revision;
-              status = 7;
+              status = 3;
               var temp_topic = new Topic((string)(Session["TopicCode"]), changeType, changeItem, productType, revision , (string) Session["Department"], model.ReplaceSingleQuote(),partNo.ReplaceSingleQuote(), partName.ReplaceSingleQuote(), processName.ReplaceSingleQuote(), status, appDescription.ReplaceSingleQuote() , subject.ReplaceSingleQuote(), detail.ReplaceSingleQuote(), timing.ReplaceSingleQuote(), (long)Session["RelatedID"],(string)(Session["User"]), date );
 
               Session["TopicID"] = M_Req.InsertTopic(temp_topic);
@@ -142,13 +142,16 @@ namespace ChangeControl.Controllers{
         public ActionResult UpdateRequest(int changeItem,int productType,string model,string partNo, string partName, string processName,string appRadio, string appDescription,string subject,string detail,string timing){
           var mode = "Edit";
           var temp_topic = (TopicAlt) Session["Topic"];
-          var revision = temp_topic.Revision + 1;
           var status = temp_topic.Status;
 
           Session["Mode"] = mode;
           try{
-                var new_topic = new Topic(temp_topic.Code, temp_topic.Type, changeItem, productType, revision,(string) Session["Department"], model.ReplaceSingleQuote(),partNo.ReplaceSingleQuote(), partName.ReplaceSingleQuote(), processName.ReplaceSingleQuote(), status, appDescription.ReplaceSingleQuote(), subject.ReplaceSingleQuote(), detail.ReplaceSingleQuote(), timing.ReplaceSingleQuote(), (long)Session["RelatedID"],(string)(Session["User"]), date );
-                Session["TopicID"] = M_Req.UpdateTopic(new_topic);
+                var new_topic = new Topic(temp_topic.Code, temp_topic.Type, changeItem, productType, temp_topic.Revision,(string) Session["Department"], model.ReplaceSingleQuote(),partNo.ReplaceSingleQuote(), partName.ReplaceSingleQuote(), processName.ReplaceSingleQuote(), status, appDescription.ReplaceSingleQuote(), subject.ReplaceSingleQuote(), detail.ReplaceSingleQuote(), timing.ReplaceSingleQuote(), (long)Session["RelatedID"],(string)(Session["User"]), date );
+                if(temp_topic.Status == 3){
+                    Session["TopicID"] = M_Req.UpdateTopic(new_topic);
+                }else{
+                    Session["TopicID"] = M_Req.UpdateTopicWithRev(new_topic);
+                }
 
                 return Json(temp_topic.Code, JsonRequestBehavior.AllowGet);
             }
@@ -163,10 +166,10 @@ namespace ChangeControl.Controllers{
 
 
         [HttpPost]
-        public ActionResult SubmitRelated(string IT,string MKT,string PC1,string PC2,string P1,string P2,string P3A,string P3M,string P4,string P5,string P6,string P7,string PE1,string PE2,string PE2_SMT,string PE2_PCB,string PE2_MT,string PE1_Process,string PE2_Process,string PCH1,string PCH2,string QC_IN1,string QC_IN2,string QC_IN3,string QC_FINAL1,string QC_FINAL2,string QC_FINAL3,string QC_NFM1,string QC_NFM2,string QC_NFM3,string QC1,string QC2,string QC3){
+        public ActionResult SubmitRelated(string IT,string MKT,string PC1,string PC2,string P1,string P2,string P3A,string P3M,string P4,string P5,string P6,string P7,string PE1,string PE2,string PE2_SMT,string PE2_PCB,string PE2_MT,string PE1_Process,string PE2_Process,string PCH,string QC_IN1,string QC_IN2,string QC_IN3,string QC_FINAL1,string QC_FINAL2,string QC_FINAL3,string QC_NFM1,string QC_NFM2,string QC_NFM3,string QC1,string QC2,string QC3, string P5_ProcessDesign, string P6_ProcessDesign){
             try{
-                Related related = new Related(IT,MKT,PC1,PC2,P1,P2,P3A,P3M,P4,P5,P6,P7,PE1,PE2,PE2_SMT,PE2_PCB,PE2_MT,PE1_Process,PE2_Process,PCH1,PCH2,QC_IN1,QC_IN2,QC_IN3,QC_FINAL1,QC_FINAL2,QC_FINAL3,QC_NFM1,QC_NFM2,QC_NFM3,QC1,QC2,QC3);
-                Session["RelatedID"] = M_Req.InsertRelated(related);
+                Related related = new Related(IT,MKT,PC1,PC2,P1,P2,P3A,P3M,P4,P5,P6,P7,PE1,PE2,PE2_SMT,PE2_PCB,PE2_MT,PE1_Process,PE2_Process,PCH,QC_IN1,QC_IN2,QC_IN3,QC_FINAL1,QC_FINAL2,QC_FINAL3,QC_NFM1,QC_NFM2,QC_NFM3,QC1,QC2,QC3, P5_ProcessDesign, P6_ProcessDesign);
+                Session["RelatedID"] = M_Req.InsertRelated(related, Session["User"].ToString());
                 return Json(new { code = 1 },JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex){
@@ -214,6 +217,10 @@ namespace ChangeControl.Controllers{
 
         public int InsertOtherProductType(string desc){
             return M_Req.InsertOtherProductType(desc);
+        }
+        [HttpPost]
+        public ActionResult GetDepartment(){
+            return Json(new { data = M_Req.GetDepartment() }, JsonRequestBehavior.AllowGet);
         }
 
         public void SendMail(List<string> mail){

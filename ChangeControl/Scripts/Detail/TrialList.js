@@ -90,7 +90,7 @@ $(() => {
                     return;
                 }));
             }).fail(() => {
-                swal("Error", "Trial is not succes, Please contact admin", "error");
+                swal("Status has been updated","will refresh in 2 second","error").then(setTimeout(() => { location.reload(); }, 1500));
                 $('#loading').addClass('hidden')
             }));
 

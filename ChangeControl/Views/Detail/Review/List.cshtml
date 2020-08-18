@@ -2,19 +2,20 @@
 @{
     var str_date = "05 มิถุนายน 2020";
     string department = (string)Session["Department"];
-    var isApprover = ((string)Session["Position"] == "Approver" || (string)Session["Position"] == "Admin");
-    var isQC = ((string)Session["Department"] == "QC1" || (string)Session["Department"] == "QC2" || (string)Session["Department"] == "QC3");
     List<Review> ElementList = Model;
 }
+
+@* /* --------------------- Show list that related to user --------------------- */ *@
 @if(ElementList.Exists(e => e.Department == department)){
         Review Element = ElementList.Find(e => e.Department == department);
         if(Element.Item.Count != 0){
-            @DefaultList(ElementList, Element, department, isApprover, isQC)
+            @DefaultList(ElementList, Element, department)
         }
 }
 
+@* /* --------------------- Show list of pending department -------------------- */ *@
 @foreach(var Element in ViewBag.ReviewRelatedList){
-    if(Element.status == 0){
+    if(Element.status == 0 && Element.name != "QC1" && Element.name != "QC2" && Element.name != "QC3"){
     <div>
         <i class="fa fa-hourglass-half  bg-secondary blue-tooltip"></i>
         <div class="timeline-item card">
@@ -29,16 +30,19 @@
     </div>
     }
 }
+
+@* /* ---------------------- Show list that already review --------------------- */ *@
 @foreach(var Element in Model){
     if(Element.Department != department){
         if(Element.Item.Count != 0){
-            @DefaultList(ElementList, Element, department, isApprover, isQC)
+            @DefaultList(ElementList, Element, department)
         }
     }
 }
 
-@helper DefaultList(List<Review> ElementList, Review Element, string department, bool isApprover, bool isQC){
+@helper DefaultList(List<Review> ElementList, Review Element, string department){
 <div>
+    @{var WaitingForCustomer = false;}
     @* <i class="fas bg-primary" style="font-family:Kanit !important">@Html.DisplayFor(model => Element.Department)</i> *@
     @if(Element.Status == 1){
         <i class="fas fa-check bg-primary blue-tooltip"></i>
@@ -64,6 +68,13 @@
                             </span>";
                     }
 
+                    if(Element.Item.Exists(e => e.Status == 13)){
+                    approve_status = 
+                            $@"<span class='badge badge-pill badge-warning'>WAITING FOR CUSTOMER
+                                    <i class='fas fa-file-signature '></i>
+                            </span>";
+                    }
+
                     var dept_status = (Element.Department == department) ? $"<span class='badge badge-pill badge-primary'> YOUR DEPARTMENT <i class='fas fa-pencil-alt'></i> </span>" : "";
                 }
                 <h6 class="mr-auto" style="font-family:Kanit"> @Element.Department @Html.Raw(HttpUtility.HtmlDecode(@dept_status)) @Html.Raw(HttpUtility.HtmlDecode(@approve_status)) </h6>
@@ -75,7 +86,7 @@
                     @{var ElementItem = Element.Item;}
                     <div class="row">
                         <label class="col-sm-4 col-form-label" style="text-align:right">
-                                Reviewed By :
+                                Issued By :
                         </label>
                         <div class="col-sm-8 col-form-label">
                             <span>
@@ -97,10 +108,13 @@
                     }
                     @foreach(var Item in ElementItem){
                         var temp_status = (String)null;
-                        if(Item.Status == true){
+                        if(Item.Status == 1){
                             temp_status = "Yes";
-                        }else if(Item.Status == false){
+                        }else if(Item.Status == 0){
                             temp_status = "No";
+                        }else if(Item.Status == 13){
+                            temp_status = "Waiting for customer";
+                            WaitingForCustomer = true;
                         }else if(Item.Status == null){
                             temp_status = "-";
                         }
@@ -181,9 +195,11 @@
             <hr style="margin-top:0px !important">
             <div class="timeline-footer">
                 <div class="float-right ">
-                    @* @if(Element.Status !=1 && isDepartment){ //Disable edit button when Element have approved*@ 
+                    @if((ViewBag.isQC || (ViewBag.isPEProcess || ViewBag.isInternal)) && ViewBag.isApprover){
+                        <a class="btn btn-warning btn-sm rv-related" id="related_rv" data-toggle="modal" data-target="#related_rv" value="@Element.ID_Review">Related</a>
+                    }
                     <a class="btn btn-warning btn-sm rv-edit" id="edit_rv" data-toggle="modal" data-target="#edit_review" value="@Element.ID_Review">Edit</a>
-                        @if(isApprover && ((Element.Status !=1 && !isQC) || (!ElementList.Exists(e => e.Status == 3 && e.Department != "QC1" && e.Department != "QC2" && e.Department != "QC3") && isQC))){ 
+                        @if(ViewBag.isApprover && ((Element.Status !=1 && !ViewBag.isQC) || (!ElementList.Exists(e => e.Status == 3 && e.Department != "QC1" && e.Department != "QC2" && e.Department != "QC3") && ViewBag.isQC && !WaitingForCustomer))){ 
                             <button class="btn btn-info btn-sm mr-1 rv-approve" value="@Element.ID_Review">Approve</button>
                         }
                 </div>

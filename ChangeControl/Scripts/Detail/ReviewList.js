@@ -13,7 +13,7 @@ $(() => {
         console.log("review",e);
         let rv_id = e.target.value;
         swal({
-            title: "Approve Review", 
+            title: "Approve Issue", 
             buttons: [true,"Approve"],
             icon: "warning",
         }).then((apr) => {
@@ -121,6 +121,9 @@ $(() => {
                 $("#ReviewSubmit").prop("disabled",true)
                 swal("Success", "Insert Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
             })
+        }).fail(() => {
+            swal("Status has been updated","will refresh in 2 second","error").then(setTimeout(() => { location.reload(); }, 1500));
+            $('#loading').addClass('hidden')
         });
 
     });

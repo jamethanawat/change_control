@@ -29,8 +29,8 @@ namespace ChangeControl.Models
             var where="";
             var sql = "";
             var ov_command = "";
-            var count_related_command = $@"(SELECT SUM(P1 + P2 + P3A + P3M + P4 + P5 + P6 + P7 + IT + MKT + PC1 + PC2 + PCH1 + PCH2 + PE1 + PE2 + PE2_SMT + PE2_PCB + PE2_MT + QC_IN1 + QC_IN2 + QC_IN3 + QC_FINAL1 + QC_FINAL2 +   
-                QC_FINAL3 + QC_NFM1 + QC_NFM2 + QC_NFM3 + PE1_Process + PE2_Process) 
+            var count_related_command = $@"(SELECT SUM(P1 + P2 + P3A + P3M + P4 + P5 + P6 + P7 + IT + MKT + PC1 + PC2 + PCH + PE1 + PE2 + PE2_SMT + PE2_PCB + PE2_MT + QC_IN1 + QC_IN2 + QC_IN3 + QC_FINAL1 + QC_FINAL2 +   
+                QC_FINAL3 + QC_NFM1 + QC_NFM2 + QC_NFM3 + PE1_Process + PE2_Process + P5_ProcessDesign + P6_ProcessDesign) 
                 FROM Related WHERE Related.ID = Topic.Related )";
             if(model.Overstatus == 2){
                 ov_command = $@"{count_related_command} 

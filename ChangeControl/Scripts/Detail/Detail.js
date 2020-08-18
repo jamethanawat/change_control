@@ -8,6 +8,7 @@ var rsm_id = 0;
 var resubmit_formIsEmpty = true;
 var TrialIsEmpty = true;
 var rsm_related_list = [];
+var new_related_list = [];
 var rv_submit;
 
 /* -------------------------------------------------------------------------- */
@@ -57,8 +58,6 @@ $("#reject").click(() => {
                 }else{
                     swal("Something wrong", "Please enter the text", "error");
                 }
-            }else{
-                alert("res abnormal");
             }
         });
     });
@@ -146,6 +145,30 @@ var rsm_validator = $('#resubmit_form').validate({
     });
     
 /* -------------------------------------------------------------------------- */
+/*                           Related's Wizard modal                           */
+/* -------------------------------------------------------------------------- */
+
+$("#related_rv").modalWizard();
+$("#related_rv").on("navigate", (e, navDir, stepNumber) => {
+    if($("#related_rv").attr("data-current-step") == 2){
+        let quick_form = [];
+        let new_related_string = "";
+        $(".new_related:checked").each(function () {
+            quick_form.push(this.name);
+        });
+        console.log(quick_form);
+        quick_form.forEach(item => {
+                new_related_string = (new_related_string == "") ? item : new_related_string + " , " + item;
+        });
+
+        $("#new_related_dept").html(new_related_string);
+        console.log("related: ",new_related_string);
+    }else{
+        // $(".btn-success").prop('disabled', true);
+    }
+});
+
+/* -------------------------------------------------------------------------- */
 /*                             Resubmit's Validate                            */
 /* -------------------------------------------------------------------------- */
 
@@ -207,48 +230,111 @@ var rsm_validator = $('#resubmit_form').validate({
     });
     
 /* -------------------------------------------------------------------------- */
-/*                             Department checkbox                            */
+/*                        Resubmit Department checkbox                        */
 /* -------------------------------------------------------------------------- */
 
     $.each(DepartmentLists, (key,val) => {
-        if($(`.${val.Name}`).length == $(`.${val.Name}:checked`).length){
-            $(`#${val.Name}`).prop('checked', true);
+        if($(`.rs-${val.Name}`).length == $(`.rs-${val.Name}:checked`).length){
+            $(`#rs-${val.Name}`).prop('checked', true);
         relatedValidate();
     }
-        $(`#${val.Name}`).change(function(e) {
-                $(`.${val.Name}`).each(function() {
+        $(`#rs-${val.Name}`).change(function(e) {
+                $(`.rs-${val.Name}`).each(function() {
                     this.checked = (e.target.checked) ? true : false;
                 });
             relatedValidate();
         });
 
-        $(`.${val.Name}`).click(function () {
+        $(`.rs-${val.Name}`).click(function () {
             if($(this).is(":checked")) {
                 var isAllChecked = 0;
 
-                $(`.${val.Name}`).each(function() {
+                $(`.rs-${val.Name}`).each(function() {
                     if (!this.checked) isAllChecked = 1;
                 });
 
                 if(isAllChecked == 0) {
-                $(`#${val.Name}`).prop("checked", true);
+                $(`#rs-${val.Name}`).prop("checked", true);
                 }     
             }else{
-                $(`#${val.Name}`).prop("checked", false); 
+                $(`#rs-${val.Name}`).prop("checked", false); 
             }
             relatedValidate();
         });
     });
 
+/* -------------------------------------------------------------------------- */
+/*                        Related Department checkbox                         */
+/* -------------------------------------------------------------------------- */
+
+$.each(DepartmentLists, (key,val) => {
+    if($(`.rl-${val.Name}`).length == $(`.rl-${val.Name}:checked`).length){
+            $(`#rl-${val.Name}`).prop("disabled", true);
+            $(`#rl-${val.Name}`).prop('checked', true);
+    relatedValidate();
+}
+    $(`#rl-${val.Name}`).change(function(e) {
+            $(`.rl-${val.Name}`).each(function() {
+                this.checked = (e.target.checked) ? true : false;
+            });
+        relatedValidate();
+    });
+
+    $(`.rl-${val.Name}`).click(function () {
+        if($(this).is(":checked")) {
+            var isAllChecked = 0;
+
+            $(`.rl-${val.Name}`).each(function() {
+                if (!this.checked) isAllChecked = 1;
+            });
+
+            if(isAllChecked == 0) {
+            $(`#rl-${val.Name}`).prop("checked", true);
+            }     
+        }else{
+            $(`#rl-${val.Name}`).prop("checked", false); 
+        }
+        relatedValidate();
+    });
+});
+
     function relatedValidate(){
         checkbox_dept = $('input:checkbox.qForm.checkSingle:checked').length
-        $(".btn-success").prop('disabled', (checkbox_dept > 0) ? false : true);
+        $(".rsm-next").prop('disabled', (checkbox_dept > 0) ? false : true);
     }
 
     $('[data-toggle="datepicker"]').datepicker({
         format: 'dd-mm-yyyy'
     });
     
+    $("#tp_approve").click(() => {
+        swal({
+            title: "Approve Topic", 
+            text: "Do you want to approve this Topic?", 
+            // closeOnClickOutside: false,
+            buttons : [true,true],
+            icon:"warning",
+        }).then((res) => {
+            if(res){
+                $.post(ApproveTopicPath,() => {
+                    var promises = [];
+                    promises.push($.post(GenerateMailPath,{
+                        'mode':(topic_code.substring(0,2) == "EX") ? 'InformUser' : 'InformPE',
+                        'topic_code':topic_code,
+                        'dept':(topic_code.substring(0,2) == "IN") ? pe_audit : null,
+                    }).fail((error) => {
+                    console.error(error);
+                    swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                    return;
+                }));
+                    swal("Success", "Approve Success", "success").then(location.reload());
+                }).fail( function(xhr, textStatus, errorThrown) {
+                    console.error(xhr.responseText);
+                    swal("Something wrong", "Please contact admin", "error");
+                });
+            }
+        });
+    })
 /* -------------------------------------------------------------------------- */
 /*                             Submit review topic                            */
 /* -------------------------------------------------------------------------- */
@@ -452,6 +538,39 @@ $("form#Confirm").submit((e) => {
             });
         });
     });
+
+/* -------------------------------------------------------------------------- */
+/*                               Apply resubmit                               */
+/* -------------------------------------------------------------------------- */
+
+$("form#related_form").submit((e) => {
+    e.preventDefault();
+    $(".new_related").attr("disabled",false);
+    let quick_form = $(".new_related").serialize();
+    console.log(quick_form);
+    $.post(SubmitRelatedPath, quick_form, () =>{
+        console.log('Related created');
+        $.post(UpdateTopicRelatedPath,(res) => {
+            if(res.status == "success"){
+                swal("Success", "Update related complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
+            }
+        });
+        // $.post(RequestResubmitPath, quick_form, (res) =>{
+        //     console.log('Resubmit created');
+        //     if(res.code){
+        //         moment.locale('en');
+        //         $.post(GenerateMailPath,{ 'mode': 'RequestDocument', 'topic_code':topic_code, 'due_date': moment(due_date,"DD-MM-YYYY").format('D MMMM YYYY'), 'dept_arry': rsm_related_list, }).fail((error) => {
+        //             console.error(error);
+        //             swal("Error", "Cannot send email to Requestor, Please try again", "error");
+        //             return;
+        //         })
+        //         swal("Success", "Resubmit Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
+        //     }else{
+        //         swal("Error", "Resubmit Not Success, Please Try Again", "error");
+        //     }
+        // });
+    });
+});
 
 /* -------------------------------------------------------------------------- */
 /*                              Response resubmit                             */

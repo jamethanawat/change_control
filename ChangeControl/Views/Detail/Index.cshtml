@@ -14,13 +14,13 @@
     List<Confirm> ConfirmList = ViewBag.ConfirmList as List<Confirm>;
 
     TopicAlt Topic = ViewData["Topic"] as TopicAlt;
-    bool isApprover = ((string)Session["Position"] == "Approver") || ((string)Session["Position"] == "Admin") ;
+    bool isApprover = ViewBag.isApprover = ((string)Session["Position"] == "Approver") || ((string)Session["Position"] == "Admin") ;
 
     var isTrialable = (bool) ViewData["isTrialable"];
     string department = (string)Session["Department"];
 
-    var isPEProcess = (department == "PE1_Process" || department == "PE2_Process");
-    var isQC = (department == "QC1" || department == "QC2" || department == "QC3");
+    var isPEProcess = ViewBag.isPEProcess = (department == "PE1_Process" || department == "PE2_Process"|| department == "PE5_ProcessDesign"|| department == "P6_ProcessDesign");
+    var isQC = ViewBag.isQC = (department == "QC1" || department == "QC2" || department == "QC3");
 
 
     string[] status_define = {"-","Approved","Rejected","Waiting","Need more document","Re-submit"," ","Request","Review","Trial", "Confirm", "Finished", "Rejected" };
@@ -35,14 +35,21 @@
     var isConfirm = (ConfirmList.Exists(confirm => confirm.Department == Session["Department"].ToString()));
     @* var isConfirm = (ConfirmList.Exists(confirm => confirm.Status == 3 && confirm.Department == Session["Department"].ToString())); *@
     var Type = Topic.Type;
-    var isInternal = (Type == "Internal");
+    var isInternal = ViewBag.isInternal = (Type == "Internal");
     var isExternal = (Type == "External");
+    var Resubmitable = (isQC || isPEProcess) && isRelated && (status != "Waiting" && status != "Finished" && status != "Rejected");
+    var Editable = ((status == "Waiting" || status == "Request") && Session["Department"].ToString() == Topic.Department);
+    var TopicApproveable = (status == "Waiting" && Session["Department"].ToString() == Topic.Department && isApprover);
+    
     List<RelatedAlt> rv_related_list = ViewData["ReviewRelatedList"] as List<RelatedAlt>;
     List<RelatedAlt> tr_related_list = ViewData["TrialRelatedList"] as List<RelatedAlt>;
     List<RelatedAlt> cf_related_list = ViewData["ConfirmRelatedList"] as List<RelatedAlt>;
+    
+    var pe_audit = (rv_related_list.Find(e => e.name == "PE1_Process" || e.name == "PE2_Process"));
     var QcReviewable = (rv_related_list != null) ? (rv_related_list.Exists(e => e.status == 0 && (e.name == "QC1" || e.name == "QC2" || e.name == "QC3") && rv_related_list.Count(d => d.status == 0) == 1) && !ReviewList.Exists(rv => rv.Status == 3)) : false;
     var QcTrialable = (tr_related_list != null) ? (!tr_related_list.Exists(e => e.status == 0) && !TrialList.Exists(tr => tr.Status == 3)) : false;
     var QcConfirmable = (cf_related_list != null) ? (cf_related_list.Exists(e => e.status == 0 && (e.name == "QC1" || e.name == "QC2" || e.name == "QC3") && cf_related_list.Count(d => d.status == 0) == 1)  && !ConfirmList.Exists(cf => cf.Status == 3)) : false;
+    
 }
 
 <script type="text/javascript">
@@ -50,14 +57,17 @@
     var topic_status = '@status';
     var topic_id = '@Topic.ID';
     var topic_code = '@Topic.Code';
+    var pe_audit = '@(pe_audit != null ? pe_audit.name : null)';
     var isQC = '@isQC'.toLowerCase() == 'true' ? true : false;
     var isTrialable = '@isTrialable'.toLowerCase() == 'true' ? true : false;
     var isReview = '@isReview'.toLowerCase() == 'true' ? true : false;
     var GenerateMailPath = '@Url.Action("GenerateMail", "Mail")';
+    var ApproveTopicPath = '@Url.Action("ApproveTopic", "Detail")';
     var CheckAllReviewBeforeApprovePath = '@Url.Action("CheckAllReviewBeforeApprove", "Detail")';
     var CheckAllTrialBeforeApprovePath = '@Url.Action("CheckAllTrialBeforeApprove", "Detail")';
     var CheckAllConfirmBeforeApprovePath = '@Url.Action("CheckAllConfirmBeforeApprove", "Detail")';
     var RejectTopicPath = '@Url.Action("RejectTopic", "Detail")';
+    var UpdateTopicRelatedPath = '@Url.Action("UpdateTopicRelated", "Detail")';
 </script>
 
     @* @Styles.Render("~/Content/css") *@
@@ -180,6 +190,187 @@
         border: 1px solid #007bff;
     }
 
+    .main-sidebar , .main-header{
+        z-index: 20 !important;
+    }
+
+    #resubmit_form .form-group{
+        margin-bottom: 0.5rem;
+    }
+
+    .hide-fab{
+        display:none;
+    }
+    .hide-fab i{
+        display:inherit;
+    }
+
+    .disable-fab{
+        pointer-events: none;
+        cursor: default;
+        color: grey
+    }
+
+    .w-actions {
+        -webkit-box-align: end;
+        -ms-flex-align: end;
+        align-items: flex-end;
+        bottom: 24px;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        position: fixed;
+        right: 24px;
+        z-index: 100
+    }
+
+    .w-actions>* {
+        margin-top: 20px
+    }
+
+    .w-actions__fab {
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center;
+        background-color: #3740ff;
+        border: 0;
+        border-radius: 50%;
+        -webkit-box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12);
+        box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12);
+        color: #fff;
+        cursor: pointer;
+        display: -webkit-inline-box;
+        display: -ms-inline-flexbox;
+        display: inline-flex;
+        font-family: "Roboto", sans-serif;
+        font-size: .875em;
+        font-weight: 600;
+        height: 56px;
+        letter-spacing: 1px;
+        overflow: hidden;
+        padding: 0;
+        position: relative;
+        text-indent: -9999px;
+        text-overflow: initial;
+        text-transform: uppercase;
+        width: 56px
+    }
+
+    @@media (min-width: 1264px) {
+        .w-actions__fab {
+            border-radius: 28px;
+            padding: 0 24px 0 52px;
+            text-indent: 0;
+            width: auto
+        }
+    }
+
+    .w-actions__fab:hover {
+        background-color: #3740ff;
+    }
+
+    .w-actions__fab:active {
+        background-color: #3740ff;
+        -webkit-box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+        box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12)
+    }
+
+    .w-actions__fab:hover,
+    .w-actions__fab:focus,
+    .w-actions__fab:active {
+        outline: 0;
+        text-decoration: none
+    }
+
+    .w-actions__fab::before {
+        background-size: 24px 24px;
+        content: '';
+        height: 24px;
+        left: 16px;
+        position: absolute;
+        top: 16px;
+        width: 24px
+    }
+
+    .w-actions__fab::after {
+        bottom: 0;
+        content: '';
+        left: 0;
+        pointer-events: none;
+        position: absolute;
+        right: 0;
+        top: 0;
+        -webkit-transition: background-color .2s, border .2s;
+        transition: background-color .2s, border .2s;
+        z-index: 1
+    }
+
+    .w-actions__fab:hover::after {
+        background-color: rgba(255, 255, 255, 0.08)
+    }
+
+    .w-actions__fab:focus::after {
+        background-color: rgba(255, 255, 255, 0.24)
+    }
+
+    .w-actions__fab:active::after {
+        background-color: rgba(255, 255, 255, 0.32)
+    }
+
+    .w-actions__fab--share::before {
+        background-image: href("https://web.dev/images/icons/subscribe.svg")
+    }
+    .w-actions__fab--resubmit::before {
+        background-image: url("@Url.Content("~/tmp/docs/assets/plugins/fontawesome-free/svgs/solid/tasks.svg")");
+    }
+
+    .w-actions__fab--subscribe {
+        background-color: #fff;
+        color: #3740ff
+    }
+
+    .w-actions__fab--subscribe:hover {
+        background-color: #fff
+    }
+
+    .w-actions__fab--subscribe:active {
+        background-color: #fff
+    }
+
+    .w-actions__fab--subscribe::before {
+        background-image: url("https://web.dev/images/icons/subscribe.svg")
+    }
+    
+    .w-actions__fab--resubmit::before {
+        background-image: url("@Url.Content("~/tmp/docs/assets/plugins/fontawesome-free/svgs/solid/tasks.svg")");
+    }
+
+    .w-actions__fab--approve::before {
+        background-image: url("@Url.Content("~/tmp/docs/assets/plugins/fontawesome-free/svgs/solid/check.svg")");
+    }
+    
+    .w-actions__fab--edit::before {
+        background-image: url("@Url.Content("~/tmp/docs/assets/plugins/fontawesome-free/svgs/solid/pencil-alt.svg")");
+    }
+
+    .w-actions__fab--subscribe:hover::after {
+        background-color: rgba(55, 64, 255, 0.04)
+    }
+
+    .w-actions__fab--subscribe:focus::after {
+        background-color: rgba(55, 64, 255, 0.12)
+    }
+
+    .w-actions__fab--subscribe:active::after {
+        background-color: rgba(55, 64, 255, 0.16)
+    }
+
+    body { padding-right: 0 !important }
+
 </style>
 
 
@@ -250,14 +441,46 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
         <div class="container-fluid">
-            <div class="row">
-                <div class="col-sm-12">
-                    @if((isQC || isPEProcess) && isRelated && (status != "Finished" || status != "Rejected")){ @Html.Partial("Fab",DepartmentList)}
+            <div class="col-sm-12">
+                <div class="row">
+                        @if(Resubmitable){ 
+                            @Html.Partial("Fab",DepartmentList)
+                        }
+
+                        @* @if(((isPEProcess && isInternal) || (isQC && isExternal)) && isApprover){  *@
+                            @Html.Partial("Related",DepartmentList)
+                        @* } *@
+                </div>
+                <div class="row">
+                    <div class="w-actions">
+                        @* @if(Editable){
+                            <a class="w-actions__fab w-actions__fab--edit bg-warning" id="tp_edit" href='@Url.Action("Index", "Request",new {id = Topic.Code})'>
+                               <span>Edit</span>
+                            </a>
+                        } *@
+                        @if(TopicApproveable){
+                            <a class="w-actions__fab w-actions__fab--approve bg-primary" id="tp_approve">
+                               <span>Approve</span>
+                            </a>
+                        }
+                        @if(Resubmitable){ 
+                            <a class="w-actions__fab w-actions__fab--resubmit bg-warning" id="resubmit" data-toggle="modal" data-target="#resubmit_modal">
+                                <span>Resubmit</span>
+                            </a>
+                        }
+                    </div>
                 </div>
             </div>
             <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1>TNS Control No. @Html.DisplayFor(model => Topic.Code) <span class="badge badge-primary">Rev @Topic.Revision</span></h1> 
+                <div class="col-sm-7">
+                    <h1>
+                        TNS Control No. @Html.DisplayFor(model => Topic.Code) 
+                        <span class="badge badge-primary">Rev @Topic.Revision</span>
+                        @if(Editable) { 
+                        <a href='@Url.Action("Index", "Request",new {id = Topic.Code})' style="font-size: 1.8rem!important;">
+                            <span class="badge badge-warning"><i class="fas fa-pencil-alt" style="font-size: 1rem!important;"></i> Edit</span></a> 
+                        }
+                    </h1>
 
                     @{
                         var rv_badge = "secondary";
@@ -312,7 +535,7 @@
                     </span>
                     
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-5">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href='@Url.Action("Index","Home")'>Change Control System</a></li>
                         <li class="breadcrumb-item active">Project Detail</li>
@@ -379,6 +602,10 @@
                                     }
                                         <h4 class="@(@ViewBag.RejectMessage != null ? "mt-3":"")">Author</h4>
                                             &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span> @Topic.Department -  @Topic.Profile.FullName (@Topic.Time_insert)</span>
+                                        @if(status != "Waiting" && Topic.ApprovedBy != null){
+                                            <h4 class="mt-3">Approved By</h4>
+                                                @:&nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span> @Topic.Department -  @Topic.ApproverProfile.FullName (@Topic.ApprovedDate)</span>
+                                        }
                                         <h4 class="mt-3">Subject/Purpose for change</h4>
                                             &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Subject.ReplaceNullWithDash().TrimStart()))</span>
                                         <h4 class="mt-3">Change Details</h4>

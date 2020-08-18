@@ -7,6 +7,7 @@
     List<Confirm> ElementList = Model as List<Confirm>;
 }
 
+@* /* --------------------- Show list that related to user --------------------- */ *@
 @if(ElementList.Exists(e => e.Department == department)){
         Confirm Element = ElementList.Find(e => e.Department == department);
         if(Element != null){
@@ -14,8 +15,9 @@
         }
 }
 
+@* /* --------------------- Show list of pending department -------------------- */ *@
 @foreach(var Element in ViewBag.ConfirmRelatedList){
-    if(Element.status == 0){
+    if(Element.status == 0 && Element.name != "QC1" && Element.name != "QC2" && Element.name != "QC3"){
     <div>
         <i class="fa fa-hourglass-half  bg-secondary blue-tooltip"></i>
         <div class="timeline-item card">
@@ -30,6 +32,7 @@
     </div>
     }
 }
+@* /* ---------------------- Show list that already confirm --------------------- */ *@
 @foreach(var Element in Model){
     if(Element != null){
         if(Element.Department != department){

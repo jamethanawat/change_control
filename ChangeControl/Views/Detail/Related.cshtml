@@ -1,0 +1,123 @@
+﻿<style>
+    .zoom-fab i{
+        color:white;
+    }
+    .modal-content{
+        box-shadow: none;
+    }
+
+    fieldset.group  { 
+        border-radius: 7px;
+        margin: 0; 
+        padding: 0; 
+        margin-bottom: 1.25em; 
+        padding: .125em; 
+    } 
+
+    fieldset.group legend { 
+        width:inherit; /* Or auto */
+        border-bottom:none;
+        margin: 0; 
+        padding: 0; 
+        font-weight: bold; 
+        margin-left: 20px; 
+        font-size: 100%; 
+        color: black; 
+    } 
+
+
+    ul.checkbox  { 
+        margin: 0; 
+        padding: 0; 
+        margin-left: 20px; 
+        list-style: none; 
+    } 
+
+    ul.checkbox li input { 
+        margin-right: .25em; 
+    } 
+
+    ul.checkbox li { 
+        border: 1px transparent solid; 
+        display:inline-block;
+        width:12em;
+    } 
+
+    ul.checkbox li label { 
+        margin-left: ; 
+    } 
+
+    .modal {
+        z-index: 150;
+    }
+
+    .modal-dialog{
+        top: -2vh;
+    }
+
+    .modal-body{
+        overflow-y: auto;
+        height: 52vh;
+    }
+
+</style>
+
+    <!-- Modal -->
+    <div class="modal fade" id="related_rv" tabindex="-1" role="dialog" aria-labelledby="related_rv" aria-modal="true" data-current-step="1">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="resubmit_modal">Request Re-Submit</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true" style="font-size:27px">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-sm-12">
+                    <form action method="post" id="related_form">
+                    <fieldset data-step="1">
+                        @foreach(var DepartmentGroup in Model){
+                            <fieldset class="group border p-2"> 
+                                @{var departMentGroupName = DepartmentGroup.Name.Replace("_", " ");}
+                                <legend class="w-auto"> <input type="checkbox" class="checkAll" id="rl-@DepartmentGroup.Name"/> <label for="rl-@DepartmentGroup.Name" style="display: contents;">@departMentGroupName</label></legend> 
+                                <ul class="checkbox"> 
+                                    @foreach(var Department in DepartmentGroup.Department){
+                                        <li><input type="checkbox" class="checkSingle rl-@DepartmentGroup.Name new_related" id="rl-@Department.ID" value="1" name="@Department.Name" @(Department.Status == 1 ? "checked disabled" : "")/><label for="rl-@Department.ID">@Department.Name</label></li> 
+                                    }
+                                </ul> 
+                            </fieldset> 
+                        }
+                    </fieldset>
+                    <fieldset data-step="2">
+                        <form class="form-horizontal">
+                            <div class="form-group row">
+                                <div class="col-sm-2 control-label txt-right">
+                                    <label>Department: </label>
+                                </div>
+                                <div class="col-sm-10">
+                                    <textarea class="form-control" id="new_related_dept" rows="4" disabled contentEditable></textarea>
+                                    @* <div id="related_dept"></div> *@
+                                </div>
+                            </div>
+                        </form>
+                    </fieldset>
+                    </form>
+                </div>
+            </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-step-to="prev">
+                    Previous
+                </button>
+                <button type="button" class="btn btn-success" data-step-to="next">
+                    Next
+                </button>
+                <button type="submit" form="related_form" class="btn btn-info">
+                    Submit
+                </button>
+            </div>
+            </div>
+        </div>
+    </div>
+

@@ -454,7 +454,7 @@
                                 <label class="col-sm-2 col-form-label">Product Type<span class="text-danger">*</span></label>
                                 <div class="col-sm-10 col-form-label">
                                 @foreach(var Type in ProductTypes){
-                                    <label style="margin-right: 15px;">
+                                    <label class="mr-3">
                                         @{
                                             var isChecked = false;
                                             if(isEditMode && Type.Name == Topic.Product_type){
@@ -692,16 +692,22 @@
                                                 RelatedList = Topic.RelatedList;
                                             }
                                             @foreach(var Department in DepartmentGroup.Department){
-                                                var isChecked = false;
-                                                if(isEditMode){
-                                                    var RelatedValue = RelatedList.GetType().GetProperty(Department.Name).GetValue(RelatedList,null);
-                                                    if(RelatedValue != null){
-                                                        if((int) RelatedValue == 1){
-                                                            isChecked = true;
+                                                try{
+                                                    var isChecked = false;
+                                                    if(isEditMode){
+                                                        var RelatedValue = RelatedList.GetType().GetProperty(Department.Name).GetValue(RelatedList,null);
+                                                        if(RelatedValue != null){
+                                                            if((int) RelatedValue == 1){
+                                                                isChecked = true;
+                                                            }
                                                         }
                                                     }
+                                                    <li><input type="checkbox" class="checkSingle @DepartmentGroup.Name" id="@Department.ID" value="1" name="@Department.Name" @(isChecked ? "checked" : "")/><label for="@Department.ID">@Department.Name</label></li> 
+                                                }catch(Exception err){
+                                                    <li><input type="checkbox" class="checkSingle @DepartmentGroup.Name" id="@Department.ID" value="1" name="@Department.Name" /><label for="@Department.ID">@Department.Name</label></li> 
+
                                                 }
-                                                <li><input type="checkbox" class="checkSingle @DepartmentGroup.Name" id="@Department.ID" value="1" name="@Department.Name" @(isChecked ? "checked" : "")/><label for="@Department.ID">@Department.Name</label></li> 
+                                            
                                             }
                                         </ul> 
                                     </fieldset> 

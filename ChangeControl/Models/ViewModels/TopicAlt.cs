@@ -31,6 +31,9 @@ namespace ChangeControl.Models{
         public string Time_insert{ get; set; }
         public string Date{ get; set; }
         public User Profile{ get; set;}
+        public string ApprovedBy{ get; set; }
+        public string ApprovedDate{ get; set; }
+        public User ApproverProfile{ get; set; }
         public TopicAlt(string Code,string Type,string ChangeItem,string ProductType,int Revision ,string Model,string PartNo,string PartName,string ProcessName,int Status,string App,string Subject,string Detail,string Timing ,long Related,string UserInsert,string TimeInsert){
             this.Code = Code.ReplaceNullWithDash();
             this.Type = Type.ReplaceNullWithDash();
@@ -74,6 +77,8 @@ namespace ChangeControl.Models{
             this.Profile.FullName = "John Doe";
             this.Profile.Name = "John";
             this.Profile.SurName = "Doe";
+            this.ApprovedBy = "63014";
+            this.ApprovedDate = DateTime.Now.ToString("d MMMM yyyy");
         }
     }
 }

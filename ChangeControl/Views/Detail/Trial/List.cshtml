@@ -7,6 +7,7 @@
     List<Trial> ElementList = Model as List<Trial>;
 }
 
+@* /* --------------------- Show list that related to user --------------------- */ *@
 @if(ElementList.Exists(e => e.Department == department)){
         Trial Element = ElementList.Find(e => e.Department == department);
         if(Element != null){
@@ -14,6 +15,7 @@
         }
 }
 
+@* /* --------------------- Show list of pending department -------------------- */ *@
 @foreach(var Element in ViewBag.TrialRelatedList){
     if(Element.status == 0){
     <div>
@@ -30,6 +32,8 @@
     </div>
     }
 }
+
+@* /* ---------------------- Show list that already trial --------------------- */ *@
 @foreach(var Element in Model){
     if(Element != null){
         if(Element.Department != department){

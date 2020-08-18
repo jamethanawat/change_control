@@ -55,6 +55,8 @@ namespace ChangeControl.Controllers{
             Topic.Time_insert = Topic.Time_insert.StringToDateTime();
             Session["TopicCode"] = Topic.Code;
             Session["TopicID"] = Topic.ID;
+            if(Topic.ApprovedDate != null) {Topic.ApprovedDate = Topic.ApprovedDate.StringToDateTime();}
+            if(Topic.ApprovedBy != null) {Topic.ApproverProfile = M_Detail.getUserByID(Topic.ApprovedBy);}
 
             ViewBag.ResubmitList = this.GetResubmitListByTopicID();
             Session["ReviewList"]  = ViewBag.ReviewList = this.GetReviewListByTopicID();
@@ -63,10 +65,19 @@ namespace ChangeControl.Controllers{
 
             var DepartmentGroup = M_Detail.GetDepartmentGroup(); //Get raw group of departments
             List<DepartmentList> departmentList = new List<DepartmentList>();
+            
+            TopicAlt tp = ViewData["Topic"] as TopicAlt;
+            
             foreach(string GroupName in DepartmentGroup){
-                List<Department> department = new List<Department>();
-                department = M_Detail.GetDepartmentByGroup(GroupName);
-                departmentList.Add(new DepartmentList(){Name = GroupName.Replace(" ", "_"), Department = department}); //Convert raw group into department list for radio
+                List<Department> departments = new List<Department>();
+                departments = M_Detail.GetDepartmentByGroup(GroupName);
+                foreach(Department department in departments){
+                    var rl = tp.RelatedListAlt.Find(e => e.name == department.Name);
+                    if(rl != null){
+                        department.Status = 1;
+                    }
+                }
+                departmentList.Add(new DepartmentList(){Name = GroupName.Replace(" ", "_"), Department = departments}); //Convert raw group into department list for radio
             }
             ViewData["DepartmentList"] = departmentList;
 
@@ -268,10 +279,10 @@ namespace ChangeControl.Controllers{
         }
 
         [HttpPost]
-        public ActionResult SubmitRelated(string IT,string MKT,string PC1,string PC2,string P1,string P2,string P3A,string P3M,string P4,string P5,string P6,string P7,string PE1,string PE2,string PE2_SMT,string PE2_PCB,string PE2_MT,string PE1_Process,string PE2_Process,string PCH1,string PCH2,string QC_IN1,string QC_IN2,string QC_IN3,string QC_FINAL1,string QC_FINAL2,string QC_FINAL3,string QC_NFM1,string QC_NFM2,string QC_NFM3,string QC1,string QC2,string QC3){
+        public ActionResult SubmitRelated(string IT,string MKT,string PC1,string PC2,string P1,string P2,string P3A,string P3M,string P4,string P5,string P6,string P7,string PE1,string PE2,string PE2_SMT,string PE2_PCB,string PE2_MT,string PE1_Process,string PE2_Process,string PCH,string QC_IN1,string QC_IN2,string QC_IN3,string QC_FINAL1,string QC_FINAL2,string QC_FINAL3,string QC_NFM1,string QC_NFM2,string QC_NFM3,string QC1,string QC2,string QC3, string P5_ProcessDesign, string P6_ProcessDesign){
             try{
-                Related related = new Related(IT,MKT,PC1,PC2,P1,P2,P3A,P3M,P4,P5,P6,P7,PE1,PE2,PE2_SMT,PE2_PCB,PE2_MT,PE1_Process,PE2_Process,PCH1,PCH2,QC_IN1,QC_IN2,QC_IN3,QC_FINAL1,QC_FINAL2,QC_FINAL3,QC_NFM1,QC_NFM2,QC_NFM3,QC1,QC2,QC3);
-                Session["RelatedID"] = M_Detail.InsertRelated(related);
+                Related related = new Related(IT,MKT,PC1,PC2,P1,P2,P3A,P3M,P4,P5,P6,P7,PE1,PE2,PE2_SMT,PE2_PCB,PE2_MT,PE1_Process,PE2_Process,PCH,QC_IN1,QC_IN2,QC_IN3,QC_FINAL1,QC_FINAL2,QC_FINAL3,QC_NFM1,QC_NFM2,QC_NFM3,QC1,QC2,QC3, P5_ProcessDesign, P6_ProcessDesign);
+                Session["RelatedID"] = M_Detail.InsertRelated(related, Session["User"].ToString());
                 return Json(new { code = 1 },JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex){
@@ -336,6 +347,9 @@ namespace ChangeControl.Controllers{
 
         [HttpPost]
         public ActionResult UpdateReview(){
+            if(!CheckCurrentStatus()){
+                throw new Exception("Status has changed");
+            }
             var updated_rv = M_Detail.UpdateReview(Session["TopicCode"] as string, Session["User"].ToString(), Session["Department"].ToString());
             Session["ReviewID"] = updated_rv.ID_Review;
             Session["ReviewRev"] = updated_rv.Revision;
@@ -344,6 +358,9 @@ namespace ChangeControl.Controllers{
 
         [HttpPost]
         public ActionResult UpdateTrial(string desc){
+            if(!CheckCurrentStatus()){
+                throw new Exception("Status has changed");
+            }
             var updated_tr = M_Detail.UpdateTrial(Session["TopicCode"] as string, desc, Session["Department"].ToString(), Session["User"].ToString());
             Session["TrialID"] = updated_tr.ID;
             Session["TrialRev"] = updated_tr.Revision;
@@ -352,6 +369,9 @@ namespace ChangeControl.Controllers{
 
         [HttpPost]
         public ActionResult UpdateConfirm(string desc){
+            if(!CheckCurrentStatus()){
+                throw new Exception("Status has changed");
+            }
             var updated_cf = M_Detail.UpdateConfirm(Session["TopicCode"] as string, desc, Session["Department"].ToString(), Session["User"].ToString());
             Session["ConfirmID"] = updated_cf.ID;
             Session["ConfirmRev"] = updated_cf.Revision;
@@ -412,7 +432,7 @@ namespace ChangeControl.Controllers{
                     mail = "InformUser";
                 }else if(Topic.Status == 8 && Session["Department"].ToString() == "QC1" || Session["Department"].ToString() == "QC2" || Session["Department"].ToString() == "QC3" ){
                     var rv_list = Session["ReviewList"] as List<Review>;
-                    if(rv_list.Exists(e => e.Item.Exists(d => d.Type == 24 && d.Status == true))){ //Request trial not exist
+                    if(rv_list.Exists(e => e.Item.Exists(d => d.Type == 24 && d.Status == 1))){ //Request trial not exist
                         M_Detail.UpdateTopicStatus(Session["TopicCode"] as string, 9);
                         mail = "StartTrial";
                     }else{
@@ -560,7 +580,7 @@ namespace ChangeControl.Controllers{
         public List<RelatedAlt> FilterTrialRelated(List<Review> review_list, List<Trial> trial_list){
             List<RelatedAlt> TrialRelatedList = new List<RelatedAlt>();
             foreach (var review in review_list){
-                if(review.Item.Exists(e => e.Type == 24 && (bool) e.Status)){
+                if(review.Item.Exists(e => e.Type == 24 && e.Status == 1)){
                     var isResponsed = trial_list.Exists( e => e.Department == review.Department);
                     var status = (isResponsed)? 1 : 0 ;
                     TrialRelatedList.Add(new RelatedAlt{name = review.Department, status = status});
@@ -648,7 +668,7 @@ namespace ChangeControl.Controllers{
             try{
                 List<RelatedAlt> temp_related_rv_list = (List<RelatedAlt>) Session["ReviewRelatedList"];
                 List<Review> temp_rv_list = (List<Review>) Session["ReviewList"];
-                if(temp_rv_list.Exists(rv => rv.Item.Exists(rv_item => rv_item.Type == 26 && rv_item.Status == true))){
+                if(temp_rv_list.Exists(rv => rv.Item.Exists(rv_item => rv_item.Type == 26 && rv_item.Status == 1))){
                     string[] pt_list = {"P1","P2","P3A","P3M","P4","P5","P6","P7"};
                     string[] qcf_list = {"QC_FINAL1", "QC_FINAL2", "QC_FINAL3"};
                     var related_pt_qcf = temp_related_rv_list.FindAll(e => e.status == 1 && (pt_list.Contains(e.name) || qcf_list.Contains(e.name)));
@@ -660,6 +680,28 @@ namespace ChangeControl.Controllers{
                 return Json(new {status="error"}, JsonRequestBehavior.AllowGet);
             }
         }
+
+        public bool CheckCurrentStatus(){
+            try{
+            var temp_topic = (TopicAlt) Session["Topic"];
+            var tp_status = M_Detail.GetTopicStatusByCode(temp_topic.Code);
+                return temp_topic.Status == tp_status;
+            }catch(Exception err){
+                return false;
+            }
+        }
+
+        public ActionResult ApproveTopic(){
+            var temp_topic = (TopicAlt) Session["Topic"];
+            M_Detail.ApproveTopicByCode(temp_topic.Code, Session["User"].ToString());
+            return Json(new {status="success"}, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult UpdateTopicRelated(){
+            M_Detail.UpdateTopicRelated(Session["TopicCode"].ToString(), (long) Session["RelatedID"]);
+            return Json(new {status="success"}, JsonRequestBehavior.AllowGet);
+        }
+
 
     }
 }
