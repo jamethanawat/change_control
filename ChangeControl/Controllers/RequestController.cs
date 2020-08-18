@@ -17,11 +17,13 @@ namespace ChangeControl.Controllers{
         // GET: Request
         private DbTapics DB_Tapics;
         private DbCCS DB_CCS;
+        private DetailModel M_Detail;
         private RequestModel M_Req;
         public List<Review> ReviewList = new List<Review>();
         public RequestController(){
             DB_Tapics = new DbTapics();
             DB_CCS = new DbCCS();
+            M_Detail = new DetailModel();
             M_Req = new RequestModel();
         }
         public class Value{
@@ -85,10 +87,10 @@ namespace ChangeControl.Controllers{
                         temp_topic.RelatedList = TopicRelatedList;
                         
 
-                        var topic_file_list = M_Req.GetFileByID(temp_topic.ID, "Topic");
+                        var topic_file_list = M_Req.GetFileByID(temp_topic.ID, "Topic"); //Get file by topic id
                         if(topic_file_list != null){
-                        temp_topic.FileList = topic_file_list;
-                        ViewData["Topic"] = temp_topic;
+                            temp_topic.FileList = topic_file_list;
+                            ViewData["Topic"] = temp_topic;
                         }
                     }
                 }

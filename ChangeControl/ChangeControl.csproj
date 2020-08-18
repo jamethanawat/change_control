@@ -3940,6 +3940,7 @@
     <Content Include="Views\Mail\Body\ConfirmUpdate.cshtml" />
     <Content Include="Views\Mail\Body\TrialUpdate.cshtml" />
     <Content Include="tsconfig.json" />
+    <Content Include="Views\Detail\Related.cshtml" />
     <None Include="Web References\myAD\ADInfo.disco" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">

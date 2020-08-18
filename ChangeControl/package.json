@@ -1,0 +1,12 @@
+{
+  "name": "changecontrol",
+  "version": "1.0.0",
+  "description": "Change Control System",
+  "main": "index.js",
+  "scripts": {
+    "build:dev": "webpack --config webpack.dev.js",
+    "build:prod": "webpack --config webpack.prod.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "-vs-binding": {
