@@ -1,5 +1,6 @@
 ﻿@using System.Data
 @using ChangeControl.Models;
+@using ChangeControl.Helpers
 @using System.Reflection;
 @model DataSet
 @{
@@ -366,9 +367,9 @@
                                 </div>
                             </div>
                         </div>
+                        <form class='form-horizontal @(isEditMode ? "Edit" : "Request")' action="" method="post" id='@(isEditMode ?  Topic.ID.ToString() : "Request")' >
                         <div class="card-body">
                                                     
-                            <form class='form-horizontal @(isEditMode ? "Edit" : "Request")' action="javascript:void(0);" id='@(isEditMode ?  Topic.ID.ToString() : "Request")' >
                                 
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Change Type<span class="text-danger">*</span></label>
@@ -384,29 +385,6 @@
                             </div>
                             <hr>
                             
-                            @* <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">Approved by</label>
-                                <div class="col-sm-10 col-form-label row" style="padding-left: 13px;">
-                                    <div class="col-sm-12"> 
-                                        <div class="row">
-                                            <label class="mr-3 col-sm-2">
-                                            <input class="mr-2" type="checkbox" name="QC1">QC1</label>
-                                            <label class="mr-3 col-sm-2">
-                                            <input class="mr-2" type="checkbox" name="QC2">QC2</label>
-                                            <label class="mr-3 col-sm-2">
-                                            <input class="mr-2" type="checkbox" name="QC3">QC3</label>
-                                        </div>
-                                        <div class="row">
-                                            <label class="mr-3 col-sm-2">
-                                            <input class="mr-2" type="checkbox" name="PE1_Process">PE1_Process</label>
-                                            <label class="mr-3 col-sm-2">
-                                            <input class="mr-2" type="checkbox" name="PE2_Process">PE2_Process</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <hr> *@
-
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Change Items<span class="text-danger">*</span></label>
                                 <div class="col-sm-10 col-form-label row" style="padding-left: 13px;">
@@ -507,19 +485,6 @@
                             @if(isApp && isEditMode){
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">APP/IPP Inform to customer </label>
-                                @* <div class="col-sm-10 col-form-label" >
-                                <div class="btn-group-custom">
-                                    
-                                    <input type="radio" name="appRadio" id="app_have_desc" value="1" class="flat-red" disabled @(isApp ? "checked" : "")>  
-                                    <label for="app_have_desc" style="padding: 4px 18px;">Yes</label>
-                                    <input type="radio" name="appRadio" id="app_no_desc" value="0" class="flat-red" disabled @(isApp ? "" : "checked")>
-                                    <label for="app_no_desc" style="padding: 4px 18px;">No</label>
-                                    <span class="span-custom-2"></span>
-                                </div>
-                                </div>
-                                
-                                <div class="col-sm-2">
-                                </div> *@
                                 <div class="col-sm-10">
                                     <div class="form-group">
                                         <textarea name="appDescription" placeholder="Place some text here" style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;" disabled>@Html.DisplayFor(model => Topic.App)
@@ -571,7 +536,6 @@
                                                         ['para', ['ul', 'ol']],
                                                     ],
                                                 });
-                                                @* $(".textareaSubject").summernote('editor.pasteHTML', "@Html.Raw(Topic.Subject)"); *@
                                             </script>
                                             }
                                     </div>
@@ -603,7 +567,6 @@
                                                         ['para', ['ul', 'ol']],
                                                     ],
                                                 });
-                                                @* $(".textareaDetails").summernote('editor.pasteHTML', "@Html.Raw(Topic.Detail)"); *@
                                             </script>
                                             }
                                     </div>
@@ -635,7 +598,6 @@
                                                         ['para', ['ul', 'ol']],
                                                     ],
                                                 });
-                                                @* $(".textareaTiming").summernote('editor.pasteHTML', "@Html.Raw(Topic.Timing)"); *@
                                             </script>
                                             }
                                     </div>
@@ -649,81 +611,12 @@
                                 <div class="col-sm-10">
                                     <input type="file" class="my-pond" name="filepond"/>
                                     @if(isEditMode && Topic.FileList.Count != 0){
-                                    var FileList = Topic.FileList;
-                                    <!-- /.card-body -->
-                                    <div class="card-footer bg-white">
-                                        <ul class="mailbox-attachments d-flex flex-wrap align-items-stretch clearfix">
-                                        @foreach(var File in FileList){
-                                            var FileSize = "0 Bytes";
-                                            var file_desc = (File.Description.Trim() == null || File.Description.Trim() == "") ? "<i>No information</i>" : File.Description;
-                                            using (Html.BeginForm("DownloadFile", "Detail", FormMethod.Post, new { enctype = "multipart/form-data" })){
-
-                                            <li data-toggle="tooltip" data-placement="top" data-html="true" title="@file_desc">
-                                                <span class="mailbox-attachment-icon">
-                                                    @{var FileType = Path.GetExtension(File.Name);}
-                                                    @if(FileType == ".docx" || FileType == ".doc" ){
-                                                        <i class="far fa-file-word"></i>
-                                                    }else if(FileType == ".pptx" || FileType == ".ppt" ){
-                                                        <i class="far fa-file-powerpoint"></i>
-                                                    }else if(FileType == ".xls" || FileType == ".xlxs" ){
-                                                        <i class="far fa-file-excel"></i>
-                                                    }else if(FileType == ".pdf"){
-                                                        <i class="far fa-file-pdf"></i>
-                                                    }else if(FileType == ".png" || FileType == ".jpeg" || FileType == ".jpg" || FileType == ".JPG" || FileType == ".gif" ){
-                                                        <i class="far fa-file-image"></i>
-                                                    }else{
-                                                        <i class="far fa-file"></i>
-                                                    }
-                                                </span>
-                                                <div class="mailbox-attachment-info">
-                                                    <a href="#" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> @Html.DisplayFor(model => File.Name)
-                                                    </a>
-                                                    <span class="mailbox-attachment-size clearfix mt-1">
-                                                    @if(File.Size != null){
-                                                        if(File.Size > 1000){
-                                                            FileSize = (File.Size / 1000) + " KB";
-                                                        }else{
-                                                            FileSize = File.Size + " Bytes";
-                                                        }
-                                                    }
-                                                        <span>@FileSize</span>
-                                                        <button name="load" value="@File.Name_Format^@File.Name" class="btn btn-default btn-sm float-right"><i class="fas fa-cloud-download-alt"></i></button>
-                                                    </span>
-                                                </div>
-                                            </li>
-                                            }
-                                        }
-                                        </ul>
-                                    </div>
-                                }
+                                        <div class="card-footer bg-white">
+                                        @{ ViewBag.DisableFileList = true; }
+                                            @Html.Partial("~/Views/Helper/FileList.cshtml",Topic.FileList as List<FileItem>)
+                                        </div>
+                                    }
                                 </div>
-
-                                    @* @if(isEditMode){
-                                        foreach(FileItem item in Topic.FileList){
-                                        <script>
-                                            $(() => {
-                                                let obj = {
-                                                    options: {
-                                                        file: {
-                                                            name: '@item.Name',
-                                                            size: '@item.Size',
-                                                        }
-                                                    }
-                                                }
-                                                
-                                                if('@item.Description' != null && '@item.Description' != ""){
-                                                    addFile('@item.ID',obj,'@item.Description'); 
-                                                }else{
-                                                    addFile(obj);
-                                                }
-                                                console.log(getFile());
-                                            });
-                                        </script>
-                                        }
-                                        <script> 
-                                            $(() => { pondSetOptions(); });
-                                        </script>
-                                    } *@
                             </div>
                             
                             <hr>
@@ -763,20 +656,20 @@
                                 </div>
                             </div>
 
-                                <br>
-                                <hr>
-                                <br>
-                                <div class="form-group row">
-                                    <div class="col-sm-12">
-                                        <button type="submit" id="ReviewSubmit" class="btn btn-info float-right">Submit</button>
-                                    </div>
-                  
+                            <br>
+                            <hr>
+                            <br>
+                            <div class="form-group row">
+                                <div class="col-sm-12">
+                                    <button type="submit" id="ReviewSubmit" class="btn btn-info float-right">Submit</button>
                                 </div>
-                            </form>
-                        </div>
+                
+                            </div>
                     </div>
+                    </form>
                 </div>
             </div>
+        </div>
                 
             </div>
             <!-- /.container-fluid -->

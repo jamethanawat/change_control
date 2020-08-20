@@ -87,5 +87,20 @@ namespace ChangeControl.Models{
             }
             return response;
         }
+
+        public List<String> GetDepartmentListByUserID(string us_id){
+            try{
+                var sql = $@"SELECT Department FROM CCS.dbo.Permission
+                            LEFT JOIN [User] ON Permission.[User] = [User].Code
+                            WHERE Permission.[User] = '{us_id}'
+                            GROUP BY Department;
+                            ;";
+                var result = DB_CCS.Database.SqlQuery<string>(sql).ToList();
+                return result;
+            }catch(Exception err){
+                return new List<String>();
+            }
+        }
+
     }
 }

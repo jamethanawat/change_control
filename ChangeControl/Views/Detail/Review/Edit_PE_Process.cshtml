@@ -48,7 +48,7 @@
                         <label for="inputChangeDetails" class="col-sm-3 col-form-label">Change date</label>
                         <div class="col-sm-9 col-form-label">
                             @{ TempItem = ItemList.Find(Item => Item.Type == 32) ?? BlankItem; }
-                            <input data-type="desc" data-id="32" data-toggle="datepicker" class="form-control required" placeholder="Select Date " autocomplete="off" name="desc-32" value="@TempItem.Description">
+                            <input data-type="desc" data-id="32" data-toggle="datepicker" class="form-control required" placeholder="Select Date " autocomplete="off" name="desc-32" value="@TempItem.Description" data-inputmask-alias="datetime" data-inputmask-inputformat="dd-mm-yyyy" data-mask="99-99-9999">
                             <div data-toggle="datepicker"></div>
                         </div>
                     </div>
@@ -105,7 +105,7 @@
                         <label for="inputSkills" class="col-sm-3 col-form-label">Due Date</label>
                         <div class="col-sm-9 col-form-label">
                             @{ TempItem = ItemList.Find(Item => Item.Type == 31) ?? BlankItem; }
-                            <input data-type="desc" data-id="31" data-toggle="datepicker" class="form-control required" placeholder="Select Date " autocomplete="off" name="desc-31" value="@TempItem.Description">
+                            <input data-type="desc" data-id="31" data-toggle="datepicker" class="form-control required" placeholder="Select Date " autocomplete="off" name="desc-31" value="@TempItem.Description" data-inputmask-alias="datetime" data-inputmask-inputformat="dd-mm-yyyy" data-mask="99-99-9999">
                             <div data-toggle="datepicker"></div>
                             @* <input type="text" name="desc-32" class="form-control" placeholder="Enter Date "> *@
                         </div>
@@ -138,7 +138,13 @@
                     <div class="form-group row">
                         <label for="inputSkills" class="col-sm-3 col-form-label">Attach File</label>
                         <div class="col-sm-9">
-                            <input type="file" class="my-pond" name="filepond" />
+                            <input type="file" class="my-pond" name="filepond_alt" />
+                            @if(Model.FileList != null && Model.FileList.Count > 0 ){
+                                <div class="card-footer bg-white">
+                                    @{ ViewBag.DisableFileList = true; }
+                                    @Html.Partial("~/Views/Helper/FileList.cshtml",Model.FileList as List<FileItem>)
+                                </div>
+                            }
                             @* <input type="file" name="filepond" data-max-files="10" required> *@
                         </div>
                     </div>

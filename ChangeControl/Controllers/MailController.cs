@@ -62,7 +62,7 @@ namespace ChangeControl.Controllers{
             }
         }
 
-        public ActionResult GenerateMail(string mode,string topic_code, string dept = null, string[] dept_arry=null, string due_date=""){
+        public ActionResult GenerateMail(string mode,string topic_code, string dept = null, string[] dept_arry=null, string due_date="", string pos=""){
             try{
                 Topic = M_Mail.GetTopicByCode(topic_code);
                 ViewBag.Mode = mode;
@@ -73,26 +73,32 @@ namespace ChangeControl.Controllers{
 
                 var email = RenderView("~/Views/Mail/index.cshtml",Topic);
                 var address_list = new List<string>();
+                List<String> temp_email_list = new List<string>();
 
-                if(dept_arry != null){
+                if(dept_arry != null){ //Dept as array
                     foreach(var temp_dept in dept_arry){
-                        address_list.AddRange(M_Mail.GetEmailByDept(temp_dept));
+                        temp_email_list = M_Mail.GetEmailByDeptAndPosition(temp_dept,pos);
+                        if (temp_email_list != null) address_list.AddRange(temp_email_list);
                     }
-                }else if(dept == "" || dept == null){
+                }else if(dept == "" || dept == null){ //Default department that related
                     var related_list = M_Mail.GetRelatedByTopicCode(topic_code);
                     Type type = related_list.GetType();
                     PropertyInfo[] props = type.GetProperties();
                     
                     foreach (var prop in props){
                         if((int) prop.GetValue(related_list) == 1 ){
-                            address_list.AddRange(M_Mail.GetEmailByDept(prop.Name));
+                            temp_email_list = M_Mail.GetEmailByDeptAndPosition(prop.Name,pos);
+                            if (temp_email_list != null) address_list.AddRange(temp_email_list);
                         }
                     }
-                }else{
-                    address_list.AddRange(M_Mail.GetEmailByDept(dept));
+                }else{ //Single department
+                    temp_email_list = M_Mail.GetEmailByDeptAndPosition(dept,pos);
+                    if (temp_email_list != null) address_list.AddRange(temp_email_list);
                 }
 
-                SendMail(email,address_list);
+                if(temp_email_list != null){
+                    SendMail(email,address_list);
+                } 
                 return Json(new {status = true}, JsonRequestBehavior.AllowGet);
             // return View(Topic);
             }catch(Exception err){
@@ -156,6 +162,12 @@ namespace ChangeControl.Controllers{
                         mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Issue request.";
                         break;
                     case "EmailReviewed" :
+                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please review.";
+                        break;
+                    case "EmailTrialed" :
+                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please review.";
+                        break;
+                    case "EmailConfirmed" :
                         mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please review.";
                         break;
                     case "InformPE" :

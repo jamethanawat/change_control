@@ -103,55 +103,10 @@
                                 </div>
                             </div>
 
-                        @if(Response.FileList != null){
-                        if(Response.FileList.Count != 0){
-                        <div class="col-sm-12 d-flex mt-4">
-                        <ul class="mailbox-attachments d-flex flex-wrap align-items-stretch clearfix">
-                            @{var FileList = Response.FileList;
-                                foreach(var File in FileList){
-                                    var FileSize = "0 Bytes";
-                                    var file_desc = (File.Description.Trim() == null || File.Description.Trim() == "") ? "<i>No information</i>" : File.Description;
-                                    using (Html.BeginForm("DownloadFile", "Detail", FormMethod.Post, new { enctype = "multipart/form-data" })){
-                                    
-                                    <li data-toggle="tooltip" data-placement="top" data-html="true" title="@file_desc">
-                                        <span class="mailbox-attachment-icon">
-                                            @{var FileType = Path.GetExtension(File.Name);}
-                                            @if(FileType == ".docx" || FileType == ".doc" ){
-                                                <i class="far fa-file-word"></i>
-                                            }else if(FileType == ".pptx" || FileType == ".ppt" ){
-                                                <i class="far fa-file-powerpoint"></i>
-                                            }else if(FileType == ".xls" || FileType == ".xlxs" ){
-                                                <i class="far fa-file-excel"></i>
-                                            }else if(FileType == ".pdf"){
-                                                <i class="far fa-file-pdf"></i>
-                                            }else if(FileType == ".png" || FileType == ".jpeg" || FileType == ".jpg" || FileType == ".JPG" || FileType == ".gif" ){
-                                                <i class="far fa-file-image"></i>
-                                            }else{
-                                                <i class="far fa-file"></i>
-                                            }
-                                        </span>
-                                        <div class="mailbox-attachment-info">
-                                            <a href="#" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> @File.Name
-                                            </a>
-                                            <span class="mailbox-attachment-size clearfix mt-1">
-                                            @if(File.Size != null){
-                                                if(File.Size > 1000){
-                                                    FileSize = (File.Size / 1000) + " KB";
-                                                }else{
-                                                    FileSize = File.Size + " Bytes";
-                                                }
-                                            }
-                                                <span>@FileSize</span>
-                                                <button name="load" value="@File.Name_Format^@File.Name" class="btn btn-default btn-sm float-right"><i class="fas fa-cloud-download-alt"></i></button>
-                                            </span>
-                                        </div>
-                                    </li>
-                                    }
-                                }
-                            }
-                            </ul>
+                        @if(Response.FileList != null && Response.FileList.Count != 0){
+                            <div class="col-sm-12 d-flex mt-4">
+                                @Html.Partial("~/Views/Helper/FileList.cshtml",Response.FileList as List<FileItem>)
                             </div>
-                            }
                         }  
                         </div>
                         @* <hr style="margin-top:0px !important">

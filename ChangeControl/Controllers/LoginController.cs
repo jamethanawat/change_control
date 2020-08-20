@@ -35,6 +35,7 @@ namespace ChangeControl.Controllers{
         public ActionResult CheckUser(string username,string password){
             var status = "error";
             var result = "error";
+            var pos = "Staff";
             if(password != "wmpobxxvoFfg,o!@#$"){
                 try{
                     res = M_Login.CheckUser(username, password);
@@ -48,7 +49,8 @@ namespace ChangeControl.Controllers{
                     Session["SurName"] = response.SurName;
                     
                     res = M_Login.GetPositionByUserID(username);
-                    Session["Position"] = (res.status == "success") ? res.data : "Staff";
+                    Session["Position"] = pos = (res.status == "success") ? res.data : "Staff";
+
 
                     res = M_Login.GetDepartmentByUserID(username);
                     result = (res.status == "success") ? res.data : GetDepartment(username);
@@ -63,7 +65,7 @@ namespace ChangeControl.Controllers{
                 }catch(Exception err){
 
                 }
-                return Json(new { status = status ,data = result }, JsonRequestBehavior.AllowGet);
+                return Json(new { status = status ,data = result, pos}, JsonRequestBehavior.AllowGet);
             }else{
                 Session["User"] = username;
                 Session["FullName"] = "Admin";
@@ -220,6 +222,10 @@ namespace ChangeControl.Controllers{
                 dept_raw = Session["DepartmentRawName"],
                 dept_id = Session["DepartmentID"]
             }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult GetDepartmentListByUserID(string us_id){
+            return Json(new { data = M_Login.GetDepartmentListByUserID(us_id) }, JsonRequestBehavior.AllowGet);
         }
     }
 }

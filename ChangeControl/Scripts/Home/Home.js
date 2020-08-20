@@ -46,17 +46,17 @@ $(document).ready(function () {
     table_cr = $('#ChangeRequestTable').DataTable();
 
 /* ----------------------- Overstatus relate to status ---------------------- */
-    $("[name='overstatus'").change((e) => {
+    $("[name='overstatus']").change((e) => {
         if(e.target.value != 1) {
             let selected_st = 6 + Number(e.target.value);
-            $("[name='status").val([`${selected_st}`]);
+            $("[name='status']").val([`${selected_st}`]);
         }
     })
 
 /* ---------------------- Status related to overstatus ---------------------- */
 
-    $("[name='status'").change((e) => {
-            $("[name='overstatus").val(['1']);
+    $("[name='status']").change((e) => {
+            $("[name='overstatus']").val(['1']);
     })
 
 
@@ -165,7 +165,7 @@ $(document).ready(function () {
                             }else{
                                     var btn_badge = `secondary`;
                                     var editable = `disabled`;
-                                    if(row.User_insert === SessionUser && row.FullStatus == "Request"){
+                                    if(row.User_insert === SessionUser && (row.FullStatus == "Waiting" || row.FullStatus == "Request")){
                                         btn_badge = `success`;
                                         var editable = ``;
                                     }

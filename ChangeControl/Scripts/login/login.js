@@ -34,31 +34,34 @@ $(document).ready(function () {
         if (Iuser.length == 0 || Ipass.length == 0) {
             swal("Error", "User Password Not Correct", "error");
         }else{
-            // if(Iuser == "63014" && (Ipass == "OPERATOR" || Ipass == "STAFF" || Ipass == "MANAGER")){
-            //     event.preventDefault();
-
-            //     swal({
-            //         title: "Developer Mode", 
-            //         text: "Please submit Department",
-            //         content: select,
-            //         icon:"warning",
-            //     }).then(() => {
-            //         let typedDepartment = $(".select-custom").children("option:selected").text();
-            //         ajaxAdmin(Iuser, Ipass, typedDepartment);
-            //     });
-            // }else{
-            //     ajaxUser(Iuser, Ipass);
-            // }
-                ajaxUser(Iuser, Ipass);
-                 
-
-
-
+            ajaxUser(Iuser, Ipass);
             function ajaxUser(Iuser, Ipass){
                 loader.toggle();
                 $.post(CheckUserPath,({ username:Iuser,password:Ipass }) ,(res) => {
-                    if(res.status == "success"){
-                        swal("Success", "Sign in complete", "success").then( window.location.href = (DetailID.length > 8 ) ? NavigateToDetail : NavigateToHome );
+                    var promises = [];
+                    if(res.pos == "Special"){
+                        var select = CreateDepartmentOption(null,Iuser)
+                        select.onchange = function selectChanged(e) { value = e.target.value }
+                        loader.toggle();
+                        
+                        swal({
+                                title: "Confirm Department", 
+                                text: "Please select your Department",
+                                closeOnClickOutside: false,
+                                // buttons : [true,true],
+                                content: select,
+                            icon:"warning",
+                        }).then(() => {
+                            loader.toggle();
+                            let selected_dept = $(".select-custom").children("option:selected").text();
+                            $.post(SetDepartmentAltPath,{dept:selected_dept},(success) => {
+                                if(success){
+                                    swal("Success", "Sign in complete", "success").then( window.location.href = (UrlTopicID.length > 8 ) ? NavigateToPrevious : NavigateToHome );
+                                }
+                            });
+                        });
+                    }else if(res.status == "success"){
+                        swal("Success", "Sign in complete", "success").then( window.location.href = (UrlTopicID.length > 8 ) ? NavigateToPrevious : NavigateToHome );
                     }else if(res.status == "missdept"){
                         var select = CreateDepartmentOption(res.data);
                         select.onchange = function selectChanged(e) { value = e.target.value }
@@ -76,7 +79,7 @@ $(document).ready(function () {
                             let selected_dept = $(".select-custom").children("option:selected").text();
                             $.post(SetDepartmentAltPath,{dept:selected_dept},(success) => {
                                 if(success){
-                                    swal("Success", "Sign in complete", "success").then( window.location.href = (DetailID.length > 8 ) ? NavigateToDetail : NavigateToHome );
+                                        swal("Success", "Sign in complete", "success").then( window.location.href = (UrlTopicID.length > 8 ) ? NavigateToPrevious : NavigateToHome );
                                 }
                             });
                         });

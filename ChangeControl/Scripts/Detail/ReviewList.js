@@ -75,11 +75,11 @@ $(() => {
                 delete files[index].detail;
             }
 
-            files.forEach(element => {
+            promises.push(files.forEach(element => {
                 var Data = new FormData();
                 Data.append("file",element.file);
                 Data.append("description",element.description);
-                promises.push($.ajax({
+                $.ajax({
                     type: "POST",
                     url: SubmitFilePath,
                     data: Data,
@@ -91,8 +91,8 @@ $(() => {
                     error: function() {
                         swal("Error", "Upload file not success", "error");
                     }
-                }));
-            });
+                })
+            }));
 
             optimized_edit_rv.forEach(element => {
                 promises.push(
@@ -109,7 +109,7 @@ $(() => {
             });
 
             promises.push(
-                $.post(GenerateMailPath,{ 'mode': 'ReviewUpdate', 'topic_code':topic_code, 'dept':result.dept, }).fail((error) => {
+                $.post(GenerateMailPath,{ 'mode': 'ReviewUpdate', 'topic_code':topic_code, 'dept':result.dept,'pos':'Approver' }).fail((error) => {
                     console.error(error);
                     swal("Error", "Cannot send email to Requestor, Please try again", "error");
                     return;

@@ -19,7 +19,7 @@
     var isTrialable = (bool) ViewData["isTrialable"];
     string department = (string)Session["Department"];
 
-    var isPEProcess = ViewBag.isPEProcess = (department == "PE1_Process" || department == "PE2_Process"|| department == "PE5_ProcessDesign"|| department == "P6_ProcessDesign");
+    var isPEProcess = ViewBag.isPEProcess = (department == "PE1_Process" || department == "PE2_Process"|| department == "P5_ProcessDesign"|| department == "P6_ProcessDesign");
     var isQC = ViewBag.isQC = (department == "QC1" || department == "QC2" || department == "QC3");
 
 
@@ -84,6 +84,18 @@
           position: -webkit-sticky;
         position: sticky;
         top: 73px;
+    }
+
+    hr {
+        margin-top: 1rem;
+        margin-bottom: 0.5rem; 
+        border: 0;
+        border-top: 1px solid rgba(0,0,0,.1);
+    }
+    
+    .card-body {
+        flex: 1 1 auto;
+        padding: 0.65rem 0.9rem;
     }
     
     #Top {
@@ -472,7 +484,7 @@
                 </div>
             </div>
             <div class="row mb-2">
-                <div class="col-sm-7">
+                <div class="col-sm-8">
                     <h1>
                         TNS Control No. @Html.DisplayFor(model => Topic.Code) 
                         <span class="badge badge-primary">Rev @Topic.Revision</span>
@@ -535,7 +547,7 @@
                     </span>
                     
                 </div>
-                <div class="col-sm-5">
+                <div class="col-sm-4">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href='@Url.Action("Index","Home")'>Change Control System</a></li>
                         <li class="breadcrumb-item active">Project Detail</li>
@@ -564,6 +576,9 @@
                                 <hr>
                                 <strong> Model :</strong>
                                 <p class="text-muted"> @Html.DisplayFor(model => Topic.Model) </p>
+                                <hr>
+                                <strong> Process Name :</strong>
+                                <p class="text-muted"> @Html.DisplayFor(model => Topic.ProcessName) </p>
                                 <hr>
                                 <strong> Part No / Part Name :</strong>
                                 <p class="text-muted"> @Html.DisplayFor(model => Topic.PartNo) / @Html.DisplayFor(model => Topic.PartName) </p>
@@ -602,10 +617,10 @@
                                     }
                                         <h4 class="@(@ViewBag.RejectMessage != null ? "mt-3":"")">Author</h4>
                                             &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span> @Topic.Department -  @Topic.Profile.FullName (@Topic.Time_insert)</span>
-                                        @if(status != "Waiting" && Topic.ApprovedBy != null){
-                                            <h4 class="mt-3">Approved By</h4>
-                                                @:&nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span> @Topic.Department -  @Topic.ApproverProfile.FullName (@Topic.ApprovedDate)</span>
-                                        }
+                                    @if(status != "Waiting" && Topic.ApprovedBy != null){
+                                        <h4 class="mt-3">Approved By</h4>
+                                            @:&nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span> @Topic.Department -  @Topic.ApproverProfile.FullName (@Topic.ApprovedDate)</span>
+                                    }
                                         <h4 class="mt-3">Subject/Purpose for change</h4>
                                             &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Subject.ReplaceNullWithDash().TrimStart()))</span>
                                         <h4 class="mt-3">Change Details</h4>
@@ -627,56 +642,12 @@
                                     </form>
 
                                 @if(Topic.FileList.Count != 0){
-                                    var FileList = Topic.FileList;
                                     <h4 class="mt-3">Attach File</h4>
-                                    <!-- /.card-body -->
                                     <div class="card-footer bg-white">
-                                        <ul class="mailbox-attachments d-flex flex-wrap align-items-stretch clearfix">
-                                        @foreach(var File in FileList){
-                                            var FileSize = "0 Bytes";
-                                            var file_desc = (File.Description.Trim() == null || File.Description.Trim() == "") ? "<i>No information</i>" : File.Description;
-                                            using (Html.BeginForm("DownloadFile", "Detail", FormMethod.Post, new { enctype = "multipart/form-data" })){
-
-                                            <li data-toggle="tooltip" data-placement="top" data-html="true" title="@file_desc">
-                                                <span class="mailbox-attachment-icon">
-                                                    @{var FileType = Path.GetExtension(File.Name);}
-                                                    @if(FileType == ".docx" || FileType == ".doc" ){
-                                                        <i class="far fa-file-word"></i>
-                                                    }else if(FileType == ".pptx" || FileType == ".ppt" ){
-                                                        <i class="far fa-file-powerpoint"></i>
-                                                    }else if(FileType == ".xls" || FileType == ".xlxs" ){
-                                                        <i class="far fa-file-excel"></i>
-                                                    }else if(FileType == ".pdf"){
-                                                        <i class="far fa-file-pdf"></i>
-                                                    }else if(FileType == ".png" || FileType == ".jpeg" || FileType == ".jpg" || FileType == ".JPG" || FileType == ".gif" ){
-                                                        <i class="far fa-file-image"></i>
-                                                    }else{
-                                                        <i class="far fa-file"></i>
-                                                    }
-                                                </span>
-                                                <div class="mailbox-attachment-info">
-                                                    <a href="#" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> @Html.DisplayFor(model => File.Name)
-                                                    </a>
-                                                    <span class="mailbox-attachment-size clearfix mt-1">
-                                                    @if(File.Size != null){
-                                                        if(File.Size > 1000){
-                                                            FileSize = (File.Size / 1000) + " KB";
-                                                        }else{
-                                                            FileSize = File.Size + " Bytes";
-                                                        }
-                                                    }
-                                                        <span>@FileSize</span>
-                                                        <button name="load" value="@File.Name_Format^@File.Name" class="btn btn-default btn-sm float-right"><i class="fas fa-cloud-download-alt"></i></button>
-                                                    </span>
-                                                </div>
-                                            </li>
-                                            }
-                                        }
-                                        </ul>
+                                    @Html.Partial("~/Views/Helper/FileList.cshtml",Topic.FileList as List<FileItem>)
                                     </div>
                                 }   
                                     </div>
-                                    <br>
                                     <!------------------------------------QUALITY CONTROL---------------------------------------------------------->
                                 @if(ReviewList.Count != 0){
                                     <hr>

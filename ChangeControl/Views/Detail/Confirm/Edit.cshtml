@@ -28,6 +28,12 @@
                         </label>
                         <div class="col-sm-10">
                             <input type="file" class="my-pond" name="filepond_alt"/>
+                            @if(Model.FileList.Count > 0){
+                                <div class="card-footer bg-white">
+                                    @{ ViewBag.DisableFileList = true; }
+                                    @Html.Partial("~/Views/Helper/FileList.cshtml",Model.FileList as List<FileItem>)
+                                </div>
+                            }
                         </div>
                         @* @foreach(FileItem item in Model.FileList){
                         <script>

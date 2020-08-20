@@ -34,13 +34,13 @@ namespace ChangeControl.Models
                 FROM Related WHERE Related.ID = Topic.Related )";
             if(model.Overstatus == 2){
                 ov_command = $@"{count_related_command} 
-		        -	(SELECT COUNT(Review.ID_Review) FROM Review WHERE  
+		        -	(SELECT COUNT(Review.ID) FROM Review WHERE  
 					 Review.Revision  = (SELECT MAX(r.Revision) FROM Review r WHERE r.Topic = Review.Topic) AND  Review.Topic = Topic.Code 
                      AND Review.Status = 1
                      AND Review.Department != 'QC1' AND Review.Department != 'QC2' AND Review.Department != 'QC3')= 0";
             }else if(model.Overstatus == 3){
-                ov_command = $@"(SELECT COUNT(ID_Review) FROM Review 
-                            LEFT JOIN Review_Item ON Review_Item.FK_Review_ID = Review.ID_Review 
+                ov_command = $@"(SELECT COUNT(ID) FROM Review 
+                            LEFT JOIN Review_Item ON Review_Item.FK_Review_ID = Review.ID 
                             WHERE Review.Revision  = (SELECT MAX(r.Revision) FROM Review r WHERE r.Topic = Review.Topic) AND  Review.Topic = Topic.Code
                             AND Review_Item.FK_Item_Type = 24
                             AND Review_Item.Status = 1)

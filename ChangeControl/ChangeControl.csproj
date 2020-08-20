@@ -510,11 +510,6 @@
     <Content Include="Plugin\animsition\README.md" />
     <Content Include="Plugin\animsition\sandbox\data.json" />
     <Content Include="Plugin\jq-fab\scss\index.scss" />
-    <Content Include="webpack.common.js" />
-    <Content Include="webpack.dev.js" />
-    <Content Include="webpack.prod.js" />
-    <Content Include="package-lock.json" />
-    <Content Include="package.json" />
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -3939,16 +3934,10 @@
     <Content Include="Views\Mail\Body\TrialApproved.cshtml" />
     <Content Include="Views\Mail\Body\ConfirmUpdate.cshtml" />
     <Content Include="Views\Mail\Body\TrialUpdate.cshtml" />
-    <Content Include="tsconfig.json" />
     <Content Include="Views\Detail\Related.cshtml" />
+    <Content Include="Views\Detail\Test.cshtml" />
+    <Content Include="Views\Helper\FileList.cshtml" />
     <None Include="Web References\myAD\ADInfo.disco" />
-    <Content Include="Web.config" />
-    <Content Include="Web.Debug.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
-    <Content Include="Web.Release.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
@@ -4214,6 +4203,13 @@
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+    <Content Include="Web.config" />
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -4231,7 +4227,6 @@
     <Content Include="Content\bootstrap.css.map" />
     <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap-theme.css.map" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
@@ -4267,7 +4262,6 @@
     </WebReferenceUrl>
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="src\index.ts" />
     <TypeScriptCompile Include="tmp\plugins\filterizr\ActiveFilter.d.ts" />
     <TypeScriptCompile Include="tmp\plugins\filterizr\animate.d.ts" />
     <TypeScriptCompile Include="tmp\plugins\filterizr\BrowserWindow.d.ts" />

@@ -78,14 +78,14 @@ namespace ChangeControl.Models
 
         public long InsertReview(string topic_code, string us_id, string dept){
             string query = null;
-            query = $"INSERT INTO CCS.dbo.Review (Topic,  [Date], [User], Department, Revision, UpdateBy, UpdateDate) OUTPUT Inserted.ID_Review VALUES('{topic_code}', {date}, '{us_id}', '{dept}', 0, '{us_id}', {date});";
+            query = $"INSERT INTO CCS.dbo.Review (Topic,  [Date], [User], Department, Revision, UpdateBy, UpdateDate) OUTPUT Inserted.ID VALUES('{topic_code}', {date}, '{us_id}', '{dept}', 0, '{us_id}', {date});";
             var review_id = DB_CCS.Database.SqlQuery<long>(query).First();
             return review_id;
         }
 
         public Review UpdateReview(string topic_code, string us_id, string dept){
             string query = null;
-            query = $@"INSERT INTO CCS.dbo.Review (Topic, [Date], [User], Department, Revision, UpdateBy, UpdateDate) OUTPUT Inserted.ID_Review , Inserted.Revision 
+            query = $@"INSERT INTO CCS.dbo.Review (Topic, [Date], [User], Department, Revision, UpdateBy, UpdateDate) OUTPUT Inserted.ID , Inserted.Revision 
             VALUES('{topic_code}', {date}, '{us_id}', '{dept}', (
                 SELECT Revision+1 FROM CCS.dbo.Review,
                 (SELECT MAX(Revision) as Version, Department as dept FROM CCS.dbo.Review WHERE Topic = '{topic_code}' AND Department = '{dept}' Group by Department) lastest
@@ -96,9 +96,9 @@ namespace ChangeControl.Models
             return review_id;
         }
 
-        public long InsertFile(HttpPostedFileBase file, long fk_id, string type, string desc, object session_user){
-            string query = $@"INSERT INTO [File] (FK_ID, [Type], Name, Size, Name_Format, Description, Time_Insert, User_Insert) 
-            OUTPUT Inserted.ID VALUES({fk_id}, '{type}', '{file.FileName.ToString().ReplaceSingleQuote()}','{file.ContentLength}','{date_ff}','{desc}','{date}','{session_user}');";
+        public long InsertFile(HttpPostedFileBase file, long fk_id, string type, string desc, object session_user, string topic_code, string dept){
+            string query = $@"INSERT INTO [File] (FK_ID, [Type], Name, Size, Name_Format, Description, Time_Insert, User_Insert, Topic, Department) 
+            OUTPUT Inserted.ID VALUES({fk_id}, '{type}', '{file.FileName.ToString().ReplaceSingleQuote()}','{file.ContentLength}','{date_ff}','{desc}','{date}','{session_user}','{topic_code}', '{dept}');";
             long result = DB_CCS.Database.SqlQuery<long>(query).First();
             return result;
         }
@@ -111,7 +111,7 @@ namespace ChangeControl.Models
         }
         public TopicAlt GetTopicByOriginID(string topic_code){ //every file review confirm is related to 
             try{
-                var sql = $@"SELECT Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, Timing, Related, User_insert, Time_insert, ApprovedBy, ApprovedDate, 
+                var sql = $@"SELECT Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Department, Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, Timing, Related, User_insert, Time_insert, ApprovedBy, ApprovedDate, 
                 ID FROM CCS.dbo.Topic 
                 LEFT JOIN Change_Item ON Topic.Change_item = ID_Change_item 
                 LEFT JOIN Product_Type ON Topic.Product_Type = ID_Product_Type 
@@ -145,12 +145,12 @@ namespace ChangeControl.Models
         }
 
         public List<Review> GetReviewByTopicCode(string topic_code){
-            var sql = $@"SELECT ID_Review, Topic, [Date], [User], Status, Department, ApprovedBy, ApprovedDate
+            var sql = $@"SELECT ID, Topic, [Date], [User], Status, Department, ApprovedBy, ApprovedDate
             FROM CCS.dbo.Review ,
             (SELECT MAX(Revision) as Version, Department as dept FROM CCS.dbo.Review WHERE Topic = '{topic_code}'  Group by Department) lastest
             WHERE Topic = '{topic_code}' 
             AND Review.Revision  = lastest.Version AND Review.Department = lastest.dept 
-            ORDER BY ID_Review ASC;";
+            ORDER BY ID ASC;";
             var ReviewResult = DB_CCS.Database.SqlQuery<Review>(sql).ToList();
             return ReviewResult;
         }
@@ -163,8 +163,8 @@ namespace ChangeControl.Models
             return ReviewItem;
         }
 
-        public List<FileItem> GetFileByID(long fk_id, string type){
-            var sql = $"SELECT ID, FK_ID, [Type], Name, Name_Format, Description, [Size], Time_Insert, User_Insert FROM CCS.dbo.[File] WHERE FK_ID = {fk_id} AND [Type] = '{type}'";
+        public List<FileItem> GetFileByID(long fk_id, string type, string topic_code, string dept){
+            var sql = $"SELECT ID, FK_ID, [Type], Name, Name_Format, Description, [Size], Time_Insert, User_Insert FROM CCS.dbo.[File] WHERE [Type] = '{type}' AND Topic = '{topic_code}' AND Department = '{dept}'";
             var FileList = DB_CCS.Database.SqlQuery<FileItem>(sql).ToList();
             return FileList;
         }
@@ -289,7 +289,7 @@ namespace ChangeControl.Models
         public bool GetTrialStatusByTopicAndDept(string topic_code, int dept_id){
             try{
                 var sql= $@"SELECT Review_Item.Status FROM CCS.dbo.Review 
-                LEFT JOIN Review_Item ON Review.ID_Review = FK_Review_ID 
+                LEFT JOIN Review_Item ON Review.ID = FK_Review_ID 
                 LEFT JOIN Review_Item_Type_Department ON Review_Item.FK_Item_Type = FK_Item_ID 
                 LEFT JOIN Department ON Review.Department = Department.Name 
                 WHERE Topic = '{topic_code}'
@@ -393,7 +393,7 @@ namespace ChangeControl.Models
 
         public void ApproveReview(long review_id,string user){
             var sql = $@"UPDATE CCS.dbo.Review SET Status=1, ApprovedBy='{user}', ApprovedDate='{date}' 
-            WHERE ID_Review={review_id};";
+            WHERE ID={review_id};";
             DB_CCS.Database.ExecuteSqlCommand(sql);
         }
 
@@ -411,7 +411,7 @@ namespace ChangeControl.Models
 
         public List<Review> CheckAllReviewBeforeApprove(string topic_code){
             try{
-                var sql = $@"SELECT ID_Review , Topic,Department, Status FROM CCS.dbo.Review,
+                var sql = $@"SELECT ID , Topic,Department, Status FROM CCS.dbo.Review,
                 (SELECT MAX(Revision) as Version, Department as dept FROM CCS.dbo.Review WHERE Topic = '{topic_code}' Group by Department ) lastest
                 WHERE Topic = '{topic_code}'                    
                 AND Review.Revision  = lastest.Version AND Review.Department  = lastest.dept 
@@ -466,7 +466,7 @@ namespace ChangeControl.Models
             var sql = $@"SELECT CASE WHEN EXISTS (
                         SELECT * FROM CCS.dbo.Topic
                         LEFT JOIN Review ON Review.Topic = Topic.Code
-                        LEFT JOIN Review_Item ON Review_Item.FK_Review_ID  = Review.ID_Review 
+                        LEFT JOIN Review_Item ON Review_Item.FK_Review_ID  = Review.ID 
                         WHERE Topic.Revision  = (SELECT MAX(t.Revision) FROM Topic t WHERE t.Code = Topic.Code) 
                         AND Review.Revision  = (SELECT MAX(r.Revision) FROM Review r WHERE r.Topic = Review.Topic)
                         AND FK_Item_Type = 26 AND Review_Item.Status = 1 
@@ -477,11 +477,11 @@ namespace ChangeControl.Models
             return result;
         }
 
-        public long GetTopicStatusByCode(string topic_code){
+        public int GetTopicStatusByCode(string topic_code){
             try{
                 var sql = $@"SELECT TOP(1) Status FROM CCS.dbo.Topic 
                 WHERE  Code = '{topic_code}' ORDER BY Revision DESC;";
-                var result = DB_CCS.Database.SqlQuery<long>(sql).First();
+                var result = DB_CCS.Database.SqlQuery<int>(sql).First();
                 return result;
             }catch(Exception ex){
                 return 0;

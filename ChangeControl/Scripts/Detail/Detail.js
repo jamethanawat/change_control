@@ -44,12 +44,14 @@ $("#reject").click(() => {
         }).then((res) => {
             if(res != null){
                 if(res.trim().length != 0){
-                    $.post(RejectTopicPath, {topic_code:topic_code,desc:res}, () => { 
-                        $.post(GenerateMailPath,{ 'mode': 'TopicReject', 'topic_code':topic_code, }).fail((error) => {
-                            console.error(error);
-                            swal("Error", "Cannot send email to Requestor, Please try again", "error");
-                            return;
-                        })
+                    $.post(RejectTopicPath, {topic_code:topic_code,desc:res}, (result) => { 
+                        if(result.status == "success" && result.mail != null){
+                            $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, }).fail((error) => {
+                                console.error(error);
+                                swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                                return;
+                            })
+                        }
                         swal("Success", "Reject Success", "success").then(location.reload());
                     }).fail( function(xhr, textStatus, errorThrown) {
                         console.error(xhr.responseText);
@@ -151,13 +153,12 @@ var rsm_validator = $('#resubmit_form').validate({
 $("#related_rv").modalWizard();
 $("#related_rv").on("navigate", (e, navDir, stepNumber) => {
     if($("#related_rv").attr("data-current-step") == 2){
-        let quick_form = [];
         let new_related_string = "";
         $(".new_related:checked").each(function () {
-            quick_form.push(this.name);
+            new_related_list.push(this.name);
         });
         console.log(quick_form);
-        quick_form.forEach(item => {
+        new_related_list.forEach(item => {
                 new_related_string = (new_related_string == "") ? item : new_related_string + " , " + item;
         });
 
@@ -307,6 +308,10 @@ $.each(DepartmentLists, (key,val) => {
         format: 'dd-mm-yyyy'
     });
     
+/* -------------------------------------------------------------------------- */
+/*                                Topic approve                               */
+/* -------------------------------------------------------------------------- */
+
     $("#tp_approve").click(() => {
         swal({
             title: "Approve Topic", 
@@ -339,76 +344,76 @@ $.each(DepartmentLists, (key,val) => {
 /*                             Submit review topic                            */
 /* -------------------------------------------------------------------------- */
 
-    $("form#review").submit((e) => {
-        rv_submit = true;
-        let RadioNotValidate = checkRadioAndInput(new_rv,rv_submit);
-        let InputNotValidate = checkInputRequired();
-        if(RadioNotValidate || InputNotValidate){
-            return; 
+$("form#review").submit((e) => {
+    rv_submit = true;
+    let RadioNotValidate = checkRadioAndInput(new_rv,rv_submit);
+    let InputNotValidate = checkInputRequired();
+    if(RadioNotValidate || InputNotValidate){
+        return; 
+    }
+
+    e.preventDefault();
+    $('#loading').removeClass('hidden')
+    let rv_form = SerializeReviewForm();
+    $.post(SubmitReviewPath, (result) => {
+        if(result.mail != ""){
+            $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept':result.dept, 'pos':result.pos }).fail((error) => {
+                console.error(error);
+                swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                return;
+            })
+        }
+        var promises = [];
+        files = file_list;
+        console.log("files",files);
+        
+        for(var index in files){
+            files[index].file = files[index].detail.file;
+            delete files[index].detail;
         }
 
-        e.preventDefault();
-        $('#loading').removeClass('hidden')
-        let rv_form = SerializeReviewForm();
-        $.post(SubmitReviewPath, (result) => {
-            if(result.mail != ""){
-                $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept':result.dept, }).fail((error) => {
-                    console.error(error);
-                    swal("Error", "Cannot send email to Requestor, Please try again", "error");
-                    return;
-                })
-            }
-            var promises = [];
-            files = file_list;
-            console.log("files",files);
-            
-            for(var index in files){
-                files[index].file = files[index].detail.file;
-                delete files[index].detail;
-            }
-
-            files.forEach(element => {
-                var Data = new FormData();
-                Data.append("file",element.file);
-                Data.append("description",element.description);
-                promises.push($.ajax({
-                    type: "POST",
-                    url: SubmitFilePath,
-                    data: Data,
-                    cache: false,
-                    processData: false,
-                    contentType: false,
-                    error: function() {
-                        swal("Error", "Upload file not success", "error");
-                    }
-                }));
-            });
-
-            rv_form.forEach(element => {
-                console.log(element);
-                promises.push(
-                    $.post(SubmitReviewItemPath, {
-                        'status' : element.status,
-                        'description' : element.desc,
-                        'id' : element.id,
-                    },(data) => {
-                        console.log('Inserted item');
-                    }).fail(() => {
-                        alert('error handling here');
-                    })
-                )
-            });
-            
-            Promise.all(promises).then(() => {
-                $('#loading').addClass('hidden')
-                $("#ReviewSubmit").prop("disabled",true)
-                swal("Success", "Insert Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
-            })
-        }).fail(() => {
-            setTimeout(() => { location.reload(); }, 1500);
+        files.forEach(element => {
+            var Data = new FormData();
+            Data.append("file",element.file);
+            Data.append("description",element.description);
+            promises.push($.ajax({
+                type: "POST",
+                url: SubmitFilePath,
+                data: Data,
+                cache: false,
+                processData: false,
+                contentType: false,
+                error: function() {
+                    swal("Error", "Upload file not success", "error");
+                }
+            }));
         });
 
+        rv_form.forEach(element => {
+            console.log(element);
+            promises.push(
+                $.post(SubmitReviewItemPath, {
+                    'status' : element.status,
+                    'description' : element.desc,
+                    'id' : element.id,
+                },(data) => {
+                    console.log('Inserted item');
+                }).fail(() => {
+                    alert('error handling here');
+                })
+            )
+        });
+        
+        Promise.all(promises).then(() => {
+            $('#loading').addClass('hidden')
+            $("#ReviewSubmit").prop("disabled",true)
+            swal("Success", "Insert Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
+        })
+    }).fail(() => {
+        setTimeout(() => { location.reload(); }, 1500);
     });
+
+});
 
 /* -------------------------------------------------------------------------- */
 /*                             Submit trial topic                             */
@@ -428,7 +433,14 @@ $("form#Trial").submit((e) => {
             delete files[index].detail;
         }
 
-        promises.push($.post(SubmitTrialPath,{ desc: trial_form[0].value},() => {
+        promises.push($.post(SubmitTrialPath,{ desc: trial_form[0].value},(result) => {
+            if(result.mail != ""){
+                $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept':result.dept, 'pos':pos }).fail((error) => {
+                    console.error(error);
+                    swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                    return;
+                })
+            }
             console.log('Inserted trial');
             files.forEach(element => {
                 var Data = new FormData();
@@ -479,7 +491,14 @@ $("form#Confirm").submit((e) => {
             delete files[index].detail;
         }
 
-        promises.push($.post(SubmitConfirmPath,{ desc: confirm_form[0].value},() => {
+        promises.push($.post(SubmitConfirmPath,{ desc: confirm_form[0].value},(result) => {
+            if(result.mail != ""){
+                $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept':result.dept, 'pos':pos }).fail((error) => {
+                    console.error(error);
+                    swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                    return;
+                })
+            }
             console.log('Inserted trial');
             files.forEach(element => {
                 var Data = new FormData();
@@ -540,7 +559,7 @@ $("form#Confirm").submit((e) => {
     });
 
 /* -------------------------------------------------------------------------- */
-/*                               Apply resubmit                               */
+/*                               Apply related                                */
 /* -------------------------------------------------------------------------- */
 
 $("form#related_form").submit((e) => {
@@ -552,23 +571,14 @@ $("form#related_form").submit((e) => {
         console.log('Related created');
         $.post(UpdateTopicRelatedPath,(res) => {
             if(res.status == "success"){
+                $.post(GenerateMailPath,{ 'mode': 'InformUser', 'topic_code':topic_code, 'dept_arry': new_related_list, }).fail((error) => {
+                    console.error(error);
+                    swal("Error", "Cannot send email to Related user, Please try again", "error");
+                    return;
+                })
                 swal("Success", "Update related complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
             }
         });
-        // $.post(RequestResubmitPath, quick_form, (res) =>{
-        //     console.log('Resubmit created');
-        //     if(res.code){
-        //         moment.locale('en');
-        //         $.post(GenerateMailPath,{ 'mode': 'RequestDocument', 'topic_code':topic_code, 'due_date': moment(due_date,"DD-MM-YYYY").format('D MMMM YYYY'), 'dept_arry': rsm_related_list, }).fail((error) => {
-        //             console.error(error);
-        //             swal("Error", "Cannot send email to Requestor, Please try again", "error");
-        //             return;
-        //         })
-        //         swal("Success", "Resubmit Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
-        //     }else{
-        //         swal("Error", "Resubmit Not Success, Please Try Again", "error");
-        //     }
-        // });
     });
 });
 

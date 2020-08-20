@@ -53,7 +53,7 @@ namespace ChangeControl.Models{
 
         public TopicAlt GetTopicByCode(string topic_code){
             try{
-                var sql = $@"SELECT  Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, Timing, Related, User_insert, Time_insert, 
+                var sql = $@"SELECT  Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Department, Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, Timing, Related, User_insert, Time_insert, 
                 ID FROM CCS.dbo.Topic 
                 LEFT JOIN Change_Item ON Topic.Change_item = ID_Change_item 
                 LEFT JOIN Product_Type ON Topic.Product_Type = ID_Product_Type 
@@ -68,19 +68,27 @@ namespace ChangeControl.Models{
 
         public List<string> GetEmailByDept(string dept){
             try{
-                var sql = $@"SELECT Email FROM CCS.dbo.[User] where Dept = '{dept}';";
+                var sql = $@"SELECT [User].Email FROM CCS.dbo.Permission
+                            LEFT JOIN [User] ON [User].Code = Permission.[User]
+                            WHERE Permission.Department = '{dept}'
+                            AND Active = '1'
+                            AND Subscribe = '1'
+                            ;";
                 var result = DB_CCS.Database.SqlQuery<string>(sql).ToList();
                 return result;
             }catch(Exception ex){
                 return null;
             }
         }
-        public List<string> GetEmailByDeptAndPosition(string dept, string pos){
+        public List<string> GetEmailByDeptAndPosition(string dept, string pos = ""){
             try{
-                var sql = $@"SELECT ID, [User], Email, Email.Dept, [Position] FROM CCS.dbo.Email
-                            LEFT JOIN [User] ON [User].Code = Email.[User]
-                            WHERE Email.Dept = '{dept}'
-                            AND [Position] = '{pos}';";
+                var sql = $@"SELECT [User].Email FROM CCS.dbo.Permission
+                            LEFT JOIN [User] ON [User].Code = Permission.[User]
+                            WHERE Permission.Department = '{dept}'" + 
+                            (pos != "" ? "AND [Position] = '{pos}'" : null) + 
+                            @"AND Active = '1'
+                            AND Subscribe = '1'
+                            ;";
                 var result = DB_CCS.Database.SqlQuery<string>(sql).ToList();
                 return result;
             }catch(Exception ex){

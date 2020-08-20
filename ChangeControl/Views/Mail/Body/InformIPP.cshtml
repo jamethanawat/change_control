@@ -2,8 +2,8 @@
 
 @{
     List<Review> rv_list = (List<Review>) Session["ReviewList"];
-    Review temp_rv = rv_list.Where(e => e.Item.Any(d => d.Type == 26  && d.Status == true)).First();
-    var ipp = temp_rv.Item.Find(d => d.Type == 26  && d.Status == true);
+    Review temp_rv = rv_list.Where(e => e.Item.Any(d => d.Type == 26  && d.Status == 1)).First();
+    var ipp = temp_rv.Item.Find(d => d.Type == 26  && d.Status == 1);
 }
     <p> 
       <strong>Subject : </strong>

@@ -84,7 +84,7 @@ $(() => {
                     
                 });
                 
-                promises.push($.post(GenerateMailPath,{ 'mode': 'TrialUpdate', 'topic_code':topic_code, 'dept':result.dept, }).fail((error) => {
+                promises.push($.post(GenerateMailPath,{ 'mode': 'TrialUpdate', 'topic_code':topic_code, 'dept':result.dept,'pos':'Approver' }).fail((error) => {
                     console.error(error);
                     swal("Error", "Cannot send email to Requestor, Please try again", "error");
                     return;

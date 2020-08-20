@@ -37,6 +37,14 @@ namespace ChangeControl.Controllers{
         private string date = DateTime.Now.ToString("yyyyMMddHHmmss");
         private string date_ff = DateTime.Now.ToString("yyyyMMddHHmmss.fff");
         public ActionResult Index(string ID)    {
+            if((string)(Session["User"]) == null || (string)(Session["Department"]) == null){
+                Session["RedirectID"] = (ID != null) ? ID : null;
+                Session["RedirectMode"] = "Request";
+                return RedirectToAction("Index", "LogIn");
+            }
+
+            Session["RedirectID"] = null;
+
             if(ID == null || M_Req.CheckTopicOwner((string) Session["User"], ID)){
                 Session["Topic"] = null;
                 ViewBag.mode = "Insert";
@@ -79,15 +87,15 @@ namespace ChangeControl.Controllers{
                 if(ID != null){ // In case of edit mode
                     Session["isEditMode"] = true;
                     TopicAlt temp_topic = M_Req.GetTopicByID(ID);
-                    Session["Topic"] = temp_topic;
                     if(temp_topic.Status != 3 && temp_topic.Status != 7 ){
                         return View("~/Views/Shared/404/index.cshtml");
                     }else{
                         var TopicRelatedList = M_Req.GetRelatedByID(temp_topic.Related);
                         temp_topic.RelatedList = TopicRelatedList;
                         
+                        Session["Topic"] = ViewData["Topic"] = temp_topic;
 
-                        var topic_file_list = M_Req.GetFileByID(temp_topic.ID, "Topic"); //Get file by topic id
+                        var topic_file_list = M_Req.GetFileByID(temp_topic.ID, "Topic", temp_topic.Code, temp_topic.Department); //Get file by topic id
                         if(topic_file_list != null){
                             temp_topic.FileList = topic_file_list;
                             ViewData["Topic"] = temp_topic;
@@ -190,7 +198,7 @@ namespace ChangeControl.Controllers{
                 var ServerSavePath = Path.Combine("D:/File/Topic/" + InputFileName);
                 file_item.file.SaveAs(ServerSavePath);
                 if(file_item.description == "null" || file_item.description == null) file_item.description = " ";
-                M_Req.InsertFile(file_item.file, (long) Session["TopicID"], "Topic", file_item.description, Session["User"]);
+                M_Req.InsertFile(file_item.file, (long) Session["TopicID"], "Topic", file_item.description, Session["User"].ToString(), Session["TopicCode"].ToString(), Session["Department"].ToString());
             }
             return Json((string)Session["TopicCode"]);
         }

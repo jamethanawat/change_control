@@ -94,9 +94,9 @@ namespace ChangeControl.Models{
             DB_CCS.Database.ExecuteSqlCommand(del);
         }
 
-        public long InsertFile(HttpPostedFileBase file, long fk_id, string type, string description, object session_user){
-            string query = $@"INSERT INTO [File] (FK_ID, [Type], Name, Size, Name_Format, Description, Time_Insert, User_Insert) 
-            OUTPUT Inserted.ID VALUES({fk_id}, '{type}', '{file.FileName.ToString().ReplaceSingleQuote()}','{file.ContentLength}','{date_ff}','{description}','{date}','{session_user}');";
+        public long InsertFile(HttpPostedFileBase file, long fk_id, string type, string description, object session_user, string topic_code, string dept){
+            string query = $@"INSERT INTO [File] (FK_ID, [Type], Name, Size, Name_Format, Description, Time_Insert, User_Insert, Topic, Department) 
+            OUTPUT Inserted.ID VALUES({fk_id}, '{type}', '{file.FileName.ToString().ReplaceSingleQuote()}','{file.ContentLength}','{date_ff}','{description}','{date}','{session_user}', '{topic_code}', '{dept}');";
             long result = DB_CCS.Database.SqlQuery<long>(query).First();
             return result;
         }
@@ -212,13 +212,13 @@ namespace ChangeControl.Models{
         }
 
         public TopicAlt GetTopicByID(string topic_code){
-            var sql = $"SELECT TOP(1) Code, [Type], Change_Item.Name as Change_item, Product_Type.Name AS Product_Type  , Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, Timing, Related, User_insert, Time_insert, ID FROM CCS.dbo.Topic LEFT JOIN Change_Item ON Topic.Change_item = ID_Change_item LEFT JOIN Product_Type ON Topic.Product_Type = ID_Product_Type WHERE Code = '{topic_code}' ORDER BY Revision DESC;";
+            var sql = $"SELECT TOP(1) Code, [Type], Change_Item.Name as Change_item, Product_Type.Name AS Product_Type  , Department, Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, Timing, Related, User_insert, Time_insert, ID FROM CCS.dbo.Topic LEFT JOIN Change_Item ON Topic.Change_item = ID_Change_item LEFT JOIN Product_Type ON Topic.Product_Type = ID_Product_Type WHERE Code = '{topic_code}' ORDER BY Revision DESC;";
             var Topic = DB_CCS.Database.SqlQuery<TopicAlt>(sql);
             return Topic.First();
         }
-        public List<FileItem> GetFileByID(long fk_id, string type){
+        public List<FileItem> GetFileByID(long fk_id, string type, string topic_code, string dept){
             try{
-                var sql = $"SELECT ID, FK_ID, [Type], Name, Name_Format, Description, [Size], Time_Insert, User_Insert FROM CCS.dbo.[File] WHERE FK_ID = {fk_id} AND [Type] = '{type}'";
+                var sql = $"SELECT ID, FK_ID, [Type], Name, Name_Format, Description, [Size], Time_Insert, User_Insert FROM CCS.dbo.[File] WHERE [Type] = '{type}' AND Topic = '{topic_code}' AND Department = '{dept}'";
                 var FileList = DB_CCS.Database.SqlQuery<FileItem>(sql).ToList();
                 return FileList;
             }catch(Exception err){

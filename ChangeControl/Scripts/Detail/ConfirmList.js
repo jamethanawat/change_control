@@ -63,7 +63,7 @@ $(() => {
             promises.push($.post(UpdateConfirmPath,{ desc: confirm_form[0].value},(result) => {
                 console.log('Inserted confirm');
 
-                promises.push($.post(GenerateMailPath,{ 'mode': 'ConfirmUpdate', 'topic_code':topic_code, 'dept':result.dept }).fail((error) => {
+                promises.push($.post(GenerateMailPath,{ 'mode': 'ConfirmUpdate', 'topic_code':topic_code, 'dept':result.dept,'pos':'Approver' }).fail((error) => {
                     console.error(error);
                     swal("Error", "Cannot send email to Requestor, Please try again", "error");
                     return;

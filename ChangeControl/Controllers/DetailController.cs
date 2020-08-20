@@ -39,6 +39,7 @@ namespace ChangeControl.Controllers{
         public ActionResult Index(string id){
             if((string)(Session["User"]) == null || (string)(Session["Department"]) == null){
                 Session["RedirectID"] = (id != null) ? id : null;
+                Session["RedirectMode"] = "Detail";
                 return RedirectToAction("Index", "LogIn");
             }
 
@@ -99,14 +100,16 @@ namespace ChangeControl.Controllers{
 
         public ActionResult SubmitReview(){
             var mail = "";
+            var pos = "";
             if(Topic.Status == 7 && Topic.Type == "External"){
                 M_Detail.UpdateTopicStatus(Session["TopicCode"] as string, 8);
             }
             mail = "EmailReviewed";
+            pos = "Approver";
             Session["ReviewID"] = M_Detail.InsertReview(Session["TopicCode"] as string, Session["User"].ToString(), Session["Department"].ToString());
             // CheckAllReviewApproved(Session["ReviewRelatedList"] as List<RelatedAlt>, Session["ReviewList"] as List<Review>);
 
-            return Json(new {code=1,mail,dept=Session["Department"].ToString()}, JsonRequestBehavior.AllowGet);
+            return Json(new {code=1,mail,dept=Session["Department"].ToString(), pos}, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult SubmitReviewItem(string status, string description, int id){
@@ -125,7 +128,7 @@ namespace ChangeControl.Controllers{
                 var ServerSavePath = Path.Combine("D:/File/Topic/" + InputFileName);
                 file_item.file.SaveAs(ServerSavePath);
                 if(file_item.description == "null" || file_item.description == null) file_item.description = " ";
-                M_Detail.InsertFile(file_item.file, (long) Session["ReviewID"], "Review", file_item.description, Session["User"]);
+                M_Detail.InsertFile(file_item.file, (long) Session["ReviewID"], "Review", file_item.description, Session["User"], Session["TopicCode"].ToString(), Session["Department"].ToString());
             }
             return Json(new {code=1}, JsonRequestBehavior.AllowGet);
         }
@@ -149,7 +152,7 @@ namespace ChangeControl.Controllers{
             List<Review> rv_list = new List<Review>();
             List<FileItem> file_list = new List<FileItem>();
 
-            var tc_file_list = M_Detail.GetFileByID(Topic.ID, "Topic");
+            var tc_file_list = M_Detail.GetFileByID(Topic.ID, "Topic", Session["TopicCode"].ToString(), Topic.Department);
             var new_tp = Topic;
             new_tp.FileList = tc_file_list;
 
@@ -168,14 +171,14 @@ namespace ChangeControl.Controllers{
             ViewData["isTrialable"] = isTrialable;
 
             foreach(Review rv_element in rv_list){
-                rv_item_list = M_Detail.GetReviewItemByReviewID(rv_element.ID_Review);
+                rv_item_list = M_Detail.GetReviewItemByReviewID(rv_element.ID);
                 rv_element.Item = rv_item_list;
                 rv_element.Date = rv_element.Date.StringToDigitDate();
                 if(rv_element.ApprovedDate.AsNullIfEmpty() != null) rv_element.ApprovedDate = rv_element.ApprovedDate.StringToDigitDate();
                 rv_element.Profile = (rv_element.User.AsNullIfEmpty() != null) ? M_Detail.getUserByID(rv_element.User) : new Models.User();
                 rv_element.Approver = (rv_element.ApprovedBy.AsNullIfEmpty() != null) ? M_Detail.getUserByID(rv_element.ApprovedBy) : new Models.User();
                 
-                file_list = M_Detail.GetFileByID(rv_element.ID_Review, "Review");
+                file_list = M_Detail.GetFileByID(rv_element.ID, "Review", Session["TopicCode"].ToString(), rv_element.Department);
                 rv_element.FileList = file_list;
             }
 
@@ -218,7 +221,7 @@ namespace ChangeControl.Controllers{
                 }
                 resubmit.Responses = response_list;
                 foreach(var response in resubmit.Responses){
-                    var rs_file_list = M_Detail.GetFileByID(response.ID, "Response");
+                    var rs_file_list = M_Detail.GetFileByID(response.ID, "Response", Session["TopicCode"].ToString(), response.Department);
                     response.FileList = rs_file_list;
                 }
                 var Related = M_Detail.GetRelatedByID(resubmit.Related);
@@ -244,7 +247,7 @@ namespace ChangeControl.Controllers{
             List<FileItem> file_list = new List<FileItem>();
             trial_list = M_Detail.GetTrialByTopicCode(Topic.Code);
             foreach(Trial tr_element in trial_list){
-                var tr_file_list = M_Detail.GetFileByID(tr_element.ID, "Trial");
+                var tr_file_list = M_Detail.GetFileByID(tr_element.ID, "Trial", Session["TopicCode"].ToString(), tr_element.Department);
                 tr_element.FileList = tr_file_list;
                 tr_element.Date =  tr_element.Date.StringToDigitDate();
                 if(tr_element.ApprovedDate.AsNullIfEmpty() != null) tr_element.ApprovedDate = tr_element.ApprovedDate.StringToDigitDate();
@@ -259,7 +262,7 @@ namespace ChangeControl.Controllers{
             List<FileItem> file_list = new List<FileItem>();
             Confirm_list = M_Detail.GetConfirmByTopicCode(Topic.Code);
             foreach(Confirm cf_element in Confirm_list){
-                var tr_file_list = M_Detail.GetFileByID(cf_element.ID, "Confirm");
+                var tr_file_list = M_Detail.GetFileByID(cf_element.ID, "Confirm", Session["TopicCode"].ToString(), cf_element.Department);
                 cf_element.FileList = tr_file_list;
                 cf_element.Date = cf_element.Date.StringToDigitDate();
                 if(cf_element.ApprovedDate.AsNullIfEmpty() != null) cf_element.ApprovedDate = cf_element.ApprovedDate.StringToDigitDate();
@@ -312,7 +315,7 @@ namespace ChangeControl.Controllers{
                 var server_path = Path.Combine("D:/File/Topic/" + input_file_name);
                 file_item.file.SaveAs(server_path);
                 if(file_item.description == "null" || file_item.description == null) file_item.description = " ";
-                M_Detail.InsertFile(file_item.file, (long) Session["ResponseID"], "Response", file_item.description, Session["User"]);
+                M_Detail.InsertFile(file_item.file, (long) Session["ResponseID"], "Response", file_item.description, Session["User"], Session["TopicCode"].ToString(), Session["Department"].ToString());
             }
             return Json(new {code=1}, JsonRequestBehavior.AllowGet);
         }
@@ -339,7 +342,7 @@ namespace ChangeControl.Controllers{
             try{
                 Session["TrialID"] = M_Detail.InsertTrial(Topic.Code ,desc, Session["Department"].ToString(), Session["User"].ToString());
                 // CheckAllTrialApproved(Session["TrialRelatedList"], C_TrialList);
-                return Json(new { code = true, mail = "EmailReviewed" },JsonRequestBehavior.AllowGet);
+                return Json(new { code = true, mail = "EmailTrialed", pos = "Approver" },JsonRequestBehavior.AllowGet);
             }catch (Exception ex){
                 return Json(new { code = false }, JsonRequestBehavior.AllowGet);
             }
@@ -351,7 +354,7 @@ namespace ChangeControl.Controllers{
                 throw new Exception("Status has changed");
             }
             var updated_rv = M_Detail.UpdateReview(Session["TopicCode"] as string, Session["User"].ToString(), Session["Department"].ToString());
-            Session["ReviewID"] = updated_rv.ID_Review;
+            Session["ReviewID"] = updated_rv.ID;
             Session["ReviewRev"] = updated_rv.Revision;
             return Json(new {code = 1,dept = Session["Department"].ToString()}, JsonRequestBehavior.AllowGet);
         }
@@ -388,7 +391,7 @@ namespace ChangeControl.Controllers{
                 var ServerSavePath = Path.Combine("D:/File/Topic/" + InputFileName);
                 file_item.file.SaveAs(ServerSavePath);
                 if(file_item.description == "null" || file_item.description == null) file_item.description = " ";
-                M_Detail.InsertFile(file_item.file, (long) Session["TrialID"], "Trial", file_item.description, Session["User"]);
+                M_Detail.InsertFile(file_item.file, (long) Session["TrialID"], "Trial", file_item.description, Session["User"], Session["TopicCode"].ToString(), Session["Department"].ToString());
             }
             return Json(new {code=1}, JsonRequestBehavior.AllowGet);
         }
@@ -399,7 +402,7 @@ namespace ChangeControl.Controllers{
                 Session["ConfirmID"] = M_Detail.InsertConfirm(Topic.Code ,desc, Session["Department"].ToString(), Session["User"].ToString());
                 // CheckAllConfirmApproved(Session["ConfirmRelatedList"], C_ConfirmList);
 
-                return Json(new { code = true ,mail = "EmailReviewed"},JsonRequestBehavior.AllowGet);
+                return Json(new { code = true ,mail = "EmailConfirmed", pos = "Approver"},JsonRequestBehavior.AllowGet);
             }catch (Exception ex){
                 return Json(new { code = false }, JsonRequestBehavior.AllowGet);
             }
@@ -415,7 +418,7 @@ namespace ChangeControl.Controllers{
                 var ServerSavePath = Path.Combine("D:/File/Topic/" + InputFileName);
                 file_item.file.SaveAs(ServerSavePath);
                 if(file_item.description == "null" || file_item.description == null) file_item.description = " ";
-                M_Detail.InsertFile(file_item.file, (long) Session["ConfirmID"], "Confirm", file_item.description, Session["User"]);
+                M_Detail.InsertFile(file_item.file, (long) Session["ConfirmID"], "Confirm", file_item.description, Session["User"], Session["TopicCode"].ToString(), Session["Department"].ToString());
             }
             return Json(new {code=1}, JsonRequestBehavior.AllowGet);
         }
@@ -646,13 +649,18 @@ namespace ChangeControl.Controllers{
             }
         }
 
-        public bool RejectTopic(string topic_code,string desc){
+        public ActionResult RejectTopic(string topic_code,string desc){
             try{
+                var temp_topic = (TopicAlt) Session["Topic"];
+                var mail = "";
                 this.UpdateTopicStatus(topic_code,12);
                 M_Detail.RejectTopic(topic_code,desc,(string) Session["User"], (string) Session["Department"]);
-                return true;
+                if(temp_topic.Status == 8){
+                    mail = "TopicReject";
+                }
+                return Json(new {status="success", mail}, JsonRequestBehavior.AllowGet);
             }catch(Exception err){
-                return false;
+                return Json(new {status="error"}, JsonRequestBehavior.AllowGet);
             }
         }
 

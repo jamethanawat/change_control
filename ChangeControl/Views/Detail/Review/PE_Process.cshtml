@@ -23,7 +23,7 @@
     <div class="form-group row">
         <label for="inputChangeDetails" class="col-sm-2 col-form-label">Change date</label>
         <div class="col-sm-10 col-form-label">
-            <input data-toggle="datepicker" data-type="desc" data-id="32" class="form-control required" placeholder="Select Date " autocomplete="off" name="desc-32" >
+            <input data-toggle="datepicker" data-type="desc" data-id="32" name="desc-32" type="text" class="form-control required"  placeholder="Select Date " autocomplete="off" data-inputmask-alias="datetime" data-inputmask-inputformat="dd-mm-yyyy" data-mask="99-99-9999">
             <div data-toggle="datepicker"></div>
             @* <input type="text" name="desc-32" class="form-control" placeholder="Enter Date "> *@
         </div>
@@ -75,7 +75,7 @@
     <div class="form-group row">
         <label for="inputSkills" class="col-sm-2 col-form-label">Due Date</label>
         <div class="col-sm-10 col-form-label">
-            <input data-toggle="datepicker" data-type="desc" data-id="31" class="form-control required" placeholder="Select Date " autocomplete="off" name="desc-31" >
+            <input data-toggle="datepicker" data-type="desc" data-id="31" class="form-control required" placeholder="Select Date " autocomplete="off" name="desc-31" data-inputmask-alias="datetime" data-inputmask-inputformat="dd-mm-yyyy" data-mask="99-99-9999">
             <div data-toggle="datepicker"></div>
             @* <input type="text" name="desc-32" class="form-control" placeholder="Enter Date "> *@
         </div>
@@ -117,7 +117,10 @@
         <div class="col-sm-12">
             <span class="text-danger" id="validate-warning" style="display:none">กรุณาระบุข้อมูล/รายละเอียดให้ครบถ้วน</span>
             <div class="float-right">
-                <button type="button" id="reject" class="btn btn-danger mr-2">Reject</button>
+                @if(ViewBag.isApprover){
+                    <a class="btn btn-warning rv-related" id="related_rv" data-toggle="modal" data-target="#related_rv">Related</a>
+                    <button type="button" id="reject" class="btn btn-danger">Reject</button>
+                }
                 <button type="submit" class="btn btn-info">Submit</button>
             </div>
         </div>
