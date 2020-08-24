@@ -333,30 +333,10 @@
         background-color: rgba(255, 255, 255, 0.32)
     }
 
-    .w-actions__fab--share::before {
-        background-image: href("https://web.dev/images/icons/subscribe.svg")
-    }
     .w-actions__fab--resubmit::before {
         background-image: url("@Url.Content("~/tmp/docs/assets/plugins/fontawesome-free/svgs/solid/tasks.svg")");
     }
 
-    .w-actions__fab--subscribe {
-        background-color: #fff;
-        color: #3740ff
-    }
-
-    .w-actions__fab--subscribe:hover {
-        background-color: #fff
-    }
-
-    .w-actions__fab--subscribe:active {
-        background-color: #fff
-    }
-
-    .w-actions__fab--subscribe::before {
-        background-image: url("https://web.dev/images/icons/subscribe.svg")
-    }
-    
     .w-actions__fab--resubmit::before {
         background-image: url("@Url.Content("~/tmp/docs/assets/plugins/fontawesome-free/svgs/solid/tasks.svg")");
     }
@@ -504,30 +484,28 @@
                         var cf_badge = "secondary";
                         var cf_icon = "fa-lock";
 
-                        if(Topic.Status >= 8){
-                            if(Topic.Status == 8){
-                                rv_badge = (isReview) ? "primary" : "warning";
-                                rv_icon = (isReview) ? "fa-check" : "fa-clock";
-                            }
+                        if(Topic.Status == 8){
+                            rv_badge = (isReview) ? "primary" : "warning";
+                            rv_icon = (isReview) ? "fa-check" : "fa-clock";
+                        }
 
-                            if(Topic.Status == 9){
-                                rv_badge = "primary";
-                                rv_icon =  "fa-check";
-                                tr_badge = (isTrial) ? "primary" : "warning";
-                                tr_icon = (isTrial) ? "fa-check" : "fa-clock";
-                            }
+                        if(Topic.Status == 9){
+                            rv_badge = "primary";
+                            rv_icon =  "fa-check";
+                            tr_badge = (isTrial) ? "primary" : "warning";
+                            tr_icon = (isTrial) ? "fa-check" : "fa-clock";
+                        }
 
-                            if(Topic.Status == 10){
-                                rv_badge = tr_badge = "primary";
-                                rv_icon = tr_icon =  "fa-check";
-                                cf_badge = (isConfirm) ? "primary" : "warning";
-                                cf_icon = (isConfirm) ? "fa-check" : "fa-clock";
-                            }
+                        if(Topic.Status == 10){
+                            rv_badge = tr_badge = "primary";
+                            rv_icon = tr_icon =  "fa-check";
+                            cf_badge = (isConfirm) ? "primary" : "warning";
+                            cf_icon = (isConfirm) ? "fa-check" : "fa-clock";
+                        }
 
-                            if(Topic.Status == 11){
-                                rv_badge = tr_badge = cf_badge = "primary";
-                                rv_icon = tr_icon = cf_icon =  "fa-check";
-                            }
+                        if(Topic.Status == 11){
+                            rv_badge = tr_badge = cf_badge = "primary";
+                            rv_icon = tr_icon = cf_icon =  "fa-check";
                         }
                     }
 
@@ -542,9 +520,11 @@
                         </span>
                     }
 
-                    <span class='badge badge-pill badge-@cf_badge'>Confirm
-                    <i class='fas @cf_icon'></i>
-                    </span>
+                    @if(ViewBag.cf_list.Contains(department)){
+                        <span class='badge badge-pill badge-@cf_badge'>Confirm
+                        <i class='fas @cf_icon'></i>
+                        </span>
+                    }
                     
                 </div>
                 <div class="col-sm-4">
@@ -625,7 +605,7 @@
                                             &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Subject.ReplaceNullWithDash().TrimStart()))</span>
                                         <h4 class="mt-3">Change Details</h4>
                                             &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Detail.ReplaceNullWithDash().TrimStart()))</span>
-                                        <h4 class="mt-3">Introduction Timing</h4>
+                                        <h4 class="mt-3">Change Date</h4>
                                             &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Timing.ReplaceNullWithDash().TrimStart()))</span>
                                         <h4 class="mt-3">Related Department</h4>
                                             &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>
@@ -732,7 +712,7 @@
                                             </div>
                                         </div>
                                     </form>                                    
-                                }else if(((isRelated && !isQC) || (isQC && QcConfirmable)) && !isConfirm && status == "Confirm"){
+                                }else if(((ViewBag.cf_list.Contains(department) && !isQC) || (isQC && QcConfirmable)) && !isConfirm && status == "Confirm"){
                                 @* /* ----------------------------- Confirm section ----------------------------- */ *@
                                     <hr><br>
                                     <h1>Confirm</h1><br>

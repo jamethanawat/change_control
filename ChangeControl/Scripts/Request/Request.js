@@ -20,6 +20,11 @@ $(document).ready(function () {
         $(this).submit();
     });
 
+    
+    $('[data-toggle="datepicker"]').datepicker({
+        format: 'dd-mm-yyyy'
+    });
+
 /* -------------------------------------------------------------------------- */
 /*                          Department checkbox list                          */
 /* -------------------------------------------------------------------------- */

@@ -1,65 +1,45 @@
+var pos_select = CreatePositionOption();
+pos_select.onchange = function selectChanged(e) {
+    value = e.target.value
+}
 
-var department_list = CreateDepartmentOption();
-var position_list = CreatePositionOption();
-department_list.onchange = function selectChanged(e) {
-    value = e.target.value
-}
-var position_list = CreatePositionOption();
-position_list.onchange = function selectChanged(e) {
-    value = e.target.value
-}
 $(() => {
     $("#change_dept_btn").click(() => {
-        //     swal({
-        //         title: "Developer Mode", 
-        //         text: "Please enter password", 
-        //         closeOnClickOutside: false,
-        //         buttons : [true,true],
-        //         content: {
-        //             element: "input",
-        //             attributes: {
-        //                 placeholder: "Type your password",
-        //                 type: "password",
-        //             },
-        //         },icon:"warning",
-        //     }).then((password) => {
-        //         if(password != null){
-        //             if(password == this.password || DevMode == "on"){
-                        swal({
-                            title: "Developer Mode", 
-                            text: "Please submit Department", 
-                            closeOnClickOutside: false,
-                            content: department_list,
-                            buttons : [true,true],
-                            icon:"warning",
-                        }).then((res) => {
-                            if(res){
-                                let typedDepartment = $(".select-custom").children("option:selected").text();
-                                if(typedDepartment != null){
-                                    console.log(typedDepartment);
-                                    $.post(SetDepartmentPath, {DepartmentName:typedDepartment}, (data) => {
-                                        if(data == 1){
-                                            swal("Success", "Set Department Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
-                                        }else{
-                                            swal("Error", "User Password Not Correct", "error");
-                                        }
-                                    },"json");
-                                }
+        var dept_select;
+        GetDepartmentList().then((departments) => {
+            dept_select = CreateDepartmentOption(null,departments);
+            dept_select.onchange = function selectChanged(e) {
+                value = e.target.value
+            }
+            swal({
+                title: "Developer Mode", 
+                text: "Please submit Department", 
+                closeOnClickOutside: false,
+                content: dept_select,
+                buttons : [true,true],
+                icon:"warning",
+            }).then((res) => {
+                if(res){
+                    let typedDepartment = $(".select-custom").children("option:selected").text();
+                    if(typedDepartment != null){
+                        console.log(typedDepartment);
+                        $.post(SetDepartmentPath, {DepartmentName:typedDepartment}, (data) => {
+                            if(data == 1){
+                                swal("Success", "Set Department Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
+                            }else{
+                                swal("Error", "User Password Not Correct", "error");
                             }
-                        });
-            //         }else{
-            //             swal("Error", "User Password Not Correct", "error");
-            //         }
-            //     }
-            // });
+                        },"json");
+                    }
+                }
+            });
+        });
     });
 
 })
 
-function CreateDepartmentOption(dept = null,user = null){
+function CreateDepartmentOption(dept = null,departments){
     var value;
-    var departments;
-    let promises = [];
     // if(position == []){
     //     position = ["PE1_Process","PE2_Process",
     //                     "MKT",
@@ -74,31 +54,17 @@ function CreateDepartmentOption(dept = null,user = null){
     //                     "QC_FINAL1","QC_FINAL2","QC_FINAL3",]
     // }
 
-    if(user == null){
-        promises.push($.post(GetDepartmentListPath,(result) => {
-            departments = result.data;
-        }));
-    }else{
-        promises.push($.post(GetDepartmentListByUserIDPath, {us_id:user} ,(result) => {
-            if(result != null){
-                departments = result.data;
-            }
-        }));
-    }
-
     const select = document.createElement('select');
     select.className = 'select-custom'
     let i=1;
-    Promise.all(promises).then(() => {
-        departments.forEach(element => {
-            let option = document.createElement('option');
-            if(dept != null) option.selected = (element == dept) ? true : false;
-            option.innerHTML = element;
-            option.value = i;
-            select.appendChild(option);
-            i++;
-        })
-    });
+    departments.forEach(element => {
+        let option = document.createElement('option');
+        if(dept != null) option.selected = (element == dept) ? true : false;
+        option.innerHTML = element;
+        option.value = i;
+        select.appendChild(option);
+        i++;
+    })
     return select;
 }
 
@@ -123,7 +89,7 @@ function SetPosition(){
                     text: "Please select Position", 
                     closeOnClickOutside: false,
                     buttons : [true,true],
-                    content: position_list,
+                    content: pos_select,
                     icon:"warning",
                 }).then(() => {
                     let typedPosition = $(".select-custom").children("option:selected").text();
@@ -145,7 +111,7 @@ function SetPosition(){
 
 function CreatePositionOption(){
     var value;
-    var position = [ "Staff","Approver","Admin"];
+    var position = [ "Issue","Approver","Admin"];
 
     const select = document.createElement('select');
     select.className = 'select-custom'
@@ -158,6 +124,22 @@ function CreatePositionOption(){
         i++;
     });
     return select;
+}
+
+async function GetDepartmentList(user = null){
+    if(user == null){
+        await $.post(GetDepartmentListPath,(result) => {
+            departments = result.data;
+        });
+    }else{
+        await $.post(GetDepartmentListByUserIDPath, {us_id:user} ,(result) => {
+            if(result != null){
+                departments = result.data;
+            }
+        });
+    }
+
+        return departments;
 }
 
 function GetSession(){

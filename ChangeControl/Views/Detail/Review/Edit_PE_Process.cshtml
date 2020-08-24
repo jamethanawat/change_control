@@ -77,7 +77,7 @@
                             <textarea data-type="desc" data-id="2" name="desc-2" class="form-control " placeholder=""> @(TempItem != null ? @TempItem.Description : "")</textarea>
                         </div>
                     </div>
-                    <div class="form-group row">
+                    @* <div class="form-group row">
                         <label for="inputEffeDoc" class="col-sm-3 col-form-label">Effected to Document (Control Plan ,FMEA)</label>
                         <div class="col-sm-3 col-form-label">
                             @{ TempItem = ItemList.Find(Item => Item.Type == 3) ?? BlankItem; }
@@ -100,7 +100,7 @@
                             <label>FMEA No. :</label>
                             <textarea data-type="desc" data-id="30" name="desc-30" class="form-control " placeholder="">@(TempItem != null ? TempItem.Description : "")</textarea>
                         </div>
-                    </div>
+                    </div> *@
                     <div class="form-group row">
                         <label for="inputSkills" class="col-sm-3 col-form-label">Due Date</label>
                         <div class="col-sm-9 col-form-label">

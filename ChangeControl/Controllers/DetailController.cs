@@ -593,15 +593,22 @@ namespace ChangeControl.Controllers{
         }
 
         public List<RelatedAlt> FilterConfirmRelated(Related related, List<Confirm> confirm_list) {
+            // string[] confirm_dept_list= {"P1","P2","P3A","P3M","P4","P5","P6","P7","QC_IN1","QC_IN2","QC_IN3","QC_FINAL1","QC_FINAL2","QC_FINAL3","QC_NFM1","QC_NFM2","QC_NFM3","QC1","QC2","QC3"};
+            var confirm_dept_list = M_Detail.GetConfirmDeptList();
+            ViewBag.cf_list = confirm_dept_list;
+
             List<RelatedAlt> ConfirmRelatedList = new List<RelatedAlt>();
             foreach (var prop in related.GetType().GetProperties()){
-                var prop_val = prop.GetValue(related, null);
-                var isRelated = ((int) prop_val == 1)? true : false;
-                if(isRelated){
-                    var isResponsed = confirm_list.Exists( e => e.Department == prop.Name);
-                    var status = (isResponsed)? 1 : 0 ;
-                    if((int) prop_val == 1){
-                        ConfirmRelatedList.Add(new RelatedAlt{name = prop.Name, status = status});
+                if(confirm_dept_list.Contains(prop.Name)){
+                    
+                    var prop_val = prop.GetValue(related, null);
+                    var isRelated = ((int) prop_val == 1)? true : false;
+                    if(isRelated){
+                        var isResponsed = confirm_list.Exists( e => e.Department == prop.Name);
+                        var status = (isResponsed)? 1 : 0 ;
+                        if((int) prop_val == 1){
+                            ConfirmRelatedList.Add(new RelatedAlt{name = prop.Name, status = status});
+                        }
                     }
                 }
             }

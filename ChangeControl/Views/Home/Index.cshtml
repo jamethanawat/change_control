@@ -170,22 +170,8 @@
                                     <!-- select2 -->
                                     <div class="form-group">
                                         <div class="row">
-                                            <div class="col-md-2">
-                                                <label>Change Type :</label>
-                                                <select class="form-control select2" id="changeType" style="width: 100%;">
-                                                    <option disabled="disabled" selected="selected">Select Type</option>
-                                                    <option value="">--- Blank ---</option>
-                                                    <option value="Internal">Internal Change</option>
-                                                    <option value="External">External Change</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-md-4">
-                                                    <label>TNS Control No. :</label>
-                                                    <input type="text" class="form-control" id="TNScontrolNo" placeholder="Enter ...">
-                                            </div>
-                                            <div class="col-md-6">
-
-                                                <label>Department Review Status :</label><br>
+                                            <div class="col-md-12">
+                                            <label>Department Status :</label> &emsp;
                                                 <label class="setcheckbox">
                                                     <input type="radio" name="status" value="0" class="flat-red" checked>
                                                     All status
@@ -220,25 +206,76 @@
                                                 </label>
                                             </div>
                                         </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-12">
+                                            <label>Sub Status :</label> &emsp;
+                                                <label class="setcheckbox">
+                                                    <input type="radio" name="sub_tatus" value="0" class="flat-red" checked>
+                                                    All status
+                                                </label>
+                                                <label class="setcheckbox">
+                                                    <input type="radio" name="sub_tatus" value="3" class="flat-red" disabled>
+                                                    Pending
+                                                </label>
+                                                <label class="setcheckbox">
+                                                    <input type="radio" name="sub_tatus" value="7" class="flat-red">
+                                                    Issued
+                                                </label>
+                                                <label class="setcheckbox">
+                                                    <input type="radio" name="sub_tatus" value="8" class="flat-red">
+                                                    Approved
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-2">
+                                                <label>Change Type :</label>
+                                                <select class="form-control select2" id="changeType" style="width: 100%;">
+                                                    <option disabled="disabled" selected="selected">Select Type</option>
+                                                    <option value="">--- Blank ---</option>
+                                                    <option value="Internal">Internal Change</option>
+                                                    <option value="External">External Change</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label>Date :</label>
+                                                <input type="text" class="form-control" id="TNScontrolNo" placeholder="Enter ...">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label>Date :</label><br>
+                                                <label class="setcheckbox">
+                                                    <input type="radio" name="date" value="" class="flat-red" checked>
+                                                    None
+                                                </label>
+                                                <label class="setcheckbox">
+                                                    <input type="radio" name="date" value="@DateTime.Now.ToString("dd-MM-yyyy")" class="flat-red">
+                                                    Today
+                                                </label>
+                                                <label class="setcheckbox">
+                                                    <input type="radio" name="date" value="@DateTime.Now.ToString("__-MM-yyyy")" class="flat-red">
+                                                    This Month
+                                                </label>
+                                                <label class="setcheckbox">
+                                                    <input type="radio" name="date" value="@DateTime.Now.ToString("_____-yyyy")" class="flat-red">
+                                                    This Year
+                                                </label>
+                                            </div>
+                                        </div>
 
                                     </div>
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-md-6">
-                                                <label>Product Type :</label>
-                                                <select class="form-control select2" id="productType" style="width: 100%;">
-                                                    <option disabled="disabled" selected="selected">Select Type</option>
+                                                <label>Related Section :</label>
+                                                <select class="form-control select2" name="dept" style="width: 100%;">
+                                                    <option disabled="disabled" selected="selected">Department</option>
                                                     <option value="">--- Blank ---</option>
-                                                    <option value="1">Meter 2R</option>
-                                                    <option value="2">Meter 4R</option>
-                                                    <option value="3">Agriculture</option>
-                                                    <option value="4">FU/SP</option>
-                                                    <option value="5">D/P</option>
-                                                    <option value="6">Pointer</option>
-                                                    <option value="7">Consumer</option>
-                                                    <option value="8">Others</option>
+                                                    @foreach(var dept in ViewBag.Departments){
+                                                        <option>@dept</option>
+                                                    }
                                                 </select>
                                             </div>
+                                            
 
                                             <div class="col-md-6">
                                                 <label>Over All Status :</label><br>
@@ -284,14 +321,14 @@
                                                     <option value="12">Others</option>
                                                 </select>
                                             </div>
-                                            <div class="col-3">
-                                                <div class="form-group">
+                                            <div class="col-md-3">
+                                                <div class="form-group mb-0">
                                                     <label>Part No :</label>
                                                     <input type="text" class="form-control" id="partno" placeholder="Enter ...">
                                                 </div>
                                             </div>
-                                            <div class="col-3">
-                                                <div class="form-group">
+                                            <div class="col-md-3">
+                                                <div class="form-group mb-0">
                                                     <label>Part Name :</label>
                                                     <input type="text" class="form-control" id="partname" placeholder="Enter ...">
                                                 </div>
@@ -301,22 +338,27 @@
                                     <div>
                                         <div class="row">
                                             <div class="col-md-6">
-                                                <label>Related Section :</label>
-                                                <select class="form-control select2" name="dept" style="width: 100%;">
-                                                    <option disabled="disabled" selected="selected">Department</option>
+                                                <label>Product Type :</label>
+                                                <select class="form-control select2" id="productType" style="width: 100%;">
+                                                    <option disabled="disabled" selected="selected">Select Type</option>
                                                     <option value="">--- Blank ---</option>
-                                                    @foreach(var dept in ViewBag.Departments){
-                                                        <option>@dept</option>
-                                                    }
+                                                    <option value="1">Meter 2R</option>
+                                                    <option value="2">Meter 4R</option>
+                                                    <option value="3">Agriculture</option>
+                                                    <option value="4">FU/SP</option>
+                                                    <option value="5">D/P</option>
+                                                    <option value="6">Pointer</option>
+                                                    <option value="7">Consumer</option>
+                                                    <option value="8">Others</option>
                                                 </select>
                                             </div>
-                                            <div class="col-3">
+                                            <div class="col-md-3">
                                                 <div class="form-group">
                                                     <label>Process Name :</label>
                                                     <input type="text" id="processname" class="form-control" placeholder="Enter ...">
                                                 </div>
                                             </div>
-                                            <div class="col-3">
+                                            <div class="col-md-3">
                                                 <div class="form-group">
                                                     <label>Model :</label>
                                                     <input type="text" class="form-control" id="Model" placeholder="Enter ...">
@@ -389,8 +431,9 @@
                                         <tr>
                                             <th width="10%">TNS No.</th>
                                             <th width="10%">Request Date</th>
+                                            <th width="10%">Change Date</th>
                                             <th width="9%">Department</th>
-                                            <th width="21%">Change Detail</th>
+                                            <th width="11%">Change Detail</th>
                                             <th width="10%">Change Type</th>
                                             <th width="8%">Model</th>
                                             <th width="8%">Status</th>

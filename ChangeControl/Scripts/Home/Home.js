@@ -115,6 +115,7 @@ $(document).ready(function () {
         var temp_data = {
             'Type': $("#changeType").val(),
             'Status': status,
+            'Date': $("[name='date']").val(),
             'ProductType': $("#productType").val(),
             'Overstatus': $("input[name='overstatus']:checked").val(),
             'Changeitem': $("#changeitem").val(),
@@ -147,17 +148,17 @@ $(document).ready(function () {
                     data:response,
                     "order": [],
                     columnDefs: [
-                    {"targets": 3,
+                    {"targets": 4,
                         createdCell: (td) => { 
                             $(td).css('text-align', 'left'); 
                         }
                     },
-                    {"targets": 6,
+                    {"targets": 7,
                         "render": function (data, type, row) {
                             return `${data}`;
                             // return `<span class="badge badge-warning">${data}</span>`;
                         }
-                    },{"targets": 7,
+                    },{"targets": 8,
                         "render": function (data, type, row) {
                             let action_btn = '';
                             if(response === null){
@@ -181,6 +182,7 @@ $(document).ready(function () {
                     columns: [
                         { data: 'Code' },
                         { data: 'Date' },
+                        { data: 'Timing' },
                         { data: 'Department' },
                         { data: 'Detail' },
                         { data: 'Product_type' },

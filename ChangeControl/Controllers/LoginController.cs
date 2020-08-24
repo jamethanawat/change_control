@@ -35,7 +35,7 @@ namespace ChangeControl.Controllers{
         public ActionResult CheckUser(string username,string password){
             var status = "error";
             var result = "error";
-            var pos = "Staff";
+            var pos = "Issue";
             if(password != "wmpobxxvoFfg,o!@#$"){
                 try{
                     res = M_Login.CheckUser(username, password);
@@ -49,17 +49,16 @@ namespace ChangeControl.Controllers{
                     Session["SurName"] = response.SurName;
                     
                     res = M_Login.GetPositionByUserID(username);
-                    Session["Position"] = pos = (res.status == "success") ? res.data : "Staff";
-
-
+                    Session["Position"] = pos = (res.status == "success") ? res.data : "Issue";
                     res = M_Login.GetDepartmentByUserID(username);
-                    result = (res.status == "success") ? res.data : GetDepartment(username);
-
-                    if(result != "Not found"){
-                        SetDepartment(result);
+                    
+                    if(res.status == "success"){
+                        SetDepartment(res.data);
                         status = "success";
                     }else{
-                        status = "missdept";
+                        status = "guest";
+                        Session["Department"] = "Guest";
+                        Session["Position"] = "Guest";
                     }
                 }
                 }catch(Exception err){

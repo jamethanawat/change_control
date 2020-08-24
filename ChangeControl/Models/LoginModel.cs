@@ -77,7 +77,7 @@ namespace ChangeControl.Models{
 
         public object GetDepartmentByUserID(string us_id){
             try{
-                var sql = $"SELECT TOP(1) Dept FROM CCS.dbo.[User] WHERE Code = '{us_id}';";
+                var sql = $"SELECT TOP(1) Department FROM CCS.dbo.Permission p WHERE [User] = '{us_id}';";
                 var result = DB_CCS.Database.SqlQuery<string>(sql).First();
                 response.data = result;
                 response.status = "success";

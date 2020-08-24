@@ -111,7 +111,7 @@ namespace ChangeControl.Models
         }
         public TopicAlt GetTopicByOriginID(string topic_code){ //every file review confirm is related to 
             try{
-                var sql = $@"SELECT Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Department, Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, Timing, Related, User_insert, Time_insert, ApprovedBy, ApprovedDate, 
+                var sql = $@"SELECT Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Department, Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, FORMAT((SELECT CONVERT(DATE, Timing, 105)), 'dd MMMM yyyy') AS Timing, Related, User_insert, Time_insert, ApprovedBy, ApprovedDate, 
                 ID FROM CCS.dbo.Topic 
                 LEFT JOIN Change_Item ON Topic.Change_item = ID_Change_item 
                 LEFT JOIN Product_Type ON Topic.Product_Type = ID_Product_Type 
@@ -126,7 +126,7 @@ namespace ChangeControl.Models
         
         public TopicAlt GetTopicByCode(string topic_code){
             try{
-                var sql = $@"SELECT  Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Department, Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, Timing, Related, User_insert, Time_insert , ApprovedBy, ApprovedDate, 
+                var sql = $@"SELECT  Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Department, Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, FORMAT((SELECT CONVERT(DATE, Timing, 105)), 'dd MMMM yyyy') AS Timing, Related, User_insert, Time_insert , ApprovedBy, ApprovedDate, 
                 ID FROM CCS.dbo.Topic 
                 LEFT JOIN Change_Item ON Topic.Change_item = ID_Change_item 
                 LEFT JOIN Product_Type ON Topic.Product_Type = ID_Product_Type 
@@ -500,6 +500,18 @@ namespace ChangeControl.Models
                             WHERE Code = '{topic_code}'
                             ORDER BY Revision DESC;";
                 DB_CCS.Database.ExecuteSqlCommand(sql);
+        }
+
+        public List<String> GetConfirmDeptList(){
+            try{
+                var sql = $@"SELECT Name FROM CCS.dbo.Department
+                            WHERE [Group] = 'Production'
+                            OR [Group] = 'Quality Control';";
+                var result = DB_CCS.Database.SqlQuery<String>(sql).ToList();
+                return result;
+            }catch(Exception ex){
+                return new List<String>();
+            }
         }
     }
 }

@@ -56,7 +56,7 @@ namespace ChangeControl.Models
                      AND Confirm.Status = 1
                      AND Confirm.Department != 'QC1' AND Confirm.Department != 'QC2' AND Confirm.Department != 'QC3')= 0";
             }
-            sql = $@"SELECT Topic.Code, Topic.Type, Change_item.Name AS Change_item , Product_type.Name AS Product_type, Topic.Department, Topic.Revision,Topic.Model, Topic.PartNo, Topic.PartName, Topic.Detail,
+            sql = $@"SELECT Topic.Code, Topic.Type, Change_item.Name AS Change_item , Product_type.Name AS Product_type, Topic.Timing, Topic.Department, Topic.Revision,Topic.Model, Topic.PartNo, Topic.PartName, Topic.Detail,
                     Topic.ProcessName, Status.Name AS FullStatus, Topic.Related, Topic.User_insert, Topic.Time_insert AS Date FROM Topic 
                     LEFT JOIN Status ON Topic.Status = Status.id 
                     LEFT JOIN Change_Item ON Topic.Change_item = ID_Change_item 
@@ -66,6 +66,7 @@ namespace ChangeControl.Models
                     (model.Type.AsNullIfWhiteSpace() != null ?  $"AND Topic.Type = '{model.Type}' " : "") +
                     (ov_command != "" ?  $"AND {ov_command} " : "") +
                     (model.Status != 0 ?  $"AND Topic.Status = '{model.Status}' " : "") +
+                    (model.Date.AsNullIfWhiteSpace() != null ? $"AND Topic.Timing LIKE '{model.Date}%' " : "") +
                     (model.ProductType.AsNullIfWhiteSpace() != null ? $"AND Topic.Product_type = {model.ProductType} " : "") +
                     (model.Changeitem.AsNullIfWhiteSpace() != null ? $"AND Topic.Change_item = {model.Changeitem} " : "") +
                     (model.Processname.AsNullIfWhiteSpace() != null ? $"AND Topic.ProcessName = '{model.Processname}' " : "") +

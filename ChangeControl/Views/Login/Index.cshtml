@@ -28,6 +28,7 @@
             var NavigateToHome = '@Url.Action("Index", "Home")';
             var UrlTopicID = '@((string) Session["RedirectID"] != null ? Session["RedirectID"].ToString() : "")';
             var NavigateToPrevious = `@((string) Session["RedirectID"] != null ? @Url.Action("Index", RedirectMode , new { id = Session["RedirectID"].ToString()}) : @Url.Action("Index", RedirectMode))`;
+            var GetDepartmentListPath = '@Url.Action("GetDepartment", "Request")';
 
         </script>
 

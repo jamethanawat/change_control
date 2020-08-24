@@ -23,7 +23,7 @@ namespace ChangeControl.Models{
             this.FullName = "Pakawat Smutkun";
             this.Name = "Pakawat";
             this.SurName = "Smutkun";
-            this.Position = "Staff";
+            this.Position = "Issue";
         }
     }
 

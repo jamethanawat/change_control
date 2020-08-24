@@ -22,10 +22,6 @@ $(document).ready(function () {
         var Iuser = $('#user').val();
         var Ipass = $('#pass').val();
 
-        // var select = CreateDepartmentOption();
-        // select.onchange = function selectChanged(e) {
-        //     value = e.target.value
-        // }
         
 
         console.log(Iuser.length);
@@ -39,50 +35,60 @@ $(document).ready(function () {
                 loader.toggle();
                 $.post(CheckUserPath,({ username:Iuser,password:Ipass }) ,(res) => {
                     var promises = [];
+                    var select;
                     if(res.pos == "Special"){
-                        var select = CreateDepartmentOption(null,Iuser)
-                        select.onchange = function selectChanged(e) { value = e.target.value }
-                        loader.toggle();
-                        
-                        swal({
-                                title: "Confirm Department", 
-                                text: "Please select your Department",
-                                closeOnClickOutside: false,
-                                // buttons : [true,true],
-                                content: select,
-                            icon:"warning",
-                        }).then(() => {
-                            loader.toggle();
-                            let selected_dept = $(".select-custom").children("option:selected").text();
-                            $.post(SetDepartmentAltPath,{dept:selected_dept},(success) => {
-                                if(success){
-                                    swal("Success", "Sign in complete", "success").then( window.location.href = (UrlTopicID.length > 8 ) ? NavigateToPrevious : NavigateToHome );
-                                }
-                            });
+                        GetDepartmentList(Iuser).then((departments) => {
+                            if(departments.length > 1){
+                                select = CreateDepartmentOption(null,departments)
+                                select.onchange = function selectChanged(e) { value = e.target.value }
+                                loader.toggle();
+                                
+                                swal({
+                                    title: "Confirm Department", 
+                                    text: "Please select your Department",
+                                    closeOnClickOutside: false,
+                                    // buttons : [true,true],
+                                    content: select,
+                                    icon:"warning",
+                                }).then(() => {
+                                    loader.toggle();
+                                    let selected_dept = $(".select-custom").children("option:selected").text();
+                                    $.post(SetDepartmentAltPath,{dept:selected_dept},(success) => {
+                                        if(success){
+                                            swal("Success", "Sign in complete", "success").then( window.location.href = (UrlTopicID.length > 8 ) ? NavigateToPrevious : NavigateToHome );
+                                        }
+                                    });
+                                });
+                            }else{
+                                swal("Success", "Sign in complete", "success").then( window.location.href = (UrlTopicID.length > 8 ) ? NavigateToPrevious : NavigateToHome );
+                            }
                         });
                     }else if(res.status == "success"){
                         swal("Success", "Sign in complete", "success").then( window.location.href = (UrlTopicID.length > 8 ) ? NavigateToPrevious : NavigateToHome );
-                    }else if(res.status == "missdept"){
-                        var select = CreateDepartmentOption(res.data);
-                        select.onchange = function selectChanged(e) { value = e.target.value }
-                        loader.toggle();
+                    }else if(res.status == "guest"){
+                        // var departments = GetDepartmentList(Iuser);
+                        // var select = CreateDepartmentOption(res.data,departments)
+                        // select.onchange = function selectChanged(e) { value = e.target.value }
+                        // loader.toggle();
 
-                        swal({
-                            title: "Confirm Department", 
-                            text: "Please select your Department",
-                            closeOnClickOutside: false,
-                            // buttons : [true,true],
-                            content: select,
-                            icon:"warning",
-                        }).then(() => {
-                            loader.toggle();
-                            let selected_dept = $(".select-custom").children("option:selected").text();
-                            $.post(SetDepartmentAltPath,{dept:selected_dept},(success) => {
-                                if(success){
-                                        swal("Success", "Sign in complete", "success").then( window.location.href = (UrlTopicID.length > 8 ) ? NavigateToPrevious : NavigateToHome );
-                                }
-                            });
-                        });
+                        // swal({
+                        //     title: "Confirm Department", 
+                        //     text: "Please select your Department",
+                        //     closeOnClickOutside: false,
+                        //     // buttons : [true,true],
+                        //     content: select,
+                        //     icon:"warning",
+                        // }).then(() => {
+                        //     loader.toggle();
+                        //     let selected_dept = $(".select-custom").children("option:selected").text();
+                        //     $.post(SetDepartmentAltPath,{dept:selected_dept},(success) => {
+                        //         if(success){
+                        //                 swal("Success", "Sign in complete", "success").then( window.location.href = (UrlTopicID.length > 8 ) ? NavigateToPrevious : NavigateToHome );
+                        //         }
+                        //     });
+                        // });
+                        swal("Success", "Sign in complete", "success").then( window.location.href = (UrlTopicID.length > 8 ) ? NavigateToPrevious : NavigateToHome );
+
                     }else{
                         loader.toggle();
 
@@ -121,9 +127,6 @@ $(document).ready(function () {
                     }
                 });
             }
-
-               
-
         }
 
     });
