@@ -24,7 +24,22 @@ $(document).ready(function () {
     $('[data-toggle="datepicker"]').datepicker({
         format: 'dd-MM-yyyy'
     });
-    $("[name='timing']").datepicker('setDate', (this.checked) ? '01-01-9999' : moment().format("DD-MM-YYYY"));
+
+    /* -------------------------------------------------------------------------- */
+    /*                          Change date configulation                         */
+    /* -------------------------------------------------------------------------- */
+
+    $("#change_date_switch").on("click", function (e) {
+        $("[name='timing']").datepicker('setDate', (this.checked) ? '01-01-9999' : moment().format("DD-MM-YYYY"));
+        $("[name='timing']").prop('disabled', (this.checked) ? true : false);
+        if(!this.checked) $("[name='timingDesc']").val(""); 
+        $("#change_date_desc").toggle();
+    });
+
+    $("[name='timing']").datepicker('setDate', (this.checked) ? '01-01-9999' : Timing);
+    if($("[name='timingDesc']").val().length > 0){
+        $("#change_date_switch").click();
+    }
 
 
 /* -------------------------------------------------------------------------- */
@@ -334,15 +349,7 @@ $(document).ready(function () {
         }
     });
 
-/* -------------------------------------------------------------------------- */
-/*                          Change date configulation                         */
-/* -------------------------------------------------------------------------- */
 
-    $("#change_date_switch").on("click", function (e) {
-        $("[name='timing']").datepicker('setDate', (this.checked) ? '01-01-9999' : moment().format("DD-MM-YYYY"));
-        $("[name='timing']").prop('disabled', (this.checked) ? true : false);
-        $("#change_date_desc").toggle();
-    });
 
     function RedirectToDetail(id) {
         window.location.replace(`${RedirectDetail}/?id=${id}`);

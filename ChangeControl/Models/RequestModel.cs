@@ -217,7 +217,7 @@ namespace ChangeControl.Models{
         }
 
         public TopicAlt GetTopicByID(string topic_code){
-            var sql = $"SELECT TOP(1) Code, [Type], Change_Item.Name as Change_item, Product_Type.Name AS Product_Type  , Department, Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, Timing, Related, User_insert, Time_insert, ID FROM Topic LEFT JOIN Change_Item ON Topic.Change_item = ID_Change_item LEFT JOIN Product_Type ON Topic.Product_Type = ID_Product_Type WHERE Code = '{topic_code}' ORDER BY Revision DESC;";
+            var sql = $"SELECT TOP(1) Code, [Type], Change_Item.Name as Change_item, Product_Type.Name AS Product_Type  , Department, Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, Timing, TimingDesc, Related, User_insert, Time_insert, ID FROM Topic LEFT JOIN Change_Item ON Topic.Change_item = ID_Change_item LEFT JOIN Product_Type ON Topic.Product_Type = ID_Product_Type WHERE Code = '{topic_code}' ORDER BY Revision DESC;";
             var Topic = DB_CCS.Database.SqlQuery<TopicAlt>(sql);
             return Topic.First();
         }

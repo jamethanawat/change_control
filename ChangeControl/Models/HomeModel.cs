@@ -41,6 +41,7 @@ namespace ChangeControl.Models
             var sql = "";
             var ov_command = "";
             var job_command = "";
+            var condition_command = "";
             if(model.Overstatus == 2){
                 ov_command = $@"(
                     SELECT COUNT(*) 
@@ -87,9 +88,19 @@ namespace ChangeControl.Models
                     break;
                 case 9:
                     phase = "Trial";
+                    condition_command = $@" AND (EXISTS (SELECT * FROM Review_Item LEFT JOIN Review ON Review_Item.FK_Review_ID = Review.ID
+                                            WHERE Review.Topic = Topic.Code
+                                            AND Review_Item.FK_Item_Type = 24
+                                            AND Review_Item.Status = 1
+                                                AND Review.Department = '{model.Department}'
+						                    AND Review.Revision = (SELECT MAX(e3.Revision) FROM Review e3 WHERE Review.Topic = e3.Topic AND Review.Department = e3.Department))
+                                            OR '{model.Department}' IN ('QC1','QC2','QC3'))";
                     break;
                 case 10:
                     phase = "Confirm";
+                    condition_command = $@" AND ('{model.Department}' IN (SELECT Name FROM Department
+                                                        WHERE [Group] = 'Production')
+                                                OR '{model.Department}' IN ('QC1','QC2','QC3'))";
                     break;
                 }
                 if(model.Status != 7){
@@ -126,7 +137,7 @@ namespace ChangeControl.Models
                     (model.Model.AsNullIfWhiteSpace() != null ? $"AND Topic.Model ='{model.Model}' " : "") +
                     (model.ControlNo.AsNullIfWhiteSpace() != null ? $"AND Topic.Code LIKE '{model.ControlNo}%' " : "") +
                     (model.Department.AsNullIfWhiteSpace() != null ? $@"AND Related.Department = '{model.Department}'" : "") + 
-                    " ORDER BY Topic.Code DESC";
+                    $"{condition_command} ORDER BY Topic.Code DESC";
             var result = DB_CCS.Database.SqlQuery<TopicAlt>(sql).ToList();
             return result;
         } 

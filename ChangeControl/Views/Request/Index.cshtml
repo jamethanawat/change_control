@@ -41,6 +41,7 @@
     var GenerateMailPath = '@Url.Action("GenerateMail", "Mail")';
     var InsertOtherChangeItemPath = '@Url.Action("InsertOtherChangeItem", "Request")';
     var InsertOtherProductTypePath = '@Url.Action("InsertOtherProductType", "Request")';
+    var Timing = '@(Topic != null ? Topic.Timing : null) ';
 </script>
 
 <script>
@@ -519,17 +520,20 @@
                                         </div>
                                             <input data-toggle="datepicker" class="form-control required" placeholder="Select Date " autocomplete="off" name="timing" data-inputmask-alias="datetime" data-inputmask-inputformat="dd-MM-yyyy" data-mask="99-99-9999" style="border-radius: 0px 5px 5px 0px; !important" required>
                                             <div data-toggle="datepicker"></div>
-                                            @if(Topic != null && Topic.Timing != null){
+                                            @* @if(Topic != null && Topic.Timing != null){
                                                 <script>
                                                     $("[name='timing']").datepicker('setDate', '@Topic.Timing');
                                                 </script>
-                                            }
+                                            } *@
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="custom-control custom-switch mt-2">
                                         <input type="checkbox" class="custom-control-input" id="change_date_switch">
+                                        @{
+                                                var t_desc = (Topic!= null ?  Topic.TimingDesc ?? null : null);
+                                            }
                                         <label class="custom-control-label" for="change_date_switch">ไม่สามารถระบุได้</label>
                                     </div>
                                 </div>
@@ -564,7 +568,9 @@
                                                 });
                                             </script>
                                             } *@
-                                        <input type="text" class="form-control" name="timingDesc" placeholder="กรุณาระบุรายละเอียด"></input>
+                                            
+
+                                        <input type="text" class="form-control" name="timingDesc" placeholder="กรุณาระบุรายละเอียด" value="@t_desc"></input>
                                     </div>
                                 </div>
                             </div>
