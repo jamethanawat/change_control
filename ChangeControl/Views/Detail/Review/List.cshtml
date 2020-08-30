@@ -3,6 +3,7 @@
     var str_date = "05 มิถุนายน 2020";
     string department = (string)Session["Department"];
     List<Review> ElementList = Model;
+    var Topic = ViewData["Topic"] as TopicAlt;
 }
 
 @* /* --------------------- Show list that related to user --------------------- */ *@
@@ -14,14 +15,14 @@
 }
 
 @* /* --------------------- Show list of pending department -------------------- */ *@
-@foreach(var Element in ViewBag.ReviewRelatedList){
-    if(Element.status == 0 && Element.name != "QC1" && Element.name != "QC2" && Element.name != "QC3"){
+@foreach(var Element in Topic.RelatedListAlt){
+    if(Element.Review == 0 && Element.Department != "QC1" && Element.Department != "QC2" && Element.Department != "QC3"){
     <div>
         <i class="fa fa-hourglass-half  bg-secondary blue-tooltip"></i>
         <div class="timeline-item card">
             <div class="timeline-header card-header d-flex" style="padding: 10px 10px 5px 10px;"  data-card-widget="collapse">
                     <h6 class="mr-auto" style="font-family:Kanit"> 
-                        @Element.name
+                        @Element.Department
                         <span class='badge badge-pill badge-secondary'>PENDING
                                 <i class='fa fa-hourglass-half'></i>
                         </span> </h6>
@@ -41,6 +42,8 @@
 }
 
 @helper DefaultList(List<Review> ElementList, Review Element, string department){
+    var Topic = ViewData["Topic"] as TopicAlt;
+
 <div>
     @{var WaitingForCustomer = false;}
     @* <i class="fas bg-primary" style="font-family:Kanit !important">@Html.DisplayFor(model => Element.Department)</i> *@
@@ -152,11 +155,11 @@
             <div class="timeline-footer">
                 <div class="float-right ">
                     <button class="btn btn-warning btn-sm rv-edit" id="edit_rv" data-toggle="modal" data-target="#edit_review" value="@Element.ID">Edit</button>
-                    @if((ViewBag.isQC || (ViewBag.isPEProcess || ViewBag.isInternal)) && ViewBag.isApprover){
+                    @if((ViewBag.isQC || (ViewBag.isPEProcess && ViewBag.isInternal)) && ViewBag.isApprover){
                         <button class="btn btn-info btn-sm rv-related" id="related_rv" data-toggle="modal" data-target="#related_rv" value="@Element.ID">Add Related</button>
                         <button type="button" id="reject" class="btn btn-danger btn-sm">Reject</button>
                     }
-                        @if(ViewBag.isApprover && ((Element.Status !=1 && !ViewBag.isQC) || (!ElementList.Exists(e => e.Status == 3 && e.Department != "QC1" && e.Department != "QC2" && e.Department != "QC3") && ViewBag.isQC && !WaitingForCustomer))){ 
+                        @if(ViewBag.isApprover && ((Element.Status !=1 && !ViewBag.isQC) || (!Topic.RelatedListAlt.Exists(e => e.Review == 0 && e.Department != "QC1" && e.Department != "QC2" && e.Department != "QC3") && ViewBag.isQC && !WaitingForCustomer))){ 
                             <button class="btn btn-info btn-sm mr-1 rv-approve" value="@Element.ID">Approve</button>
                         }
                 </div>

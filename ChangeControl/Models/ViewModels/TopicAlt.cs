@@ -19,13 +19,15 @@ namespace ChangeControl.Models{
         public string ProcessName{ get; set; }
         public int Status{ get; set; }
         public string FullStatus{ get; set; }
+        public string SubStatus{ get; set; }
         public string App{ get; set; }
         public string Subject{ get; set; }
         public string Detail{ get; set; }
         public string Timing { get; set; }
+        public string TimingDesc { get; set; }
         public List<FileItem> FileList { get; set; }
         public long Related{ get; set; }
-        public Related RelatedList{ get; set; }
+        // public Related RelatedList{ get; set; }
         public List<RelatedAlt> RelatedListAlt{ get; set; }
         public string User_insert{ get; set; }
         public string Time_insert{ get; set; }
@@ -34,7 +36,7 @@ namespace ChangeControl.Models{
         public string ApprovedBy{ get; set; }
         public string ApprovedDate{ get; set; }
         public User ApproverProfile{ get; set; }
-        public TopicAlt(string Code,string Type,string ChangeItem,string ProductType,int Revision ,string Model,string PartNo,string PartName,string ProcessName,int Status,string App,string Subject,string Detail,string Timing ,long Related,string UserInsert,string TimeInsert){
+        public TopicAlt(string Code,string Type,string ChangeItem,string ProductType,int Revision ,string Model,string PartNo,string PartName,string ProcessName,int Status,string App,string Subject,string Detail,string Timing ,string TimingDesc ,long Related,string UserInsert,string TimeInsert){
             this.Code = Code.ReplaceNullWithDash();
             this.Type = Type.ReplaceNullWithDash();
             this.Change_item = ChangeItem.ReplaceNullWithDash();
@@ -49,6 +51,7 @@ namespace ChangeControl.Models{
             this.Subject = Subject.ReplaceNullWithDash();
             this.Detail = Detail.ReplaceNullWithDash();
             this.Timing = Timing;
+            this.TimingDesc = TimingDesc;
             this.Related = Related;
             this.User_insert = UserInsert;
             this.Time_insert = TimeInsert;

@@ -22,7 +22,7 @@ $(() => {
                     if(res == "True"){
                         $.post(ApproveReviewPath, {review_id:rv_id}, (result) => {
                             if(result){
-                                if(result.mail != ""){
+                                if(result.mail != "" && result.mail != null){
                                     $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept': result.dept, }).fail((error) => {
                                         console.error(error);
                                         swal("Error", "Cannot send email to Requestor, Please try again", "error");
@@ -81,7 +81,7 @@ $(() => {
                 Data.append("description",element.description);
                 $.ajax({
                     type: "POST",
-                    url: SubmitFilePath,
+                    url: InsertFilePath,
                     data: Data,
                     cache: false,
                     processData: false,
@@ -96,7 +96,7 @@ $(() => {
 
             optimized_edit_rv.forEach(element => {
                 promises.push(
-                    $.post(SubmitReviewItemPath, {
+                    $.post(InsertReviewItemPath, {
                         'status' : element.status,
                         'description' : element.desc,
                         'id' : element.id,

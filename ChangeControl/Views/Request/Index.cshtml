@@ -20,22 +20,21 @@
     var isEditMode = (Topic != null); //Default when insert
     Session["isEditMode"] = isEditMode;
 
-    Related RelatedList = new Related();
+    List<RelatedAlt> RelatedList = new List<RelatedAlt>();
 }
 @Scripts.Render("~/bundles/jquery")
-@Scripts.Render("~/bundles/bootstrap")
 
 
 <script type="text/javascript">
     InsertRequestPath = '@Url.Action("Submit", "Request")';
     UpdateRequestPath = '@Url.Action("UpdateRequest", "Request")';
-    InsertRelatedPath = '@Url.Action("SubmitRelated", "Request")';
-    InsertFilePath = '@Url.Action("SubmitFile", "Request")';
+    InsertRelatedPath = '@Url.Action("InsertRelated", "Request")';
+    InsertFilePath = '@Url.Action("InsertFile", "Request")';
     UpdateFilePath = '@Url.Action("UpdateFile", "Request")';
     remove = '@Url.Action("RemoveDATA", "Request")';
     sendmail = '@Url.Action("AddListMail", "Request")';
     GetSummernote = '@Url.Action("GetSummernote", "Request")';
-    SubmitFilePath = '@Url.Action("SaveFile", "Request")';
+    InsertFilePath = '@Url.Action("InsertFile", "Request")';
     DepartmentLists = @Html.Raw(Json.Encode(DepartmentLists));
     isEditMode = '@Session["isEditMode"]';
     var RedirectDetail = '@Url.Action("Index", "Detail")';
@@ -512,13 +511,40 @@
                                 }
                             }
                             <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">Change Date </label>
+                                <label class="col-sm-2 col-form-label">Change Date<span class="text-danger">*</span> </label>
                                 <div class="col-sm-4">
-                                    @* <div class="form-group">
-                                        <textarea class="textareaTiming" name="timing" placeholder="Place some text here">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                                        </div>
+                                            <input data-toggle="datepicker" class="form-control required" placeholder="Select Date " autocomplete="off" name="timing" data-inputmask-alias="datetime" data-inputmask-inputformat="dd-MM-yyyy" data-mask="99-99-9999" style="border-radius: 0px 5px 5px 0px; !important" required>
+                                            <div data-toggle="datepicker"></div>
+                                            @if(Topic != null && Topic.Timing != null){
+                                                <script>
+                                                    $("[name='timing']").datepicker('setDate', '@Topic.Timing');
+                                                </script>
+                                            }
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="custom-control custom-switch mt-2">
+                                        <input type="checkbox" class="custom-control-input" id="change_date_switch">
+                                        <label class="custom-control-label" for="change_date_switch">ไม่สามารถระบุได้</label>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group row" id="change_date_desc" style="display:none">
+                                <label class="col-sm-2 col-form-label">Change Date's Description<span class="text-danger">*</span> </label>
+                                <div class="col-sm-10">
+                                    <div class="form-group">
+                                        @* <textarea class="textareaSubject" name="subject" placeholder="Place some text here">
                                         </textarea>
                                             <script>
-                                                $('.textareaTiming').summernote({
+                                                $('.textareaSubject').summernote({
                                                     height: 140,
                                                     toolbar: [
                                                         ['font', ['bold', 'underline', 'clear']],
@@ -527,9 +553,9 @@
                                                     ],
                                                 });
                                             </script>
-                                            @if(isTiming){
+                                            @if(isSubject){
                                             <script>
-                                                $(".textareaTiming").summernote('code', `@Html.Raw(Topic.Timing)`,{
+                                                $(".textareaSubject").summernote('code' , `@Html.Raw(Topic.Subject)`,{
                                                     toolbar: [
                                                         ['font', ['bold', 'underline', 'clear']],
                                                         ['fontsize', ['fontsize']],
@@ -537,16 +563,8 @@
                                                     ],
                                                 });
                                             </script>
-                                            }
-                                    </div> *@
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
-                                        </div>
-                                            <input data-toggle="datepicker" class="form-control required" placeholder="Select Date " autocomplete="off" name="timing" data-inputmask-alias="datetime" data-inputmask-inputformat="dd-mm-yyyy" data-mask="99-99-9999">
-
-                                            @* <input type="text" name="timing" data-toggle="datepicker" autocomplete="off" class="form-control mb-0 pb-0 rounded" data-inputmask-alias="datetime" data-inputmask-inputformat="dd-mm-yyyy"> *@
-                                            <div data-toggle="datepicker"></div>
+                                            } *@
+                                        <input type="text" class="form-control" name="timingDesc" placeholder="กรุณาระบุรายละเอียด"></input>
                                     </div>
                                 </div>
                             </div>
@@ -638,23 +656,17 @@
                                         @{var departMentGroupName = DepartmentGroup.Name.Replace("_", " ");}
                                         <legend class="w-auto"> <input type="checkbox" class="checkedAll" id="@DepartmentGroup.Name"/> <label for="@DepartmentGroup.Name" style="display: contents;">@departMentGroupName</label></legend> 
                                         <ul class="checkbox"> 
-                                            @if(isEditMode){
-                                                RelatedList = Topic.RelatedList;
-                                            }
                                             @foreach(var Department in DepartmentGroup.Department){
                                                 try{
                                                     var isChecked = false;
                                                     if(isEditMode){
-                                                        var RelatedValue = RelatedList.GetType().GetProperty(Department.Name).GetValue(RelatedList,null);
-                                                        if(RelatedValue != null){
-                                                            if((int) RelatedValue == 1){
+                                                        if(Topic.RelatedListAlt.Exists(x => x.Department == Department.Name)){
                                                                 isChecked = true;
-                                                            }
                                                         }
                                                     }
-                                                    <li><input type="checkbox" class="checkSingle @DepartmentGroup.Name" id="@Department.ID" value="1" name="@Department.Name" @(isChecked ? "checked" : "")/><label for="@Department.ID">@Department.Name</label></li> 
+                                                    <li><input type="checkbox" class="related_radio checkSingle @DepartmentGroup.Name" id="@Department.ID" value="1" name="@Department.Name" @(isChecked ? "checked" : "")/><label for="@Department.ID">@Department.Name</label></li> 
                                                 }catch(Exception err){
-                                                    <li><input type="checkbox" class="checkSingle @DepartmentGroup.Name" id="@Department.ID" value="1" name="@Department.Name" /><label for="@Department.ID">@Department.Name</label></li> 
+                                                    <li><input type="checkbox" class="related_radio checkSingle @DepartmentGroup.Name" id="@Department.ID" value="1" name="@Department.Name" /><label for="@Department.ID">@Department.Name</label></li> 
 
                                                 }
                                             

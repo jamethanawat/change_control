@@ -18,6 +18,7 @@ namespace ChangeControl.Controllers{
         private DbTapics DB_Tapics;
         private DbCCS DB_CCS;
         private DetailModel M_Detail;
+        private HomeModel M_Home;
         private RequestModel M_Req;
         public List<Review> ReviewList = new List<Review>();
         public RequestController(){
@@ -25,6 +26,7 @@ namespace ChangeControl.Controllers{
             DB_CCS = new DbCCS();
             M_Detail = new DetailModel();
             M_Req = new RequestModel();
+            M_Home = new HomeModel();
         }
         public class Value{
             public List<string> value { get; set; }
@@ -33,16 +35,22 @@ namespace ChangeControl.Controllers{
             public HttpPostedFileBase file {get; set;}
             public string description {get; set;}
         }
+
+        // public class C_Inherit_Home : HomeController{
+
+
+        // }
         public List<GetID> topic_detail = new List<GetID>();
         private string date = DateTime.Now.ToString("yyyyMMddHHmmss");
         private string date_ff = DateTime.Now.ToString("yyyyMMddHHmmss.fff");
-        public ActionResult Index(string ID)    {
-            if((string)(Session["User"]) == null || (string)(Session["Department"]) == null){
+        public ActionResult Index(string ID){
+            if((string)(Session["User"]) == null || (string)(Session["Department"]) == null || (string)(Session["Department"]) == "Guest"){
                 Session["RedirectID"] = (ID != null) ? ID : null;
                 Session["RedirectMode"] = "Request";
                 return RedirectToAction("Index", "LogIn");
             }
 
+            GenerateTopicList(Convert.ToString(Session["Department"]), Convert.ToString(Session["Position"]));
             Session["RedirectID"] = null;
 
             if(ID == null || M_Req.CheckTopicOwner((string) Session["User"], ID)){
@@ -90,8 +98,8 @@ namespace ChangeControl.Controllers{
                     if(temp_topic.Status != 3 && temp_topic.Status != 7 ){
                         return View("~/Views/Shared/404/index.cshtml");
                     }else{
-                        var TopicRelatedList = M_Req.GetRelatedByID(temp_topic.Related);
-                        temp_topic.RelatedList = TopicRelatedList;
+                        temp_topic.RelatedListAlt = M_Req.GetRelatedByID(temp_topic.Related);
+                        temp_topic.Timing = temp_topic.Timing.StringToDigitDate2();
                         
                         Session["Topic"] = ViewData["Topic"] = temp_topic;
 
@@ -108,7 +116,7 @@ namespace ChangeControl.Controllers{
             }
         }
         [HttpPost, ValidateInput(false)]
-        public ActionResult Submit(string changeType,int changeItem,int productType,string model,string partNo, string partName, string processName,string appRadio, string appDescription,string subject,string detail,string timing){
+        public ActionResult Submit(string changeType,int changeItem,int productType,string model,string partNo, string partName, string processName,string appRadio, string appDescription,string subject,string detail,string timing,string timingDesc){
           int status;
           var mode = "Insert";
           var revision = 0;
@@ -135,51 +143,60 @@ namespace ChangeControl.Controllers{
               }
               Session["Revision"] = revision;
               status = 3;
-              var temp_topic = new Topic((string)(Session["TopicCode"]), changeType, changeItem, productType, revision , (string) Session["Department"], model.ReplaceSingleQuote(),partNo.ReplaceSingleQuote(), partName.ReplaceSingleQuote(), processName.ReplaceSingleQuote(), status, appDescription.ReplaceSingleQuote() , subject.ReplaceSingleQuote(), detail.ReplaceSingleQuote(), timing.ReplaceSingleQuote(), (long)Session["RelatedID"],(string)(Session["User"]), date );
+              
+              var new_timing = timing.Split('-');
+              timing = $"{new_timing[2]}{new_timing[1]}{new_timing[0]}000000";
+              
+              var temp_topic = new Topic((string)(Session["TopicCode"]), changeType, changeItem, productType, revision , (string) Session["Department"], model.ReplaceSingleQuote(),partNo.ReplaceSingleQuote(), partName.ReplaceSingleQuote(), processName.ReplaceSingleQuote(), status, appDescription.ReplaceSingleQuote() , subject.ReplaceSingleQuote(), detail.ReplaceSingleQuote(), timing.ReplaceSingleQuote(), timingDesc.ReplaceSingleQuote(), (long)Session["RelatedID"],(string)(Session["User"]), date );
 
               Session["TopicID"] = M_Req.InsertTopic(temp_topic);
               M_Req.InsertTopicApprove((string)Session["TopicCode"]);
-              return Json((string)Session["TopicCode"],JsonRequestBehavior.AllowGet);
+              return Json(new { status = "success", id = Session["TopicCode"].ToString(), mail = "EmailRequested", dept=Session["Department"].ToString(), pos = "Approver" },JsonRequestBehavior.AllowGet);
           }
           catch (Exception ex){
               System.Diagnostics.Debug.WriteLine("Exception");
               System.Diagnostics.Debug.WriteLine(ex);
-              return Json(new { code = -1 }, JsonRequestBehavior.AllowGet);
+              return Json(new { status = "error", id = Session["TopicCode"].ToString(), mail = "EmailRequested", dept=Session["Department"].ToString(), pos = "Approver" },JsonRequestBehavior.AllowGet);
           }
         }
 
         [HttpPost, ValidateInput(false)]
-        public ActionResult UpdateRequest(int changeItem,int productType,string model,string partNo, string partName, string processName,string appRadio, string appDescription,string subject,string detail,string timing){
+        public ActionResult UpdateRequest(int changeItem,int productType,string model,string partNo, string partName, string processName,string appRadio, string appDescription,string subject,string detail,string timing,string timingDesc){
           var mode = "Edit";
+          var mail = "";
           var temp_topic = (TopicAlt) Session["Topic"];
-          var status = temp_topic.Status;
+        //   var status = temp_topic.Status;
+          var status = 3;
 
           Session["Mode"] = mode;
           try{
-                var new_topic = new Topic(temp_topic.Code, temp_topic.Type, changeItem, productType, temp_topic.Revision,(string) Session["Department"], model.ReplaceSingleQuote(),partNo.ReplaceSingleQuote(), partName.ReplaceSingleQuote(), processName.ReplaceSingleQuote(), status, appDescription.ReplaceSingleQuote(), subject.ReplaceSingleQuote(), detail.ReplaceSingleQuote(), timing.ReplaceSingleQuote(), (long)Session["RelatedID"],(string)(Session["User"]), date );
+                var new_timing = timing.Split('-');
+                timing = $"{new_timing[2]}{new_timing[1]}{new_timing[0]}000000";
+                var new_topic = new Topic(temp_topic.Code, temp_topic.Type, changeItem, productType, temp_topic.Revision,(string) Session["Department"], model.ReplaceSingleQuote(),partNo.ReplaceSingleQuote(), partName.ReplaceSingleQuote(), processName.ReplaceSingleQuote(), status, appDescription.ReplaceSingleQuote(), subject.ReplaceSingleQuote(), detail.ReplaceSingleQuote(), timing.ReplaceSingleQuote(), timingDesc.ReplaceSingleQuote(), (long)Session["RelatedID"],(string)(Session["User"]), date );
                 if(temp_topic.Status == 3){
+                    mail = "EmailRequested";
                     Session["TopicID"] = M_Req.UpdateTopic(new_topic);
                 }else{
+                    mail = "TopicUpdate";
                     Session["TopicID"] = M_Req.UpdateTopicWithRev(new_topic);
                 }
 
-                return Json(temp_topic.Code, JsonRequestBehavior.AllowGet);
+              return Json(new { status = "success", id = temp_topic.Code, mail, dept=Session["Department"].ToString(), pos = "Approver" },JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex){
 
                 System.Diagnostics.Debug.WriteLine("Exception");
                 System.Diagnostics.Debug.WriteLine(ex);
 
-                return Json(new { code = -1 }, JsonRequestBehavior.AllowGet);
+              return Json(new { status = "error", id = temp_topic.Code, mail, dept=Session["Department"].ToString(), pos = "Approver" },JsonRequestBehavior.AllowGet);
             }
         }
 
 
         [HttpPost]
-        public ActionResult SubmitRelated(string IT,string MKT,string PC1,string PC2,string P1,string P2,string P3A,string P3M,string P4,string P5,string P6,string P7,string PE1,string PE2,string PE2_SMT,string PE2_PCB,string PE2_MT,string PE1_Process,string PE2_Process,string PCH,string QC_IN1,string QC_IN2,string QC_IN3,string QC_FINAL1,string QC_FINAL2,string QC_FINAL3,string QC_NFM1,string QC_NFM2,string QC_NFM3,string QC1,string QC2,string QC3, string P5_ProcessDesign, string P6_ProcessDesign){
+        public ActionResult InsertRelated(List<String> dept_list){
             try{
-                Related related = new Related(IT,MKT,PC1,PC2,P1,P2,P3A,P3M,P4,P5,P6,P7,PE1,PE2,PE2_SMT,PE2_PCB,PE2_MT,PE1_Process,PE2_Process,PCH,QC_IN1,QC_IN2,QC_IN3,QC_FINAL1,QC_FINAL2,QC_FINAL3,QC_NFM1,QC_NFM2,QC_NFM3,QC1,QC2,QC3, P5_ProcessDesign, P6_ProcessDesign);
-                Session["RelatedID"] = M_Req.InsertRelated(related, Session["User"].ToString());
+                Session["RelatedID"] = M_Req.InsertRelated(dept_list, Session["User"].ToString());
                 return Json(new { code = 1 },JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex){
@@ -188,7 +205,7 @@ namespace ChangeControl.Controllers{
         }
 
         [HttpPost]
-        public ActionResult SubmitFile(RawFile file_item){
+        public ActionResult InsertFile(RawFile file_item){
 
             Value temp_file = new Value();
             temp_file = Session["TxtFile"] as Value;
@@ -287,6 +304,53 @@ namespace ChangeControl.Controllers{
             if (br != fs.Length)
                 throw new System.IO.IOException(s);
             return data;
+        }
+        [HttpPost]
+        public void GenerateTopicList(string Department, string Position){
+            var dept = Department ?? "Guest";
+            var pos = Position ?? "Guest";
+            bool isApprover = ViewBag.isApprover = (pos == "Approver") || (pos == "Admin") || (pos == "Special") ;
+            var isPEProcess = ViewBag.isPEProcess = (dept == "PE1_Process" || dept == "PE2_Process"|| dept == "P5_ProcessDesign"|| dept == "P6_ProcessDesign");
+            var isQC = ViewBag.isQC = (dept == "QC1" || dept == "QC2" || dept == "QC3");
+            var confirm_dept_list = M_Home.GetConfirmDeptList();
+
+
+            List<TopicNoti> req_list = new List<TopicNoti>();
+            List<TopicNoti> rv_list = new List<TopicNoti>();
+            List<TopicNoti> tr_list = new List<TopicNoti>();
+            List<TopicNoti> cf_list = new List<TopicNoti>();
+
+            if(dept != null){
+                rv_list.AddRange(M_Home.GetReviewPendingByDepartment(dept));
+                if(isApprover){
+                    req_list.AddRange(M_Home.GetRequestIssuedByDepartment(dept));
+                    rv_list.AddRange(M_Home.GetReviewIssuedByDepartment(dept));
+                }
+                if(isPEProcess){
+                    req_list.AddRange(M_Home.GetRequestApprovedByDepartment(dept));
+                }
+                if(isQC){
+                    rv_list.AddRange(M_Home.GetReviewApproved());
+                    tr_list.AddRange(M_Home.GetTrialApproved());
+                    cf_list.AddRange(M_Home.GetConfirmApproved());
+                }
+                if(confirm_dept_list.Contains(dept)){
+                    cf_list.AddRange(M_Home.GetConfirmPendingByDepartment(dept));
+                    if(isApprover){
+                        cf_list.AddRange(M_Home.GetConfirmIssuedByDepartment(dept));
+                    }
+                }
+                if(M_Home.CheckTrialableByDepartment(dept)){
+                    tr_list.AddRange(M_Home.GetTrialPendingByDepartment(dept));
+                    if(isApprover){
+                        tr_list.AddRange(M_Home.GetTrialIssuedByDepartment(dept));
+                    }
+                }
+                ViewData["TopicRequestList"] = req_list;
+                ViewData["TopicReviewList"] = rv_list;
+                ViewData["TopicTrialList"] = tr_list;
+                ViewData["TopicList"] = cf_list;
+            }
         }
 
     }

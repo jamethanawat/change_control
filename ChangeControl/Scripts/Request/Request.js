@@ -22,8 +22,10 @@ $(document).ready(function () {
 
     
     $('[data-toggle="datepicker"]').datepicker({
-        format: 'dd-mm-yyyy'
+        format: 'dd-MM-yyyy'
     });
+    $("[name='timing']").datepicker('setDate', (this.checked) ? '01-01-9999' : moment().format("DD-MM-YYYY"));
+
 
 /* -------------------------------------------------------------------------- */
 /*                          Department checkbox list                          */
@@ -114,6 +116,10 @@ $(document).ready(function () {
         }
         
         let form = SerializeReviewForm();
+        let quick_form = $(".related_radio").serializeArray();
+        for(x in quick_form){
+            quick_form[x] = quick_form[x].name;
+        }
 
         files = file_list;
         for(var index in files){
@@ -122,11 +128,20 @@ $(document).ready(function () {
         }
         $("#loading").removeClass('hidden');
         var inserted_id = "ER-0000000";
-        $.post(InsertRelatedPath, form, () => {
+        $.post(InsertRelatedPath, { dept_list : quick_form}, () => {
             console.log('Related created');
-            $.post(InsertRequestPath, form, (id) => {
+            $.post(InsertRequestPath, form, (result) => {
+                inserted_id = result.id;
                 console.log('Topic created');
-                inserted_id = id;
+
+                if(result.mail != ""){
+                    $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':inserted_id, 'dept':result.dept, 'pos':result.pos }).fail((error) => {
+                        console.error(error);
+                        swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                        return;
+                    })
+                }
+                
                     var promises = [];
                     console.log('files: ',files);
                     
@@ -178,6 +193,11 @@ $(document).ready(function () {
     $("form.Edit").submit((e) => {
         e.preventDefault();
             let form = SerializeReviewForm();
+            let quick_form = $(".related_radio").serializeArray();
+            for(x in quick_form){
+                quick_form[x] = quick_form[x].name;
+            }
+
             let topic_id = $("form.Edit").attr('id');
             console.log('form: ',form);
             files = file_list;
@@ -188,11 +208,19 @@ $(document).ready(function () {
 
             $("#loading").removeClass('hidden');
             var inserted_id = "ER-0000000";
-            $.post(InsertRelatedPath,form, () => {
+            $.post(InsertRelatedPath,  { dept_list : quick_form}, () => {
                 console.log('Related created');
-                $.post(UpdateRequestPath, form, (id) =>{
+                $.post(UpdateRequestPath, form, (result) =>{
                     console.log('Topic created');
-                    inserted_id = id;
+                    inserted_id = result.id;
+
+                    if(result.mail != ""){
+                        $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':inserted_id, 'dept':result.dept, 'pos':result.pos }).fail((error) => {
+                            console.error(error);
+                            swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                            return;
+                        })
+                    }
                         var promises = [];
                         
                         files.forEach(element => {
@@ -306,6 +334,16 @@ $(document).ready(function () {
         }
     });
 
+/* -------------------------------------------------------------------------- */
+/*                          Change date configulation                         */
+/* -------------------------------------------------------------------------- */
+
+    $("#change_date_switch").on("click", function (e) {
+        $("[name='timing']").datepicker('setDate', (this.checked) ? '01-01-9999' : moment().format("DD-MM-YYYY"));
+        $("[name='timing']").prop('disabled', (this.checked) ? true : false);
+        $("#change_date_desc").toggle();
+    });
+
     function RedirectToDetail(id) {
         window.location.replace(`${RedirectDetail}/?id=${id}`);
     }
@@ -330,3 +368,12 @@ function SerializeArrayReviewForm(){
     return form;
 }
 
+// window.onload = function () {
+//         new Vue({
+//             //this targets the div id app
+//             el: '#vue_change_date',
+//             data: {
+//             active: true
+//         }
+//     })
+// }

@@ -45,7 +45,7 @@ $("#reject").click(() => {
             if(res != null){
                 if(res.trim().length != 0){
                     $.post(RejectTopicPath, {topic_code:topic_code,desc:res}, (result) => { 
-                        if(result.status == "success" && result.mail != null){
+                        if(result.status == "success" && result.mail != null && result.mail != ""){
                             $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, }).fail((error) => {
                                 console.error(error);
                                 swal("Error", "Cannot send email to Requestor, Please try again", "error");
@@ -154,10 +154,10 @@ $("#related_rv").modalWizard();
 $("#related_rv").on("navigate", (e, navDir, stepNumber) => {
     if($("#related_rv").attr("data-current-step") == 2){
         let new_related_string = "";
+        new_related_list = [];
         $(".new_related:checked").each(function () {
             new_related_list.push(this.name);
         });
-        console.log(quick_form);
         new_related_list.forEach(item => {
                 new_related_string = (new_related_string == "") ? item : new_related_string + " , " + item;
         });
@@ -355,7 +355,7 @@ $("form#review").submit((e) => {
     e.preventDefault();
     $('#loading').removeClass('hidden')
     let rv_form = SerializeReviewForm();
-    $.post(SubmitReviewPath, (result) => {
+    $.post(InsertReviewPath, (result) => {
         if(result.mail != ""){
             $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept':result.dept, 'pos':result.pos }).fail((error) => {
                 console.error(error);
@@ -378,7 +378,7 @@ $("form#review").submit((e) => {
             Data.append("description",element.description);
             promises.push($.ajax({
                 type: "POST",
-                url: SubmitFilePath,
+                url: InsertFilePath,
                 data: Data,
                 cache: false,
                 processData: false,
@@ -392,7 +392,7 @@ $("form#review").submit((e) => {
         rv_form.forEach(element => {
             console.log(element);
             promises.push(
-                $.post(SubmitReviewItemPath, {
+                $.post(InsertReviewItemPath, {
                     'status' : element.status,
                     'description' : element.desc,
                     'id' : element.id,
@@ -433,9 +433,9 @@ $("form#Trial").submit((e) => {
             delete files[index].detail;
         }
 
-        promises.push($.post(SubmitTrialPath,{ desc: trial_form[0].value},(result) => {
+        promises.push($.post(InsertTrialPath,{ desc: trial_form[0].value},(result) => {
             if(result.mail != ""){
-                $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept':result.dept, 'pos':pos }).fail((error) => {
+                $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept':result.dept, 'pos':result.pos }).fail((error) => {
                     console.error(error);
                     swal("Error", "Cannot send email to Requestor, Please try again", "error");
                     return;
@@ -448,7 +448,7 @@ $("form#Trial").submit((e) => {
                 Data.append("description",element.description);
                 promises.push($.ajax({
                     type: "POST",
-                    url: SubmitFileTrialPath,
+                    url: InsertFileTrialPath,
                     data: Data,
                     cache: false,
                     processData: false,
@@ -491,9 +491,9 @@ $("form#Confirm").submit((e) => {
             delete files[index].detail;
         }
 
-        promises.push($.post(SubmitConfirmPath,{ desc: confirm_form[0].value},(result) => {
+        promises.push($.post(InsertConfirmPath,{ desc: confirm_form[0].value},(result) => {
             if(result.mail != ""){
-                $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept':result.dept, 'pos':pos }).fail((error) => {
+                $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept':result.dept, 'pos':result.pos }).fail((error) => {
                     console.error(error);
                     swal("Error", "Cannot send email to Requestor, Please try again", "error");
                     return;
@@ -506,7 +506,7 @@ $("form#Confirm").submit((e) => {
                 Data.append("description",element.description);
                 promises.push($.ajax({
                     type: "POST",
-                    url: SubmitFileConfirmPath,
+                    url: InsertFileConfirmPath,
                     data: Data,
                     cache: false,
                     processData: false,
@@ -534,14 +534,17 @@ $("form#Confirm").submit((e) => {
 /* -------------------------------------------------------------------------- */
 /*                               Apply resubmit                               */
 /* -------------------------------------------------------------------------- */
-
     $("form#resubmit_form").submit((e) => {
         e.preventDefault();
-        let quick_form = $("form#resubmit_form").serialize();
+        let quick_form = $(".rsm_related_radio").serializeArray();
+        for(x in quick_form){
+            quick_form[x] = quick_form[x].name;
+        }
+
         console.log(quick_form);
-        $.post(SubmitRelatedPath, quick_form, () =>{
+        $.post(InsertRelatedPath, {dept_list:quick_form}, () =>{
             console.log('Related created');
-            $.post(RequestResubmitPath, quick_form, (res) =>{
+            $.post(RequestResubmitPath, $("#resubmit_form").serialize(), (res) =>{
                 console.log('Resubmit created');
                 if(res.code){
                     moment.locale('en');
@@ -564,14 +567,25 @@ $("form#Confirm").submit((e) => {
 
 $("form#related_form").submit((e) => {
     e.preventDefault();
+
+    let new_dept_related = $(".new_related").serializeArray();
+    for(x in new_dept_related){
+        new_dept_related[x] = new_dept_related[x].name;
+    }
+
     $(".new_related").attr("disabled",false);
-    let quick_form = $(".new_related").serialize();
-    console.log(quick_form);
-    $.post(SubmitRelatedPath, quick_form, () =>{
+    
+    let new_all_related = $(".new_related").serializeArray();
+    for(x in new_all_related){
+        new_all_related[x] = new_all_related[x].name;
+    }
+    
+    console.log(new_all_related);
+    $.post(InsertRelatedPath, {dept_list : new_all_related}, () =>{
         console.log('Related created');
         $.post(UpdateTopicRelatedPath,(res) => {
             if(res.status == "success"){
-                $.post(GenerateMailPath,{ 'mode': 'InformUser', 'topic_code':topic_code, 'dept_arry': new_related_list, }).fail((error) => {
+                $.post(GenerateMailPath,{ 'mode': 'InformUser', 'topic_code':topic_code, 'dept_arry': new_dept_related, }).fail((error) => {
                     console.error(error);
                     swal("Error", "Cannot send email to Related user, Please try again", "error");
                     return;
@@ -602,7 +616,7 @@ $("form#related_form").submit((e) => {
                 delete files[index].detail;
             }
 
-            promises.push($.post(SubmitResponsePath,{ desc: form_response[0].value, resubmit_id: rsm_id},() => {
+            promises.push($.post(InsertResponsePath,{ desc: form_response[0].value, resubmit_id: rsm_id},() => {
                 console.log('Inserted item');
                 files.forEach(element => {
                     var Data = new FormData();
@@ -610,7 +624,7 @@ $("form#related_form").submit((e) => {
                     Data.append("description",element.description);
                     promises.push($.ajax({
                         type: "POST",
-                        url: SubmitFileResponsePath,
+                        url: InsertFileResponsePath,
                         data: Data,
                         cache: false,
                         processData: false,

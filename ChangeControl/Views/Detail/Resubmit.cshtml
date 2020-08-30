@@ -19,7 +19,7 @@
                     <div class="timeline-header card-header d-flex" style="padding: 10px 10px 5px 10px;"  data-card-widget="collapse">
                         @{
                             var list = Resubmit.RelatedList as List<RelatedAlt>;
-                            var c_response = list.FindAll(Related => Related.status == 1);
+                            var c_response = list.FindAll(Related => Related.Response == 1);
                         }
                             <h6 class="mr-auto" style="font-family:Kanit"> Related Department : @list.Count (Replied : @c_response.Count)</h6>
                             <button type="button" class="btn btn-tool arrow-collapse" data-card-widget="collapse"><i class="fas fa-chevron-down"></i></button>
@@ -59,8 +59,8 @@
                                 var RelatedList = Resubmit.RelatedList;
                                 var i=0;
                                     foreach (var Related in RelatedList){
-                                        var isResponsed = (Related.status == 1) ? true : false;
-                                        @(i>0?" , ":"")@Related.name
+                                        var isResponsed = (Related.Response == 1) ? true : false;
+                                        @(i>0?" , ":"")@Related.Department
                                         i++;
                                     }
                                 }
@@ -116,7 +116,7 @@
                 </div>
                 <!-- END timeline item -->
             }
-            if(list.Exists(Related => Related.status == 0 && Related.name == Session["Department"].ToString())){
+            if(list.Exists(Related => Related.Response == 0 && Related.Department == Session["Department"].ToString())){
             <!-- timeline item -->
             <div>
                 <i class="fas fa-pen bg-warning"></i>

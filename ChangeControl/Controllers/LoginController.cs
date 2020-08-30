@@ -16,9 +16,13 @@ namespace ChangeControl.Controllers{
         
         private LoginModel M_Login;
         public List<Department> A = new List<Department>();
+        private HomeModel M_Home;
+
         private string admin = "63014";
         public LoginController(){
             M_Login = new LoginModel();
+            M_Home = new HomeModel();
+
             res.data = null;
             res.status = null;
         }
@@ -50,15 +54,23 @@ namespace ChangeControl.Controllers{
                     
                     res = M_Login.GetPositionByUserID(username);
                     Session["Position"] = pos = (res.status == "success") ? res.data : "Issue";
-                    res = M_Login.GetDepartmentByUserID(username);
+                    if(pos == "Admin"){
+                        Session["Department"] = "IT";
+                        Session["Position"] = "Admin";
+                        Session["DepartmentID"] = 9;
+                    }else if(pos != "Guest"){
+                        res = M_Login.GetDepartmentByUserID(username);
+                    }
                     
-                    if(res.status == "success"){
+                    if(pos == "Admin"){
+                        status = "success";
+                    }else if(res.status == "success"){
                         SetDepartment(res.data);
                         status = "success";
                     }else{
                         status = "guest";
                         Session["Department"] = "Guest";
-                        Session["Position"] = "Guest";
+                        Session["DepartmentID"] = 46;
                     }
                 }
                 }catch(Exception err){
@@ -225,6 +237,54 @@ namespace ChangeControl.Controllers{
 
         public ActionResult GetDepartmentListByUserID(string us_id){
             return Json(new { data = M_Login.GetDepartmentListByUserID(us_id) }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public void GenerateTopicList(string Department, string Position){
+            var dept = Department ?? "Guest";
+            var pos = Position ?? "Guest";
+            bool isApprover = ViewBag.isApprover = (pos == "Approver") || (pos == "Admin") || (pos == "Special") ;
+            var isPEProcess = ViewBag.isPEProcess = (dept == "PE1_Process" || dept == "PE2_Process"|| dept == "P5_ProcessDesign"|| dept == "P6_ProcessDesign");
+            var isQC = ViewBag.isQC = (dept == "QC1" || dept == "QC2" || dept == "QC3");
+            var confirm_dept_list = M_Home.GetConfirmDeptList();
+
+
+            List<TopicNoti> req_list = new List<TopicNoti>();
+            List<TopicNoti> rv_list = new List<TopicNoti>();
+            List<TopicNoti> tr_list = new List<TopicNoti>();
+            List<TopicNoti> cf_list = new List<TopicNoti>();
+
+            if(dept != null){
+                rv_list.AddRange(M_Home.GetReviewPendingByDepartment(dept));
+                if(isApprover){
+                    req_list.AddRange(M_Home.GetRequestIssuedByDepartment(dept));
+                    rv_list.AddRange(M_Home.GetReviewIssuedByDepartment(dept));
+                }
+                if(isPEProcess){
+                    req_list.AddRange(M_Home.GetRequestApprovedByDepartment(dept));
+                }
+                if(isQC){
+                    rv_list.AddRange(M_Home.GetReviewApproved());
+                    tr_list.AddRange(M_Home.GetTrialApproved());
+                    cf_list.AddRange(M_Home.GetConfirmApproved());
+                }
+                if(confirm_dept_list.Contains(dept)){
+                    cf_list.AddRange(M_Home.GetConfirmPendingByDepartment(dept));
+                    if(isApprover){
+                        cf_list.AddRange(M_Home.GetConfirmIssuedByDepartment(dept));
+                    }
+                }
+                if(M_Home.CheckTrialableByDepartment(dept)){
+                    tr_list.AddRange(M_Home.GetTrialPendingByDepartment(dept));
+                    if(isApprover){
+                        tr_list.AddRange(M_Home.GetTrialIssuedByDepartment(dept));
+                    }
+                }
+                ViewData["TopicRequestList"] = req_list;
+                ViewData["TopicReviewList"] = rv_list;
+                ViewData["TopicTrialList"] = tr_list;
+                ViewData["TopicList"] = cf_list;
+            }
         }
     }
 }

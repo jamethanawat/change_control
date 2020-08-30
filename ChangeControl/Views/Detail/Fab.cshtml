@@ -83,7 +83,7 @@
                                 <legend class="w-auto"> <input type="checkbox" class="checkAll qForm" id="rs-@DepartmentGroup.Name"/> <label for="rs-@DepartmentGroup.Name" style="display: contents;">@departMentGroupName</label></legend> 
                                 <ul class="checkbox"> 
                                     @foreach(var Department in DepartmentGroup.Department){
-                                        <li><input type="checkbox" class="checkSingle rs-@DepartmentGroup.Name qForm" id="rs-@Department.ID" value="1" name="@Department.Name" /><label for="rs-@Department.ID">@Department.Name</label></li> 
+                                        <li><input type="checkbox" class="rsm_related_radio checkSingle rs-@DepartmentGroup.Name qForm" id="rs-@Department.ID" value="1" name="@Department.Name" /><label for="rs-@Department.ID">@Department.Name</label></li> 
                                     }
                                 </ul> 
                             </fieldset> 

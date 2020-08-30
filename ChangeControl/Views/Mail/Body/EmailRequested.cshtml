@@ -1,12 +1,13 @@
 ﻿
     <p> 
       <strong>Subject : </strong>
-      Process change no. <b>@Model.Code</b> Audit Request more document.
+      Process change no. <b>@Model.Code</b> please approve request.
     </p>
     <p>Dear all concernings,</p>
     <p>
       According to  <b>@Model.Code</b> of model <b>@Model.Model</b> Part no. <b>@Model.PartNo</b> <br> 
-      Audit request more document within <b>@ViewBag.DueDate</b>.
+      @* review by <b>@Model.Profile.FullName</b>  *@
+      within <b>@DateTime.Now.AddDays(10).ToString("d MMMM yyyy")</b> Please review data.
     </p>
     <p>For more details, please click this <a href="@ViewBag.Url">Link.</a></p>
     <p>Best Regards</p>

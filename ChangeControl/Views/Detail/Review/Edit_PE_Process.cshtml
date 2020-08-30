@@ -29,7 +29,7 @@
                         <label for="inputAcceptance" class="col-sm-3 col-form-label">Evaluation result</label>
 
                         @{ TempItem = ItemList.Find(Item => Item.Type == 0) ?? BlankItem; }
-                        <div class="col-sm-3 col-form-label">
+                        <div class="col-sm-9 col-form-label">
                             <label class="mr-3">
                                 <input data-type="status" data-id="0" type="radio" name="rd-0" value="1" class="flat-red" @(TempItem.Status == 1 ? "checked" : "")>
                                 Acceptance
@@ -39,10 +39,10 @@
                                 Not, Acceptance
                             </label>
                         </div>
-                        <div class="col-sm-6 col-form-label">
+                        @* <div class="col-sm-6 col-form-label">
                             <label>Not Approve reason :</label>
                             <input data-type="desc" data-id="0" type="text" name="desc-0" class="form-control " placeholder="200 character limit" value="@TempItem.Description">
-                        </div>
+                        </div> *@
                     </div>
                     <div class="form-group row">
                         <label for="inputChangeDetails" class="col-sm-3 col-form-label">Change date</label>

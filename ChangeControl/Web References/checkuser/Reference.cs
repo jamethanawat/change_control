@@ -13,7 +13,7 @@
 // 
 #pragma warning disable 1591
 
-namespace ChangeControl.CheckUser {
+namespace ChangeControl.checkuser {
     using System;
     using System.Web.Services;
     using System.Diagnostics;

@@ -20,7 +20,7 @@ $(() => {
                     if(res == "True"){
                         $.post(ApproveConfirmPath, {confirm_id:cf_id}, (result) => {
                             if(result){
-                                if(result.mail != ""){
+                                if(result.mail != "" && result.mail != null){
                                     $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept': result.dept, }).fail((error) => {
                                         console.error(error);
                                         swal("Error", "Cannot send email to Requestor, Please try again", "error");
@@ -75,7 +75,7 @@ $(() => {
                     Data.append("description",element.description);
                     promises.push($.ajax({
                         type: "POST",
-                        url: SubmitFileConfirmPath,
+                        url: InsertFileConfirmPath,
                         data: Data,
                         cache: false,
                         processData: false,

@@ -2,28 +2,27 @@
 @{
     var str_date = "05 มิถุนายน 2020";
     string department = (string)Session["Department"];
-    var isApprover = ((string)Session["Position"] == "Approver" || (string)Session["Position"] == "Admin");
-    var isQC = ((string)Session["Department"] == "QC1" || (string)Session["Department"] == "QC2" || (string)Session["Department"] == "QC3");
     List<Trial> ElementList = Model as List<Trial>;
+    var Topic = ViewData["Topic"] as TopicAlt;
 }
 
 @* /* --------------------- Show list that related to user --------------------- */ *@
 @if(ElementList.Exists(e => e.Department == department)){
         Trial Element = ElementList.Find(e => e.Department == department);
         if(Element != null){
-            @DefaultList(ElementList, Element, department, isApprover, isQC)
+            @DefaultList(ElementList, Element, department)
         }
 }
 
 @* /* --------------------- Show list of pending department -------------------- */ *@
-@foreach(var Element in ViewBag.TrialRelatedList){
-    if(Element.status == 0){
+@foreach(var Element in Topic.RelatedListAlt){
+    if(Element.Trial == 0 && Element.Department != "QC1" && Element.Department != "QC2" && Element.Department != "QC3"){
     <div>
         <i class="fa fa-hourglass-half  bg-secondary blue-tooltip"></i>
         <div class="timeline-item card">
             <div class="timeline-header card-header d-flex" style="padding: 10px 10px 5px 10px;"  data-card-widget="collapse">
                     <h6 class="mr-auto" style="font-family:Kanit"> 
-                        @Element.name
+                        @Element.Department
                         <span class='badge badge-pill badge-secondary'>PENDING
                                 <i class='fa fa-hourglass-half '></i>
                         </span> </h6>
@@ -37,12 +36,12 @@
 @foreach(var Element in Model){
     if(Element != null){
         if(Element.Department != department){
-            @DefaultList(ElementList, Element, department, isApprover, isQC)
+            @DefaultList(ElementList, Element, department)
         }
     }
 }
 
-@helper DefaultList(List<Trial> ElementList, Trial Element, string department, bool isApprover, bool isQC){
+@helper DefaultList(List<Trial> ElementList, Trial Element, string department){
     <div>
     @* <i class="fas bg-primary" style="font-family:Kanit !important">@Html.DisplayFor(model => Element.Department)</i> *@
     @if(Element.Status == 1){
@@ -117,13 +116,13 @@
         </div>
         @{
             var isDepartment = (department == Element.Department);
-            @* if((isApprover || isDepartment) && Element.Status != 1  && (string)Session["Status"] == "Element"){ *@
+            @* if((ViewBag.isApprover || isDepartment) && Element.Status != 1  && (string)Session["Status"] == "Element"){ *@
             if((isDepartment) && (string)Session["Status"] == "Trial"){
             <hr style="margin-top:0px !important">
             <div class="timeline-footer">
                 <div class="float-right ">
                     <a href="#" class="btn btn-warning btn-sm tr-edit"id="edit_tr" data-toggle="modal" data-target="#edit_trial" value="@Element.ID" >Edit</a>
-                        @if(isApprover && ((Element.Status !=1 && !isQC) || (!ElementList.Exists(e => e.Status == 3 && e.Department != "QC1" && e.Department != "QC2" && e.Department != "QC3") && isQC))){ 
+                        @if(ViewBag.isApprover && ((Element.Status !=1 && !ViewBag.isQC) || (!ElementList.Exists(e => e.Status == 3 && e.Department != "QC1" && e.Department != "QC2" && e.Department != "QC3") && ViewBag.isQC)) ){ 
                             <button a href="#" class="btn btn-info btn-sm mr-1 tr-approve" value="@Element.ID">Approve</button> 
                         }
                 </div>

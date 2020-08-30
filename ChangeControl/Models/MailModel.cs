@@ -46,7 +46,7 @@ namespace ChangeControl.Models{
          } 
 
         public Department GetDepartmentIdByDepartmentName(string Department){
-            var sql = $"SELECT TOP (1) ID_Department AS Id FROM dbo.[Department] WHERE Department.Name = '{Department}' OR Department.Name LIKE '{Department}%'";
+            var sql = $"SELECT TOP (1) ID AS Id FROM dbo.[Department] WHERE Department.Name = '{Department}' OR Department.Name LIKE '{Department}%'";
             var result = DB_CCS.Database.SqlQuery<Department>(sql).First();
             return result;
         }
@@ -54,7 +54,7 @@ namespace ChangeControl.Models{
         public TopicAlt GetTopicByCode(string topic_code){
             try{
                 var sql = $@"SELECT  Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Department, Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, Timing, Related, User_insert, Time_insert, 
-                ID FROM CCS.dbo.Topic 
+                ID FROM Topic 
                 LEFT JOIN Change_Item ON Topic.Change_item = ID_Change_item 
                 LEFT JOIN Product_Type ON Topic.Product_Type = ID_Product_Type 
                 WHERE  Code = '{topic_code}' ORDER BY Revision DESC;";
@@ -68,7 +68,7 @@ namespace ChangeControl.Models{
 
         public List<string> GetEmailByDept(string dept){
             try{
-                var sql = $@"SELECT [User].Email FROM CCS.dbo.Permission
+                var sql = $@"SELECT [User].Email FROM Permission
                             LEFT JOIN [User] ON [User].Code = Permission.[User]
                             WHERE Permission.Department = '{dept}'
                             AND Active = '1'
@@ -82,13 +82,15 @@ namespace ChangeControl.Models{
         }
         public List<string> GetEmailByDeptAndPosition(string dept, string pos = ""){
             try{
-                var sql = $@"SELECT [User].Email FROM CCS.dbo.Permission
+                var sql = $@"SELECT [User].Email FROM Permission
                             LEFT JOIN [User] ON [User].Code = Permission.[User]
-                            WHERE Permission.Department = '{dept}'" + 
-                            (pos != "" ? "AND [Position] = '{pos}'" : null) + 
-                            @"AND Active = '1'
-                            AND Subscribe = '1'
-                            ;";
+                            WHERE Permission.Department = '{dept}' ";
+                if(pos == "Approver"){
+                    sql += $"AND ([Position] = 'Approver' OR [Position] = 'Special' OR [Position] = 'Admin') ";
+                }
+                sql += @"AND Active = '1'
+                        AND Subscribe = '1';";
+
                 var result = DB_CCS.Database.SqlQuery<string>(sql).ToList();
                 return result;
             }catch(Exception ex){
@@ -96,17 +98,18 @@ namespace ChangeControl.Models{
             }
         }
 
-        public Related GetRelatedByTopicCode(string topic_code){
+        public List<string> GetRelatedByTopicCode(string topic_code){
             try{
-                var sql = $@"SELECT P1, P2, P3A, P3M, P4, P5, P6, P7, IT, MKT, PC1, PC2, PCH, PE1, PE2, PE2_SMT, PE2_PCB, PE2_MT, QC_IN1, QC_IN2, QC_IN3, QC_FINAL1, QC_FINAL2, QC_FINAL3, QC_NFM1, QC_NFM2, QC_NFM3, QC1, QC2, QC3, PE1_Process, PE2_Process , P5_ProcessDesign, P6_ProcessDesign
-                FROM CCS.dbo.Related 
-                LEFT JOIN Topic ON Related.ID = Topic.Related 
-                WHERE Topic.Code = '{topic_code}';";
-                var result = DB_CCS.Database.SqlQuery<Related>(sql).First();
+                var sql = $@"SELECT Related.Department
+                    FROM Related 
+                    LEFT JOIN Topic On Related.PK_Related = Topic.Related
+                    WHERE Topic.Code = '{topic_code}'
+                    AND Topic.Revision  = (SELECT MAX(t.Revision) FROM Topic t WHERE t.Code = Topic.Code) 
+                    ;";
+                var result = DB_CCS.Database.SqlQuery<string>(sql).ToList();
                 return result;
             }catch(Exception ex){
-                Related blank_related = new Related();
-                return blank_related;
+                return new List<string>();
             }
         }
     }

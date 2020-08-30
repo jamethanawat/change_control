@@ -14,11 +14,14 @@
     List<Confirm> ConfirmList = ViewBag.ConfirmList as List<Confirm>;
 
     TopicAlt Topic = ViewData["Topic"] as TopicAlt;
-    bool isApprover = ViewBag.isApprover = ((string)Session["Position"] == "Approver") || ((string)Session["Position"] == "Admin") ;
+    
+    var department = (Session["Department"] != null) ? Session["Department"].ToString() : null;
+    var pos = (Session["Position"] != null) ? Session["Position"].ToString() : null;
+
 
     var isTrialable = (bool) ViewData["isTrialable"];
-    string department = (string)Session["Department"];
 
+    bool isApprover = ViewBag.isApprover = (pos == "Approver") || (pos == "Admin") || (pos == "Special") ;
     var isPEProcess = ViewBag.isPEProcess = (department == "PE1_Process" || department == "PE2_Process"|| department == "P5_ProcessDesign"|| department == "P6_ProcessDesign");
     var isQC = ViewBag.isQC = (department == "QC1" || department == "QC2" || department == "QC3");
 
@@ -27,10 +30,8 @@
     var status = status_define[Topic.Status];
     Session["Status"] = status;
 
-    var tc_list = Topic.RelatedListAlt as List<RelatedAlt>;
-
-    var isReview = (tc_list.Exists(Related => Related.status == 1 && Related.name == Session["Department"].ToString()));
-    var isRelated = (tc_list.Exists(Related => Related.name == Session["Department"].ToString()));
+    var isReview = (Topic.RelatedListAlt.Exists(Related => Related.Review == 1 && Related.Department == Session["Department"].ToString()));
+    var isRelated = (Topic.RelatedListAlt.Exists(Related => Related.Department == Session["Department"].ToString()));
     var isTrial = (TrialList.Exists(trial => trial.Department == Session["Department"].ToString()));
     var isConfirm = (ConfirmList.Exists(confirm => confirm.Department == Session["Department"].ToString()));
     @* var isConfirm = (ConfirmList.Exists(confirm => confirm.Status == 3 && confirm.Department == Session["Department"].ToString())); *@
@@ -40,16 +41,13 @@
     var Resubmitable = (isQC || isPEProcess) && isRelated && (status != "Waiting" && status != "Finished" && status != "Rejected");
     var Editable = ((status == "Waiting" || status == "Request") && Session["Department"].ToString() == Topic.Department);
     var TopicApproveable = (status == "Waiting" && Session["Department"].ToString() == Topic.Department && isApprover);
-    
-    List<RelatedAlt> rv_related_list = ViewData["ReviewRelatedList"] as List<RelatedAlt>;
-    List<RelatedAlt> tr_related_list = ViewData["TrialRelatedList"] as List<RelatedAlt>;
-    List<RelatedAlt> cf_related_list = ViewData["ConfirmRelatedList"] as List<RelatedAlt>;
-    
-    var pe_audit = (rv_related_list.Find(e => e.name == "PE1_Process" || e.name == "PE2_Process"));
-    var QcReviewable = (rv_related_list != null) ? (rv_related_list.Exists(e => e.status == 0 && (e.name == "QC1" || e.name == "QC2" || e.name == "QC3") && rv_related_list.Count(d => d.status == 0) == 1) && !ReviewList.Exists(rv => rv.Status == 3)) : false;
-    var QcTrialable = (tr_related_list != null) ? (!tr_related_list.Exists(e => e.status == 0) && !TrialList.Exists(tr => tr.Status == 3)) : false;
-    var QcConfirmable = (cf_related_list != null) ? (cf_related_list.Exists(e => e.status == 0 && (e.name == "QC1" || e.name == "QC2" || e.name == "QC3") && cf_related_list.Count(d => d.status == 0) == 1)  && !ConfirmList.Exists(cf => cf.Status == 3)) : false;
-    
+
+    var pe_audit = (Topic.RelatedListAlt.Find(e => e.Department == "PE1_Process" || e.Department == "PE2_Process" || e.Department == "P5_ProcessDesign"  || e.Department == "P6_ProcessDesign" ));
+
+    var QcReviewable = ViewBag.QcReviewable = (Topic.RelatedListAlt != null) ? (Topic.RelatedListAlt.Exists(e => e.Review == 0 && (e.Department == "QC1" || e.Department == "QC2" || e.Department == "QC3") && Topic.RelatedListAlt.Count(d => d.Review == 0) == 1) && !ReviewList.Exists(rv => rv.Status == 3)) : false;
+    var QcTrialable = ViewBag.QcTrialable = (Topic.RelatedListAlt != null) ? (Topic.RelatedListAlt.Exists(e => e.Trial == 2 && (e.Department == "QC1" || e.Department == "QC2" || e.Department == "QC3") && !Topic.RelatedListAlt.Exists(d => d.Trial == 0)) && !TrialList.Exists(tr => tr.Status == 3)) : false;
+    var QcConfirmable = ViewBag.QcConfirmable = (Topic.RelatedListAlt != null) ? (Topic.RelatedListAlt.Exists(e => e.Confirm == 0 && (e.Department == "QC1" || e.Department == "QC2" || e.Department == "QC3")) && !Topic.RelatedListAlt.Exists(e => e.Confirm == 0 && (ViewBag.cf_list.Contains(e.Department))) && !ConfirmList.Exists(cf => cf.Status == 3)) : false;
+
 }
 
 <script type="text/javascript">
@@ -57,7 +55,7 @@
     var topic_status = '@status';
     var topic_id = '@Topic.ID';
     var topic_code = '@Topic.Code';
-    var pe_audit = '@(pe_audit != null ? pe_audit.name : null)';
+    var pe_audit = '@(pe_audit != null ? pe_audit.Department : null)';
     var isQC = '@isQC'.toLowerCase() == 'true' ? true : false;
     var isTrialable = '@isTrialable'.toLowerCase() == 'true' ? true : false;
     var isReview = '@isReview'.toLowerCase() == 'true' ? true : false;
@@ -111,7 +109,7 @@
         transition: background-color .3s, opacity .5s, visibility .5s;
         opacity: 0;
         visibility: hidden;
-        z-index: 50;
+        z-index: 19;
         left: 56%;
         cursor: pointer;
     }
@@ -148,15 +146,6 @@
         padding: 0px 10px 10px 10px !important;
     }
  
-    .bg-warning, .bg-warning>a {
-        color: white !important;
-    }
-
-    .btn-warning, .btn-warning>a {
-        color: white !important;
-        cursor: pointer;
-    }
-
     .tooltip-inner {
         background-color: #007bff;
     }
@@ -186,11 +175,6 @@
     .file-list .mailbox-attachments li {
         width: 180px;
         transition: transform 0.5s !important;
-    }
-
-    .badge-warning, .bg-warning, .btn-warning{
-        color: white !important;
-        background: #ff9900 !important;
     }
 
     p.text-muted {
@@ -377,18 +361,18 @@
     var ApproveTrialPath = '@Url.Action("ApproveTrial", "Detail")';
     var UpdateTrialPath = '@Url.Action("UpdateTrial", "Detail")';
 
-    var SubmitRelatedPath = '@Url.Action("SubmitRelated", "Detail")';
+    var InsertRelatedPath = '@Url.Action("InsertRelated", "Detail")';
     var RequestResubmitPath = '@Url.Action("RequestResubmit", "Detail")';
-    var SubmitResponsePath = '@Url.Action("SubmitResponse", "Detail")';
-    var SubmitFileResponsePath = '@Url.Action("SubmitFileResponse", "Detail")';
+    var InsertResponsePath = '@Url.Action("InsertResponse", "Detail")';
+    var InsertFileResponsePath = '@Url.Action("InsertFileResponse", "Detail")';
 
-    var SubmitReviewPath = '@Url.Action("SubmitReview", "Detail")';
-    var SubmitReviewItemPath = '@Url.Action("SubmitReviewItem", "Detail")';
-    var SubmitFilePath = '@Url.Action("SubmitFile", "Detail")';
-    var SubmitTrialPath = '@Url.Action("SubmitTrial", "Detail")';
-    var SubmitFileTrialPath = '@Url.Action("SubmitFileTrial", "Detail")';
-    var SubmitConfirmPath = '@Url.Action("SubmitConfirm", "Detail")';
-    var SubmitFileConfirmPath = '@Url.Action("SubmitFileConfirm", "Detail")';
+    var InsertReviewPath = '@Url.Action("InsertReview", "Detail")';
+    var InsertReviewItemPath = '@Url.Action("InsertReviewItem", "Detail")';
+    var InsertFilePath = '@Url.Action("InsertFile", "Detail")';
+    var InsertTrialPath = '@Url.Action("InsertTrial", "Detail")';
+    var InsertFileTrialPath = '@Url.Action("InsertFileTrial", "Detail")';
+    var InsertConfirmPath = '@Url.Action("InsertConfirm", "Detail")';
+    var InsertFileConfirmPath = '@Url.Action("InsertFileConfirm", "Detail")';
     
     var CheckApproveIPPPath = '@Url.Action("CheckApproveIPP", "Detail")';
     
@@ -599,22 +583,27 @@
                                             &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span> @Topic.Department -  @Topic.Profile.FullName (@Topic.Time_insert)</span>
                                     @if(status != "Waiting" && Topic.ApprovedBy != null){
                                         <h4 class="mt-3">Approved By</h4>
-                                            @:&nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span> @Topic.Department -  @Topic.ApproverProfile.FullName (@Topic.ApprovedDate)</span>
+                                            try{
+                                                @:&nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span> @Topic.Department -  @Topic.ApproverProfile.FullName (@Topic.ApprovedDate)</span>
+                                            }catch(Exception err){
+                                                <script>
+                                                   window.location.reload();
+                                                </script>
+                                            }
                                     }
                                         <h4 class="mt-3">Subject/Purpose for change</h4>
                                             &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Subject.ReplaceNullWithDash().TrimStart()))</span>
                                         <h4 class="mt-3">Change Details</h4>
                                             &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Detail.ReplaceNullWithDash().TrimStart()))</span>
                                         <h4 class="mt-3">Change Date</h4>
-                                            &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Timing.ReplaceNullWithDash().TrimStart()))</span>
+                                            &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Timing.ReplaceNullWithDash().TrimStart()))</span> <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.TimingDesc.ReplaceNullWithDash().TrimStart()))</span>
                                         <h4 class="mt-3">Related Department</h4>
                                             &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>
                                             @{
-                                                var RelatedList = Topic.RelatedListAlt;
                                                 var j=0;
-                                                foreach (var Related in RelatedList){
-                                                    var isResponsed = (Related.status == 1) ? true : false;
-                                                    @(j>0?" , ":"")@Related.name
+                                                foreach (var Related in Topic.RelatedListAlt){
+                                                    var isResponsed = (Related.Review == 1) ? true : false;
+                                                    @(j>0?" , ":"")@Related.Department
                                                     j++;
                                                 }
                                             }
@@ -629,12 +618,13 @@
                                 }   
                                     </div>
                                     <!------------------------------------QUALITY CONTROL---------------------------------------------------------->
-                                @if(ReviewList.Count != 0){
+                                @if(isExternal || ReviewList.Count != 0){
                                     <hr>
                                     @* <h1>Quality Control</h1> *@
                                     <!-- The timeline -->
                                     <div class="timeline timeline-inverse">
-                                        <!-- timeline time label -->
+
+                @* /* ------------------------------- Review List ------------------------------ */ *@
                                         <div class="time-label">
                                             <span class="bg-primary">
                                                 Review <br> 
@@ -643,21 +633,23 @@
                                         </div>
                                             @Html.Partial("Review/List",ReviewList) 
 
+                @* /* ------------------------------- Trial List ------------------------------ */ *@
                                         @if(status == "Trial" || status == "Confirm" || status == "Finished"){
                                         <div class="time-label">
-                                            @if(tr_related_list.Count() > 0){ //Request trial not exist
+                                            @if((Topic.RelatedListAlt.Count(e => e.Trial == 1) > 0 && status != "Trial") || status == "Trial"){ //Request trial not exist
                                                 <span class="bg-primary">
-                                                    Trail and following
+                                                    Trail & Confirm
                                                 </span>
                                             }
                                         </div>
                                             @Html.Partial("Trial/List",TrialList) 
                                         }
 
+                @* /* ------------------------------- Confirm List ------------------------------ */ *@
                                         @if(status == "Confirm" || status == "Finished"){
                                         <div class="time-label">
                                             <span class="bg-primary">
-                                                Confirm status
+                                                Initial Production
                                             </span>
                                         </div>
                                             @Html.Partial("Confirm/List",ConfirmList) 
@@ -691,7 +683,7 @@
                                 }else if((isTrialable || (QcTrialable && isQC)) && !isTrial && status == "Trial"){
                                 @* /* ----------------------------- Trial section ----------------------------- */ *@
                                     <hr><br>
-                                    <h1>Trial</h1><br>
+                                    <h1>Trial & Confirm</h1><br>
                                     <form class="form-horizontal"  action="javascript:void(0);" id="Trial">
                                     <div class="form-group row">
                                         <label class="col-sm-2 col-form-label"> Description: </label>
@@ -715,7 +707,7 @@
                                 }else if(((ViewBag.cf_list.Contains(department) && !isQC) || (isQC && QcConfirmable)) && !isConfirm && status == "Confirm"){
                                 @* /* ----------------------------- Confirm section ----------------------------- */ *@
                                     <hr><br>
-                                    <h1>Confirm</h1><br>
+                                    <h1>Initial Production</h1><br>
                                     <form class="form-horizontal"  action="javascript:void(0);" id="Confirm">
                                     <div class="form-group row">
                                         <label class="col-sm-2 col-form-label"> Description: </label>

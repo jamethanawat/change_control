@@ -34,7 +34,8 @@ $(document).ready(function () {
 /* ------------------------------ Add pre-word ------------------------------ */
 
     $("#TNScontrolNo").on("click",(e) => {
-        $("input[name='status']").prop("checked",false);
+        $("[name='overstatus'][value=1]").prop("checked",true)
+        $("[name='status'][value=0]").prop("checked",true)
         let chang_type_val = $("#changeType").val();
         if(chang_type_val  == "Internal"){
             e.target.value = "IN-";
@@ -42,6 +43,7 @@ $(document).ready(function () {
             e.target.value = "EX-";
         }
     });
+    
     var table_cr;
     table_cr = $('#ChangeRequestTable').DataTable();
 
@@ -84,6 +86,17 @@ $(document).ready(function () {
         });
     });
 
+/* ------------------------------- Change Date ------------------------------ */
+    $("#change_date_switch").prop("checked", true);
+    $("#date_range").prop("disabled", true);
+    $("#date_range").css('color', '#e9ecef');
+
+    $("#change_date_switch").on("click", function (e) {
+        $("#date_range").prop("disabled", (this.checked) ?  true : false);
+        $("#date_range").css('color', (this.checked) ?  '#e9ecef' : '#495057');
+    });
+
+
 /* -------------------------------------------------------------------------- */
 /*                            Clear radio and input                           */
 /* -------------------------------------------------------------------------- */
@@ -100,9 +113,15 @@ $(document).ready(function () {
         $("[name='dept']").val("");
         $("#processname").val("");
         $("[name='overstatus'][value=1]").prop("checked",true)
-        $("[name='status'][value=7]").prop("checked",true)
+        $("[name='status'][value=0]").prop("checked",true)
         $("#TNScontrolNo").val("");
         $("#TNScontrolNo").attr("placeholder","__-_______");
+        $('#date_range').data('daterangepicker').setStartDate(moment().format('DD/MM/YYYY'));
+        $('#date_range').data('daterangepicker').setEndDate(moment().format('DD/MM/YYYY'));
+        $("#date_range").prop("disabled", false);
+        $("#date_range").css('color', '#495057');
+
+
     });
 
 /* -------------------------------------------------------------------------- */
@@ -112,10 +131,12 @@ $(document).ready(function () {
     $("#search").click((e) => {
         e.preventDefault();
         let status = $("input[name='status']:checked").val() || 0;
+        
         var temp_data = {
             'Type': $("#changeType").val(),
             'Status': status,
-            'Date': $("[name='date']").val(),
+            'StartDate': ($("#date_range").is(":disabled")) ? null : $('#date_range').data('daterangepicker').startDate.format('YYYYMMDD'),
+            'EndDate': ($("#date_range").is(":disabled")) ? null : $('#date_range').data('daterangepicker').endDate.format('YYYYMMDD'),
             'ProductType': $("#productType").val(),
             'Overstatus': $("input[name='overstatus']:checked").val(),
             'Changeitem': $("#changeitem").val(),
@@ -155,6 +176,8 @@ $(document).ready(function () {
                     },
                     {"targets": 7,
                         "render": function (data, type, row) {
+                            data = (data == "Waiting") ? "Request" : data;
+                            data = (row.SubStatus != null) ? `${row.SubStatus}` : data;
                             return `${data}`;
                             // return `<span class="badge badge-warning">${data}</span>`;
                         }
@@ -199,5 +222,42 @@ $(document).ready(function () {
             }
         });
     });
+
+/* -------------------------------------------------------------------------- */
+/*                                 Date range                                 */
+/* -------------------------------------------------------------------------- */
+
+// Date range picker
+    $('#date_range').daterangepicker({
+        locale: {
+            format: 'DD/MM/YYYY'
+        }
+    })
+    
+    // $('#reservationtime').daterangepicker({
+    //   timePicker: true,
+    //   timePickerIncrement: 30,
+    //   locale: {
+    //     format: 'MM/DD/YYYY hh:mm A'
+    //   }
+    // })
+    
+    // $('#daterange-btn').daterangepicker(
+    //   {
+    //     ranges   : {
+    //       'Today'       : [moment(), moment()],
+    //       'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+    //       'Last 7 Days' : [moment().subtract(6, 'days'), moment()],
+    //       'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+    //       'This Month'  : [moment().startOf('month'), moment().endOf('month')],
+    //       'Last Month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+    //     },
+    //     startDate: moment().subtract(29, 'days'),
+    //     endDate  : moment()
+    //   },
+    //   function (start, end) {
+    //     $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'))
+    //   }
+    // )
 
 });

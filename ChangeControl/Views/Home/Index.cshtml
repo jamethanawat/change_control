@@ -7,20 +7,23 @@
     GetLine = '@Url.Action("GetLine", "Home")';
     GetSearch = '@Url.Action("GetSearch", "Home")';
     SessionUser = '@Session["User"].ToString()';
+    us_dept = '@Session["Department"].ToString()';
 </script>
 
 @Scripts.Render("~/bundles/jquery")
 @Scripts.Render("~/bundles/sweetalert")
-
-<script src="~/Scripts/Home/Home.js"></script>
 <script>
     $(document).ready(function () {
         $("#menu1-1").addClass('active');
         $('#menu2-1').removeClass('active');
         $('#menu3-1').removeClass('active');
-
+        $("[name='dept']").val(us_dept,true)
     });
+
 </script>
+
+<script src="~/Scripts/Home/Home.js"></script>
+
 <style>
 
     .txtcenter {
@@ -169,17 +172,17 @@
                                 <div class="col-md-12">
                                     <!-- select2 -->
                                     <div class="form-group">
-                                        <div class="row">
+                                        <div class="row mb-3">
                                             <div class="col-md-12">
-                                            <label>Department Status :</label> &emsp;
+                                            <label>Phase :</label> &emsp;
                                                 <label class="setcheckbox">
                                                     <input type="radio" name="status" value="0" class="flat-red" checked>
                                                     All status
                                                 </label>
-                                                <label class="setcheckbox">
+                                                @* <label class="setcheckbox">
                                                     <input type="radio" name="status" value="3" class="flat-red">
                                                     Waiting
-                                                </label>
+                                                </label> *@
                                                 <label class="setcheckbox">
                                                     <input type="radio" name="status" value="7" class="flat-red">
                                                     Request
@@ -190,11 +193,11 @@
                                                 </label>
                                                 <label class="setcheckbox">
                                                     <input type="radio" name="status" value="9" class="flat-red">
-                                                    Trial
+                                                    Trial & Confirm
                                                 </label>
                                                 <label class="setcheckbox">
                                                     <input type="radio" name="status" value="10" class="flat-red">
-                                                    Confirm
+                                                    Initial Production
                                                 </label>
                                                 <label class="setcheckbox">
                                                     <input type="radio" name="status" value="11" class="flat-red">
@@ -203,27 +206,6 @@
                                                 <label class="setcheckbox">
                                                     <input type="radio" name="status" value="12" class="flat-red">
                                                     Rejected
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="row mb-3">
-                                            <div class="col-md-12">
-                                            <label>Sub Status :</label> &emsp;
-                                                <label class="setcheckbox">
-                                                    <input type="radio" name="sub_tatus" value="0" class="flat-red" checked>
-                                                    All status
-                                                </label>
-                                                <label class="setcheckbox">
-                                                    <input type="radio" name="sub_tatus" value="3" class="flat-red" disabled>
-                                                    Pending
-                                                </label>
-                                                <label class="setcheckbox">
-                                                    <input type="radio" name="sub_tatus" value="7" class="flat-red">
-                                                    Issued
-                                                </label>
-                                                <label class="setcheckbox">
-                                                    <input type="radio" name="sub_tatus" value="8" class="flat-red">
-                                                    Approved
                                                 </label>
                                             </div>
                                         </div>
@@ -238,27 +220,29 @@
                                                 </select>
                                             </div>
                                             <div class="col-md-4">
-                                                <label>Date :</label>
+                                                <label>Control No. :</label>
                                                 <input type="text" class="form-control" id="TNScontrolNo" placeholder="Enter ...">
                                             </div>
-                                            <div class="col-md-6">
-                                                <label>Date :</label><br>
-                                                <label class="setcheckbox">
-                                                    <input type="radio" name="date" value="" class="flat-red" checked>
-                                                    None
-                                                </label>
-                                                <label class="setcheckbox">
-                                                    <input type="radio" name="date" value="@DateTime.Now.ToString("dd-MM-yyyy")" class="flat-red">
-                                                    Today
-                                                </label>
-                                                <label class="setcheckbox">
-                                                    <input type="radio" name="date" value="@DateTime.Now.ToString("__-MM-yyyy")" class="flat-red">
-                                                    This Month
-                                                </label>
-                                                <label class="setcheckbox">
-                                                    <input type="radio" name="date" value="@DateTime.Now.ToString("_____-yyyy")" class="flat-red">
-                                                    This Year
-                                                </label>
+                                            <div class="col-md-4">
+                                                <label>Change Date :</label><br>
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                    <span class="input-group-text">
+                                                        <i class="far fa-calendar-alt"></i>
+                                                    </span>
+                                                    </div>
+                                                    <input type="text" class="form-control float-right" id="date_range">
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-2 ">
+                                                <br>
+                                                <div class="form-group">
+                                                    <div class="custom-control custom-switch mt-2">
+                                                        <input type="checkbox" class="custom-control-input" id="change_date_switch">
+                                                        <label class="custom-control-label" for="change_date_switch">ไม่ต้องระบุวันที่</label>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -278,22 +262,22 @@
                                             
 
                                             <div class="col-md-6">
-                                                <label>Over All Status :</label><br>
+                                                <label>Over All Status Complete :</label><br>
                                                 <label class="setcheckbox">
                                                     <input type="radio" name="overstatus" value="1" class="flat-red" checked>
                                                     All status
                                                 </label>
                                                 <label class="setcheckbox">
                                                     <input type="radio" name="overstatus" value="2" class="flat-red">
-                                                    Review complete
+                                                    Review
                                                 </label>
                                                 <label class="setcheckbox">
                                                     <input type="radio" name="overstatus" value="3" class="flat-red">
-                                                    Trial complete
+                                                    Trial & Confirm
                                                 </label>
                                                 <label class="setcheckbox">
                                                     <input type="radio" name="overstatus" value="4" class="flat-red">
-                                                    Confirm Complete
+                                                    Initial Production
                                                 </label>
                                                 
                                             </div>

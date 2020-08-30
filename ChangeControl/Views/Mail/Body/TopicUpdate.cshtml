@@ -8,7 +8,7 @@
     </p>
     <p>Dear all concernings,</p>
     <p>
-      According to  <b>@Model.Code</b> of model <b>@Model.Model</b> Part no. <b>@Model.PartNo</b> has of <b><u>@Model.Department</u></b> department gas been revised from revision <b>@prev_rev</b> to Revision <b>@Model.Revision</b>, by <b>@Model.Profile.FullName</b>, Please check your review data again.
+      According to  <b>@Model.Code</b> of model <b>@Model.Model</b> Part no. <b>@Model.PartNo</b> has of <b><u>@Model.Department</u></b> department gas been revised from revision <b>@prev_rev</b> to Revision <b>@Model.Revision</b>, by <b>@Session["FullName"].ToString()</b>, Please check your review data again.
     </p>
     <p>For more details, please click this <a href="@ViewBag.Url">Link.</a></p>
     <p>Best Regards</p>

@@ -120,6 +120,25 @@ namespace ChangeControl.Helpers
             }
         }
 
+        public static string StringToDigitDate2(this string date_time){ //yyyy-MM-yyyy
+            try{
+                if(date_time == null){
+                    return DateTime.Now.ToString("d MMMM yyyy");
+                }else{
+                    var Year = date_time.Substring(0,4);
+                    var Month = date_time.Substring(4,2);
+                    var Day = date_time.Substring(6,2);
+                    var Hour = date_time.Substring(8,2);
+                    var Minute = date_time.Substring(10,2);
+                    var Second = date_time.Substring(12,2);
+                    var result = DateTime.ParseExact($"{Year}-{Month}-{Day} {Hour}:{Minute}:{Second}", "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+                    return result.ToString("dd-MM-yyyy");
+                }
+            }catch(Exception err){
+                return DateTime.Now.ToString("dd-MM-yyyy");
+            }
+        }
+
         public static string StringToDigitDate3(this string date_time){ //dd-MM-yyyy to dd/MM/yy
             try{
                 if(date_time == null){

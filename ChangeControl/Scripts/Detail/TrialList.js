@@ -20,7 +20,7 @@ $(() => {
                     if(res == "True"){
                         $.post(ApproveTrialPath, {trial_id:tr_id}, (result) => {
                             if(result){
-                                if(result.mail != ""){
+                                if(result.mail != "" && result.mail != null){
                                     $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept': result.dept, }).fail((error) => {
                                         console.error(error);
                                         swal("Error", "Cannot send email to Requestor, Please try again", "error");
@@ -69,7 +69,7 @@ $(() => {
                     Data.append("description",element.description);
                     promises.push($.ajax({
                         type: "POST",
-                        url: SubmitFileTrialPath,
+                        url: InsertFileTrialPath,
                         data: Data,
                         cache: false,
                         processData: false,

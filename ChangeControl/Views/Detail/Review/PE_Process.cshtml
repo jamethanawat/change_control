@@ -3,9 +3,9 @@
 <br>
 <form class="form-horizontal" action="javascript:void(0);" id="review">
     <div class="form-group row">
-        <label for="inputAcceptance" class="col-sm-2 col-form-label">Evaluation result</label>
+        <label for="inputAcceptance" class="col-sm-3 col-form-label">Evaluation result</label>
 
-        <div class="col-sm-3 col-form-label">
+        <div class="col-sm-9 col-form-label">
             <label class="mr-3">
                 <input type="radio" data-type="status" data-id="0" name="rd-0" value="1" class="flat-red" checked>
                 Acceptance
@@ -15,27 +15,27 @@
                 Not, Acceptance
             </label>
         </div>
-        <div class="col-sm-7 col-form-label">
+        @* <div class="col-sm-7 col-form-label">
             <label>Not Approve reason :</label>
             <input type="text" data-type="desc" data-id="0" name="desc-0" class="form-control" placeholder="200 character limit">
-        </div>
+        </div> *@
     </div>
     <div class="form-group row">
-        <label for="inputChangeDetails" class="col-sm-2 col-form-label">Change date</label>
-        <div class="col-sm-10 col-form-label">
+        <label for="inputChangeDetails" class="col-sm-3 col-form-label">Change date</label>
+        <div class="col-sm-9 col-form-label">
             <input data-toggle="datepicker" data-type="desc" data-id="32" name="desc-32" type="text" class="form-control required"  placeholder="Select Date " autocomplete="off" data-inputmask-alias="datetime" data-inputmask-inputformat="dd-mm-yyyy" data-mask="99-99-9999">
             <div data-toggle="datepicker"></div>
             @* <input type="text" name="desc-32" class="form-control" placeholder="Enter Date "> *@
         </div>
     </div>
     <div class="form-group row">
-        <label for="inputChangeDetails" class="col-sm-2 col-form-label">Change details</label>
-        <div class="col-sm-10 col-form-label">
+        <label for="inputChangeDetails" class="col-sm-3 col-form-label">Change details</label>
+        <div class="col-sm-9 col-form-label">
             <input type="text"data-type="desc" data-id="1"  name="desc-1" class="form-control required" placeholder="500 character limit" >
         </div>
     </div>
     <div class="form-group row">
-        <label for="inputProDesRe" class="col-sm-2 col-form-label">Process design review</label>
+        <label for="inputProDesRe" class="col-sm-3 col-form-label">Process design review</label>
         <div class="col-sm-3 col-form-label">
             <label class="mr-3">
                 <input type="radio" data-type="status" data-id="2" name="rd-2" value="1" class="flat-red" checked>
@@ -46,13 +46,13 @@
                 No, Acceptance
             </label>
         </div>
-        <div class="col-sm-7 col-form-label">
+        <div class="col-sm-6 col-form-label">
             <label>if yes,inform to NS   Due date :</label>
             <textarea data-type="desc" data-id="2" name="desc-2" class="form-control" placeholder=""></textarea>
         </div>
     </div>
     @* <div class="form-group row">
-        <label for="inputEffeDoc" class="col-sm-2 col-form-label">Effected to Document (Control Plan ,FMEA)</label>
+        <label for="inputEffeDoc" class="col-sm-3 col-form-label">Effected to Document (Control Plan ,FMEA)</label>
         <div class="col-sm-3 col-form-label">
             <label class="mr-3">
                 <input type="radio" data-type="status" data-id="3" name="rd-3" value="1" class="flat-red" checked>
@@ -73,21 +73,21 @@
         </div>
     </div> *@
     <div class="form-group row">
-        <label for="inputSkills" class="col-sm-2 col-form-label">Due Date</label>
-        <div class="col-sm-10 col-form-label">
+        <label for="inputSkills" class="col-sm-3 col-form-label">Due Date</label>
+        <div class="col-sm-9 col-form-label">
             <input data-toggle="datepicker" data-type="desc" data-id="31" class="form-control required" placeholder="Select Date " autocomplete="off" name="desc-31" data-inputmask-alias="datetime" data-inputmask-inputformat="dd-mm-yyyy" data-mask="99-99-9999">
             <div data-toggle="datepicker"></div>
             @* <input type="text" name="desc-32" class="form-control" placeholder="Enter Date "> *@
         </div>
     </div>
     <div class="form-group row">
-        <label for="inputSkills" class="col-sm-2 col-form-label">Others  (Please specify)</label>
-        <div class="col-sm-10 col-form-label">
+        <label for="inputSkills" class="col-sm-3 col-form-label">Others  (Please specify)</label>
+        <div class="col-sm-9 col-form-label">
             <input name="desc-22" data-type="desc" data-id="22" type="text" class="form-control required" placeholder="500 character limit" >
         </div>
     </div>
     <div class="form-group row">
-        <label for="inputReqReTrial" class="col-sm-2 col-form-label">Request Trial</label>
+        <label for="inputReqReTrial" class="col-sm-3 col-form-label">Request Trial</label>
         <div class="col-sm-3 col-form-label">
             <label class="mr-3">
                 <input type="radio" data-type="status" data-id="24" name="rd-24" value="1" class="flat-red" checked>
@@ -98,14 +98,14 @@
                 No, Acceptance
             </label>
         </div>
-        <div class="col-sm-7 col-form-label">
+        <div class="col-sm-6 col-form-label">
             <label>Details :</label>
             <textarea data-type="desc" data-id="24" class="form-control" name="desc-24" placeholder=""></textarea>
         </div>
     </div>
     <div class="form-group row">
-        <label for="inputSkills" class="col-sm-2 col-form-label">Attach File</label>
-        <div class="col-sm-10">
+        <label for="inputSkills" class="col-sm-3 col-form-label">Attach File</label>
+        <div class="col-sm-9">
             <input type="file" class="my-pond" name="filepond" />
             @* <input type="file" name="filepond" data-max-files="10" required> *@
         </div>

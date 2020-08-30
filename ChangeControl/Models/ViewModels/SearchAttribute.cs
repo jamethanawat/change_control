@@ -9,7 +9,8 @@ namespace ChangeControl.Models
     {
         public string Type{ get; set; }
         public int Status{ get; set; }
-        public string Date{ get; set; }
+        public string StartDate{ get; set; }
+        public string EndDate{ get; set; }
         public string ProductType{ get; set; }
         public int Overstatus{ get; set; }
         public string Changeitem{ get; set; }
@@ -22,10 +23,11 @@ namespace ChangeControl.Models
         public string Department{ get; set; }
         public string Processname{ get; set; }
         public string Production{ get; set; }
-        public SearchAttribute(string Type,int Status, string Date,string ProductType,int Overstatus,string Changeitem,string ControlNo, string Model,string Chosechangeitem,string Partno,string Partname,string Department,string Processname ,string Production ,string Line){
+        public SearchAttribute(string Type,int Status, string StartDate, string EndDate,string ProductType,int Overstatus,string Changeitem,string ControlNo, string Model,string Chosechangeitem,string Partno,string Partname,string Department,string Processname ,string Production ,string Line){
             this.Type = Type;
             this.Status = Status;
-            this.Date = Date;
+            this.StartDate = StartDate;
+            this.EndDate = EndDate;
             this.ProductType = ProductType;
             this.Overstatus = Overstatus;
             this.Changeitem = Changeitem;

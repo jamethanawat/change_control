@@ -62,7 +62,7 @@ namespace ChangeControl.Controllers{
             }
         }
 
-        public ActionResult GenerateMail(string mode,string topic_code, string dept = null, string[] dept_arry=null, string due_date="", string pos=""){
+        public ActionResult GenerateMail(string mode,string topic_code, string dept = null, string[] dept_arry=null, string due_date="", string pos="") {
             try{
                 Topic = M_Mail.GetTopicByCode(topic_code);
                 ViewBag.Mode = mode;
@@ -82,15 +82,12 @@ namespace ChangeControl.Controllers{
                     }
                 }else if(dept == "" || dept == null){ //Default department that related
                     var related_list = M_Mail.GetRelatedByTopicCode(topic_code);
-                    Type type = related_list.GetType();
-                    PropertyInfo[] props = type.GetProperties();
-                    
-                    foreach (var prop in props){
-                        if((int) prop.GetValue(related_list) == 1 ){
-                            temp_email_list = M_Mail.GetEmailByDeptAndPosition(prop.Name,pos);
+
+                    related_list.ForEach(rl => {
+                            temp_email_list = M_Mail.GetEmailByDeptAndPosition(rl,pos);
                             if (temp_email_list != null) address_list.AddRange(temp_email_list);
-                        }
-                    }
+                    });
+
                 }else{ //Single department
                     temp_email_list = M_Mail.GetEmailByDeptAndPosition(dept,pos);
                     if (temp_email_list != null) address_list.AddRange(temp_email_list);
@@ -161,6 +158,9 @@ namespace ChangeControl.Controllers{
                     case "EmailRequestor" :
                         mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Issue request.";
                         break;
+                    case "EmailRequested" :
+                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please approve request.";
+                        break;
                     case "EmailReviewed" :
                         mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please review.";
                         break;
@@ -213,7 +213,7 @@ namespace ChangeControl.Controllers{
                         mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Not approve.";
                         break;
                     case "RequestDocument" :
-                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} QA Request more documents.";
+                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Audit Request more documents.";
                         break;
                     default :
                         mailMessage.Subject = "ERROR";

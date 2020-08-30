@@ -36,7 +36,7 @@ $(document).ready(function () {
                 $.post(CheckUserPath,({ username:Iuser,password:Ipass }) ,(res) => {
                     var promises = [];
                     var select;
-                    if(res.pos == "Special"){
+                    if(res.pos == "Special" || res.pos == "S_Issue"){
                         GetDepartmentList(Iuser).then((departments) => {
                             if(departments.length > 1){
                                 select = CreateDepartmentOption(null,departments)
