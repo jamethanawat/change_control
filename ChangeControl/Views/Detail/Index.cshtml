@@ -596,7 +596,8 @@
                                         <h4 class="mt-3">Change Details</h4>
                                             &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Detail.ReplaceNullWithDash().TrimStart()))</span>
                                         <h4 class="mt-3">Change Date</h4>
-                                            &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Timing.ReplaceNullWithDash().TrimStart()))</span> <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.TimingDesc.ReplaceNullWithDash().TrimStart()))</span>
+                                            &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Timing.ReplaceNullWithDash().TrimStart()))</span> 
+                                        @if(Topic.TimingDesc != null) {<span>@Html.Raw(HttpUtility.HtmlDecode(Topic.TimingDesc.TrimStart()))</span>}
                                         <h4 class="mt-3">Related Department</h4>
                                             &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>
                                             @{
