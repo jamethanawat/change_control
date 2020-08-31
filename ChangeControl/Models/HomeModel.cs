@@ -126,8 +126,7 @@ namespace ChangeControl.Models
                     "WHERE Topic.Revision  = (SELECT MAX(t.Revision) FROM Topic t WHERE t.Code = Topic.Code AND t.Department = Topic.Department) " +
                     (model.Type.AsNullIfWhiteSpace() != null ?  $"AND Topic.Type = '{model.Type}' " : "") +
                     (ov_command != "" ?  $"AND {ov_command} " : "") +
-                    (model.Status != 0 ?  $"AND Topic.Status = '{model.Status}' " : "") +
-                    (model.Status == 7 ?  $"OR Topic.Status = '3' " : "") +
+                    (model.Status != 0 && model.Status == 7 ? $"AND (Topic.Status = '{model.Status}' OR Topic.Status = '3')" : $"AND Topic.Status = '{model.Status}' ") +
                     (model.StartDate.AsNullIfWhiteSpace() != null && model.EndDate.AsNullIfWhiteSpace() != null ? $"AND SUBSTRING(Topic.Timing, 0 ,9) >= {model.StartDate} AND SUBSTRING(Topic.Timing, 0 ,9) <= {model.EndDate} " : "") +
                     (model.ProductType.AsNullIfWhiteSpace() != null ? $"AND Topic.Product_type = {model.ProductType} " : "") +
                     (model.Changeitem.AsNullIfWhiteSpace() != null ? $"AND Topic.Change_item = {model.Changeitem} " : "") +
@@ -136,7 +135,10 @@ namespace ChangeControl.Models
                     (model.Partno.AsNullIfWhiteSpace() != null ? $"AND Topic.PartNo ='{model.Partno}' " : "") +
                     (model.Model.AsNullIfWhiteSpace() != null ? $"AND Topic.Model ='{model.Model}' " : "") +
                     (model.ControlNo.AsNullIfWhiteSpace() != null ? $"AND Topic.Code LIKE '{model.ControlNo}%' " : "") +
-                    (model.Department.AsNullIfWhiteSpace() != null ? $@"AND Related.Department = '{model.Department}'" : "") + 
+                    (model.Status == 7 ?
+                        (model.Department.AsNullIfWhiteSpace() != null ? $@"AND Topic.Department = '{model.Department}'" : "") : 
+                        (model.Department.AsNullIfWhiteSpace() != null ? $@"AND Related.Department = '{model.Department}'" : "")
+                    )+
                     $"{condition_command} ORDER BY Topic.Code DESC";
             var result = DB_CCS.Database.SqlQuery<TopicAlt>(sql).ToList();
             return result;
