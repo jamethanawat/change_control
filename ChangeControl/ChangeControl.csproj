@@ -512,6 +512,7 @@
     <Content Include="Plugin\animsition\sandbox\data.json" />
     <Content Include="Plugin\jq-fab\scss\index.scss" />
     <Content Include="libman.json" />
+    <Content Include="manual.pdf" />
     <None Include="Properties\PublishProfiles\CCS_Test.pubxml" />
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Include="Properties\Settings.settings">
