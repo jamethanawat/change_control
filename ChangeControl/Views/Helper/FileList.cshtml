@@ -10,7 +10,6 @@
         var FileSize = "0 Bytes";
         var file_desc = (File.Description.Trim() == null || File.Description.Trim() == "") ? "<i>No information</i>" : File.Description;
 
-        using (Html.BeginForm("DownloadFile", "Detail", FormMethod.Post, new { enctype = "multipart/form-data" })){
         @* <form action="@Url.Action("DownloadFile", "Detail")" enctype="multipart/form-data" method="post">  *@
         <li data-toggle="tooltip" data-placement="top" data-html="true" title="@file_desc">
             <span class="mailbox-attachment-icon">
@@ -41,13 +40,14 @@
                     }
                 }
                     <span>@FileSize</span>
-                    @if((ViewBag.DisableFileList != null && !ViewBag.DisableFileList) || (ViewBag.DisableFileList == null)){
-                        <button name="load" value="@File.Name_Format^@File.Name" class="btn btn-default btn-sm float-right"><i class="fas fa-cloud-download-alt"></i></button>
+                    @using (Html.BeginForm("DownloadFile", "Detail", FormMethod.Post, new { enctype = "multipart/form-data" })){
+                        if((ViewBag.DisableFileList != null && !ViewBag.DisableFileList) || (ViewBag.DisableFileList == null)){
+                            <button name="load" value="@File.Name_Format^@File.Name" class="btn btn-default btn-sm float-right"><i class="fas fa-cloud-download-alt"></i></button>
+                        }
                     }
                 </span>
             </div>
         </li>
         @* </form> *@
-        }
     }
     </ul>

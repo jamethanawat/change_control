@@ -153,7 +153,7 @@ namespace ChangeControl.Models
             return result;
         }
         public List<String> GetDepartmentList(){
-            var sql = $"SELECT Name FROM Department;";
+            var sql = $"SELECT Name FROM Department WHERE Name != 'Guest';";
             var result = DB_CCS.Database.SqlQuery<String>(sql).ToList();
             return result;
         }

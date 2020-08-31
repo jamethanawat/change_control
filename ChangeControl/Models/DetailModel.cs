@@ -27,14 +27,18 @@ namespace ChangeControl.Models
 
         public List<FormReviewItem> GetReviewItemByDepartment(int department_id)
         {
-            var sql = $@"SELECT Review_Item_Type.Name AS Name, Review_Item_Type.ID AS ID  FROM Department
-                        LEFT JOIN Review_Item_Type_Department ON Department.ID = Review_Item_Type_Department.FK_Department_ID
-                        LEFT JOIN Review_Item_Type ON Review_Item_Type_Department.FK_Item_ID = Review_Item_Type.ID
-                        WHERE Department.ID = '{department_id}'
-                        GROUP BY Review_Item_Type.Name , Review_Item_Type.Seq ,Review_Item_Type.ID
-                        ORDER BY Review_Item_Type.Seq";
-            var Review_Item = DB_CCS.Database.SqlQuery<FormReviewItem>(sql).ToList();
-            return Review_Item;
+            try{
+                var sql = $@"SELECT Review_Item_Type.Name AS Name, Review_Item_Type.ID AS ID  FROM Department
+                            LEFT JOIN Review_Item_Type_Department ON Department.ID = Review_Item_Type_Department.FK_Department_ID
+                            LEFT JOIN Review_Item_Type ON Review_Item_Type_Department.FK_Item_ID = Review_Item_Type.ID
+                            WHERE Department.ID = '{department_id}'
+                            GROUP BY Review_Item_Type.Name , Review_Item_Type.Seq ,Review_Item_Type.ID
+                            ORDER BY Review_Item_Type.Seq";
+                var Review_Item = DB_CCS.Database.SqlQuery<FormReviewItem>(sql).ToList();
+                return Review_Item;
+            }catch(Exception err){
+                return new List<FormReviewItem>();
+            }
         }
 
         public void SetForeignKey(object foreign_key)
