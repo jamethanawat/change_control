@@ -45,11 +45,11 @@ namespace ChangeControl.Models
             if(model.Overstatus == 2){
                 ov_command = $@"(
                     SELECT COUNT(*) 
-                    ROM Related WHERE Related.PK_Related =  Topic.Related AND Related.Department != 'QC1' AND Related.Department != 'QC2' AND Related.Department != 'QC3')
+                    FROM Related WHERE Related.PK_Related =  Topic.Related AND Related.Department != 'QC1' AND Related.Department != 'QC2' AND Related.Department != 'QC3')
 		        =	(SELECT COUNT(Review.ID) FROM Review WHERE  
 					 Review.Revision  = (SELECT MAX(r.Revision) FROM Review r WHERE r.Topic = Review.Topic AND r.Department = Review.Department) AND  Review.Topic = Topic.Code 
                      AND Review.Status = 1
-                     AND Review.Department NOT IN ('QC1', 'QC2', 'QC3')";
+                     AND Review.Department NOT IN ('QC1', 'QC2', 'QC3'))";
             }else if(model.Overstatus == 3){
                 ov_command = $@"(SELECT COUNT(Review.ID) FROM Review 
                             LEFT JOIN Review_Item ON Review_Item.FK_Review_ID = Review.ID 
@@ -59,7 +59,7 @@ namespace ChangeControl.Models
                 =   (SELECT COUNT(Trial.ID) FROM Trial WHERE
 					 Trial.Revision  = (SELECT MAX(t.Revision) FROM Trial t WHERE t.Topic = Trial.Topic AND t.Department = Trial.Department) AND Trial.Topic = Topic.Code 
                      AND Trial.Status = 1
-                     AND Trial.Department NOT IN ('QC1', 'QC2', 'QC3')";
+                     AND Trial.Department NOT IN ('QC1', 'QC2', 'QC3'))";
 
             }else if(model.Overstatus == 4){
                 ov_command = $@"(SELECT COUNT(*) FROM Related  
@@ -71,7 +71,7 @@ namespace ChangeControl.Models
 		        =	(SELECT COUNT(Confirm.ID) FROM Confirm WHERE
 					 Confirm.Revision  = (SELECT MAX(c.Revision) FROM Confirm c WHERE c.Topic = Confirm.Topic AND c.Department = Confirm.Department) AND  Confirm.Topic = Topic.Code 
                      AND Confirm.Status = 1
-                     AND Confirm.Department NOT IN ('QC1', 'QC2', 'QC3')";
+                     AND Confirm.Department NOT IN ('QC1', 'QC2', 'QC3'))";
             }
 
             if(model.Department.AsNullIfWhiteSpace() != null && model.Status != 0){
@@ -103,7 +103,7 @@ namespace ChangeControl.Models
                                                 OR '{model.Department}' IN ('QC1','QC2','QC3'))";
                     break;
                 }
-                if(model.Status != 7){
+                if(model.Status != 7 && model.Status != 11 && model.Status != 12 ){
                     job_command = $@", ISNULL((SELECT CASE
                                 WHEN e.Status = 3 THEN 'Issued'
                                 WHEN e.Status = 1 THEN 'Approve'
@@ -126,7 +126,7 @@ namespace ChangeControl.Models
                     "WHERE Topic.Revision  = (SELECT MAX(t.Revision) FROM Topic t WHERE t.Code = Topic.Code AND t.Department = Topic.Department) " +
                     (model.Type.AsNullIfWhiteSpace() != null ?  $"AND Topic.Type = '{model.Type}' " : "") +
                     (ov_command != "" ?  $"AND {ov_command} " : "") +
-                    (model.Status != 0 && model.Status == 7 ? $"AND (Topic.Status = '{model.Status}' OR Topic.Status = '3')" : $"AND Topic.Status = '{model.Status}' ") +
+                    (model.Status != 0 && model.Status == 7 ? $"AND (Topic.Status = '{model.Status}' OR Topic.Status = '3')" : (model.Status != 0 ? $"AND Topic.Status = '{model.Status}'" : "")) +
                     (model.StartDate.AsNullIfWhiteSpace() != null && model.EndDate.AsNullIfWhiteSpace() != null ? $"AND SUBSTRING(Topic.Timing, 0 ,9) >= {model.StartDate} AND SUBSTRING(Topic.Timing, 0 ,9) <= {model.EndDate} " : "") +
                     (model.ProductType.AsNullIfWhiteSpace() != null ? $"AND Topic.Product_type = {model.ProductType} " : "") +
                     (model.Changeitem.AsNullIfWhiteSpace() != null ? $"AND Topic.Change_item = {model.Changeitem} " : "") +
@@ -136,8 +136,11 @@ namespace ChangeControl.Models
                     (model.Model.AsNullIfWhiteSpace() != null ? $"AND Topic.Model ='{model.Model}' " : "") +
                     (model.ControlNo.AsNullIfWhiteSpace() != null ? $"AND Topic.Code LIKE '{model.ControlNo}%' " : "") +
                     (model.Status == 7 ?
-                        (model.Department.AsNullIfWhiteSpace() != null ? $@"AND Topic.Department = '{model.Department}'" : "") : 
-                        (model.Department.AsNullIfWhiteSpace() != null ? $@"AND Related.Department = '{model.Department}'" : "")
+                        (model.Department.AsNullIfWhiteSpace() != null ? $@" AND Topic.Department = '{model.Department}'" : "") : 
+                        (model.Status == 0 || model.Status == 11 || model.Status == 12  ?
+                            (model.Department.AsNullIfWhiteSpace() != null ? $@" AND (Topic.Department = '{model.Department}' OR Related.Department = '{model.Department}')" : "") :
+                            (model.Department.AsNullIfWhiteSpace() != null ? $@" AND Related.Department = '{model.Department}'" : "")
+                        )
                     )+
                     $"{condition_command} ORDER BY Topic.Code DESC";
             var result = DB_CCS.Database.SqlQuery<TopicAlt>(sql).ToList();

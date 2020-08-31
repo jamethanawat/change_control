@@ -26,7 +26,7 @@
     var isQC = ViewBag.isQC = (department == "QC1" || department == "QC2" || department == "QC3");
 
 
-    string[] status_define = {"-","Approved","Rejected","Waiting","Need more document","Re-submit"," ","Request","Review","Trial", "Confirm", "Finished", "Rejected" };
+    string[] status_define = {"-","Approved","Rejected","Waiting","Need more document","Re-submit"," ","Request","Review","Trial and Confirm", "Initial Production", "Finished", "Rejected" };
     var status = status_define[Topic.Status];
     Session["Status"] = status;
 
@@ -493,10 +493,11 @@
                         }
                     }
 
-
-                    <span class='badge badge-pill badge-@rv_badge'>Review
-                    <i class='fas @rv_icon'></i>
-                    </span>
+                    @if(isRelated){
+                        <span class='badge badge-pill badge-@rv_badge'>Review
+                        <i class='fas @rv_icon'></i>
+                        </span>
+                    }
 
                     @if(isTrialable || (isQC && isRelated)){
                         <span class='badge badge-pill badge-@tr_badge'>Trial
@@ -504,7 +505,7 @@
                         </span>
                     }
 
-                    @if(ViewBag.cf_list.Contains(department)){
+                    @if(ViewBag.cf_list.Contains(department) || (isQC && isRelated)){
                         <span class='badge badge-pill badge-@cf_badge'>Confirm
                         <i class='fas @cf_icon'></i>
                         </span>

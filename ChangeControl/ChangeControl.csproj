@@ -511,6 +511,7 @@
     <Content Include="Plugin\animsition\README.md" />
     <Content Include="Plugin\animsition\sandbox\data.json" />
     <Content Include="Plugin\jq-fab\scss\index.scss" />
+    <Content Include="libman.json" />
     <None Include="Properties\PublishProfiles\CCS_Test.pubxml" />
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Include="Properties\Settings.settings">

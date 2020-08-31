@@ -183,7 +183,7 @@ namespace ChangeControl.Controllers{
                         mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please approve change request.";
                         break;
                     case "StartTrial" :
-                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please start trial change.";
+                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please start Trial and Confirm.";
                         break;
                     case "InformIPP" :
                         mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please attach IPP label.";
@@ -192,10 +192,10 @@ namespace ChangeControl.Controllers{
                         mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Review & Trial already please followup.";
                         break;
                     case "StartConfirm" :
-                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please confirm.";
+                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please Initial Confirm.";
                         break;
                     case "ConfirmApproved" :
-                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please close confirm.";
+                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please close Initial Confirm.";
                         break;
                     case "TopicUpdate" :
                         mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} {ViewBag.Topic.Department} Revised review data to Rev{ViewBag.Topic.Revision}.";
