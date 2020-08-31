@@ -26,7 +26,7 @@
     var isQC = ViewBag.isQC = (department == "QC1" || department == "QC2" || department == "QC3");
 
 
-    string[] status_define = {"-","Approved","Rejected","Waiting","Need more document","Re-submit"," ","Request","Review","Trial and Confirm", "Initial Production", "Finished", "Rejected" };
+    string[] status_define = {"-","Approved","Rejected","Waiting","Need more document","Re-submit"," ","Request","Review","Trial & Confirm", "Initial Production", "Finished", "Rejected" };
     var status = status_define[Topic.Status];
     Session["Status"] = status;
 
@@ -636,11 +636,11 @@
                                             @Html.Partial("Review/List",ReviewList) 
 
                 @* /* ------------------------------- Trial List ------------------------------ */ *@
-                                        @if(status == "Trial" || status == "Confirm" || status == "Finished"){
+                                        @if(Topic.Status == 9 || Topic.Status == 10 || Topic.Status == 11 || Topic.Status == 12){
                                         <div class="time-label">
-                                            @if((Topic.RelatedListAlt.Count(e => e.Trial == 1) > 0 && status != "Trial") || status == "Trial"){ //Request trial not exist
+                                            @if((Topic.RelatedListAlt.Count(e => e.Trial == 1) > 0 && Topic.Status != 9 ) || Topic.Status == 9 ){ //Request trial not exist
                                                 <span class="bg-primary">
-                                                    Trail & Confirm
+                                                    Trial & Confirm
                                                 </span>
                                             }
                                         </div>
@@ -648,7 +648,7 @@
                                         }
 
                 @* /* ------------------------------- Confirm List ------------------------------ */ *@
-                                        @if(status == "Confirm" || status == "Finished"){
+                                        @if(Topic.Status == 10 || Topic.Status == 11 || Topic.Status == 12){
                                         <div class="time-label">
                                             <span class="bg-primary">
                                                 Initial Production
@@ -657,7 +657,7 @@
                                             @Html.Partial("Confirm/List",ConfirmList) 
                                         }
 
-                                        @if(status == "Finished" || status == "Rejected"){
+                                        @if(Topic.Status == 11 || Topic.Status == 12){
                                         <div class="time-label">
                                             <span class="bg-primary">
                                                 Closed 
@@ -672,17 +672,17 @@
                                 }
 
                                 @* /* ----------------------------- Review section ----------------------------- */ *@
-                                @if(isRelated && !isReview && (status == "Request" || status == "Review")){
-                                    if(isPEProcess && (status == "Request" || status == "Review")){
+                                @if(isRelated && !isReview && (Topic.Status == 7 || Topic.Status == 8)){
+                                    if(isPEProcess && (Topic.Status == 7 || Topic.Status == 8)){
                                         Session["isIssued"] = true;
                                         @Html.Partial("Review/PE_Process") 
-                                    }else if(isQC && QcReviewable && (status == "Review")){
+                                    }else if(isQC && QcReviewable && (Topic.Status == 8)){
                                         @Html.Partial("Review/QC")
-                                    }else if(((!isQC && !isPEProcess && status == "Review" && isInternal) || (isExternal && !isQC))){
+                                    }else if(((!isQC && !isPEProcess && Topic.Status == 8 && isInternal) || (isExternal && !isQC))){
                                         @Html.Partial("Review/Other", ReviewItems) 
                                     }
 
-                                }else if((isTrialable || (QcTrialable && isQC)) && !isTrial && status == "Trial"){
+                                }else if((isTrialable || (QcTrialable && isQC)) && !isTrial && Topic.Status == 9){
                                 @* /* ----------------------------- Trial section ----------------------------- */ *@
                                     <hr><br>
                                     <h1>Trial & Confirm</h1><br>
@@ -706,7 +706,7 @@
                                             </div>
                                         </div>
                                     </form>                                    
-                                }else if(((ViewBag.cf_list.Contains(department) && !isQC) || (isQC && QcConfirmable)) && !isConfirm && status == "Confirm"){
+                                }else if(((ViewBag.cf_list.Contains(department) && !isQC) || (isQC && QcConfirmable)) && !isConfirm && Topic.Status == 10){
                                 @* /* ----------------------------- Confirm section ----------------------------- */ *@
                                     <hr><br>
                                     <h1>Initial Production</h1><br>
