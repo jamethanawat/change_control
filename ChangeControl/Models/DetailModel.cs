@@ -177,15 +177,16 @@ namespace ChangeControl.Models
             }
         }
 
-        public void InsertResubmit(string desc, string due_date, long related, string topic_code, string user_id, int status){
-            var sql = $@"INSERT INTO Resubmit (Description, DueDate, [Date], Related, Topic, [User], Status) 
-            VALUES('{desc.ReplaceSingleQuote()}', '{due_date}', '{date}', '{related}', '{topic_code}', '{user_id}', {status});";
+        public void InsertResubmit(string desc, string due_date, long related, string topic_code, string user_id, int status,string dept){
+            var sql = $@"INSERT INTO Resubmit (Description, DueDate, [Date], Related, Topic, [User], Status, Dept) 
+            VALUES('{desc.ReplaceSingleQuote()}', '{due_date}', '{date}', '{related}', '{topic_code}', '{user_id}', {status}, '{dept}');";
             DB_CCS.Database.ExecuteSqlCommand(sql);
         }
         
         public List<Resubmit> GetResubmitByTopicID(string topic_code){
-            var sql = $@"SELECT ID, Description, DueDate, [Date], Related, Topic, [User] 
-            FROM Resubmit WHERE Topic = '{topic_code}' ORDER BY [Date] DESC;";
+            var sql = $@"SELECT ID, Description, DueDate, [Date], Related, Topic, [User] ,Dept
+            FROM Resubmit WHERE Topic = '{topic_code}' 
+            ORDER BY [Date] DESC;";
             var result = DB_CCS.Database.SqlQuery<Resubmit>(sql).ToList();
             return result;
         }

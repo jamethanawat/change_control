@@ -451,7 +451,7 @@
                 <div class="col-sm-8">
                     <h1>
                         TNS Control No. @Html.DisplayFor(model => Topic.Code) 
-                        <span class="badge badge-primary">Rev @Topic.Revision</span>
+                        <span class="badge badge-primary">Rev @Topic.Revision.ToString("00")</span>
                         @if(Editable) { 
                         <a href='@Url.Action("Index", "Request",new {id = Topic.Code})' style="font-size: 1.8rem!important;">
                             <span class="badge badge-warning"><i class="fas fa-pencil-alt" style="font-size: 1rem!important;"></i> Edit</span></a> 

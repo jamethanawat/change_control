@@ -301,22 +301,31 @@
                                 </p>
                             </a>
                         </li>
-                        @if(Session["Department"].ToString() != "Guest"){
-                        <li id="menu2" class="nav-item">
-                            <a id="menu2-1" href="@Url.Action("Index", "Request")" class="nav-link animsition-link">
-                                <i class="nav-icon fas fa-edit"></i>
+                        @if (Session["Department"].ToString() != "Guest")
+                        {
+                            <li id="menu2" class="nav-item">
+                                <a id="menu2-1" href="@Url.Action("Index", "Request")" class="nav-link animsition-link">
+                                    <i class="nav-icon fas fa-edit"></i>
 
-                                <p>
-                                    Request change item
-                                </p>
-                            </a>
-                        </li>
+                                    <p>
+                                        Request change item
+                                    </p>
+                                </a>
+                            </li>
                         }
                         <li id="menu3" class="nav-item" style="display:none">
                             <a id="menu3-1" href="@Url.Action("Index", "Detail")" class="nav-link animsition-link">
                                 <i class="nav-icon far fa-clone"></i>
                                 <p>
                                     Detail
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="~/manual.pdf"  class="nav-link animsition-link">
+                                <i class="nav-icon far fa-clone"></i>
+                                <p>
+                                    Manual
                                 </p>
                             </a>
                         </li>
@@ -345,9 +354,9 @@
         <!-- /.control-sidebar -->
         <!-- Main Footer -->
         <footer class="main-footer" style="position: unset;">
-            <strong>Copyright &copy; 2019-2020 Tapics Design Team</strong> All rights reserved.
+            <strong>Copyright &copy; 2019-2020 IT Department Design Team</strong> All rights reserved.
             <div class="float-right d-none d-sm-inline-block">
-                <b>Version</b> 1
+                <b>Version</b> 1.1
             </div>
         </footer>
     </div>

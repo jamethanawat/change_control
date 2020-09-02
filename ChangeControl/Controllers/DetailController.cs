@@ -254,7 +254,7 @@ namespace ChangeControl.Controllers{
 
         public ActionResult RequestResubmit(string desc, string due_date){
             try{
-                M_Detail.InsertResubmit(desc, due_date, (long) Session["RelatedID"], Topic.Code, (string)Session["User"], Topic.Status);
+                M_Detail.InsertResubmit(desc, due_date, (long) Session["RelatedID"], Topic.Code, (string)Session["User"], Topic.Status, (string)Session["Department"]);
                 return Json(new {code=true}, JsonRequestBehavior.AllowGet);
             }catch (Exception ex){
                 return Json(new {code=false}, JsonRequestBehavior.AllowGet);

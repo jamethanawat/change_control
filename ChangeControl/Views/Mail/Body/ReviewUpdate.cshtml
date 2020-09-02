@@ -1,13 +1,17 @@
 ﻿@{
   string host = $"/Detail/Index/?id={Model.Code}";
 
-  var rev = (int) Session["ReviewRev"];
-  int prev_rev = rev - 1;
+ // var rev = (int) Session["ReviewRev"];
+  //int prev_rev = rev - 1;
+   var Irev = (int) Session["ReviewRev"];
+  int Iprev_rev = Irev - 1;
+  string rev = Irev.ToString("00");
+  string prev_rev = Iprev_rev.ToString("00");
 }
-    <p> 
+    @* <p> 
       <strong>Subject : </strong>
       Process change no. <b>@Model.Code</b>, <b> @Session["FullName"].ToString()</b> Revised Review Data to <b>Rev @rev</b>.
-    </p>
+    </p> *@
     <p>Dear all concernings,</p>
     <p>
       According to  <b>@Model.Code</b> of model <b>@Model.Model</b> Part no. <b>@Model.PartNo</b>, Review data has been revised
@@ -15,4 +19,4 @@
        , by <b>@Session["FullName"].ToString()</b>, Please check your Review data again.
     </p>
     <p>For more details, please click this <a href="@ViewBag.Url">Link.</a></p>
-    <p>Best Regards</p>
+    <p>Best Regards14</p>

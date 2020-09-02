@@ -156,64 +156,70 @@ namespace ChangeControl.Controllers{
                 
                 switch(ViewBag.Mode){
                     case "EmailRequestor" :
-                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Issue request.";
+                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Issue request.1";
                         break;
                     case "EmailRequested" :
-                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please approve request.";
+                        //1
+                        mailMessage.Subject = $"Phase Request : Process change no. {ViewBag.Topic.Code} Issued2";
                         break;
                     case "EmailReviewed" :
-                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please review.";
+                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please review.3";
                         break;
                     case "EmailTrialed" :
-                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please review.";
+                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please review.4";
                         break;
                     case "EmailConfirmed" :
-                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please review.";
+                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please review.5";
                         break;
                     case "InformPE" :
-                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please review.";
+                        //2
+                        mailMessage.Subject = $"Phase Review : Process change no. {ViewBag.Topic.Code} Requested6";
                         break;
                     case "InformUser" :
-                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Issue.";
+                        //4
+                        mailMessage.Subject = $"Phase Review : Process change no. {ViewBag.Topic.Code} Review7";
                         break;
                     case "RequestTrial" :
-                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Production request Trial please followup";
+                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Production request Trial please followup8";
                         break;
                     case "ReviewApproved" :
-                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please approve change request.";
+                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please approve change request.9";
                         break;
                     case "StartTrial" :
-                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please start Trial and Confirm.";
+                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please start Trial and Confirm.10";
                         break;
                     case "InformIPP" :
-                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please attach IPP label.";
+                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please attach IPP label.11";
                         break;
                     case "TrialApproved" :
-                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Review & Trial already please followup.";
+                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Review & Trial already please followup.12";
                         break;
                     case "StartConfirm" :
-                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please Initial Confirm.";
+                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please Initial Confirm.13";
                         break;
                     case "ConfirmApproved" :
-                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please close Initial Confirm.";
+                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Please close Initial Confirm.14";
                         break;
                     case "TopicUpdate" :
-                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} {ViewBag.Topic.Department} Revised review data to Rev{ViewBag.Topic.Revision}.";
+                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} {ViewBag.Topic.Department} Revised review data to Rev{ViewBag.Topic.Revision.ToString("00")}.15";
                         break;
-                    case "ReviewUpdate" :
-                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} {Session["FullName"].ToString()}; Revised review data to Rev{Session["ReviewRev"].ToString()}.";
+                    case "ReviewUpdate" :   
+                        string REVReview = Convert.ToInt32(Session["ReviewRev"].ToString()).ToString("00");
+                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} {Session["FullName"].ToString()}; Revised review data to Rev. {REVReview}16";
                         break;
                     case "TrialUpdate" :
-                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} {Session["FullName"].ToString()}; Revised trial data to Rev. {Session["TrialRev"].ToString()}";
+                        string REVTrial = Convert.ToInt32(Session["TrialRev"].ToString()).ToString("00");
+                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} {Session["FullName"].ToString()}; Revised trial data to Rev. {REVTrial}17";
                         break;
                     case "ConfirmUpdate" :
-                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} {Session["FullName"].ToString()}; Revised confirm data to Rev{Session["ConfirmRev"].ToString()}.";
+                        string REVConfirm = Convert.ToInt32(Session["ConfirmRev"].ToString()).ToString("00");
+                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} {Session["FullName"].ToString()}; Revised confirm data to Rev. {REVConfirm}18";
                         break;
                     case "TopicReject" :
-                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Not approve.";
+                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Not approve.19";
                         break;
                     case "RequestDocument" :
-                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Audit Request more documents.";
+                        mailMessage.Subject = $"Process change no. {ViewBag.Topic.Code} Audit Request more documents.20";
                         break;
                     default :
                         mailMessage.Subject = "ERROR";
