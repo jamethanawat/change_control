@@ -16,6 +16,8 @@ namespace ChangeControl.Controllers{
         }
         public HomeController(){
             M_Home = new HomeModel();
+            if(ViewBag.QCAudit == null) ViewBag.QCAudit = M_Home.GetQcAudit();
+            if(ViewBag.PEAudit == null) ViewBag.PEAudit = M_Home.GetPEAudit();
         }
         public ActionResult Index(){
             ViewBag.Departments = GetDepartmentList();
@@ -69,8 +71,8 @@ namespace ChangeControl.Controllers{
             var dept = Department ?? "Guest";
             var pos = Position ?? "Guest";
             bool isApprover = ViewBag.isApprover = (pos == "Approver") || (pos == "Admin") || (pos == "Special") ;
-            var isPEProcess = ViewBag.isPEProcess = (dept == "PE1_Process" || dept == "PE2_Process"|| dept == "P5_ProcessDesign"|| dept == "P6_ProcessDesign");
-            var isQC = ViewBag.isQC = (dept == "QC1" || dept == "QC2" || dept == "QC3");
+            var isPEProcess = ViewBag.isPEProcess = (ViewBag.PEAudit.Contains(dept));
+            var isQC = ViewBag.isQC = (ViewBag.QCAudit.Contains(dept));
             var confirm_dept_list = M_Home.GetConfirmDeptList();
 
 

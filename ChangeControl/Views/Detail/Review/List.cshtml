@@ -16,7 +16,7 @@
 
 @* /* --------------------- Show list of pending department -------------------- */ *@
 @foreach(var Element in Topic.RelatedListAlt){
-    if(Element.Review == 0 && Element.Department != "QC1" && Element.Department != "QC2" && Element.Department != "QC3"){
+    if(Element.Review == 0 && !ViewBag.QCAudit.Contains(Element.Department )){
     <div>
         <i class="fa fa-hourglass-half  bg-secondary blue-tooltip"></i>
         <div class="timeline-item card">
@@ -149,8 +149,7 @@
         </div>
         @{
             var isDepartment = (department == Element.Department);
-            @* if((isDepartment) && Element.Status != 1 && ((string)Session["Status"] == "Request" || (string)Session["Status"] == "Element")){ //Disable edit and approve button when Element have approved *@
-            if((isDepartment) && ((string)Session["Status"] == "Request" || (string)Session["Status"] == "Review")){
+            if((isDepartment) && ((int) Session["Status"] == 7 || (int) Session["Status"] == 8)){
             <hr style="margin-top:0px !important">
             <div class="timeline-footer">
                 <div class="float-right ">
@@ -159,7 +158,7 @@
                         <button class="btn btn-info btn-sm rv-related" id="related_rv" data-toggle="modal" data-target="#related_rv" value="@Element.ID">Add Related</button>
                         <button type="button" id="reject" class="btn btn-danger btn-sm">Reject</button>
                     }
-                        @if(ViewBag.isApprover && ((Element.Status !=1 && !ViewBag.isQC) || (!Topic.RelatedListAlt.Exists(e => e.Review == 0 && e.Department != "QC1" && e.Department != "QC2" && e.Department != "QC3") && ViewBag.isQC && !WaitingForCustomer))){ 
+                        @if(ViewBag.isApprover && ((Element.Status !=1 && !ViewBag.isQC) || (!Topic.RelatedListAlt.Exists(e => e.Review == 0 && !ViewBag.QCAudit.Contains(e.Department )) && ViewBag.isQC && !WaitingForCustomer))){ 
                             <button class="btn btn-info btn-sm mr-1 rv-approve" value="@Element.ID">Approve</button>
                         }
                 </div>

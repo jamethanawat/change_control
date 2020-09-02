@@ -22,6 +22,8 @@ namespace ChangeControl.Controllers{
         public LoginController(){
             M_Login = new LoginModel();
             M_Home = new HomeModel();
+            if(ViewBag.QCAudit == null) ViewBag.QCAudit = M_Home.GetQcAudit();
+            if(ViewBag.PEAudit == null) ViewBag.PEAudit = M_Home.GetPEAudit();
 
             res.data = null;
             res.status = null;
@@ -91,55 +93,13 @@ namespace ChangeControl.Controllers{
             }
         }
 
-        public string CheckDepartment(string dept){
-            string[] PE_Process = {"PE1_Process","PE2_Process","P5_ProcessDesign","P6_ProcessDesign"};
-            string[] MKT = {"MKT","MKT1","MKT2"};
-            string[] IT = {"IT","IT1","IT2"};
-            string[] PE = {"PE","PE1","PE2","PE2_SMT","PE2_PCB","PE2_MT"};
-            string[] PCH = {"PCH"};
-            string[] P = {"P","P1","P2","P3A","P3M","P4","P5","P6","P7"};
-            string[] PC = {"PC","PC1","PC2"};
-            string[] QC = {"QC","QC1","QC2","QC3"};
-            string[] QC_IN = {"QC_IN","QC_IN1","QC_IN2","QC_IN3"};
-            string[] QC_NFM = {"QC_NFM","QC_NFM1","QC_NFM2","QC_NFM3"};
-            string[] QC_FINAL = {"QC_FINAL","QC_FINAL1","QC_FINAL2","QC_FINAL3"};
-
-            var result = "Error";
-            
-            if(PE_Process.Contains(dept)){
-                result = "PE1_Process";
-            }else if(MKT.Contains(dept)){
-                result = "MKT";
-            }else if (IT.Contains(dept)){ 
-                result = "IT";
-            }else if(PE.Contains(dept)){
-                result = "PE";
-            }else if(PCH.Contains(dept)){
-                result = "PCH";
-            }else if(P.Contains(dept)){
-                result = "P";
-            }else if(PC.Contains(dept)){
-                result = "PC";
-            }else if(QC.Contains(dept)){
-                result = "QC";
-            }else if(QC_IN.Contains(dept)){
-                result = "QC_IN";
-            }else if(QC_NFM.Contains(dept)){
-                result = "QC_NFM";
-            }else if(QC_FINAL.Contains(dept)){
-                result = "QC_FINAL";
-            }else{
-                result = "Not found";
-            }
-            return result;
-        }
 
         public string GetDepartment(string us_id){
             myAD.ADInfo conAD = new myAD.ADInfo();
             var temp_dept = conAD.ChkSection(us_id);
             Session["DepartmentRawName"] = temp_dept;
 
-            string[] PE_Process = {"PE1_Process","PE2_Process","P5_ProcessDesign","P6_ProcessDesign"};
+            string[] PE_Process = ViewBag.PEAudit;
             string[] MKT = {"MKT"};
             string[] IT = {"IT"};
             string[] PE = {"PE1","PE2","PE2_SMT","PE2_PCB","PE2_MT"};
@@ -244,8 +204,8 @@ namespace ChangeControl.Controllers{
             var dept = Department ?? "Guest";
             var pos = Position ?? "Guest";
             bool isApprover = ViewBag.isApprover = (pos == "Approver") || (pos == "Admin") || (pos == "Special") ;
-            var isPEProcess = ViewBag.isPEProcess = (dept == "PE1_Process" || dept == "PE2_Process"|| dept == "P5_ProcessDesign"|| dept == "P6_ProcessDesign");
-            var isQC = ViewBag.isQC = (dept == "QC1" || dept == "QC2" || dept == "QC3");
+            var isPEProcess = ViewBag.isPEProcess = (ViewBag.PEAudit.Contains(dept));
+            var isQC = ViewBag.isQC = (ViewBag.QCAudit.Contains(dept));
             var confirm_dept_list = M_Home.GetConfirmDeptList();
 
 
@@ -286,5 +246,6 @@ namespace ChangeControl.Controllers{
                 ViewData["TopicList"] = cf_list;
             }
         }
+
     }
 }

@@ -127,12 +127,35 @@ namespace ChangeControl.Models
                 ID FROM Topic 
                 LEFT JOIN Change_Item ON Topic.Change_item = ID_Change_item 
                 LEFT JOIN Product_Type ON Topic.Product_Type = ID_Product_Type 
-                WHERE  Code = '{topic_code}' ORDER BY Revision DESC;";
+                WHERE ApprovedBy IS NOT NULL
+                AND Code = '{topic_code}' 
+                ORDER BY Revision DESC;";
                 var Topic = DB_CCS.Database.SqlQuery<TopicAlt>(sql).First();
                 return Topic;
             }catch(Exception ex){
-                TopicAlt blank_topic = new TopicAlt();
-                return blank_topic;
+                var sql = $@"SELECT  Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Department, Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, Timing, TimingDesc, Related, User_insert, Time_insert , ApprovedBy, ApprovedDate, 
+                ID FROM Topic 
+                LEFT JOIN Change_Item ON Topic.Change_item = ID_Change_item 
+                LEFT JOIN Product_Type ON Topic.Product_Type = ID_Product_Type 
+                WHERE Code = '{topic_code}' 
+                ORDER BY Revision DESC;";
+                var Topic = DB_CCS.Database.SqlQuery<TopicAlt>(sql).First();
+                return Topic;
+            }
+        }
+        public TopicAlt GetTopicByCodeAndOwned(string topic_code, string dept){
+            try{
+                var sql = $@"SELECT  Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Department, Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, Timing, TimingDesc, Related, User_insert, Time_insert , ApprovedBy, ApprovedDate, 
+                ID FROM Topic 
+                LEFT JOIN Change_Item ON Topic.Change_item = ID_Change_item 
+                LEFT JOIN Product_Type ON Topic.Product_Type = ID_Product_Type 
+                WHERE  Code = '{topic_code}' 
+                AND Department = '{dept}'
+                ORDER BY Revision DESC;";
+                var Topic = DB_CCS.Database.SqlQuery<TopicAlt>(sql).First();
+                return Topic;
+            }catch(Exception ex){
+                return this.GetTopicByCode(topic_code);
             }
         }
 
@@ -177,15 +200,16 @@ namespace ChangeControl.Models
             }
         }
 
-        public void InsertResubmit(string desc, string due_date, long related, string topic_code, string user_id, int status){
-            var sql = $@"INSERT INTO Resubmit (Description, DueDate, [Date], Related, Topic, [User], Status) 
-            VALUES('{desc.ReplaceSingleQuote()}', '{due_date}', '{date}', '{related}', '{topic_code}', '{user_id}', {status});";
+        public void InsertResubmit(string desc, string due_date, long related, string topic_code, string user_id, int status,string dept){
+            var sql = $@"INSERT INTO Resubmit (Description, DueDate, [Date], Related, Topic, [User], Status, Dept) 
+            VALUES('{desc.ReplaceSingleQuote()}', '{due_date}', '{date}', '{related}', '{topic_code}', '{user_id}', {status}, '{dept}');";
             DB_CCS.Database.ExecuteSqlCommand(sql);
         }
         
         public List<Resubmit> GetResubmitByTopicID(string topic_code){
-            var sql = $@"SELECT ID, Description, DueDate, [Date], Related, Topic, [User] 
-            FROM Resubmit WHERE Topic = '{topic_code}' ORDER BY [Date] DESC;";
+            var sql = $@"SELECT ID, Description, DueDate, [Date], Related, Topic, [User] ,Dept
+            FROM Resubmit WHERE Topic = '{topic_code}' 
+            ORDER BY [Date] DESC;";
             var result = DB_CCS.Database.SqlQuery<Resubmit>(sql).ToList();
             return result;
         }

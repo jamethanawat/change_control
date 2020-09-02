@@ -27,6 +27,8 @@ namespace ChangeControl.Controllers{
             M_Detail = new DetailModel();
             M_Req = new RequestModel();
             M_Home = new HomeModel();
+            if(ViewBag.QCAudit == null) ViewBag.QCAudit = M_Home.GetQcAudit();
+            if(ViewBag.PEAudit == null) ViewBag.PEAudit = M_Home.GetPEAudit();
         }
         public class Value{
             public List<string> value { get; set; }
@@ -172,7 +174,7 @@ namespace ChangeControl.Controllers{
           try{
                 var new_timing = timing.Split('-');
                 timing = $"{new_timing[2]}{new_timing[1]}{new_timing[0]}000000";
-                var new_topic = new Topic(temp_topic.Code, temp_topic.Type, changeItem, productType, temp_topic.Revision,(string) Session["Department"], model.ReplaceSingleQuote(),partNo.ReplaceSingleQuote(), partName.ReplaceSingleQuote(), processName.ReplaceSingleQuote(), status, appDescription.ReplaceSingleQuote(), subject.ReplaceSingleQuote(), detail.ReplaceSingleQuote(), timing.ReplaceSingleQuote(), timingDesc.ReplaceSingleQuote(), (long)Session["RelatedID"],(string)(Session["User"]), date );
+                var new_topic = new Topic(temp_topic.Code, temp_topic.Type, changeItem, productType, temp_topic.Revision,temp_topic.Department, model.ReplaceSingleQuote(),partNo.ReplaceSingleQuote(), partName.ReplaceSingleQuote(), processName.ReplaceSingleQuote(), status, appDescription.ReplaceSingleQuote(), subject.ReplaceSingleQuote(), detail.ReplaceSingleQuote(), timing.ReplaceSingleQuote(), timingDesc.ReplaceSingleQuote(), (long)Session["RelatedID"],(string)(Session["User"]), date );
                 if(temp_topic.Status == 3){
                     mail = "EmailRequested";
                     Session["TopicID"] = M_Req.UpdateTopic(new_topic);
@@ -181,7 +183,7 @@ namespace ChangeControl.Controllers{
                     Session["TopicID"] = M_Req.UpdateTopicWithRev(new_topic);
                 }
 
-              return Json(new { status = "success", id = temp_topic.Code, mail, dept=Session["Department"].ToString(), pos = "Approver" },JsonRequestBehavior.AllowGet);
+              return Json(new { status = "success", id = temp_topic.Code, mail, dept=temp_topic.Department, pos = "Approver" },JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex){
 
@@ -310,8 +312,8 @@ namespace ChangeControl.Controllers{
             var dept = Department ?? "Guest";
             var pos = Position ?? "Guest";
             bool isApprover = ViewBag.isApprover = (pos == "Approver") || (pos == "Admin") || (pos == "Special") ;
-            var isPEProcess = ViewBag.isPEProcess = (dept == "PE1_Process" || dept == "PE2_Process"|| dept == "P5_ProcessDesign"|| dept == "P6_ProcessDesign");
-            var isQC = ViewBag.isQC = (dept == "QC1" || dept == "QC2" || dept == "QC3");
+            var isPEProcess = ViewBag.isPEProcess = (ViewBag.PEAudit.Contains(dept));
+            var isQC = ViewBag.isQC = (ViewBag.QCAudit.Contains(dept));
             var confirm_dept_list = M_Home.GetConfirmDeptList();
 
 

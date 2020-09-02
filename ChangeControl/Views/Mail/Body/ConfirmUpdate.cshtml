@@ -1,18 +1,16 @@
 ﻿@{
   string host = $"/Detail/Index/?id={Model.Code}";
 
-  var rev = (int) Session["ConfirmRev"];
-  int prev_rev = rev - 1;
+  var Irev = Convert.ToInt32(Session["ConfirmRev"].ToString());
+  int Iprev_rev = Irev - 1;
+  string rev = Irev.ToString("00");
+  string prev_rev = Iprev_rev.ToString("00");
 }
-    <p> 
-      <strong>Subject : </strong>
-      Process change no. <b>@Model.Code</b>, <b> @Session["FullName"].ToString()</b> Revised Confim Data to <b>Rev @rev</b>.
-    </p>
     <p>Dear all concernings,</p>
     <p>
       According to  <b>@Model.Code</b> of model <b>@Model.Model</b> Part no. <b>@Model.PartNo</b>, Confim data has been revised
-       from revision <b>@prev_rev</b> to Revision <b>@rev</b>
-       , by <b>@Session["FullName"].ToString()</b>, Please check your Confim data again.
+       from revision <b>@prev_rev</b> to revision <b>@rev</b>
+       , by <b>@Session["FullName"].ToString()</b>, Please check your confim data again.
     </p>
     <p>For more details, please click this <a href="@ViewBag.Url">Link.</a></p>
     <p>Best Regards</p>

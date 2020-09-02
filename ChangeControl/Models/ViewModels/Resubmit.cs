@@ -14,7 +14,7 @@ namespace ChangeControl.Models{
         public long Related { get; set; }
         public List<RelatedAlt> RelatedList { get; set; }
         public List<Response> Responses { get; set; }
-        public User Profile {get; set;} 
-
+        public User Profile {get; set;}
+        public string Dept { get; set; }
     }
 }

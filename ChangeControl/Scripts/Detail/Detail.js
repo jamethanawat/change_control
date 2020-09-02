@@ -25,7 +25,7 @@ $(() => {
         new_rv.push(rv.name.split("-")[1]);
     });
 
-    if(topic_status == "Request" || !isQC || !isReview){
+    if(topic_status == "7" || !isQC || !isReview){
         $(".zoom-fab#change_status").addClass("hide-fab");
     }
 
@@ -46,7 +46,7 @@ $("#reject").click(() => {
                 if(res.trim().length != 0){
                     $.post(RejectTopicPath, {topic_code:topic_code,desc:res}, (result) => { 
                         if(result.status == "success" && result.mail != null && result.mail != ""){
-                            $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, }).fail((error) => {
+                            $.post(GenerateMailPath,{ 'mode': result.mail, 'dept': result.dept, 'topic_code':topic_code, }).fail((error) => {
                                 console.error(error);
                                 swal("Error", "Cannot send email to Requestor, Please try again", "error");
                                 return;
@@ -274,14 +274,16 @@ $.each(DepartmentLists, (key,val) => {
             $(`#rl-${val.Name}`).prop('checked', true);
     relatedValidate();
 }
-    $(`#rl-${val.Name}`).change(function(e) {
-            $(`.rl-${val.Name}`).each(function() {
-                this.checked = (e.target.checked) ? true : false;
+    $(`#rl-${val.Name}`).change(function(e) { //Group checkbox
+            $(`.rl-${val.Name}`).each(function() { //Sub checkbox
+                if(this.disabled == false){ //If sub checkbox is disabled
+                    this.checked = (e.target.checked) ? true : false;
+                }
             });
         relatedValidate();
     });
 
-    $(`.rl-${val.Name}`).click(function () {
+    $(`.rl-${val.Name}`).click(function () { //Sub checkbox
         if($(this).is(":checked")) {
             var isAllChecked = 0;
 
@@ -568,6 +570,40 @@ $("form#Confirm").submit((e) => {
 $("form#related_form").submit((e) => {
     e.preventDefault();
 
+    let QC1 = $("input#rl-29").prop("checked");
+    let QC2 = $("input#rl-30").prop("checked");
+    let QC3 = $("input#rl-31").prop("checked");
+        
+    let PE1_Process = $("input#rl-32").prop("checked");
+    let PE2_Process = $("input#rl-33").prop("checked");
+    let P5_ProcessDesign = $("input#rl-44").prop("checked");
+    let P6_ProcessDesign = $("input#rl-45").prop("checked");
+
+
+    if(isInternal){
+        if(!(PE1_Process || PE2_Process || P5_ProcessDesign || P6_ProcessDesign) || !(QC1 || QC2 || QC3)){ //Need to select PE_Process or QC as Auditor at lease one
+            swal("Warning", "Please select PE_Process and QC at least one", "warning");
+            return;
+        }else if(Number(QC1) + Number(QC2) + Number(QC3) != 1 && Number(PE1_Process) + Number(PE2_Process) + Number(P5_ProcessDesign) + Number(P6_ProcessDesign) != 1  == false){ //When select QC and PE_Process more than one
+            swal("Warning", "Please select one QC and one PE_Process", "warning");
+            return
+        }else if(Number(QC1) + Number(QC2) + Number(QC3) != 1 ){ //When select QC more than one
+            swal("Warning", "Please select one QC", "warning");
+            return
+        }else if(Number(PE1_Process) + Number(PE2_Process) + Number(P5_ProcessDesign) + Number(P6_ProcessDesign) != 1   ){ //When select PE_Process more than one
+            swal("Warning", "Please select one PE_Process", "warning");
+            return
+        }
+    }else if(isExternal){
+        if(!(QC1 || QC2 || QC3)){ //Need to select QC as Auditor at lease one
+            swal("Warning", "Please select QC at least one", "warning");
+            return;
+        }else if(Number(QC1) + Number(QC2) + Number(QC3) != 1 ){ //When select QC more than one
+            swal("Warning", "Please select one QC", "warning");
+            return
+        }
+    }
+
     let new_dept_related = $(".new_related").serializeArray();
     for(x in new_dept_related){
         new_dept_related[x] = new_dept_related[x].name;
@@ -585,11 +621,13 @@ $("form#related_form").submit((e) => {
         console.log('Related created');
         $.post(UpdateTopicRelatedPath,(res) => {
             if(res.status == "success"){
-                $.post(GenerateMailPath,{ 'mode': 'InformUser', 'topic_code':topic_code, 'dept_arry': new_dept_related, }).fail((error) => {
-                    console.error(error);
-                    swal("Error", "Cannot send email to Related user, Please try again", "error");
-                    return;
-                })
+                if(topic_status == "8"){
+                    $.post(GenerateMailPath,{ 'mode': 'InformUser', 'topic_code':topic_code, 'dept_arry': new_dept_related, }).fail((error) => {
+                        console.error(error);
+                        swal("Error", "Cannot send email to Related user, Please try again", "error");
+                        return;
+                    });
+                }
                 swal("Success", "Update related complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
             }
         });
@@ -657,13 +695,13 @@ $("form#related_form").submit((e) => {
     $(".zoom-fab#change_status").click(() => {
         var change_status = "Change status from";
         var new_status = 0;
-        if(topic_status == "Review"){
+        if(topic_status == "8"){
             change_status += " Review to Trial";
             new_status = 9;
-        }else if(topic_status == "Trial"){
+        }else if(topic_status == "9"){
             change_status += " Trial to Confirm";
             new_status = 10;
-        }else if(topic_status == "Confirm"){
+        }else if(topic_status == "10"){
             change_status += " Confirm to Close";
             new_status = 11;
         }

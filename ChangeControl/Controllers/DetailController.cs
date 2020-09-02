@@ -22,6 +22,8 @@ namespace ChangeControl.Controllers{
             M_Req = new RequestModel();
             M_Home = new HomeModel();
             C_Mail = new MailController();
+            if(ViewBag.QCAudit == null) ViewBag.QCAudit = M_Home.GetQcAudit();
+            if(ViewBag.PEAudit == null) ViewBag.PEAudit = M_Home.GetPEAudit();
         }
         public class Value{
             public List<string> value { get; set; }
@@ -41,7 +43,7 @@ namespace ChangeControl.Controllers{
 
         public ActionResult Index(string id){
             if((string)(Session["User"]) == null || (string)(Session["Department"]) == null){
-                Session["RedirectID"] = (id != null) ? id : null;
+                Session["RedirectID"] = id ?? null;
                 Session["RedirectMode"] = "Detail";
                 return RedirectToAction("Index", "LogIn");
             }
@@ -49,13 +51,9 @@ namespace ChangeControl.Controllers{
             GenerateTopicList(Session["Department"].ToString(), Session["Position"].ToString());
             Session["RedirectID"] = null;
 
-            if(id != null){
-                Session["TopicCode"] = id;
-            }else{
-                Session["TopicCode"] = M_Detail.GetFirstTopic();
-            }
+                Session["TopicCode"] = id ?? M_Detail.GetFirstTopic();
 
-            Topic = M_Detail.GetTopicByCode(Session["TopicCode"].ToString() as string);
+            Topic = M_Detail.GetTopicByCodeAndOwned(Session["TopicCode"].ToString(), Session["Department"].ToString());
             Topic.Profile = M_Detail.getUserByID(Topic.User_insert);
             Topic.Time_insert = Topic.Time_insert.StringToDateTime();
             Topic.Timing = Topic.Timing.StringToDateTime();
@@ -166,7 +164,7 @@ namespace ChangeControl.Controllers{
             var tmp_dept_id = (int)Session["DepartmentID"];
 
             // Set review item for each department
-            if(tmp_dept != "PE1_Process" && tmp_dept != "PE1_Process" && tmp_dept != "QC"){
+            if(!ViewBag.PEAudit.Contains(tmp_dept) && !ViewBag.QCAudit.Contains(tmp_dept)){
                 var rv_form_item = M_Detail.GetReviewItemByDepartment(tmp_dept_id);
                 ViewData["FormReviewItem"] = rv_form_item;
             }
@@ -254,7 +252,7 @@ namespace ChangeControl.Controllers{
 
         public ActionResult RequestResubmit(string desc, string due_date){
             try{
-                M_Detail.InsertResubmit(desc, due_date, (long) Session["RelatedID"], Topic.Code, (string)Session["User"], Topic.Status);
+                M_Detail.InsertResubmit(desc, due_date, (long) Session["RelatedID"], Topic.Code, (string)Session["User"], Topic.Status, (string)Session["Department"]);
                 return Json(new {code=true}, JsonRequestBehavior.AllowGet);
             }catch (Exception ex){
                 return Json(new {code=false}, JsonRequestBehavior.AllowGet);
@@ -334,7 +332,7 @@ namespace ChangeControl.Controllers{
             }
             var updated_rv = M_Detail.UpdateReview((long) Session["TopicID"], Session["TopicCode"].ToString(), Session["User"].ToString(), Session["Department"].ToString());
             Session["ReviewID"] = updated_rv.ID;
-            Session["ReviewRev"] = updated_rv.Revision;
+            Session["ReviewRev"] = updated_rv.Revision.ToString();
             return Json(new {code = 1,dept = Session["Department"].ToString()}, JsonRequestBehavior.AllowGet);
         }
 
@@ -408,11 +406,11 @@ namespace ChangeControl.Controllers{
                 var mail = "";
                 var dept = "";
                 M_Detail.ApproveReview(review_id,(string) Session["User"]);
-                if(Topic.Status == 7 && (Session["Department"].ToString() == "PE1_Process" || Session["Department"].ToString() == "PE2_Process" || Session["Department"].ToString() == "P5_ProcessDesign" || Session["Department"].ToString() == "P6_ProcessDesign") && Topic.Type == "Internal"){ //PE_Process open review case
+                if(Topic.Status == 7 && (ViewBag.PEAudit.Contains(Session["Department"].ToString())) && Topic.Type == "Internal"){ //PE_Process open review case
                     M_Detail.UpdateTopicStatus(Session["TopicCode"].ToString(), 8);
                     M_Detail.UpdateTopicApproveRequest(Session["User"].ToString(),Topic.Code);
                     mail = "InformUser";
-                }else if(Topic.Status == 8 && Session["Department"].ToString() == "QC1" || Session["Department"].ToString() == "QC2" || Session["Department"].ToString() == "QC3" ){
+                }else if(Topic.Status == 8 && ViewBag.QCAudit.Contains(Session["Department"].ToString()) ){
                     var rv_list = Session["ReviewList"] as List<Review>;
                     if(rv_list.Exists(e => e.Item.Exists(d => d.Type == 24 && d.Status == 1))){ //Request trial not exist
                         M_Detail.UpdateTopicStatus(Session["TopicCode"].ToString(), 9);
@@ -441,7 +439,7 @@ namespace ChangeControl.Controllers{
                 var mail = "";
                 var dept = "";
                 M_Detail.ApproveTrial(trial_id,(string) Session["User"]);
-                if(Topic.Status == 9 && Session["Department"].ToString() == "QC1" || Session["Department"].ToString() == "QC2" || Session["Department"].ToString() == "QC3" ){
+                if(Topic.Status == 9 && ViewBag.QCAudit.Contains(Session["Department"].ToString()) ){
                     M_Detail.UpdateTopicStatus(Session["TopicCode"].ToString(), 10);
                     M_Detail.UpdateTopicApproveTrial(Session["User"].ToString(),Topic.Code);
                     mail = "StartConfirm";
@@ -464,7 +462,7 @@ namespace ChangeControl.Controllers{
                 var mail = "";
                 var dept = "ConfirmApproved";
                 M_Detail.ApproveConfirm(confirm_id,(string) Session["User"]);
-                if(Topic.Status == 10 && Session["Department"].ToString() == "QC1" || Session["Department"].ToString() == "QC2" || Session["Department"].ToString() == "QC3" ){
+                if(Topic.Status == 10 && ViewBag.QCAudit.Contains(Session["Department"].ToString()) ){
                     M_Detail.UpdateTopicStatus(Session["TopicCode"].ToString(), 11);
                     M_Detail.UpdateTopicApproveClose(Session["User"].ToString(),Topic.Code);
                 }else if(Topic.Status == 10){
@@ -532,7 +530,6 @@ namespace ChangeControl.Controllers{
         }
 
         public void FilterConfirmRelated(List<Confirm> cf_list) {
-            // string[] confirm_dept_list= {"P1","P2","P3A","P3M","P4","P5","P6","P7","QC_IN1","QC_IN2","QC_IN3","QC_FINAL1","QC_FINAL2","QC_FINAL3","QC_NFM1","QC_NFM2","QC_NFM3","QC1","QC2","QC3"};
             var confirm_dept_list = M_Detail.GetConfirmDeptList();
             ViewBag.cf_list = confirm_dept_list;
 
@@ -550,14 +547,14 @@ namespace ChangeControl.Controllers{
         public bool CheckAllReviewBeforeApprove(string topic_code){
             var dept = (string) Session["Department"];
             var result = true;
-            if(dept == "QC1" || dept == "QC2" || dept == "QC3"){
+            if(ViewBag.QCAudit.Contains(dept)){
                 List<Review> rv_list = M_Detail.CheckAllReviewBeforeApprove(topic_code);
                 TopicAlt topic = Session["Topic"] as TopicAlt;
                     if(rv_list.Count != 0){
-                        if(topic.Type == "Internal" && (string) Session["Department"] == "PE1_Process" || (string)  Session["Department"] == "PE2_Process" ){
-                            var rv_pe_process = rv_list.Find(x => x.Department == "PE1_Process" || x.Department == "PE2_Process");
+                        if(topic.Type == "Internal" && ViewBag.PEAudit.Contains(Session["Department"].ToString()) ){
+                            var rv_pe_process = rv_list.Find(x => ViewBag.PEAudit.Contains(x.Department));
                             if(rv_pe_process != null) rv_list.Remove(rv_pe_process);
-                            result = (rv_list.Count != 0) ? !rv_list.Exists(e => e.Status == 3 && e.Department != "PE1_Process" || e.Department != "PE2_Process") : true;
+                            result = (rv_list.Count != 0) ? !rv_list.Exists(e => e.Status == 3 && ViewBag.PEAudit.Contains(e.Department)) : true;
                         }else{
                             result = !rv_list.Exists(e => e.Status == 3);
                         }
@@ -570,7 +567,7 @@ namespace ChangeControl.Controllers{
 
         public bool CheckAllTrialBeforeApprove(string topic_code){
             var dept = (string) Session["Department"];
-            if(dept == "QC1" || dept == "QC2" || dept == "QC3"){
+            if(ViewBag.QCAudit.Contains(dept)){
                 List<Trial> result = M_Detail.CheckAllTrialBeforeApprove(topic_code);
                 return (result.Count != 0) ? !result.Exists(e => e.Status == 3) : false;
             }else{
@@ -580,7 +577,7 @@ namespace ChangeControl.Controllers{
 
         public bool CheckAllConfirmBeforeApprove(string topic_code){
             var dept = (string) Session["Department"];
-            if(dept == "QC1" || dept == "QC2" || dept == "QC3"){
+            if(ViewBag.QCAudit.Contains(dept)){
                 List<Confirm> result = M_Detail.CheckAllConfirmBeforeApprove(topic_code);
                 return (result.Count != 0) ? !result.Exists(e => e.Status == 3) : true;
             }else{
@@ -592,12 +589,14 @@ namespace ChangeControl.Controllers{
             try{
                 var temp_topic = (TopicAlt) Session["Topic"];
                 var mail = "";
+                var dept = "";
                 this.UpdateTopicStatus(topic_code,12);
                 M_Detail.RejectTopic(topic_code,desc,(string) Session["User"], (string) Session["Department"]);
-                if(temp_topic.Status == 8){
-                    mail = "TopicReject";
+                mail = "TopicReject";
+                if(temp_topic.Status == 7){
+                    dept = temp_topic.Department;
                 }
-                return Json(new {status="success", mail}, JsonRequestBehavior.AllowGet);
+                return Json(new {status="success", mail , dept}, JsonRequestBehavior.AllowGet);
             }catch(Exception err){
                 return Json(new {status="error"}, JsonRequestBehavior.AllowGet);
             }
@@ -613,9 +612,8 @@ namespace ChangeControl.Controllers{
 
         public ActionResult CheckApproveIPP(string topic_code){
             try{
-                string[] qc_list = {"QC1", "QC2", "QC3"};
                 List<Review> temp_rv_list = (List<Review>) Session["ReviewList"];
-                if(temp_rv_list.Exists(rv => rv.Item.Exists(rv_item => rv_item.Type == 26 && rv_item.Status == 1)) && qc_list.Contains(Session["Department"].ToString())){
+                if(temp_rv_list.Exists(rv => rv.Item.Exists(rv_item => rv_item.Type == 26 && rv_item.Status == 1)) && ViewBag.QCAudit.Contains(Session["Department"].ToString())){
                     string[] pt_list = {"P1","P2","P3A","P3M","P4","P5","P6","P7"};
                     string[] qcf_list = {"QC_FINAL1", "QC_FINAL2", "QC_FINAL3"};
 
@@ -655,8 +653,8 @@ namespace ChangeControl.Controllers{
             var dept = Department ?? "Guest";
             var pos = Position ?? "Guest";
             bool isApprover = ViewBag.isApprover = (pos == "Approver") || (pos == "Admin") || (pos == "Special") ;
-            var isPEProcess = ViewBag.isPEProcess = (dept == "PE1_Process" || dept == "PE2_Process"|| dept == "P5_ProcessDesign"|| dept == "P6_ProcessDesign");
-            var isQC = ViewBag.isQC = (dept == "QC1" || dept == "QC2" || dept == "QC3");
+            var isPEProcess = ViewBag.isPEProcess = (ViewBag.PEAudit.Contains(dept));
+            var isQC = ViewBag.isQC = (ViewBag.QCAudit.Contains(dept));
             var confirm_dept_list = M_Home.GetConfirmDeptList();
 
 

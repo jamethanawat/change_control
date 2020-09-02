@@ -16,7 +16,7 @@
 
 @* /* --------------------- Show list of pending department -------------------- */ *@
 @foreach(var Element in Topic.RelatedListAlt){
-    if(Element.Trial == 0 && Element.Department != "QC1" && Element.Department != "QC2" && Element.Department != "QC3"){
+    if(Element.Trial == 0 && !ViewBag.QCAudit.Contains(Element.Department )){
     <div>
         <i class="fa fa-hourglass-half  bg-secondary blue-tooltip"></i>
         <div class="timeline-item card">
@@ -116,13 +116,12 @@
         </div>
         @{
             var isDepartment = (department == Element.Department);
-            @* if((ViewBag.isApprover || isDepartment) && Element.Status != 1  && (string)Session["Status"] == "Element"){ *@
-            if((isDepartment) && (string)Session["Status"] == "Trial & Confirm"){
+            if((isDepartment) && (int) Session["Status"] == 9){
             <hr style="margin-top:0px !important">
             <div class="timeline-footer">
                 <div class="float-right ">
                     <a href="#" class="btn btn-warning btn-sm tr-edit"id="edit_tr" data-toggle="modal" data-target="#edit_trial" value="@Element.ID" >Edit</a>
-                        @if(ViewBag.isApprover && ((Element.Status !=1 && !ViewBag.isQC) || (!ElementList.Exists(e => e.Status == 3 && e.Department != "QC1" && e.Department != "QC2" && e.Department != "QC3") && ViewBag.isQC)) ){ 
+                        @if(ViewBag.isApprover && ((Element.Status !=1 && !ViewBag.isQC) || (!ElementList.Exists(e => e.Status == 3 && !ViewBag.QCAudit.Contains(e.Department )) && ViewBag.isQC)) ){ 
                             <button a href="#" class="btn btn-info btn-sm mr-1 tr-approve" value="@Element.ID">Approve</button> 
                         }
                 </div>

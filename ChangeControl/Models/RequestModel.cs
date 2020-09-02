@@ -126,7 +126,10 @@ namespace ChangeControl.Models{
         }
 
          public long UpdateTopicWithRev(Topic m){
-            string query = $@"INSERT INTO Topic (Code, [Type], Change_item, Product_type, Revision , Department, Model, PartNo, PartName, ProcessName, Status, [APP/IPP], Subject, Detail, Timing , TimingDesc ,Related, User_insert, Time_insert)  
+            string query = $@"
+            UPDATE CCS_TEST.dbo.Topic SET Status = 3 WHERE Code = '{m.Code}';
+
+            INSERT INTO Topic (Code, [Type], Change_item, Product_type, Revision , Department, Model, PartNo, PartName, ProcessName, Status, [APP/IPP], Subject, Detail, Timing , TimingDesc ,Related, User_insert, Time_insert)  
             OUTPUT Inserted.ID VALUES( '{m.Code}','{m.Type}', {m.Change_item} , '{m.Product_type}' , 
                 (SELECT MAX(t.Revision)+1 FROM Topic t WHERE t.Code = '{m.Code}') 
              ,'{m.Department}' ,'{m.Model}', '{m.PartNo}', '{m.PartName}', '{m.ProcessName}', '{m.Status}', '{m.App}' , '{m.Subject}' , '{m.Detail}', '{m.Timing}','{m.TimingDesc}', '{m.Related}','{m.User_insert}','{m.Time_insert}' );";

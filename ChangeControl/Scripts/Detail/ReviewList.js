@@ -20,26 +20,34 @@ $(() => {
             if(apr){
                 $.post(CheckAllReviewBeforeApprovePath, {topic_code:topic_code}, (res) => {
                     if(res == "True"){
+                        var promises = [];
+
                         $.post(ApproveReviewPath, {review_id:rv_id}, (result) => {
                             if(result){
                                 if(result.mail != "" && result.mail != null){
+                                promises.push(
                                     $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept': result.dept, }).fail((error) => {
                                         console.error(error);
                                         swal("Error", "Cannot send email to Requestor, Please try again", "error");
                                         return;
-                                    });
+                                    })
+                                );
                                 }
                                 $.post(CheckApproveIPPPath, {topic_code:topic_code}, (res) => { 
                                     if(res.status == "success"){
-                                        $.post(GenerateMailPath,{ 'mode': 'InformIPP', 'topic_code':topic_code, 'dept_arry': res.data, }).fail((error) => {
+                                        promises.push(
+                                            $.post(GenerateMailPath,{ 'mode': 'InformIPP', 'topic_code':topic_code, 'dept_arry': res.data, }).fail((error) => {
                                             console.error(error);
                                             console.error("err: ipp");
                                             swal("Error", "Cannot send email to IPP, Please try again", "error");
                                             return;
-                                        });
+                                            })
+                                        );
                                     }
                                 })
-                                swal("Success", "Change Status Success", "success").then(location.reload());
+                                Promise.all(promises).then(() => {
+                                    swal("Success", "Change Status Success", "success").then(location.reload());
+                                });
                             }else{
                                 swal("Error", "User Password Not Correct", "error");
                             }

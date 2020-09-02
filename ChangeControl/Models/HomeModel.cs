@@ -342,6 +342,19 @@ namespace ChangeControl.Models
             return result;
         }
 
+        public List<String> GetQcAudit(){
+            var sql = $@"SELECT Name FROM Department
+                WHERE [Group] = 'Quality Control' AND Audit = 1;";
+            var result = DB_CCS.Database.SqlQuery<String>(sql).ToList();
+            return result;
+        }
+        public List<String> GetPEAudit(){
+            var sql = $@"SELECT Name FROM Department
+                WHERE [Group] = 'Production Engineer Process' AND Audit = 1;";
+            var result = DB_CCS.Database.SqlQuery<String>(sql).ToList();
+            return result;
+        }
+
         
 
 

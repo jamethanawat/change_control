@@ -93,6 +93,7 @@ $(document).ready(function () {
     $("form.Request").submit((e) => {
         e.preventDefault();
         
+        // CheckAudit();
         let QC1 = $("input#29").prop("checked");
         let QC2 = $("input#30").prop("checked");
         let QC3 = $("input#31").prop("checked");
@@ -101,11 +102,11 @@ $(document).ready(function () {
         let PE2_Process = $("input#33").prop("checked");
         let P5_ProcessDesign = $("input#44").prop("checked");
         let P6_ProcessDesign = $("input#45").prop("checked");
-
+    
         let isInternal = $("#type_internal").is(":checked");
         let isExternal = $("#type_external").is(":checked");
-
-
+    
+    
         if(isInternal){
             if(!(PE1_Process || PE2_Process || P5_ProcessDesign || P6_ProcessDesign) || !(QC1 || QC2 || QC3)){ //Need to select PE_Process or QC as Auditor at lease one
                 swal("Warning", "Please select PE_Process and QC at least one", "warning");
@@ -207,13 +208,51 @@ $(document).ready(function () {
 
     $("form.Edit").submit((e) => {
         e.preventDefault();
+
+        // CheckAudit();
+        let QC1 = $("input#29").prop("checked");
+        let QC2 = $("input#30").prop("checked");
+        let QC3 = $("input#31").prop("checked");
+            
+        let PE1_Process = $("input#32").prop("checked");
+        let PE2_Process = $("input#33").prop("checked");
+        let P5_ProcessDesign = $("input#44").prop("checked");
+        let P6_ProcessDesign = $("input#45").prop("checked");
+    
+        let isInternal = $("#type_internal").is(":checked");
+        let isExternal = $("#type_external").is(":checked");
+    
+    
+        if(isInternal){
+            if(!(PE1_Process || PE2_Process || P5_ProcessDesign || P6_ProcessDesign) || !(QC1 || QC2 || QC3)){ //Need to select PE_Process or QC as Auditor at lease one
+                swal("Warning", "Please select PE_Process and QC at least one", "warning");
+                return;
+            }else if(Number(QC1) + Number(QC2) + Number(QC3) != 1 && Number(PE1_Process) + Number(PE2_Process) + Number(P5_ProcessDesign) + Number(P6_ProcessDesign) != 1  == false){ //When select QC and PE_Process more than one
+                swal("Warning", "Please select one QC and one PE_Process", "warning");
+                return
+            }else if(Number(QC1) + Number(QC2) + Number(QC3) != 1 ){ //When select QC more than one
+                swal("Warning", "Please select one QC", "warning");
+                return
+            }else if(Number(PE1_Process) + Number(PE2_Process) + Number(P5_ProcessDesign) + Number(P6_ProcessDesign) != 1   ){ //When select PE_Process more than one
+                swal("Warning", "Please select one PE_Process", "warning");
+                return
+            }
+        }else if(isExternal){
+            if(!(QC1 || QC2 || QC3)){ //Need to select QC as Auditor at lease one
+                swal("Warning", "Please select QC at least one", "warning");
+                return;
+            }else if(Number(QC1) + Number(QC2) + Number(QC3) != 1 ){ //When select QC more than one
+                swal("Warning", "Please select one QC", "warning");
+                return
+            }
+        }
+        
             let form = SerializeReviewForm();
             let quick_form = $(".related_radio").serializeArray();
             for(x in quick_form){
                 quick_form[x] = quick_form[x].name;
             }
 
-            let topic_id = $("form.Edit").attr('id');
             console.log('form: ',form);
             files = file_list;
             for(var index in files){
@@ -373,6 +412,45 @@ function SerializeReviewForm(){
 function SerializeArrayReviewForm(){
     let form = $("form").serializeArray();
     return form;
+}
+
+function CheckAudit(){
+    let QC1 = $("input#29").prop("checked");
+    let QC2 = $("input#30").prop("checked");
+    let QC3 = $("input#31").prop("checked");
+        
+    let PE1_Process = $("input#32").prop("checked");
+    let PE2_Process = $("input#33").prop("checked");
+    let P5_ProcessDesign = $("input#44").prop("checked");
+    let P6_ProcessDesign = $("input#45").prop("checked");
+
+    let isInternal = $("#type_internal").is(":checked");
+    let isExternal = $("#type_external").is(":checked");
+
+
+    if(isInternal){
+        if(!(PE1_Process || PE2_Process || P5_ProcessDesign || P6_ProcessDesign) || !(QC1 || QC2 || QC3)){ //Need to select PE_Process or QC as Auditor at lease one
+            swal("Warning", "Please select PE_Process and QC at least one", "warning");
+            return;
+        }else if(Number(QC1) + Number(QC2) + Number(QC3) != 1 && Number(PE1_Process) + Number(PE2_Process) + Number(P5_ProcessDesign) + Number(P6_ProcessDesign) != 1  == false){ //When select QC and PE_Process more than one
+            swal("Warning", "Please select one QC and one PE_Process", "warning");
+            return
+        }else if(Number(QC1) + Number(QC2) + Number(QC3) != 1 ){ //When select QC more than one
+            swal("Warning", "Please select one QC", "warning");
+            return
+        }else if(Number(PE1_Process) + Number(PE2_Process) + Number(P5_ProcessDesign) + Number(P6_ProcessDesign) != 1   ){ //When select PE_Process more than one
+            swal("Warning", "Please select one PE_Process", "warning");
+            return
+        }
+    }else if(isExternal){
+        if(!(QC1 || QC2 || QC3)){ //Need to select QC as Auditor at lease one
+            swal("Warning", "Please select QC at least one", "warning");
+            return;
+        }else if(Number(QC1) + Number(QC2) + Number(QC3) != 1 ){ //When select QC more than one
+            swal("Warning", "Please select one QC", "warning");
+            return
+        }
+    }
 }
 
 // window.onload = function () {
