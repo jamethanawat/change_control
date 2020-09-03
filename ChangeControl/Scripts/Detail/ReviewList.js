@@ -33,7 +33,8 @@ $(() => {
                                     })
                                 );
                                 }
-                                $.post(CheckApproveIPPPath, {topic_code:topic_code}, (res) => { 
+                                promises.push(
+                                    $.post(CheckApproveIPPPath, {topic_code:topic_code}, (res) => { 
                                     if(res.status == "success"){
                                         promises.push(
                                             $.post(GenerateMailPath,{ 'mode': 'InformIPP', 'topic_code':topic_code, 'dept_arry': res.data, }).fail((error) => {
@@ -45,6 +46,7 @@ $(() => {
                                         );
                                     }
                                 })
+                                );
                                 Promise.all(promises).then(() => {
                                     swal("Success", "Change Status Success", "success").then(location.reload());
                                 });
