@@ -324,6 +324,7 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\DetailController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
@@ -340,6 +341,7 @@
     <Compile Include="Models\DetailModel.cs" />
     <Compile Include="Models\HomeModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
+    <Compile Include="Models\UserModel.cs" />
     <Compile Include="Models\MailModel.cs" />
     <Compile Include="Models\RequestModel.cs" />
     <Compile Include="Models\ViewModels\ChangeItem.cs" />
@@ -443,6 +445,8 @@
     <Content Include="Plugin\animsition\src\css\zoom\zoom-sm.css" />
     <Content Include="Plugin\animsition\src\css\zoom\zoom.css" />
     <Content Include="Plugin\animsition\src\js\animsition.js" />
+    <Content Include="Plugin\dataTables.treeGrid-ch.js" />
+    <Content Include="Plugin\dataTables.treeGrid.js" />
     <Content Include="Plugin\datepicker\datepicker.common.js" />
     <Content Include="Plugin\datepicker\datepicker.css" />
     <Content Include="Plugin\datepicker\datepicker.esm.js" />
@@ -523,6 +527,7 @@
     <Content Include="Scripts\Detail\Detail.js" />
     <Content Include="Scripts\Detail\ReviewList.js" />
     <Content Include="Scripts\Detail\TrialList.js" />
+    <Content Include="Scripts\User\User.js" />
     <Content Include="Scripts\Home\Home.js" />
     <!-- <Content Include="Scripts\jquery-3.4.1.js" />
     <Content Include="Scripts\jquery-3.4.1.min.js" />
@@ -3944,6 +3949,7 @@
     <Content Include="Views\Mail\Body\EmailConfirmed.cshtml" />
     <Content Include="Views\Mail\Body\EmailRequested.cshtml" />
     <Content Include="Views\Mail\Body\EmailTrialed.cshtml" />
+    <Content Include="Views\User\Index.cshtml" />
     <None Include="Web References\myAD\ADInfo.disco" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />

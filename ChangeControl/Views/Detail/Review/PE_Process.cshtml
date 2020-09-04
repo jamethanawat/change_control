@@ -51,7 +51,7 @@
             <textarea data-type="desc" data-id="2" name="desc-2" class="form-control" placeholder=""></textarea>
         </div>
     </div>
-    @* <div class="form-group row">
+    <div class="form-group row">
         <label for="inputEffeDoc" class="col-sm-3 col-form-label">Effected to Document (Control Plan ,FMEA)</label>
         <div class="col-sm-3 col-form-label">
             <label class="mr-3">
@@ -71,7 +71,7 @@
             <label>FMEA No. :</label>
             <textarea name="desc-30" data-type="desc" data-id="30" class="form-control" placeholder=""></textarea>
         </div>
-    </div> *@
+    </div>
     <div class="form-group row">
         <label for="inputSkills" class="col-sm-3 col-form-label">Due Date</label>
         <div class="col-sm-9 col-form-label">
@@ -117,7 +117,7 @@
         <div class="col-sm-12">
             <span class="text-danger" id="validate-warning" style="display:none">กรุณาระบุข้อมูล/รายละเอียดให้ครบถ้วน</span>
             <div class="float-right">
-                @if(ViewBag.isApprover){
+                @if(ViewBag.isApprover && ViewBag.isInternal){
                     <a class="btn btn-warning rv-related" id="related_rv" data-toggle="modal" data-target="#related_rv">Related</a>
                     <button type="button" id="reject" class="btn btn-danger">Reject</button>
                 }

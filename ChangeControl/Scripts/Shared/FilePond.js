@@ -109,7 +109,7 @@ $(() => {
             },
             icon:"warning",
         }).then((result) => {
-            $(".modal").not("#resubmit_modal").modal("show");
+            // $(".modal").not("#resubmit_modal").modal("show");
             if(result != null && result != "" && result != "clear"){
                  console.log(`${update_id}`);
                 $(`.filepond--file-status-main#s${update_id}`).html(result).show("slow");
@@ -119,48 +119,12 @@ $(() => {
                     text: "เพิ่มคำอธิบายสำเร็จ", 
                     icon:"success",
                 });
-            }else if(result == "clear"){
+            }else if(result != null){
                 $(`.filepond--file-status-main#s${update_id}`).hide("slow");
                 file_list[update_i].description = null;
-                // swal({
-                //     title: "สำเร็จ", 
-                //     text: "เพิ่มคำอธิบายสำเร็จ", 
-                //     icon:"success",
-                // });
             }
         });
     }
 
-    // window.pondAddFile = (path = "/nature.jpg") => {
-    //     pond.addFile(path, {options: {
-    //         file: {
-    //             name: 'my-file.png',
-    //         }
-    //     }});
-    // };
-
-    // window.addPondFile = () => {
-
-    // }
-
-    // window.addFile = (id = null,file,description = null) => {
-    //     file_arry.push(file);
-    //     let detail = {
-    //         id: id,
-    //         description: description
-    //     }
-    //     if(description != null) file_detail.push(detail);
-    //     file_length++;
-    // }
-
-    // window.getFile = () => {
-    //     return file_arry;
-    // }
-
-    // window.pondSetOptions = () => {
-    //     pond.setOptions({
-    //         files:file_arry
-    //     });
-    // }
 
 });

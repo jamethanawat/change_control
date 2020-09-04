@@ -118,10 +118,9 @@ $(document).ready(function () {
         $("#TNScontrolNo").attr("placeholder","__-_______");
         $('#date_range').data('daterangepicker').setStartDate(moment().format('DD/MM/YYYY'));
         $('#date_range').data('daterangepicker').setEndDate(moment().format('DD/MM/YYYY'));
-        $("#date_range").prop("disabled", false);
-        $("#date_range").css('color', '#495057');
-
-
+        $("#date_range").prop("disabled", true);
+        $("#date_range").css('color', '#e9ecef');
+        $("#change_date_switch").prop("checked",true);
     });
 
 /* -------------------------------------------------------------------------- */

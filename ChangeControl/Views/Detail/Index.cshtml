@@ -44,7 +44,7 @@
 
     var pe_audit = (Topic.RelatedListAlt.Find(e => ViewBag.PEAudit.Contains(e.Department) ));
 
-    var QcReviewable = ViewBag.QcReviewable = (Topic.RelatedListAlt != null) ? (Topic.RelatedListAlt.Exists(e => e.Review == 0 && (ViewBag.QCAudit.Contains(e.Department )) && Topic.RelatedListAlt.Count(d => d.Review == 0) == 1) && !ReviewList.Exists(rv => rv.Status == 3)) : false;
+    var QcReviewable = ViewBag.QcReviewable = (Topic.RelatedListAlt != null) ? ((Topic.RelatedListAlt.Count(d => d.Review == 0) == 1) && !ReviewList.Exists(rv => rv.Status == 3)) : false;
     var QcTrialable = ViewBag.QcTrialable = (Topic.RelatedListAlt != null) ? (Topic.RelatedListAlt.Exists(e => e.Trial == 2 && (ViewBag.QCAudit.Contains(e.Department )) && !Topic.RelatedListAlt.Exists(d => d.Trial == 0)) && !TrialList.Exists(tr => tr.Status == 3)) : false;
     var QcConfirmable = ViewBag.QcConfirmable = (Topic.RelatedListAlt != null) ? (Topic.RelatedListAlt.Exists(e => e.Confirm == 0 && (ViewBag.QCAudit.Contains(e.Department ))) && !Topic.RelatedListAlt.Exists(e => e.Confirm == 0 && (ViewBag.cf_list.Contains(e.Department))) && !ConfirmList.Exists(cf => cf.Status == 3)) : false;
 
@@ -424,10 +424,9 @@
                         @if(Resubmitable){ 
                             @Html.Partial("Fab",DepartmentList)
                         }
-
-                        @* @if(((isPEProcess && isInternal) || (isQC && isExternal)) && isApprover){  *@
+                        @if(Topic.Status == 7 || Topic.Status == 8){
                             @Html.Partial("Related",DepartmentList)
-                        @* } *@
+                        }
                 </div>
                 <div class="row">
                     <div class="w-actions">

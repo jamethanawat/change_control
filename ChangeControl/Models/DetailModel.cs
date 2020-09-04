@@ -513,5 +513,68 @@ namespace ChangeControl.Models
                 return new List<String>();
             }
         }
+
+        public bool CheckAllReviewApproved(string tp_code){
+             try{
+                var sql = $@"SELECT CASE 
+                            WHEN NOT EXISTS (
+                                SELECT Department, Status
+                                FROM Review p
+                                WHERE p.Topic = '{tp_code}'
+                                AND p.Revision  = (SELECT MAX(c.Revision) FROM Review c WHERE c.Topic = p.Topic AND c.Department = p.Department )
+                                AND p.Department NOT IN ('QC1','QC2','QC3')
+                                AND p.Status = 3
+                                )
+                            THEN CAST(1 AS BIT)
+                            ELSE CAST(0 AS BIT) END;
+                            ";
+                var result = DB_CCS.Database.SqlQuery<bool>(sql).First();
+                return result;
+            }catch(Exception ex){
+                return false;
+            }
+        }
+
+        public bool CheckAllTrialApproved(string tp_code){
+             try{
+                var sql = $@"SELECT CASE 
+                            WHEN NOT EXISTS (
+                                SELECT Department, Status
+                                FROM Trial p
+                                WHERE p.Topic = '{tp_code}'
+                                AND p.Revision  = (SELECT MAX(c.Revision) FROM Trial c WHERE c.Topic = p.Topic AND c.Department = p.Department )
+                                AND p.Department NOT IN ('QC1','QC2','QC3')
+                                AND p.Status = 3
+                                )
+                            THEN CAST(1 AS BIT)
+                            ELSE CAST(0 AS BIT) END;
+                            ";
+                var result = DB_CCS.Database.SqlQuery<bool>(sql).First();
+                return result;
+            }catch(Exception ex){
+                return false;
+            }
+        }
+
+        public bool CheckAllConfirmApproved(string tp_code){
+             try{
+                var sql = $@"SELECT CASE 
+                            WHEN NOT EXISTS (
+                                SELECT Department, Status
+                                FROM Confirm p
+                                WHERE p.Topic = '{tp_code}'
+                                AND p.Revision  = (SELECT MAX(c.Revision) FROM Confirm c WHERE c.Topic = p.Topic AND c.Department = p.Department )
+                                AND p.Department NOT IN ('QC1','QC2','QC3')
+                                AND p.Status = 3
+                                )
+                            THEN CAST(1 AS BIT)
+                            ELSE CAST(0 AS BIT) END;
+                            ";
+                var result = DB_CCS.Database.SqlQuery<bool>(sql).First();
+                return result;
+            }catch(Exception ex){
+                return false;
+            }
+        }
     }
 }

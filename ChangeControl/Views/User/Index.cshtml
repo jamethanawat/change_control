@@ -1,0 +1,224 @@
+﻿@{
+    //ViewBag.Title = "Home Page";
+    ViewBag.Title = "Change Control System | User";
+}
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/sweetalert")
+<script>
+    $(document).ready(function () {
+        $("#menu1-1").removeClass('active');
+        $('#menu2-1').removeClass('active');
+        $('#menu3-1').removeClass('active');
+        $('#menu4-1').addClass('active');
+        $("[name='dept']").val(us_dept,true)
+    });
+
+</script>
+<!-- DataTables -->
+<script src="~/tmp/plugins/datatables/jquery.dataTables.js"></script>
+<script src="~/tmp/plugins/datatables-bs4/js/dataTables.bootstrap4.js"></script>
+<script src="~/Scripts/User/User.js"></script>
+<script src="~/Plugin/dataTables.treeGrid.js"></script>
+
+<div class="content-wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>User/Permission Management</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="#">Change Control System</a></li>
+                        <li class="breadcrumb-item active">User</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <!-- /.container-fluid -->
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6">
+                    <!-- jquery validation -->
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title">Add User </h3>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="row">
+                                <!-- left column -->
+                                <div class="col-md-12">
+                                    <!-- select2 -->
+
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-group mb-0">
+                                                    <label>Code :</label>
+                                                    <input type="text" class="form-control" id="code" placeholder="Enter ...">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <div class="form-group mb-0">
+                                                    <label>Name :</label>
+                                                    <input type="text" class="form-control" id="name" placeholder="Enter ...">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-group mb-0">
+                                                    <label>Position :</label>
+                                                    <select class="form-control select2" id="position" style="width: 100%;">
+                                                        <option disabled="disabled">Select Position</option>
+                                                        <option value="1"  selected="selected">Issue</option>
+                                                        <option value="2">Admin</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <div class="form-group mb-0">
+                                                    <label>E-Mail :</label>
+                                                    <input type="text" class="form-control" id="email" placeholder="Enter ...">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer">
+                            @* <button type="submit" class="btn btn-default" id="clear_btn">Clear</button> *@
+                            @* <button type="submit" class="btn btn-primary float-right" style="margin-left: 5px;"><i class="fa fa-file-archive-o"></i>&nbsp;&nbsp;Report</button> *@
+                            <button id="user" type="submit" value="search" class="btn btn-info float-right"><i class="fa fa-pen"></i>&nbsp;&nbsp;Submit</button>
+                        </div>
+                    </div>
+                    <!-- /.card -->
+                </div>
+                <div class="col-md-6">
+                    <!-- jquery validation -->
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title"> Permission </h3>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="row">
+                                <!-- left column -->
+                                <div class="col-md-12">
+                                    <!-- select2 -->
+
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="form-group mb-0">
+                                                    <label>Code :</label>
+                                                    <select class="form-control select2" id="position" style="width: 100%;">
+                                                        <option disabled="disabled">Select Position</option>
+                                                        <option value="1"  selected="selected">Issue</option>
+                                                        <option value="2">Admin</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-9">
+                                                <div class="form-group mb-0">
+                                                    <label>Department :</label>
+                                                    <select class="form-control select2" id="position" style="width: 100%;">
+                                                        <option disabled="disabled">Select Position</option>
+                                                        <option value="1"  selected="selected">Issue</option>
+                                                        <option value="2">Admin</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group mb-0">
+                                                    <label>Recieve email :</label>
+                                                    <select class="form-control select2" id="position" style="width: 100%;">
+                                                        <option value="1"  selected="selected">Yes</option>
+                                                        <option value="2">No</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer">
+                            @* <button type="submit" class="btn btn-default" id="clear_btn">Clear</button> *@
+                            @* <button type="submit" class="btn btn-primary float-right" style="margin-left: 5px;"><i class="fa fa-file-archive-o"></i>&nbsp;&nbsp;Report</button> *@
+                            <button id="user" type="submit" value="search" class="btn btn-info float-right"><i class="fa fa-pen"></i>&nbsp;&nbsp;Submit</button>
+                        </div>
+                    </div>
+                    <!-- /.card -->
+                </div>
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.container-fluid -->
+    </section>
+
+
+    <!-- /.content -->
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+        <div class="row">
+            <!-- left column -->
+            <div class="col-md-12">
+                <!-- jquery validation -->
+                <div class="card card-primary">
+                            <div class="card-header">
+                                <h3 class="card-title">Total records <small>....</small></h3>
+                            </div>
+                            <!-- /.card-header -->
+
+                            <div class="card-body table-responsive">
+                                <table id="user_tb" class="table table-bordered table-hover txtcenter" width="100%" style="table-layout: fixed;">
+                                    <thead>
+                                        <tr>
+                                            <th width="5%"></th>
+                                            <th width="7%">Code</th>
+                                            <th width="15%">Name</th>
+                                            <th width="26%">Email</th>
+                                            <th width="10%">Department</th>
+                                            <th width="8%">Active</th>
+                                            <th width="9%">Subscribe</th>
+                                            @*<th>Inform to Customer</th>
+                                <th>Trial & Followup status</th>
+                                <th>Close Status</th>*@
+                                        </tr>
+                                    </thead>
+                                    @using (Html.BeginForm("GoTo", "Home", FormMethod.Post))
+                                    {
+                                        <tbody id="tbody1">
+                                        </tbody>
+                                    }
+                            </table>
+                        </div>
+                    </div>
+                            <!-- /.card -->
+                </div>
+                    <!-- /.row -->
+        </div>
+        </div>
+        <!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+</div>

@@ -35,7 +35,7 @@ $(() => {
                                 }
                                 promises.push(
                                     $.post(CheckApproveIPPPath, {topic_code:topic_code}, (res) => { 
-                                    if(res.status == "success"){
+                                    if(res.status == "success" && (res.data != null && res.data.length > 0)){
                                         promises.push(
                                             $.post(GenerateMailPath,{ 'mode': 'InformIPP', 'topic_code':topic_code, 'dept_arry': res.data, }).fail((error) => {
                                             console.error(error);

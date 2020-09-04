@@ -402,16 +402,18 @@ namespace ChangeControl.Controllers{
 
         [HttpPost]
         public ActionResult ApproveReview(long review_id){
-            try{
+            var rv_list = Session["ReviewList"] as List<Review>;
+            try
+            {
                 var mail = "";
                 var dept = "";
+                    
                 M_Detail.ApproveReview(review_id,(string) Session["User"]);
                 if(Topic.Status == 7 && (ViewBag.PEAudit.Contains(Session["Department"].ToString())) && Topic.Type == "Internal"){ //PE_Process open review case
                     M_Detail.UpdateTopicStatus(Session["TopicCode"].ToString(), 8);
                     M_Detail.UpdateTopicApproveRequest(Session["User"].ToString(),Topic.Code);
                     mail = "InformUser";
                 }else if(Topic.Status == 8 && ViewBag.QCAudit.Contains(Session["Department"].ToString()) ){
-                    var rv_list = Session["ReviewList"] as List<Review>;
                     if(rv_list.Exists(e => e.Item.Exists(d => d.Type == 24 && d.Status == 1))){ //Request trial not exist
                         M_Detail.UpdateTopicStatus(Session["TopicCode"].ToString(), 9);
                         mail = "StartTrial";
@@ -421,8 +423,8 @@ namespace ChangeControl.Controllers{
                     }
                     M_Detail.UpdateTopicApproveReview(Session["User"].ToString(),Topic.Code);
                 }else if(Topic.Status == 7 ||Topic.Status == 8){
-                    var qc_audit = Topic.RelatedListAlt.Find(e => e.Review == 0 && (e.Department == "QC1" || e.Department == "QC2" || e.Department == "QC2"));
-                    if(Topic.RelatedListAlt.Count(e => e.Review == 0) == 1){
+                    var qc_audit = Topic.RelatedListAlt.Find(e => (ViewBag.QCAudit.Contains(e.Department)));
+                    if((Topic.RelatedListAlt.Count(e => e.Review == 0) == 1 || rv_list.Exists(e => e.Department == qc_audit.Department)) && M_Detail.CheckAllReviewApproved(Session["TopicCode"].ToString())){
                         mail = "ReviewApproved";
                         dept = qc_audit.Department;
                     }
@@ -435,6 +437,7 @@ namespace ChangeControl.Controllers{
 
         [HttpPost]
         public ActionResult ApproveTrial(long trial_id){
+            var tr_list = Session["TrialList"] as List<Review>;
             try{
                 var mail = "";
                 var dept = "";
@@ -444,8 +447,8 @@ namespace ChangeControl.Controllers{
                     M_Detail.UpdateTopicApproveTrial(Session["User"].ToString(),Topic.Code);
                     mail = "StartConfirm";
                 }else if(Topic.Status == 9){
-                    var qc_audit = Topic.RelatedListAlt.Find(e => (e.Department == "QC1" || e.Department == "QC2" || e.Department == "QC2"));
-                    if(Topic.RelatedListAlt.Exists(e => e.Trial == 2 && (e.Department == "QC1" || e.Department == "QC2" || e.Department == "QC2")) && !Topic.RelatedListAlt.Exists(e => e.Trial == 0)){
+                    var qc_audit = Topic.RelatedListAlt.Find(e => (ViewBag.QCAudit.Contains(e.Department)));
+                    if(Topic.RelatedListAlt.Exists(e => e.Trial == 2 && (ViewBag.QCAudit.Contains(e.Department))) && !Topic.RelatedListAlt.Exists(e => e.Trial == 0) &&  M_Detail.CheckAllTrialApproved(Session["TopicCode"].ToString())){
                         mail = "TrialApproved";
                         dept = qc_audit.Department;
                     }
@@ -458,7 +461,10 @@ namespace ChangeControl.Controllers{
 
         [HttpPost]
         public ActionResult ApproveConfirm(long confirm_id){
+            var cf_list = Session["ConfirmList"] as List<Review>;
             try{
+                var confirm_dept_list = M_Home.GetConfirmDeptList();
+                
                 var mail = "";
                 var dept = "ConfirmApproved";
                 M_Detail.ApproveConfirm(confirm_id,(string) Session["User"]);
@@ -466,8 +472,8 @@ namespace ChangeControl.Controllers{
                     M_Detail.UpdateTopicStatus(Session["TopicCode"].ToString(), 11);
                     M_Detail.UpdateTopicApproveClose(Session["User"].ToString(),Topic.Code);
                 }else if(Topic.Status == 10){
-                    var qc_audit = Topic.RelatedListAlt.Find(e => e.Confirm == 0  && (e.Department == "QC1" || e.Department == "QC2" || e.Department == "QC2"));
-                    if(Topic.RelatedListAlt.Count(e => e.Confirm == 0 && (e.Department == "QC1" || e.Department == "QC2" || e.Department == "QC2")) == 1){
+                    var qc_audit = Topic.RelatedListAlt.Find(e => (ViewBag.QCAudit.Contains(e.Department)));
+                    if(Topic.RelatedListAlt.Exists(e => e.Confirm == 0 && (ViewBag.QCAudit.Contains(e.Department)))  && !Topic.RelatedListAlt.Exists(e => e.Confirm == 0 && confirm_dept_list.Contains(e.Department)) && M_Detail.CheckAllConfirmApproved(Session["TopicCode"].ToString())){
                         mail = "ConfirmApproved";
                         dept = qc_audit.Department;
                     }

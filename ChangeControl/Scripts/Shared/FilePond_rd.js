@@ -121,48 +121,12 @@ $(() => {
                     text: "เพิ่มคำอธิบายสำเร็จ", 
                     icon:"success",
                 });
-            }else if(result == "clear"){
+            }else if(result != null){
                 $(`.filepond--file-status-main#s${update_id}`).hide("slow");
                 file_list_rd[update_i].description = null;
-                // swal({
-                //     title: "สำเร็จ", 
-                //     text: "เพิ่มคำอธิบายสำเร็จ", 
-                //     icon:"success",
-                // });
             }
         });
     }
 
-    // window.rd_pondAddFile = (path = "/nature.jpg") => {
-    //     pond_rd.addFile(path, {options: {
-    //         file: {
-    //             name: 'my-file.png',
-    //         }
-    //     }});
-    // };
-
-    // window.rd_addFile = (id = null,file,description = null) => {
-    //     file_arry.push(file);
-    //     let detail = {
-    //         id: id,
-    //         description: description
-    //     }
-    //     if(description != null) file_detail.push(detail);
-    //     file_length++;
-    // }
-
-    // window.rd_getFile = () => {
-    //     return file_list_rd;
-    // }
-
-    // window.rd_pondSetOptions = () => {
-    //     pond_rd.setOptions({
-    //         files:file_arry
-    //     });
-    // }
-
-    // window.rd_removeFile = (id) => {
-    //     pond_rd.removeFile(id);
-    // }
 
 });

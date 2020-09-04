@@ -236,12 +236,10 @@
             <ul class="navbar-nav ml-auto">
                 <!-- Messages Dropdown Menu -->
                 @NodeNoti(req_list,"Request")
-                <!-- Messages Dropdown Menu -->
                 @NodeNoti(rv_list,"Review")
-                <!-- Notifications Dropdown Menu -->
                 @NodeNoti(tr_list,"Trial & Confirm")
-                <!-- Notifications Dropdown Menu -->
                 @NodeNoti(cf_list,"Initial Production")
+
                 <!-- Notifications Dropdown Menu -->
                 @if((string) Session["Position"] == "Admin"){
                 <li class="nav-item">
@@ -321,6 +319,14 @@
                                 </p>
                             </a>
                         </li>
+                        <li id="menu4" class="nav-item">
+                            <a id="menu4-1" href="@Url.Action("Index", "User")" class="nav-link animsition-link">
+                                <i class="nav-icon far fa-clone"></i>
+                                <p>
+                                    User
+                                </p>
+                            </a>
+                        </li>
                         <li class="nav-item">
                             <a href="~/manual.pdf"  class="nav-link animsition-link">
                                 <i class="nav-icon far fa-clone"></i>
@@ -356,7 +362,7 @@
         <footer class="main-footer" style="position: unset;">
             <strong>Copyright &copy; 2019-2020 IT Department Design Team</strong> All rights reserved.
             <div class="float-right d-none d-sm-inline-block">
-                <b>Version</b> 1.1
+                <b>Version</b> 1.2
             </div>
         </footer>
     </div>

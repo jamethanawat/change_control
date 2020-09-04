@@ -62,7 +62,7 @@ namespace ChangeControl.Controllers{
             }
         }
 
-        public ActionResult GenerateMail(string mode,string topic_code, string dept = null, string[] dept_arry=null, string due_date="", string pos="") {
+        public ActionResult GenerateMail(string mode,string topic_code, string dept = null, string[] dept_arry=null, string due_date="", string pos="")  {
             try{
                 Topic = M_Mail.GetTopicByCode(topic_code);
                 ViewBag.Mode = mode;
@@ -193,7 +193,7 @@ namespace ChangeControl.Controllers{
                         mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Approved by Related Department.";
                         break;
                     case "StartConfirm" :
-                        mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Please Issue.";
+                        mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Please Issue in Initial Production.";
                         break;
                     case "ConfirmApproved" :
                         mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Approved by Related Department.";
