@@ -445,6 +445,8 @@
     <Content Include="Plugin\animsition\src\css\zoom\zoom-sm.css" />
     <Content Include="Plugin\animsition\src\css\zoom\zoom.css" />
     <Content Include="Plugin\animsition\src\js\animsition.js" />
+    <Content Include="Plugin\DataTables Demo\demo.html" />
+    <Content Include="Plugin\DataTables Demo\js\dataTables.treeGrid.js" />
     <Content Include="Plugin\dataTables.treeGrid-ch.js" />
     <Content Include="Plugin\dataTables.treeGrid.js" />
     <Content Include="Plugin\datepicker\datepicker.common.js" />
@@ -477,6 +479,8 @@
     <Content Include="Plugin\SweetAlert\sweetalert-dev.js" />
     <Content Include="Plugin\SweetAlert\sweetalert.css" />
     <Content Include="Plugin\SweetAlert\sweetalert.min.js" />
+    <Content Include="Plugin\switchery\switchery.css" />
+    <Content Include="Plugin\switchery\switchery.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Plugin\filepond\.github\ISSUE_TEMPLATE.md" />
@@ -517,6 +521,7 @@
     <Content Include="Plugin\jq-fab\scss\index.scss" />
     <Content Include="libman.json" />
     <Content Include="manual.pdf" />
+    <Content Include="Plugin\DataTables Demo\json\data.json" />
     <None Include="Properties\PublishProfiles\CCS_Test.pubxml" />
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Include="Properties\Settings.settings">

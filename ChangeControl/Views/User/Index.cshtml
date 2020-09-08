@@ -4,6 +4,10 @@
 }
 @Scripts.Render("~/bundles/jquery")
 @Scripts.Render("~/bundles/sweetalert")
+<script type="text/javascript">
+    SessionUser = '@Session["User"].ToString()';
+    us_dept = '@Session["Department"].ToString()';
+</script>
 <script>
     $(document).ready(function () {
         $("#menu1-1").removeClass('active');
@@ -16,9 +20,10 @@
 </script>
 <!-- DataTables -->
 <script src="~/tmp/plugins/datatables/jquery.dataTables.js"></script>
-<script src="~/tmp/plugins/datatables-bs4/js/dataTables.bootstrap4.js"></script>
+@* <script src="~/tmp/plugins/datatables-bs4/js/dataTa/bles.bootstrap4.js"></script> *@
 <script src="~/Scripts/User/User.js"></script>
-<script src="~/Plugin/dataTables.treeGrid.js"></script>
+@* <script src="~/Plugin/dataTables.treeGrid-ch.js"></script> *@
+@* <script src="~/Plugin/dataTables.treeGrid.js"></script> *@
 
 <div class="content-wrapper">
     <section class="content-header">

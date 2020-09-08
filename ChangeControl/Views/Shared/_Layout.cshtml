@@ -205,9 +205,9 @@
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
-@* <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed sidebar-collapse"> *@
+    @* <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed sidebar-collapse"> *@
     <div class="wrapper">
-   
+
         <!-- Navbar -->
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">
             <!-- Left navbar links -->
@@ -235,24 +235,25 @@
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
                 <!-- Messages Dropdown Menu -->
-                @NodeNoti(req_list,"Request")
-                @NodeNoti(rv_list,"Review")
-                @NodeNoti(tr_list,"Trial & Confirm")
-                @NodeNoti(cf_list,"Initial Production")
+                @NodeNoti(req_list, "Request")
+                @NodeNoti(rv_list, "Review")
+                @NodeNoti(tr_list, "Trial & Confirm")
+                @NodeNoti(cf_list, "Initial Production")
 
                 <!-- Notifications Dropdown Menu -->
-                @if((string) Session["Position"] == "Admin"){
-                <li class="nav-item">
-                    <a class="nav-link pr-0" id="change_dept_btn">
-                        @* Change Department *@
-                        <input type="submit" class="btn btn-block btn-sm btn-outline-primary" value="Change Department">
-                    </a>
-                </li>
+                @if ((string)Session["Position"] == "Admin")
+                {
+                    <li class="nav-item">
+                        <a class="nav-link pr-0" id="change_dept_btn">
+                            @* Change Department *@
+                            <input type="submit" class="btn btn-block btn-sm btn-outline-primary" value="Change Department">
+                        </a>
+                    </li>
                 }
 
                 <li class="nav-item">
                     <a class="nav-link" href='@Url.Action("SignOut", "Login")'>
-                            @* Sign Out *@
+                        @* Sign Out *@
                         <input type="submit" class="btn btn-block btn-sm btn-outline-danger" value="Sign out">
                     </a>
                 </li>
@@ -278,18 +279,18 @@
                         <img src="~/tmp/dist/img/TNSavatar.png" class="img-circle elevation-2" alt="User Image">
                     </div>
                     <div class="info mt-n2">
-                    @{
-                        var us_name = Session["FullName"].ToString() + " (" + Session["Department"] + ")";
-                    }
+                        @{
+                            var us_name = Session["FullName"].ToString() + " (" + Session["Department"] + ")";
+                        }
                         <a href="#" class="d-block px-2" title="@us_name" style="white-space: pre-line;">@us_name</a>
                     </div>
                 </div>
-          
+
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         <!-- Add icons to the links using the .nav-icon class
-    with font-awesome or any other icon font library -->
+                        with font-awesome or any other icon font library -->
                         <li id="menu1" class="nav-item">
                             <a id="menu1-1" href="@Url.Action("Index", "Home")" class="nav-link animsition-link">
                                 <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -311,24 +312,19 @@
                                 </a>
                             </li>
                         }
-                        <li id="menu3" class="nav-item" style="display:none">
-                            <a id="menu3-1" href="@Url.Action("Index", "Detail")" class="nav-link animsition-link">
-                                <i class="nav-icon far fa-clone"></i>
-                                <p>
-                                    Detail
-                                </p>
-                            </a>
-                        </li>
-                        <li id="menu4" class="nav-item">
-                            <a id="menu4-1" href="@Url.Action("Index", "User")" class="nav-link animsition-link">
-                                <i class="nav-icon far fa-clone"></i>
-                                <p>
-                                    User
-                                </p>
-                            </a>
-                        </li>
+                        @if (Session["Position"].ToString() == "Admin")
+                        {
+                            <li id="menu4" class="nav-item">
+                                <a id="menu4-1" href="@Url.Action("Index", "User")" class="nav-link animsition-link">
+                                    <i class="nav-icon fas fa-user-friends"></i>
+                                    <p>
+                                        User
+                                    </p>
+                                </a>
+                            </li>
+                        }
                         <li class="nav-item">
-                            <a href="~/manual.pdf"  class="nav-link animsition-link">
+                            <a href="~/manual.pdf" class="nav-link animsition-link">
                                 <i class="nav-icon far fa-clone"></i>
                                 <p>
                                     Manual
@@ -344,9 +340,9 @@
 
         <!-- Content Wrapper. Contains page content -->
         <div class="">
-        @* <div class="animsition"> *@
+            @* <div class="animsition"> *@
             <div class="loading hidden" id="loading">
-            @* <div class="loading" id="loading" style="display:none"> *@
+                @* <div class="loading" id="loading" style="display:none"> *@
                 <img src="~/Plugin/img/loading-3.svg" style="width:auto;height:auto;">
             </div>
             @RenderBody()
@@ -362,6 +358,8 @@
         <footer class="main-footer" style="position: unset;">
             <strong>Copyright &copy; 2019-2020 IT Department Design Team</strong> All rights reserved.
             <div class="float-right d-none d-sm-inline-block">
+                Support by: Tapics admin, tel no:2062,2064,3005,3006
+                &nbsp;
                 <b>Version</b> 1.2
             </div>
         </footer>
@@ -380,6 +378,8 @@
     <link rel="stylesheet" href="~/tmp/plugins/summernote/summernote-bs4.css">
     <!-- DataTables -->
     <script src="~/tmp/plugins/datatables/jquery.dataTables.js"></script>
+    @* <script src="~/Plugin/dataTables.treeGrid-ch.js"></script> *@
+    <script src="~/Plugin/dataTables.treeGrid.js"></script>
     <script src="~/tmp/plugins/datatables-bs4/js/dataTables.bootstrap4.js"></script>
     <!-- overlayScrollbars -->
     <script src="~/tmp/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
@@ -410,11 +410,14 @@
 
     <!-- jq-fab -->
     <script src="~/Plugin/jq-fab/js/index.js"></script>
-    
+
+    <!-- Switchery -->
+    <link href="~/Plugin/switchery/switchery.css" rel="stylesheet" />
+    <script src="~/Plugin/switchery/switchery.js"></script>
+
     <script src="~/Scripts/jquery.modal-wizard.js"></script>
 
-    
-    <link  href="~/Plugin/datepicker/datepicker.min.css" rel="stylesheet">
+    <link href="~/Plugin/datepicker/datepicker.min.css" rel="stylesheet">
     <script src="~/Plugin/datepicker/datepicker.min.js"></script>
 
     <script src="~/tmp/plugins/daterangepicker/daterangepicker.js"></script>
@@ -423,8 +426,8 @@
     <script src="~/Plugin/animsition/dist/js/animsition.js"></script>
 
     <script src="~/Scripts/Shared/Shared.js"></script>
-    
-    <script src="~/Scripts/jquery.transit.min.js"></script> 
+
+    <script src="~/Scripts/jquery.transit.min.js"></script>
     <!-- page script -->
     <script>
         $(function () {

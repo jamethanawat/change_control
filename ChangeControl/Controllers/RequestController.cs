@@ -97,6 +97,7 @@ namespace ChangeControl.Controllers{
                 if(ID != null){ // In case of edit mode
                     Session["isEditMode"] = true;
                     TopicAlt temp_topic = M_Req.GetTopicByID(ID);
+
                     if(temp_topic.Status != 3 && temp_topic.Status != 7 ){
                         return View("~/Views/Shared/404/index.cshtml");
                     }else{
@@ -217,7 +218,7 @@ namespace ChangeControl.Controllers{
                 var ServerSavePath = Path.Combine("D:/File/Topic/" + InputFileName);
                 file_item.file.SaveAs(ServerSavePath);
                 if(file_item.description == "null" || file_item.description == null) file_item.description = " ";
-                M_Req.InsertFile(file_item.file, (long) Session["TopicID"], "Topic", file_item.description, Session["User"].ToString(), Session["TopicCode"].ToString(), Session["Department"].ToString());
+                M_Req.InsertFile(file_item.file, (long) Session["TopicID"], "Topic", file_item.description.ReplaceSingleQuote(), Session["User"].ToString(), Session["TopicCode"].ToString(), Session["Department"].ToString());
             }
             return Json((string)Session["TopicCode"]);
         }
@@ -241,11 +242,11 @@ namespace ChangeControl.Controllers{
 
         [HttpPost]
         public int InsertOtherChangeItem(string desc){
-            return M_Req.InsertOtherChangeItem(desc);
+            return M_Req.InsertOtherChangeItem(desc.ReplaceSingleQuote());
         }
 
         public int InsertOtherProductType(string desc){
-            return M_Req.InsertOtherProductType(desc);
+            return M_Req.InsertOtherProductType(desc.ReplaceSingleQuote());
         }
         [HttpPost]
         public ActionResult GetDepartment(){

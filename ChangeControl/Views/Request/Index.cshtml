@@ -404,13 +404,7 @@
                                         }
                                             <div class="row">
                                                 <label class="mr-3">
-                                                    @{
-                                                        var isChecked = false;
-                                                        if(isEditMode && Item.Name == Topic.Change_item){
-                                                            isChecked = true;    
-                                                        }
-                                                    }
-                                                    <input type="radio" name="changeItem" value="@Item.ID" class='flat-red @(Item.ID == 12?"other":"")' @(isChecked || Item.ID > 12 ? "checked" : "")>
+                                                    <input type="radio" name="changeItem" value="@(isEditMode && Item.ID == 12 && Topic.Change_item != Item.ID.ToString() ? Topic.Change_item : Item.ID.ToString())" class='flat-red @(Item.ID == 12 ? "other":"")' @(isEditMode && (Topic.Change_item == Item.ID.ToString() || Convert.ToInt32(Topic.Change_item) > 12)? "checked" : "") required>
                                                     @Html.DisplayFor(model => Item.Name) 
                                                     <span class="changeItem-desc"></span>
                                                 </label>
@@ -433,13 +427,7 @@
                                 <div class="col-sm-10 col-form-label">
                                 @foreach(var Type in ProductTypes){
                                     <label class="mr-3">
-                                        @{
-                                            var isChecked = false;
-                                            if(isEditMode && Type.Name == Topic.Product_type){
-                                                isChecked = true;    
-                                            }
-                                        }
-                                        <input type="radio" name="productType" value="@Type.ID" class="flat-red @(Type.ID == 8?"other":"")" @(isChecked || Type.ID > 8 ? "checked" : "") required>
+                                        <input type="radio" name="productType" value="@(isEditMode && Type.ID == 8 && Topic.Product_type != Type.ID.ToString() ? Topic.Product_type : Type.ID.ToString())" class='flat-red @(Type.ID == 8 ? "other":"")' @(isEditMode && (Topic.Product_type == Type.ID.ToString() || Convert.ToInt32(Topic.Product_type) > 8)? "checked" : "") required>
                                         @Html.DisplayFor(model => Type.Name)
                                         <span class="productType-desc"></span>
                                     </label>

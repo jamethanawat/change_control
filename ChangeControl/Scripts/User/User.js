@@ -3,83 +3,141 @@
         code:'63014',
         name:'Pakawat Smutkun',
         email:'pakawat.smutkun@email.thns.co.th',
-        department:'null',
+        department:'IT',
         active:'1',
         subscribe:'1',
         children: [
-            {department: 'QC1'},
-            {department: 'QC2'},
-            {department: 'QC3'},
+            {
+                code:'',
+                name:'',
+                email:'',
+                department:'QC1',
+                active:'1',
+                subscribe:'0',
+            },
+            {
+                code:'',
+                name:'',
+                email:'',
+                department:'QC2',
+                active:'1',
+                subscribe:'1',
+            },
+            {
+                code:'',
+                name:'',
+                email:'',
+                department:'QC3',
+                active:'0',
+                subscribe:'0',
+            },
         ]
-    }
+    },
+    // {
+    //     code:'63014',
+    //     name:'Pakawat Smutkun',
+    //     email:'pakawat.smutkun@email.thns.co.th',
+    //     department:'OT',
+    //     active:'1',
+    //     subscribe:'1',
+    //     children: []
+    // }
 ];
-
 $(document).ready(function () {
-    $('#user_tb').DataTable( { 
-        "paging": true,
-        "lengthChange": true,
-        "searching": true,
-        "ordering": true,
-        "info": true,
-        "autoWidth": true,
-        "pageLength": 10,
+    var dataTable = $('#user_tb').DataTable( {
+        // "paging": true,
+        // "lengthChange": true,
+        // "searching": true,
+        // "ordering": false,
+        // "info": true,
+        // "autoWidth": true,
+        // "pageLength": 10,
+        data:mock_data,
+        treeGrid: {
+            left: 10,
+            expandIcon: '<span>+</span>',
+            collapseIcon: '<span>-</span>'
+        },
+        columns: 
+        [
+            {
+                target: 0,
+                className: 'treegrid-control',
+                data: function (item) {
+                    if(item.children != null && item.children.length > 0){
+                        return '<span>+</span>';
+                    }
+                    return '';
+                }
+            },
+            { data: 'code' },
+            { data: 'name' },
+            { data: 'email' },
+            { data: 'department' },
+            { 
+                target: 5,
+                data: function (item){
+                    let checked = (item.active == 1) ? "checked" : "";
+                    return `<input type="checkbox" class="js-switch" ${checked} />`;
+                } 
+            },
+            { 
+                target: 6,
+                data: function (item){
+                    let checked = (item.subscribe == 1) ? "checked" : "";
+                    return `<input type="checkbox" class="js-switch" ${checked} />`;
+                } 
+            },
+            // {
+            //     title: '',
+            //     target: 0,
+            //     className: 'treegrid-control',
+            //     data: function (item) {
+            //         if(item.children != null && item.children.length > 0){
+            //             return '<span>+</span>';
+            //         }
+            //         return '';
+            //     }
+            // },
+            // { 
+            //     title: 'code',
+            //     target: 1,
+            //     data: function (item) {
+            //     return item.code
+            // }},
+            // { 
+            //     title: 'name',
+            //     target: 2,
+            //     data: function (item) {
+            //     return item.name
+            // }},
+            // { 
+            //     title: 'email',
+            //     target: 3,
+            //     data: function (item) {
+            //     return item.email
+            // }},
+            // { 
+            //     title: 'department',
+            //     target: 4,
+            //     data: function (item) {
+            //     return item.department
+            // }},
+            // { 
+            //     title: 'active',
+            //     target: 5,
+            //     data: function (item) {
+            //     return item.active
+            // }},
+            // { 
+            //     title: 'subscribe',
+            //     target: 6,
+            //     data: function (item) {
+            //     return item.subscribe
+            // }},
+        ],
     });
 
-    var table_cr;
-    table_cr = $('#user_tb').DataTable();
-
-    
-    table_cr.clear();
-                table_cr.destroy();
-                table_cr = $('#user_tb').DataTable( {
-                    data:[{
-                        code:'63014',
-                        name:'Pakawat Smutkun',
-                        email:'pakawat.smutkun@email.thns.co.th',
-                        department:'null',
-                        active:'1',
-                        subscribe:'1',
-                        children: [
-                            {department: 'QC1'},
-                            {department: 'QC2'},
-                            {department: 'QC3'},
-                        ]
-                    }],
-                    treeGrid: {
-                        left: 10,
-                        expandIcon: '<span>+</span>',
-                        collapseIcon: '<span>-</span>'
-                    },
-                    "order": [],
-                    columns: [
-                        // {
-                        //     data: function (item) {
-                        //         if (item.children != null && item.children.length > 0) {
-                        //             return '<span> + </span>';
-                        //         }
-                        //         return '';
-                        //     }
-                        // },
-                        {
-                            title: '',
-                            target: 0,
-                            className: 'treegrid-control',
-                            data: function (item) {
-                                if (item.children) {
-                                    return '<span>+</span>';
-                                }
-                                return '';
-                            }
-                        },
-                        { data: 'code' },
-                        { data: 'name' },
-                        { data: 'email' },
-                        { data: 'department' },
-                        { data: 'active' },
-                        { data: 'subscribe' },
-                    ],
-                    
-                });
 });
 
 
