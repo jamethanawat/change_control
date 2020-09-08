@@ -404,7 +404,7 @@
                                         }
                                             <div class="row">
                                                 <label class="mr-3">
-                                                    <input type="radio" name="changeItem" value="@(isEditMode && Item.ID == 12 && Topic.Change_item != Item.ID.ToString() ? Topic.Change_item : Item.ID.ToString())" class='flat-red @(Item.ID == 12 ? "other":"")' @(isEditMode && (Topic.Change_item == Item.ID.ToString() || Convert.ToInt32(Topic.Change_item) > 12)? "checked" : "") required>
+                                                    <input type="radio" name="changeItem" value="@(isEditMode && Item.ID == 36 && Topic.Change_item != Item.ID.ToString() ? Topic.Change_item : Item.ID.ToString())" class='flat-red @(Item.ID == 36 ? "other":"")' @(isEditMode && (Topic.Change_item == Item.ID.ToString() || Convert.ToInt32(Topic.Change_item) > 36)? "checked" : "") required>
                                                     @Html.DisplayFor(model => Item.Name) 
                                                     <span class="changeItem-desc"></span>
                                                 </label>

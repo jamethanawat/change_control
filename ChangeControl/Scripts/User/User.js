@@ -3,9 +3,9 @@
         code:'63014',
         name:'Pakawat Smutkun',
         email:'pakawat.smutkun@email.thns.co.th',
-        department:'IT',
-        active:'1',
-        subscribe:'1',
+        department:'Special',
+        active:'',
+        subscribe:'',
         children: [
             {
                 code:'',
@@ -78,14 +78,14 @@ $(document).ready(function () {
                 target: 5,
                 data: function (item){
                     let checked = (item.active == 1) ? "checked" : "";
-                    return `<input type="checkbox" class="js-switch" ${checked} />`;
+                    return (item.active != "")?`<input type="checkbox" class="js-switch" ${checked} />`:"";
                 } 
             },
             { 
                 target: 6,
                 data: function (item){
                     let checked = (item.subscribe == 1) ? "checked" : "";
-                    return `<input type="checkbox" class="js-switch" ${checked} />`;
+                    return (item.subscribe != "")?`<input type="checkbox" class="js-switch" ${checked} />`:"";
                 } 
             },
             // {
