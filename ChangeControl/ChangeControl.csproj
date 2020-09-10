@@ -487,8 +487,14 @@
     <Content Include="Plugin\SweetAlert\sweetalert-dev.js" />
     <Content Include="Plugin\SweetAlert\sweetalert.css" />
     <Content Include="Plugin\SweetAlert\sweetalert.min.js" />
+    <Content Include="Plugin\switch-bs\bootstrap-switch-button.css" />
+    <Content Include="Plugin\switch-bs\bootstrap-switch-button.min.js" />
     <Content Include="Plugin\switchery\switchery.css" />
     <Content Include="Plugin\switchery\switchery.js" />
+    <Content Include="Plugin\switchery\switchery.min.css" />
+    <Content Include="Plugin\switchery\switchery.min.js" />
+    <Content Include="Plugin\switch\switch.css" />
+    <Content Include="Plugin\switch\switch.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Plugin\filepond\.github\ISSUE_TEMPLATE.md" />
@@ -531,6 +537,7 @@
     <Content Include="manual.pdf" />
     <Content Include="Plugin\DataTables Demo\json\data.json" />
     <None Include="packages.config" />
+    <Content Include="Plugin\switch-bs\bootstrap-switch-button.min.js.map" />
     <None Include="Properties\PublishProfiles\CCS_Test.pubxml" />
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Include="Properties\Settings.settings">

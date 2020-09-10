@@ -19,6 +19,16 @@ namespace ChangeControl.Models
         private class Line{
             public string line { get; set; }
         }
+
+        public class SummaryTopic{
+            public int Total { get; set; }
+            public int Request { get; set; }
+            public int Review { get; set; }
+            public int Trial { get; set; }
+            public int Confirm { get; set; }
+            public int Finished { get; set; }
+            public int Rejected { get; set; }
+        }
         public object GetLine(string Production){
             var sql = "SELECT line FROM bm_line where proddpt ='"+Production+"' ORDER BY line ASC";
             var result = _dbtapics.Database.SqlQuery<Line>(sql);
@@ -220,7 +230,7 @@ namespace ChangeControl.Models
             return result;
         }
 
-        public List<TopicNoti> GetReviewApproved(){ //For QC
+        public List<TopicNoti> GetReviewApproved(string dept){ //For QC
             var sql = $@"SELECT DISTINCT Code, Topic.Revision, Topic.Status, Subject, Detail, Time_insert, 'Approved' AS SubStatus 
                         FROM Topic
                         LEFT JOIN Related ON Topic.Related = PK_Related
@@ -229,7 +239,8 @@ namespace ChangeControl.Models
                           	AND 
                           		(SELECT COUNT(Review.ID) FROM Review WHERE Review.Topic = Topic.Code AND Review.Status = 1 AND Review.Department != 'QC1' AND Review.Department != 'QC2' AND Review.Department != 'QC3' AND Review.Revision = (SELECT MAX(r.Revision) FROM Review r WHERE r.Topic = Review.Topic AND r.Department = Review.Department)) = 
                           		(SELECT COUNT(Related.ID) FROM Related WHERE Topic.Related = PK_Related AND Related.Department != 'QC1' AND Related.Department != 'QC2' AND Related.Department != 'QC3')
-                            AND NOT EXISTS ( SELECT * FROM Review WHERE Review.Topic = Topic.Code AND Review.Status = 3 AND Review.Department != 'QC1' AND Review.Department != 'QC2' AND Review.Department != 'QC3'  AND Review.Revision = (SELECT MAX(rv.Revision) FROM Review rv WHERE rv.Topic = Review.Topic AND rv.Department = Review.Department));";
+                            AND NOT EXISTS ( SELECT * FROM Review WHERE Review.Topic = Topic.Code AND Review.Status = 3 AND Review.Department != 'QC1' AND Review.Department != 'QC2' AND Review.Department != 'QC3'  AND Review.Revision = (SELECT MAX(rv.Revision) FROM Review rv WHERE rv.Topic = Review.Topic AND rv.Department = Review.Department)) 
+                            AND Related.Department = '{dept}';";
             var result = DB_CCS.Database.SqlQuery<TopicNoti>(sql).ToList();
             return result;
         }
@@ -263,10 +274,11 @@ namespace ChangeControl.Models
             var result = DB_CCS.Database.SqlQuery<TopicNoti>(sql).ToList();
             return result;
         }
-        public List<TopicNoti> GetTrialApproved(){ //For QC
+        public List<TopicNoti> GetTrialApproved(string dept){ //For QC
             var sql = $@"SELECT DISTINCT Code, Topic.Revision, Topic.Status, Subject, Detail, Time_insert, 'Approved' AS SubStatus 
 
                         FROM Topic
+                        LEFT JOIN Related ON Topic.Related = PK_Related
                         LEFT JOIN Review ON Review.Topic = Topic.Code
                         LEFT JOIN Review_Item ri ON Review.ID = ri.FK_Review_ID
                         WHERE Topic.Revision = (SELECT MAX(t.Revision) FROM Topic t WHERE t.Code = Topic.Code  AND t.Department = Topic.Department)
@@ -280,9 +292,10 @@ namespace ChangeControl.Models
 							(SELECT COUNT(*) 
 							FROM Review 
 							LEFT JOIN Review_Item ri ON FK_Review_ID = Review.ID
-							WHERE Review.Revision = (SELECT MAX(r.Revision) FROM Review r WHERE r.Topic = Review.Topic AND r.Department = Review.Department )
-							AND Review.Topic = Topic.Code
-							AND ri.FK_Item_Type = 24 AND ri.Status = 1);";
+							WHERE Review.Revision = (SELECT MAX(r.Revision) FROM Review r WHERE r.Topic = Review.Topic AND r.Department = Review.Department) 
+							AND Review.Topic = Topic.Code 
+							AND ri.FK_Item_Type = 24 AND ri.Status = 1) 
+                            AND Related.Department = '{dept}';";
             var result = DB_CCS.Database.SqlQuery<TopicNoti>(sql).ToList();
             return result;
         }
@@ -321,14 +334,13 @@ namespace ChangeControl.Models
             var result = DB_CCS.Database.SqlQuery<TopicNoti>(sql).ToList();
             return result;
         }
-        public List<TopicNoti> GetConfirmApproved(){
+        public List<TopicNoti> GetConfirmApproved(string dept){
             var sql = $@"SELECT DISTINCT Code, Topic.Revision, Topic.Status, Subject, Detail, Time_insert, 'Approved' AS SubStatus 
                         FROM Topic
                         LEFT JOIN Related ON Topic.Related = PK_Related
                         LEFT JOIN Department ON Related.Department = Department.Name
                         WHERE Topic.Revision = (SELECT MAX(t.Revision) FROM Topic t WHERE t.Code = Topic.Code  AND t.Department = Topic.Department)
                             AND Topic.Status = 10
-	                        AND (Department.[Group] = 'Production')
                           	AND 
                         (SELECT COUNT(Confirm.ID) FROM Confirm WHERE Confirm.Topic = Topic.Code 
                         AND Confirm.Status = 1 AND Confirm.Department != 'QC1' AND Confirm.Department != 'QC2' AND Confirm.Department != 'QC3' AND Confirm.Revision = (SELECT MAX(c.Revision) FROM Confirm c WHERE c.Topic = Confirm.Topic AND c.Department = Confirm.Department)) =
@@ -337,7 +349,8 @@ namespace ChangeControl.Models
                         WHERE Topic.Related = PK_Related AND Related.Department != 'QC1' AND Related.Department != 'QC2' 
                         AND Related.Department != 'QC3' AND (sub_d.[Group] = 'Production'))
                         
-                        AND NOT EXISTS ( SELECT * FROM Confirm WHERE Confirm.Topic = Topic.Code AND Confirm.Status = 3 AND Confirm.Department != 'QC1' AND Confirm.Department != 'QC2' AND Confirm.Department != 'QC3' );";
+                        AND NOT EXISTS ( SELECT * FROM Confirm WHERE Confirm.Topic = Topic.Code AND Confirm.Status = 3 AND Confirm.Department != 'QC1' AND Confirm.Department != 'QC2' AND Confirm.Department != 'QC3') 
+                        AND Related.Department = '{dept}';";
             var result = DB_CCS.Database.SqlQuery<TopicNoti>(sql).ToList();
             return result;
         }
@@ -355,8 +368,22 @@ namespace ChangeControl.Models
             return result;
         }
 
-        
-
+        public SummaryTopic GetSummaryTopic(){
+            var sql = $@"SELECT 
+                            COUNT (*) AS Total,
+                            SUM(CASE WHEN t1.Status = 3 OR t1.Status = 7 THEN 1 ELSE 0 END) Request,
+                            SUM(CASE WHEN t1.Status = 8 THEN 1 ELSE 0 END) Review,
+                            SUM(CASE WHEN t1.Status = 9 THEN 1 ELSE 0 END) Trial,
+                            SUM(CASE WHEN t1.Status = 10 THEN 1 ELSE 0 END) Confirm,
+                            SUM(CASE WHEN t1.Status = 11 THEN 1 ELSE 0 END) Finished,
+                            SUM(CASE WHEN t1.Status = 12 THEN 1 ELSE 0 END) Rejected
+                        FROM (
+                            SELECT Code, Status, Revision FROM Topic tt
+                            WHERE tt.Revision  = (SELECT MAX(t.Revision) FROM Topic t WHERE t.Code = tt.Code)
+                        ) AS t1;";
+            var result = DB_CCS.Database.SqlQuery<SummaryTopic>(sql).First();
+            return result;
+        }
 
     }
 }

@@ -14,16 +14,20 @@
         $('#menu2-1').removeClass('active');
         $('#menu3-1').removeClass('active');
         $('#menu4-1').addClass('active');
-        $("[name='dept']").val(us_dept,true)
+        $("[name='dept']").val(us_dept, true)
     });
 
 </script>
 <!-- DataTables -->
-<script src="~/tmp/plugins/datatables/jquery.dataTables.js"></script>
-@* <script src="~/tmp/plugins/datatables-bs4/js/dataTa/bles.bootstrap4.js"></script> *@
 <script src="~/Scripts/User/User.js"></script>
-@* <script src="~/Plugin/dataTables.treeGrid-ch.js"></script> *@
-@* <script src="~/Plugin/dataTables.treeGrid.js"></script> *@
+
+@* <link href="~/Plugin/switch-bs/bootstrap-switch-button.css" rel="stylesheet" />
+<script src="~/Plugin/switch-bs/bootstrap-switch-button.min.js"></script>*@
+
+@* <link href="~/Plugin/switch/switch.css" rel="stylesheet" />
+<script src="~/Plugin/switch/switch.js"></script>  *@
+
+
 
 <div class="content-wrapper">
     <section class="content-header">
@@ -82,7 +86,7 @@
                                                     <label>Position :</label>
                                                     <select class="form-control select2" id="position" style="width: 100%;">
                                                         <option disabled="disabled">Select Position</option>
-                                                        <option value="1"  selected="selected">Issue</option>
+                                                        <option value="1" selected="selected">Issue</option>
                                                         <option value="2">Admin</option>
                                                     </select>
                                                 </div>
@@ -129,7 +133,7 @@
                                                     <label>Code :</label>
                                                     <select class="form-control select2" id="position" style="width: 100%;">
                                                         <option disabled="disabled">Select Position</option>
-                                                        <option value="1"  selected="selected">Issue</option>
+                                                        <option value="1" selected="selected">Issue</option>
                                                         <option value="2">Admin</option>
                                                     </select>
                                                 </div>
@@ -139,7 +143,7 @@
                                                     <label>Department :</label>
                                                     <select class="form-control select2" id="position" style="width: 100%;">
                                                         <option disabled="disabled">Select Position</option>
-                                                        <option value="1"  selected="selected">Issue</option>
+                                                        <option value="1" selected="selected">Issue</option>
                                                         <option value="2">Admin</option>
                                                     </select>
                                                 </div>
@@ -152,7 +156,7 @@
                                                 <div class="form-group mb-0">
                                                     <label>Recieve email :</label>
                                                     <select class="form-control select2" id="position" style="width: 100%;">
-                                                        <option value="1"  selected="selected">Yes</option>
+                                                        <option value="1" selected="selected">Yes</option>
                                                         <option value="2">No</option>
                                                     </select>
                                                 </div>
@@ -184,44 +188,44 @@
     <!-- Main content -->
     <section class="content">
         <div class="container-fluid">
-        <div class="row">
-            <!-- left column -->
-            <div class="col-md-12">
-                <!-- jquery validation -->
-                <div class="card card-primary">
-                            <div class="card-header">
-                                <h3 class="card-title">Total records <small>....</small></h3>
-                            </div>
-                            <!-- /.card-header -->
+            <div class="row">
+                <!-- left column -->
+                <div class="col-md-12">
+                    <!-- jquery validation -->
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title">Total records <small>....</small></h3>
+                        </div>
+                        <!-- /.card-header -->
 
-                            <div class="card-body table-responsive">
-                                <table id="user_tb" class="table table-bordered table-hover txtcenter" width="100%" style="table-layout: fixed;">
-                                    <thead>
-                                        <tr>
-                                            <th width="5%"></th>
-                                            <th width="7%">Code</th>
-                                            <th width="15%">Name</th>
-                                            <th width="26%">Email</th>
-                                            <th width="10%">Department</th>
-                                            <th width="8%">Active</th>
-                                            <th width="9%">Subscribe</th>
-                                            @*<th>Inform to Customer</th>
-                                <th>Trial & Followup status</th>
-                                <th>Close Status</th>*@
-                                        </tr>
-                                    </thead>
-                                    @using (Html.BeginForm("GoTo", "Home", FormMethod.Post))
-                                    {
-                                        <tbody id="tbody1">
-                                        </tbody>
-                                    }
+                        <div class="card-body table-responsive">
+                            <table id="user_tb" class="table table-bordered table-hover txtcenter" width="100%" style="table-layout: fixed;">
+                                <thead>
+                                    <tr>
+                                        <th width="5%"></th>
+                                        <th width="7%">Code</th>
+                                        <th width="15%">Name</th>
+                                        <th width="26%">Email</th>
+                                        <th width="10%">Department</th>
+                                        <th width="8%">Active</th>
+                                        <th width="7%">Subscribe</th>
+                                        @*<th>Inform to Customer</th>
+                                            <th>Trial & Followup status</th>
+                                            <th>Close Status</th>*@
+                                    </tr>
+                                </thead>
+                                @using (Html.BeginForm("GoTo", "Home", FormMethod.Post))
+                                {
+                                    <tbody id="tbody1">
+                                    </tbody>
+                                }
                             </table>
                         </div>
                     </div>
-                            <!-- /.card -->
+                    <!-- /.card -->
                 </div>
-                    <!-- /.row -->
-        </div>
+                <!-- /.row -->
+            </div>
         </div>
         <!-- /.container-fluid -->
     </section>

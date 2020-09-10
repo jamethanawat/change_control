@@ -60,11 +60,10 @@ namespace ChangeControl.Controllers
                 {
                     req_list.AddRange(M_Home.GetRequestApprovedByDepartment(dept));
                 }
-                if (isQC)
-                {
-                    rv_list.AddRange(M_Home.GetReviewApproved());
-                    tr_list.AddRange(M_Home.GetTrialApproved());
-                    cf_list.AddRange(M_Home.GetConfirmApproved());
+                if(isQC){
+                    rv_list.AddRange(M_Home.GetReviewApproved(dept));
+                    tr_list.AddRange(M_Home.GetTrialApproved(dept));
+                    cf_list.AddRange(M_Home.GetConfirmApproved(dept));
                 }
                 if (confirm_dept_list.Contains(dept))
                 {
