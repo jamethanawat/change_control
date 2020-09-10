@@ -56,6 +56,9 @@
       <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="EPPlus, Version=5.3.1.0, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
+      <HintPath>..\packages\EPPlus.5.3.1\lib\net45\EPPlus.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.AspNetCore.Antiforgery, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNetCore.Antiforgery.2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Antiforgery.dll</HintPath>
     </Reference>
@@ -201,6 +204,7 @@
     <Reference Include="Npgsql.EntityFramework, Version=2.2.7.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
       <HintPath>..\packages\Npgsql.EntityFramework.2.2.7\lib\net45\Npgsql.EntityFramework.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Buffers.4.5.0\lib\netstandard2.0\System.Buffers.dll</HintPath>
@@ -251,6 +255,7 @@
     <Reference Include="System.Text.Json, Version=4.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Text.Json.4.6.0\lib\net461\System.Text.Json.dll</HintPath>
     </Reference>
+    <Reference Include="System.Threading.Tasks" />
     <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.3\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
@@ -324,6 +329,7 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\DetailController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -341,6 +347,7 @@
     <Compile Include="Models\DetailModel.cs" />
     <Compile Include="Models\HomeModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
+    <Compile Include="Models\ReportModel.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Models\MailModel.cs" />
     <Compile Include="Models\RequestModel.cs" />
@@ -357,6 +364,7 @@
     <Compile Include="Models\ViewModels\Reject.cs" />
     <Compile Include="Models\ViewModels\Related.cs" />
     <Compile Include="Models\ViewModels\RelatedAlt.cs" />
+    <Compile Include="Models\ViewModels\ReportExcel.cs" />
     <Compile Include="Models\ViewModels\Response.cs" />
     <Compile Include="Models\ViewModels\Resubmit.cs" />
     <Compile Include="Models\ViewModels\Review.cs" />
@@ -522,6 +530,7 @@
     <Content Include="libman.json" />
     <Content Include="manual.pdf" />
     <Content Include="Plugin\DataTables Demo\json\data.json" />
+    <None Include="packages.config" />
     <None Include="Properties\PublishProfiles\CCS_Test.pubxml" />
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Include="Properties\Settings.settings">
@@ -532,6 +541,7 @@
     <Content Include="Scripts\Detail\Detail.js" />
     <Content Include="Scripts\Detail\ReviewList.js" />
     <Content Include="Scripts\Detail\TrialList.js" />
+    <Content Include="Scripts\Report\Report.js" />
     <Content Include="Scripts\User\User.js" />
     <Content Include="Scripts\Home\Home.js" />
     <!-- <Content Include="Scripts\jquery-3.4.1.js" />
@@ -3955,6 +3965,7 @@
     <Content Include="Views\Mail\Body\EmailRequested.cshtml" />
     <Content Include="Views\Mail\Body\EmailTrialed.cshtml" />
     <Content Include="Views\User\Index.cshtml" />
+    <Content Include="Views\Report\Index.cshtml" />
     <None Include="Web References\myAD\ADInfo.disco" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
