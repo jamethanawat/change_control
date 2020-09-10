@@ -5,11 +5,11 @@
 
 @Scripts.Render("~/bundles/jquery")
 @Scripts.Render("~/bundles/sweetalert")
-    <script type="text/javascript">
+<script type="text/javascript">
     SessionUser = '@Session["User"].ToString()';
     us_dept = '@Session["Department"].ToString()';
         Report = '@Url.Action("GenerateReport", "Report")';
-    </script>
+</script>
 <script>
     $(document).ready(function () {
         $("#menu1-1").removeClass('active');
@@ -17,7 +17,7 @@
         $('#menu3-1').removeClass('active');
         $('#menu4-1').removeClass('active');
         $('#menu5-1').addClass('active');
-        $("[name='dept']").val(us_dept,true)
+        $("[name='dept']").val(us_dept, true)
     });
 
 </script>
@@ -32,7 +32,7 @@
             <div class="row mb-2">
                 <div class="col-sm-6">
                     <h1>Summary Data</h1>
-                </div>          
+                </div>
             </div>
         </div>
         <!-- /.container-fluid -->
@@ -56,7 +56,7 @@
 
                                     <div class="form-group">
                                         <div class="row">
-                                           
+
                                             <div class="col-md-12">
                                                 <label>Select Date :</label><br>
                                                 <div class="input-group">
@@ -70,24 +70,30 @@
                                             </div>
                                         </div>
                                     </div>
-                           
+
                                 </div>
 
                             </div>
                         </div>
                         <!-- /.card-body -->
                         <div class="card-footer">
-                        
+
                             <button id="submit" type="submit" class="btn btn-info float-right"><i class="fas fa-download"></i>&nbsp;&nbsp;Download Excel</button>
                         </div>
                     </div>
                     <!-- /.card -->
                 </div>
-   
+
             </div>
             <!-- /.row -->
         </div>
         <!-- /.container-fluid -->
     </section>
+    @using (Html.BeginForm("CrystalReportReport", "Report", FormMethod.Post))
+    {
+        <button type="submit">CrystalReport</button>
+
+    }
+
 </div>
 

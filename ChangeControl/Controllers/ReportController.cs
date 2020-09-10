@@ -1,8 +1,10 @@
 ﻿using ChangeControl.Models;
 using ChangeControl.Models.ViewModels;
+using CrystalDecisions.CrystalReports.Engine;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -26,7 +28,7 @@ namespace ChangeControl.Controllers
             if ((string)(Session["User"]) == null || (string)(Session["Department"]) == null)
             {
                 Session["RedirectID"] = id ?? null;
-                Session["RedirectMode"] = "User";
+                Session["RedirectMode"] = "Report";
                 return RedirectToAction("Index", "LogIn");
             }
             GenerateTopicList(Session["Department"].ToString(), Session["Position"].ToString());
@@ -169,6 +171,22 @@ namespace ChangeControl.Controllers
             Response.BinaryWrite(Ep.GetAsByteArray());
             Response.End();
         }
+        public ActionResult CrystalReportReport()
+        {
 
+            ReportDocument rd = new ReportDocument();
+            rd.Load(Server.MapPath("~/CrystalReport/CCS_V_2.rpt"));
+            Response.Buffer = false;
+            Response.ClearContent();
+            Response.ClearHeaders();
+            //rd.SetDataSource(list);
+            Stream stream = rd.ExportToStream(CrystalDecisions.Shared.ExportFormatType.PortableDocFormat);
+            rd.Close();
+            rd.Dispose();
+            return new FileStreamResult(stream, "application/pdf");
+           // return File(stream, "application/pdf", "CustomerList.pdf");
+        
         }
+
+    }
 }
