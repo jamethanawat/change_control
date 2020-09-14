@@ -690,7 +690,7 @@
                                         @Html.Partial("Review/Other", ReviewItems) 
                                     }
 
-                                }else if((isTrialable || (QcTrialable && isQC)) && !isTrial && Topic.Status == 9){
+                                }else if(isRelated && (isTrialable || (QcTrialable && isQC)) && !isTrial && Topic.Status == 9){
                                 @* /* ----------------------------- Trial section ----------------------------- */ *@
                                     <hr><br>
                                     <h1>Trial & Confirm</h1><br>
@@ -714,7 +714,7 @@
                                             </div>
                                         </div>
                                     </form>                                    
-                                }else if(((ViewBag.cf_list.Contains(department) && !isQC) || (isQC && QcConfirmable)) && !isConfirm && Topic.Status == 10){
+                                }else if(isRelated && ((ViewBag.cf_list.Contains(department) && !isQC) || (isQC && QcConfirmable)) && !isConfirm && Topic.Status == 10){
                                 @* /* ----------------------------- Confirm section ----------------------------- */ *@
                                     <hr><br>
                                     <h1>Initial Production</h1><br>

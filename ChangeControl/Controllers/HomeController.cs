@@ -14,6 +14,7 @@ namespace ChangeControl.Controllers{
         public class Line{
             public string line { get; set; }
         }
+
         public HomeController(){
             M_Home = new HomeModel();
             if(ViewBag.QCAudit == null) ViewBag.QCAudit = M_Home.GetQcAudit();
@@ -25,6 +26,7 @@ namespace ChangeControl.Controllers{
                 Session["url"] = "Home";
                 return RedirectToAction("Index", "Login");
             }
+            ViewBag.SummaryTopic = M_Home.GetSummaryTopic();
             GenerateTopicList(Session["Department"].ToString(), Session["Position"].ToString());
             return View();
         }
@@ -91,9 +93,9 @@ namespace ChangeControl.Controllers{
                     req_list.AddRange(M_Home.GetRequestApprovedByDepartment(dept));
                 }
                 if(isQC){
-                    rv_list.AddRange(M_Home.GetReviewApproved());
-                    tr_list.AddRange(M_Home.GetTrialApproved());
-                    cf_list.AddRange(M_Home.GetConfirmApproved());
+                    rv_list.AddRange(M_Home.GetReviewApproved(dept));
+                    tr_list.AddRange(M_Home.GetTrialApproved(dept));
+                    cf_list.AddRange(M_Home.GetConfirmApproved(dept));
                 }
                 if(confirm_dept_list.Contains(dept)){
                     cf_list.AddRange(M_Home.GetConfirmPendingByDepartment(dept));
@@ -113,5 +115,6 @@ namespace ChangeControl.Controllers{
                 ViewData["TopicList"] = cf_list;
             }
         }
+
     }
 }

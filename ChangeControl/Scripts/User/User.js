@@ -3,9 +3,9 @@
         code:'63014',
         name:'Pakawat Smutkun',
         email:'pakawat.smutkun@email.thns.co.th',
-        department:'IT',
-        active:'1',
-        subscribe:'1',
+        department:'Special',
+        active:'',
+        subscribe:'',
         children: [
             {
                 code:'',
@@ -70,74 +70,35 @@ $(document).ready(function () {
                     return '';
                 }
             },
-            { data: 'code' },
+            { data: 'code', },
             { data: 'name' },
             { data: 'email' },
-            { data: 'department' },
+            { data: 'department',
+              className: 'center'
+            },
             { 
                 target: 5,
+                className: 'center', 
                 data: function (item){
                     let checked = (item.active == 1) ? "checked" : "";
-                    return `<input type="checkbox" class="js-switch" ${checked} />`;
+                    return (item.active != "")?`<input type="checkbox" class="js-switch" ${checked} />`:"";
                 } 
             },
             { 
                 target: 6,
+                className: 'center', 
                 data: function (item){
                     let checked = (item.subscribe == 1) ? "checked" : "";
-                    return `<input type="checkbox" class="js-switch" ${checked} />`;
+                    return (item.subscribe != "")?`<input type="checkbox" class="js-switch" ${checked} />`:"";
                 } 
             },
-            // {
-            //     title: '',
-            //     target: 0,
-            //     className: 'treegrid-control',
-            //     data: function (item) {
-            //         if(item.children != null && item.children.length > 0){
-            //             return '<span>+</span>';
-            //         }
-            //         return '';
-            //     }
-            // },
-            // { 
-            //     title: 'code',
-            //     target: 1,
-            //     data: function (item) {
-            //     return item.code
-            // }},
-            // { 
-            //     title: 'name',
-            //     target: 2,
-            //     data: function (item) {
-            //     return item.name
-            // }},
-            // { 
-            //     title: 'email',
-            //     target: 3,
-            //     data: function (item) {
-            //     return item.email
-            // }},
-            // { 
-            //     title: 'department',
-            //     target: 4,
-            //     data: function (item) {
-            //     return item.department
-            // }},
-            // { 
-            //     title: 'active',
-            //     target: 5,
-            //     data: function (item) {
-            //     return item.active
-            // }},
-            // { 
-            //     title: 'subscribe',
-            //     target: 6,
-            //     data: function (item) {
-            //     return item.subscribe
-            // }},
         ],
     });
 
+    // $(".treegrid-control").click();
+
+    // var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
+    // elems.forEach(function(html) { var switchery = new Switchery(html); });
 });
 
 
