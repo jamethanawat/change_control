@@ -89,5 +89,12 @@ namespace ChangeControl.Models
          
             return result.ToList();
         }
+        public List<test> test()
+        {
+            var sql = @"select top (10) dept from [User]";
+            var result = DB_CCS.Database.SqlQuery<test>(sql);
+
+            return result.ToList();
+        }
     }
 }

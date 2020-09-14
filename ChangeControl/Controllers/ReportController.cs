@@ -3,6 +3,7 @@ using ChangeControl.Models.ViewModels;
 using CrystalDecisions.CrystalReports.Engine;
 using OfficeOpenXml;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -174,11 +175,34 @@ namespace ChangeControl.Controllers
         public ActionResult CrystalReportReport()
         {
 
+            List<ReportExcel> result = new List<ReportExcel>();
+     
+            result = M_Report.GetReport("20200901", "20200902");
+            List<test> result2 = new List<test>();
+
+            result2 = M_Report.test();
+
             ReportDocument rd = new ReportDocument();
             rd.Load(Server.MapPath("~/CrystalReport/CCS_V_2.rpt"));
             Response.Buffer = false;
             Response.ClearContent();
             Response.ClearHeaders();
+
+
+
+            IEnumerable<ReportExcel> customers = result;
+            IEnumerable<test> products = result2;
+            //List<object> everything = new List<object>();
+            //everything.Add(customers);
+            //everything.Add(products);
+            ArrayList Mainlst = new ArrayList();
+            Mainlst.Add(customers);
+            Mainlst.Add(products);
+            rd.Database.Tables[0].SetDataSource(customers);
+            rd.Database.Tables[1].SetDataSource(products);
+
+
+
             //rd.SetDataSource(list);
             Stream stream = rd.ExportToStream(CrystalDecisions.Shared.ExportFormatType.PortableDocFormat);
             rd.Close();
