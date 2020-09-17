@@ -10,6 +10,7 @@ $(() => {
         maxFiles: 20,
         allowMultiple: true,
         required: false,
+        allowPaste: false,
         labelIdle: `<i class="fas fa-paperclip"></i> Drag &amp; Drop your files or <span class="filepond--label-action"> Browse</span> (Limit 10MB)`,
         maxFileSize: '10MB'
     });
