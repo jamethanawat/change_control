@@ -9,7 +9,7 @@
     <head>
         @Scripts.Render("~/bundles/modernizr")
         @Scripts.Render("~/bundles/jquery")
-        @Scripts.Render("~/bundles/bootstrap")
+        @* @Scripts.Render("~/bundles/bootstrap") *@
         @Scripts.Render("~/bundles/sweetalert")
 
         <style>
@@ -29,6 +29,7 @@
             var UrlTopicID = '@((string) Session["RedirectID"] != null ? Session["RedirectID"].ToString() : "")';
             var NavigateToPrevious = `@((string) Session["RedirectID"] != null ? @Url.Action("Index", RedirectMode , new { id = Session["RedirectID"].ToString()}) : @Url.Action("Index", RedirectMode))`;
             var GetDepartmentListPath = '@Url.Action("GetDepartment", "Request")';
+            var GetCountPermissionByUserPath = '@Url.Action("GetCountPermissionByUser", "Login")';
 
         </script>
 
@@ -55,7 +56,11 @@
         <!-- Google Font: Source Sans Pro -->
         @*<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">*@
 
-        
+        <style>
+            .select-custom{
+                width: 40% !important;
+            }
+        </style>
     </head>
 
     <body>

@@ -3,6 +3,8 @@ pos_select.onchange = function selectChanged(e) {
     value = e.target.value
 }
 
+var notyf = new Notyf();
+
 $(() => {
     $("#change_dept_btn").click(() => {
         var dept_select;

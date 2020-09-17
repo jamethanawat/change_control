@@ -7,7 +7,7 @@
 @Scripts.Render("~/bundles/sweetalert")
     <script type="text/javascript">
     SessionUser = '@Session["User"].ToString()';
-    us_dept = '@Session["Department"].ToString()';
+    var us_dept = '@Session["Department"].ToString()';
         Report = '@Url.Action("GenerateReport", "Report")';
     </script>
 <script>

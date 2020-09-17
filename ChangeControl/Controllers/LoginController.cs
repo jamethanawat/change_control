@@ -195,6 +195,10 @@ namespace ChangeControl.Controllers{
             }, JsonRequestBehavior.AllowGet);
         }
 
+        public int GetCountPermissionByUser(string user){
+            return M_Login.GetCountPermissionByUser(user);
+        }
+
         public ActionResult GetDepartmentListByUserID(string us_id){
             return Json(new { data = M_Login.GetDepartmentListByUserID(us_id) }, JsonRequestBehavior.AllowGet);
         }

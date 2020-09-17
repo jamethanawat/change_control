@@ -8,7 +8,7 @@
     GetLine = '@Url.Action("GetLine", "Home")';
     GetSearch = '@Url.Action("GetSearch", "Home")';
     SessionUser = '@Session["User"].ToString()';
-    us_dept = '@Session["Department"].ToString()';
+    var us_dept = '@Session["Department"].ToString()';
 </script>
 
 @Scripts.Render("~/bundles/jquery")
@@ -144,7 +144,7 @@
                 <!-- /.col -->
                 <div class="col-2">
                     <div class="info-box">
-                        <span class="info-box-icon" style="background-color: #e899c5"><i class="fas fa-check"></i></span>
+                        <span class="info-box-icon" style="background-color: #007bffd1"><i class="fas fa-check"></i></span>
 
                         <div class="info-box-content">
                             <span class="info-box-text">Finished</span>
@@ -273,7 +273,7 @@
                                                     <option disabled="disabled" selected="selected">Department</option>
                                                     <option value="">--- Blank ---</option>
                                                     @foreach(var dept in ViewBag.Departments){
-                                                        <option>@dept</option>
+                                                        <option value="@dept">@dept</option>
                                                     }
                                                 </select>
                                             </div>

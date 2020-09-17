@@ -101,5 +101,11 @@ namespace ChangeControl.Models{
             }
         }
 
+        public int GetCountPermissionByUser(string user){
+            var sql = $@"SELECT COUNT(*) FROM Permission WHERE [User] = '{user}';";
+            var result = DB_CCS.Database.SqlQuery<int>(sql).First();
+            return result;
+        }
+
     }
 }
