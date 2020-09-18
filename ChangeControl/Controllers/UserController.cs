@@ -32,7 +32,7 @@ namespace ChangeControl.Controllers{
             GenerateTopicList(Session["Department"].ToString(), Session["Position"].ToString());
             ViewBag.Positions = (Session["Position"].ToString() == "Admin") ? M_User.GetAdminPosition() : M_User.GetPosition();
             ViewBag.Users = M_User.GetUserCodeByDept(Session["Department"].ToString());
-            ViewBag.Depts = M_User.GetDepartmentByGroup(Session["Department"].ToString());
+            ViewBag.Depts = (Session["Position"].ToString() == "Admin") ? M_User.GetDepartmentList() : M_User.GetDepartmentByGroup(Session["Department"].ToString());
             return View();
         }
 

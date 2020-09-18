@@ -70,6 +70,11 @@ namespace ChangeControl.Models{
             }
         }
 
+        public List<String> GetDepartmentList(){
+            var sql = $"SELECT Name FROM Department WHERE Name != 'Guest';";
+            var result = DB_CCS.Database.SqlQuery<String>(sql).ToList();
+            return result;
+        }
         public List<string> GetPosition(){
             var sql = $@"SELECT Name FROM [Position] WHERE Permission IS NULL;";
                 var result = DB_CCS.Database.SqlQuery<string>(sql).ToList();
