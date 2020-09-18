@@ -576,5 +576,15 @@ namespace ChangeControl.Models
                 return false;
             }
         }
+        
+        public bool DeleteFileByNameFormat(string name_format){
+             try{
+                var sql = $@"DELETE FROM [File] WHERE Name_Format = '{name_format}';";
+                DB_CCS.Database.ExecuteSqlCommand(sql);
+                return true;
+            }catch(Exception ex){
+                return false;
+            }
+        }
     }
 }

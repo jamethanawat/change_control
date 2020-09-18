@@ -141,6 +141,8 @@ namespace ChangeControl.Controllers{
         }
         public void SendMail(string email_body,List<string> address_list){
             foreach(var address in address_list){
+                if(address == null) continue;
+                
                 var datemail = DateTime.Now.ToString("dd/MM/yyy HH:mm:ss");
                 string FromName = "Change Control System";
                 string FromEmail = "ccs@email.thns.co.th";

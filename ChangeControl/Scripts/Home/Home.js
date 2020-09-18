@@ -3,17 +3,9 @@ var GetLine;
 var GetSearch;
 var GetTopicDetail;
 var SessionUser;
+var table_cr;
 $(document).ready(function () {
     $("body").addClass("sidebar-collapse", 1000);
-    $('#ChangeRequestTable').DataTable( { 
-        "paging": true,
-        "lengthChange": true,
-        "searching": true,
-        "ordering": true,
-        "info": true,
-        "autoWidth": true,
-        "pageLength": 10,
-    });
 
 /* ----------------------- Add pleaceholder to TNS No ----------------------- */
 
@@ -44,8 +36,6 @@ $(document).ready(function () {
         }
     });
     
-    var table_cr;
-    table_cr = $('#ChangeRequestTable').DataTable();
 
 /* ----------------------- Overstatus relate to status ---------------------- */
     $("[name='overstatus']").change((e) => {
@@ -129,97 +119,39 @@ $(document).ready(function () {
 
     $("#search").click((e) => {
         e.preventDefault();
-        let status = $("input[name='status']:checked").val() || 0;
-        
-        var temp_data = {
-            'Type': $("#changeType").val(),
-            'Status': status,
-            'StartDate': ($("#date_range").is(":disabled")) ? null : $('#date_range').data('daterangepicker').startDate.format('YYYYMMDD'),
-            'EndDate': ($("#date_range").is(":disabled")) ? null : $('#date_range').data('daterangepicker').endDate.format('YYYYMMDD'),
-            'ProductType': $("#productType").val(),
-            'Overstatus': $("input[name='overstatus']:checked").val(),
-            'Changeitem': $("#changeitem").val(),
-            'ControlNo': $("#TNScontrolNo").val(),
-            'Model': $("#Model").val(),
-            'Partno': $("#partno").val(),
-            'Partname': $("#partname").val(),
-            'Department': $("[name='dept']").val(),
-            'Processname': $("#processname").val(),
-            'Line': $("#line").val(),
-            'Production': $("#Production").val(),
-            'Line': $("#Line").val(),
-        };
-        
+        // table_cr.ajax.reload();
         $.ajax({
             type: "POST",
             url: GetSearch,
-            data: JSON.stringify(temp_data),
+            data: JSON.stringify({
+                'Type': $("#changeType").val(),
+                'Status': $("input[name='status']:checked").val() || 0,
+                'StartDate': ($("#date_range").is(":disabled")) ? null : $('#date_range').data('daterangepicker').startDate.format('YYYYMMDD'),
+                'EndDate': ($("#date_range").is(":disabled")) ? null : $('#date_range').data('daterangepicker').endDate.format('YYYYMMDD'),
+                'ProductType': $("#productType").val(),
+                'Overstatus': $("input[name='overstatus']:checked").val(),
+                'Changeitem': $("#changeitem").val(),
+                'ControlNo': $("#TNScontrolNo").val(),
+                'Model': $("#Model").val(),
+                'Partno': $("#partno").val(),
+                'Partname': $("#partname").val(),
+                'Department': $("[name='dept']").val(),
+                'Processname': $("#processname").val(),
+                'Line': $("#line").val(),
+                'Production': $("#Production").val(),
+                'Line': $("#Line").val(),
+            }),
             contentType: 'application/json; charset=utf-8',
-            beforeSend: function(){
-                $("#loading").removeClass('hidden');
-            },
-            complete: function(){
-                $("#loading").addClass('hidden');
-            },
-            success: function (response) {
+            success: (data) => {
                 table_cr.clear();
-                table_cr.destroy();
-                table_cr = $('#ChangeRequestTable').DataTable( {
-                    data:response,
-                    "order": [],
-                    columnDefs: [
-                    {"targets": 4,
-                        createdCell: (td) => { 
-                            $(td).css('text-align', 'left'); 
-                        }
-                    },
-                    {"targets": 7,
-                        "render": function (data, type, row) {
-                            data = (data == "Waiting") ? "Request" : data;
-                            data = (row.SubStatus != null) ? `${row.SubStatus}` : data;
-                            return `${data}`;
-                            // return `<span class="badge badge-warning">${data}</span>`;
-                        }
-                    },{"targets": 8,
-                        "render": function (data, type, row) {
-                            let action_btn = '';
-                            if(response === null){
-                                return null;
-                            }else{
-                                    var btn_badge = `secondary`;
-                                    var editable = `disabled`;
-                                    if(row.User_insert === SessionUser && (row.FullStatus == "Waiting" || row.FullStatus == "Request")){
-                                        btn_badge = `success`;
-                                        var editable = ``;
-                                    }
-                                    return `<div class="btn-group"><a href="Detail/?id=${row.Code}"><button type="button" name="detail" id="${row.Code}" class="btn btn-info btn-left btn-sm mb-1 mr-1" data-toggle="modal" data-target="#largeModal" >`+
-                                    `<i class="fas fa-external-link-alt"></i></button></a><a href="Request/?id=${row.Code}"><button type="button" name="edit" id="${row.Code}" class="btn btn-`+
-                                    btn_badge + ` btn-right btn-sm  mb-1" data-toggle="modal" data-target="#largeModal"` +
-                                    editable + `>`+
-                                    `<i class="fas fa-pen"></i>`+
-                                    `</button></a></div>`;
-                            }
-                        }
-                    }],
-                    columns: [
-                        { data: 'Code' },
-                        { data: 'Date' },
-                        { data: 'Timing' },
-                        { data: 'Department' },
-                        { data: 'Detail' },
-                        { data: 'Product_type' },
-                        { data: 'Model' },
-                        { data: 'FullStatus' },
-                    ],
-                });
-
-                $("body, html").animate({
-                    scrollTop: 700
-                }, 100)
+                table_cr.rows.add(data);
+                table_cr.draw();
             },
-            error: function () {
-            }
         });
+
+        $("body, html").animate({
+            scrollTop: 700
+        }, 100)
     });
 
 /* -------------------------------------------------------------------------- */
@@ -233,30 +165,59 @@ $(document).ready(function () {
         }
     })
     
-    // $('#reservationtime').daterangepicker({
-    //   timePicker: true,
-    //   timePickerIncrement: 30,
-    //   locale: {
-    //     format: 'MM/DD/YYYY hh:mm A'
-    //   }
-    // })
-    
-    // $('#daterange-btn').daterangepicker(
-    //   {
-    //     ranges   : {
-    //       'Today'       : [moment(), moment()],
-    //       'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-    //       'Last 7 Days' : [moment().subtract(6, 'days'), moment()],
-    //       'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-    //       'This Month'  : [moment().startOf('month'), moment().endOf('month')],
-    //       'Last Month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-    //     },
-    //     startDate: moment().subtract(29, 'days'),
-    //     endDate  : moment()
-    //   },
-    //   function (start, end) {
-    //     $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'))
-    //   }
-    // )
+    table_cr = $('#ChangeRequestTable').DataTable({
+        "paging": true,
+        "lengthChange": true,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "autoWidth": true,
+        "pageLength": 10,
+        "order": [],
+        columnDefs: [
+        {"targets": 4,
+            createdCell: (td) => { 
+                $(td).css('text-align', 'left'); 
+            }
+        },
+        {"targets": 7,
+            "render": function (data, type, row) {
+                data = (data == "Waiting") ? "Request" : data;
+                data = (row.SubStatus != null) ? `${row.SubStatus}` : data;
+                return `${data}`;
+                // return `<span class="badge badge-warning">${data}</span>`;
+            }
+        },{"targets": 8,
+            "render": function (data, type, row) {
+                let action_btn = '';
+                if(data === null){
+                    return null;
+                }else{
+                        var btn_badge = `secondary`;
+                        var editable = `disabled`;
+                        if(row.User_insert === SessionUser && (row.FullStatus == "Waiting" || row.FullStatus == "Request")){
+                            btn_badge = `success`;
+                            var editable = ``;
+                        }
+                        return `<div class="btn-group"><a href="Detail/?id=${row.Code}"><button type="button" name="detail" id="${row.Code}" class="btn btn-info btn-left btn-sm mb-1 mr-1" data-toggle="modal" data-target="#largeModal" >`+
+                        `<i class="fas fa-external-link-alt"></i></button></a><a href="Request/?id=${row.Code}"><button type="button" name="edit" id="${row.Code}" class="btn btn-`+
+                        btn_badge + ` btn-right btn-sm  mb-1" data-toggle="modal" data-target="#largeModal"` +
+                        editable + `>`+
+                        `<i class="fas fa-pen"></i>`+
+                        `</button></a></div>`;
+                }
+            }
+        }],
+        columns: [
+            { data: 'Code' },
+            { data: 'Date' },
+            { data: 'Timing' },
+            { data: 'Department' },
+            { data: 'Detail' },
+            { data: 'Product_type' },
+            { data: 'Model' },
+            { data: 'FullStatus' },
+        ],
+    });
 
 });

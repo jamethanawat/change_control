@@ -3,6 +3,8 @@ pos_select.onchange = function selectChanged(e) {
     value = e.target.value
 }
 
+var notyf = new Notyf();
+
 $(() => {
     $("#change_dept_btn").click(() => {
         var dept_select;
@@ -33,6 +35,26 @@ $(() => {
                     }
                 }
             });
+        });
+    });
+
+    $("[name='remove_file']").click(function(e) {
+        swal({
+            title: "Delete file", 
+            text: "Do you want to delete this file?", 
+            closeOnClickOutside: false,
+            buttons : [true,true],
+            icon:"warning",
+        }).then((res) => {
+            if(res){
+                $.post(DeleteFileByNameFormatPath, {name_format : this.value.split("^")[0]}, (res) => {
+                    if(res.status == 'success'){
+                        swal("Success", "Remove file success", "success").then(setTimeout(() => { location.reload(); }, 1500));
+                    }else{
+                        swal("Error", "Remove file not success, Please contact admin", "error");
+                    }
+                });
+            }
         });
     });
 

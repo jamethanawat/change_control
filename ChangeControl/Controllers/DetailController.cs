@@ -653,6 +653,16 @@ namespace ChangeControl.Controllers{
             M_Detail.UpdateTopicRelated(Session["TopicCode"].ToString(), (long) Session["RelatedID"]);
             return Json(new {status="success"}, JsonRequestBehavior.AllowGet);
         }
+        
+        public ActionResult DeleteFileByNameFormat(string name_format){
+            try{
+                M_Detail.DeleteFileByNameFormat(name_format);
+                return Json(new {status="success"}, JsonRequestBehavior.AllowGet);
+            }catch(Exception err){
+                return Json(new {status="error"}, JsonRequestBehavior.AllowGet);
+            }
+        }
+
 
         [HttpPost]
         public void GenerateTopicList(string Department, string Position){

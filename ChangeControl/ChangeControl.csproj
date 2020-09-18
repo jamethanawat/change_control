@@ -48,6 +48,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CrystalDecisions.CrystalReports.Engine, Version=13.0.4000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL" />
+    <Reference Include="CrystalDecisions.ReportSource, Version=13.0.4000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL" />
+    <Reference Include="CrystalDecisions.Shared, Version=13.0.4000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL" />
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.dll</HintPath>
       <Private>True</Private>
@@ -365,6 +368,7 @@
     <Compile Include="Models\ViewModels\Related.cs" />
     <Compile Include="Models\ViewModels\RelatedAlt.cs" />
     <Compile Include="Models\ViewModels\ReportExcel.cs" />
+    <Compile Include="Models\ViewModels\UserWithPermission.cs" />
     <Compile Include="Models\ViewModels\Response.cs" />
     <Compile Include="Models\ViewModels\Resubmit.cs" />
     <Compile Include="Models\ViewModels\Review.cs" />
@@ -372,6 +376,7 @@
     <Compile Include="Models\ViewModels\SearchAttribute.cs" />
     <Compile Include="Models\ViewModels\SearchResult.cs" />
     <Compile Include="Models\ViewModels\Summernote.cs" />
+    <Compile Include="Models\ViewModels\test.cs" />
     <Compile Include="Models\ViewModels\Topic.cs" />
     <Compile Include="Models\ViewModels\TopicAlt.cs" />
     <Compile Include="Models\ViewModels\TopicApprove.cs" />
@@ -383,6 +388,12 @@
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="CrystalReport\CCS_v_2.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CCS_v_2.rpt</DependentUpon>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Services\FileService.cs" />
     <Compile Include="Web References\checkuser\Reference.cs">
@@ -484,17 +495,11 @@
     <Content Include="Plugin\ldLoader\ldld.min.js" />
     <Content Include="Plugin\ldLoader\loading.min.css" />
     <Content Include="Plugin\loading.css" />
+    <Content Include="Plugin\notyf\notyf.min.css" />
+    <Content Include="Plugin\notyf\notyf.min.js" />
     <Content Include="Plugin\SweetAlert\sweetalert-dev.js" />
     <Content Include="Plugin\SweetAlert\sweetalert.css" />
     <Content Include="Plugin\SweetAlert\sweetalert.min.js" />
-    <Content Include="Plugin\switch-bs\bootstrap-switch-button.css" />
-    <Content Include="Plugin\switch-bs\bootstrap-switch-button.min.js" />
-    <Content Include="Plugin\switchery\switchery.css" />
-    <Content Include="Plugin\switchery\switchery.js" />
-    <Content Include="Plugin\switchery\switchery.min.css" />
-    <Content Include="Plugin\switchery\switchery.min.js" />
-    <Content Include="Plugin\switch\switch.css" />
-    <Content Include="Plugin\switch\switch.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Plugin\filepond\.github\ISSUE_TEMPLATE.md" />
@@ -537,7 +542,6 @@
     <Content Include="manual.pdf" />
     <Content Include="Plugin\DataTables Demo\json\data.json" />
     <None Include="packages.config" />
-    <Content Include="Plugin\switch-bs\bootstrap-switch-button.min.js.map" />
     <None Include="Properties\PublishProfiles\CCS_Test.pubxml" />
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Include="Properties\Settings.settings">
@@ -4266,6 +4270,7 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
+    <Service Include="{C0C07587-41A7-46C8-8FBD-3F9C8EBE2DDC}" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
@@ -4388,6 +4393,12 @@
     <TypeScriptCompile Include="tmp\plugins\fullcalendar-interaction\main.d.ts" />
     <TypeScriptCompile Include="tmp\plugins\fullcalendar-timegrid\main.d.ts" />
     <TypeScriptCompile Include="tmp\plugins\fullcalendar\main.d.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CrystalReport\CCS_v_2.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>CCS_v_2.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

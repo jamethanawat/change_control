@@ -4,10 +4,22 @@
 }
 @Scripts.Render("~/bundles/jquery")
 @Scripts.Render("~/bundles/sweetalert")
+
 <script type="text/javascript">
     SessionUser = '@Session["User"].ToString()';
-    us_dept = '@Session["Department"].ToString()';
+    var us_dept = '@Session["Department"].ToString()';
+    var us_pos = '@Session["Position"].ToString()';
+    var AddUserPath = '@Url.Action("AddUser", "User")';
+    var AddPermissionPath = '@Url.Action("AddPermission", "User")';
+    var GetUserCodeByDeptPath = '@Url.Action("GetUserCodeByDept", "User")';
+    var GetUserWithPermissionByDeptPath = '@Url.Action("GetUserWithPermissionByDept", "User")';
+    var UpdatePositionPath = '@Url.Action("UpdatePosition", "User")';
+    var UpdateSubscribePath = '@Url.Action("UpdateSubscribe", "User")';
+    var DeletePermissionPath = '@Url.Action("DeletePermission", "User")';
+    var DeleteUserPath = '@Url.Action("DeleteUser", "User")';
+    var Positions = @Html.Raw(Json.Encode(ViewBag.Positions));
 </script>
+
 <script>
     $(document).ready(function () {
         $("#menu1-1").removeClass('active');
@@ -20,14 +32,6 @@
 </script>
 <!-- DataTables -->
 <script src="~/Scripts/User/User.js"></script>
-
-@* <link href="~/Plugin/switch-bs/bootstrap-switch-button.css" rel="stylesheet" />
-<script src="~/Plugin/switch-bs/bootstrap-switch-button.min.js"></script>*@
-
-@* <link href="~/Plugin/switch/switch.css" rel="stylesheet" />
-<script src="~/Plugin/switch/switch.js"></script>  *@
-
-
 
 <div class="content-wrapper">
     <section class="content-header">
@@ -54,62 +58,73 @@
                     <!-- jquery validation -->
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3 class="card-title">Add User </h3>
+                            <h3 class="card-title"><i class="fas fa-user-plus"></i> Add User </h3>
                         </div>
 
-                        <div class="card-body">
-                            <div class="row">
-                                <!-- left column -->
-                                <div class="col-md-12">
-                                    <!-- select2 -->
+                        <form action="javascript:void(0);" id="User">
+                            <div class="card-body">
+                                <div class="row">
+                                    <!-- left column -->
+                                    <div class="col-md-12">
+                                        <!-- select2 -->
 
-                                    <div class="form-group">
-                                        <div class="row">
-                                            <div class="col-md-4">
-                                                <div class="form-group mb-0">
-                                                    <label>Code :</label>
-                                                    <input type="text" class="form-control" id="code" placeholder="Enter ...">
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-group mb-0">
+                                                        <label>ID :</label>
+                                                        <input type="text" maxlength="5" class="form-control" name="user" placeholder="Enter ...">
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-md-8">
-                                                <div class="form-group mb-0">
-                                                    <label>Name :</label>
-                                                    <input type="text" class="form-control" id="name" placeholder="Enter ...">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <div class="row">
-                                            <div class="col-md-4">
-                                                <div class="form-group mb-0">
-                                                    <label>Position :</label>
-                                                    <select class="form-control select2" id="position" style="width: 100%;">
-                                                        <option disabled="disabled">Select Position</option>
-                                                        <option value="1" selected="selected">Issue</option>
-                                                        <option value="2">Admin</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-8">
-                                                <div class="form-group mb-0">
-                                                    <label>E-Mail :</label>
-                                                    <input type="text" class="form-control" id="email" placeholder="Enter ...">
+                                                <div class="col-md-8">
+                                                    <div class="form-group mb-0">
+                                                        <label>Name :</label>
+                                                        <input type="text" class="form-control" name="name" placeholder="Enter ...">
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-group mb-0">
+                                                        <label>Position :</label>
+                                                        <select class="form-control select2" name="position" style="width: 100%;">
+                                                            <option disabled="disabled">Select Position</option>
+                                                            @{
+                                                                var i = 0;
+                                                                foreach(var position in ViewBag.Positions){
+                                                                    <option value="@i" @(i == 0 ? "selected":"")>@position</option>
+                                                                        i++;
+                                                                }
+                                                            }
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <div class="form-group mb-0">
+                                                        <label>E-Mail :</label>
+                                                        <input type="text" class="form-control" name="email" placeholder="Enter ...">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     </div>
 
                                 </div>
-
                             </div>
-                        </div>
-                        <!-- /.card-body -->
+                            <!-- /.card-body -->
+                        </form>
+                        
                         <div class="card-footer">
-                            @* <button type="submit" class="btn btn-default" id="clear_btn">Clear</button> *@
-                            @* <button type="submit" class="btn btn-primary float-right" style="margin-left: 5px;"><i class="fa fa-file-archive-o"></i>&nbsp;&nbsp;Report</button> *@
-                            <button id="user" type="submit" value="search" class="btn btn-info float-right"><i class="fa fa-pen"></i>&nbsp;&nbsp;Submit</button>
+                            <button class="btn btn-default" type="button" id="clear_btn" form="User">Clear</button>
+                            <button id="user_submit" type="submit" class="btn btn-info float-right" form="User">
+                                @* <i class="fa fa-pen"></i>&nbsp;&nbsp; *@
+                                Submit
+                            </button>
                         </div>
+
                     </div>
                     <!-- /.card -->
                 </div>
@@ -117,62 +132,69 @@
                     <!-- jquery validation -->
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3 class="card-title"> Permission </h3>
+                            <h3 class="card-title"><i class="fas fa-user-cog"></i> Add Permission </h3>
                         </div>
 
-                        <div class="card-body">
-                            <div class="row">
-                                <!-- left column -->
-                                <div class="col-md-12">
-                                    <!-- select2 -->
+                        <form action="javascript:void(0);" id="Permission">
+                            <div class="card-body">
+                                <div class="row">
+                                    <!-- left column -->
+                                    <div class="col-md-12">
+                                        <!-- select2 -->
 
-                                    <div class="form-group">
-                                        <div class="row">
-                                            <div class="col-md-3">
-                                                <div class="form-group mb-0">
-                                                    <label>Code :</label>
-                                                    <select class="form-control select2" id="position" style="width: 100%;">
-                                                        <option disabled="disabled">Select Position</option>
-                                                        <option value="1" selected="selected">Issue</option>
-                                                        <option value="2">Admin</option>
-                                                    </select>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <div class="form-group mb-0">
+                                                        <label>ID :</label>
+                                                        <select class="form-control select2" name="user" style="width: 100%;">
+                                                            <option disabled="disabled">Select Position</option>
+                                                            @foreach(var user in ViewBag.Users){
+                                                                <option value="@user" @(Session["User"].ToString() == user ? "selected" : "")>@user</option>
+                                                            }
+                                                        </select>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-md-9">
-                                                <div class="form-group mb-0">
-                                                    <label>Department :</label>
-                                                    <select class="form-control select2" id="position" style="width: 100%;">
-                                                        <option disabled="disabled">Select Position</option>
-                                                        <option value="1" selected="selected">Issue</option>
-                                                        <option value="2">Admin</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="form-group mb-0">
-                                                    <label>Recieve email :</label>
-                                                    <select class="form-control select2" id="position" style="width: 100%;">
-                                                        <option value="1" selected="selected">Yes</option>
-                                                        <option value="2">No</option>
-                                                    </select>
+                                                <div class="col-md-9">
+                                                    <div class="form-group mb-0">
+                                                        <label>Department :</label>
+                                                        <select class="form-control select2" name="dept" style="width: 100%;">
+                                                            <option disabled="disabled">Select Position</option>
+                                                            @foreach(var dept in ViewBag.Depts){
+                                                                <option value="@dept" @(Session["Department"].ToString() == dept ? "selected" : "")>@dept</option>
+                                                            }
+                                                        </select>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="form-group mb-0">
+                                                        <label>Receive email :</label>
+                                                        <select class="form-control select2" name="receive_mail" style="width: 100%;">
+                                                            <option value="1" selected="selected">Yes</option>
+                                                            <option value="0">No</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     </div>
 
                                 </div>
-
                             </div>
-                        </div>
-                        <!-- /.card-body -->
+                            <!-- /.card-body -->
+                        </form>
+
                         <div class="card-footer">
                             @* <button type="submit" class="btn btn-default" id="clear_btn">Clear</button> *@
-                            @* <button type="submit" class="btn btn-primary float-right" style="margin-left: 5px;"><i class="fa fa-file-archive-o"></i>&nbsp;&nbsp;Report</button> *@
-                            <button id="user" type="submit" value="search" class="btn btn-info float-right"><i class="fa fa-pen"></i>&nbsp;&nbsp;Submit</button>
+                            <button id="user" type="submit" value="search" class="btn btn-info float-right" form="Permission">
+                                @* <i class="fa fa-pen"></i>&nbsp;&nbsp; *@
+                                Submit
+                            </button>
                         </div>
                     </div>
                     <!-- /.card -->
@@ -199,19 +221,16 @@
                         <!-- /.card-header -->
 
                         <div class="card-body table-responsive">
-                            <table id="user_tb" class="table table-bordered table-hover txtcenter" width="100%" style="table-layout: fixed;">
+                            <table id="user_tb" class="table table-bordered table-hover txtcenter" width="100%">
                                 <thead>
                                     <tr>
-                                        <th width="5%"></th>
-                                        <th width="7%">Code</th>
-                                        <th width="15%">Name</th>
-                                        <th width="26%">Email</th>
-                                        <th width="10%">Department</th>
-                                        <th width="8%">Active</th>
-                                        <th width="7%">Subscribe</th>
-                                        @*<th>Inform to Customer</th>
-                                            <th>Trial & Followup status</th>
-                                            <th>Close Status</th>*@
+                                        <th class="center" width="3%"></th>
+                                        <th class="center" width="8%">ID</th>
+                                        <th class="center" width="35%">Name</th>
+                                        <th class="center" width="15%">Position</th>
+                                        <th class="center" width="15%">Dept.</th>
+                                        <th class="center" width="12%">Subscribe</th>
+                                        <th class="center" width="12%">Action</th>
                                     </tr>
                                 </thead>
                                 @using (Html.BeginForm("GoTo", "Home", FormMethod.Post))
