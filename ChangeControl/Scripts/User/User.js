@@ -15,8 +15,8 @@ $(document).ready(function () {
         },
         treeGrid: {
             left: 10,
-            expandIcon: '<span>+</span>',
-            collapseIcon: '<span>-</span>'
+            expandIcon: '<span><i class="fas fa-angle-right text-primary"></i></span>',
+            collapseIcon: '<span><i class="fas fa-angle-down text-primary"></i></span>'
         },
         order: [[ 1, "asc" ]],
         columns: 
@@ -26,50 +26,41 @@ $(document).ready(function () {
                 className: 'treegrid-control',
                 orderable: false,
                 data: function (item) {
-                    if(item.children != null && item.children.length > 0){
-                        return '<span>+</span>';
-                    }
+                    if(item.children != null && item.children.length > 0) return '<span><i class="fas fa-angle-right text-primary"></i></span>';
                     return '';
                 }
             },{
                 target: 1,
                 data: function (item) {
-                    if(item.Name == "" || item.Name == null){
-                        return '';
-                    }
+                    if(item.Name == "" || item.Name == null) return '';
                     return item.User;
                 }
             },{
                 target: 2,
                 orderable: false,
                 data: function (item) {
-                    
                     return (item.Name != null) ? `${item.Name}`+(item.Email ? `<br>${item.Email}` : "") : null ;
                 }
             },{ 
                 target: 3,
                 className: 'center', 
                 data: function (item){
-                    if(item.Name == "" || item.Name == null){
-                        return "";
-                    }
+                    if(item.Name == "" || item.Name == null) return "";
+
                     let select_pos = `<select class="form-control select2" name="position" style="width: 100%;" onchange="changePosition(this)" `+ (item.Position == "Admin" && us_pos != "Admin" ? `disabled` : null)  +` >`;
                     item.Position = (item.Position == "Special") ? "Approver" : (item.Position == "S_Issue") ? "Issue" : item.Position;
                     Positions.forEach(pos => {
                         select_pos += `<option user="${item.User}" value="${pos}"`+(pos == item.Position ? "selected" : "")+`>${pos}</option>`;
                     });
                     
-                    if(!Positions.includes("Admin") && item.Position == "Admin"){
-                        select_pos += `<option value="2" selected disabled>Admin</option>`;
-                    }
+                    if(!Positions.includes("Admin") && item.Position == "Admin") select_pos += `<option value="2" selected disabled>Admin</option>`;
+                    
                     select_pos += `</select>`;
-                    // return (item.Position == "Special") ? "Approver" : (item.Position == "S_Issue") ? "Issue" : item.Position;
                     return select_pos;
                 } },
             { data: 'Dept',
               className: 'center'
-            },
-            { 
+            },{ 
                 target: 5,
                 className: 'center', 
                 data: function (item){
@@ -80,21 +71,22 @@ $(document).ready(function () {
                                 </label>
                             </div>`;
                 } 
-            },
-            {
+            },{
                 target: 6,
                 orderable: false,
                 data: function (item) {
-                    if(item.Name != null){
-                        return `<input type="submit" class="btn btn-block btn-sm btn-danger" user="${item.User}" value="Delete user" onclick="deleteUser(this)">`;
-                    }
-                    return `<input type="submit" class="btn btn-block btn-sm btn-warning" user="${item.User}" department="${item.Dept}" value="Delete user" onclick="deletePermission(this)">`;
+                    if(item.Name != null) return `<input type="submit" class="btn btn-block btn-sm btn-danger" user="${item.User}" value="Delete user" onclick="deleteUser(this)">`;
+                    return `<input type="submit" class="btn btn-block btn-sm btn-warning" user="${item.User}" department="${item.Dept}" value="Delete permission" onclick="deletePermission(this)">`;
                 }
             },
         ],
     });
 
     $("input[name='user']").mask('00000');  
+
+/* ---------------------------------------------------------------------------------------------- */
+/*                                            Add user                                            */
+/* ---------------------------------------------------------------------------------------------- */
 
     $("form#User").submit(function (e) {
         let user_form = $(this).serialize()
@@ -125,6 +117,10 @@ $(document).ready(function () {
         }
     });
 
+/* ---------------------------------------------------------------------------------------------- */
+/*                                         Add permission                                         */
+/* ---------------------------------------------------------------------------------------------- */
+
     $("form#Permission").submit(function (e) {
         let pms_form = $(this).serialize()
         console.log(pms_form);
@@ -145,17 +141,14 @@ $(document).ready(function () {
         }
     });
 
+/* ---------------------------------------------------------------------------------------------- */
+/*                                          On clear user                                         */
+/* ---------------------------------------------------------------------------------------------- */
+
     $("#clear_btn").click(function(e){
         e.preventDefault();
         if(e.which != 13) $(this.form).trigger('reset');
     })
-
-    $(() => {
-        $("td [name='position']").on("change",function(e){
-            console.log(e);
-            console.log(this);
-        });
-    });
 
 });
 
@@ -165,11 +158,7 @@ function changePosition(e){
     let opt_us = e.selectedOptions[0].getAttribute("user")
     if((e.value != "" && e.value != null) && (opt_us != "" && opt_us != null)){
         $.post(UpdatePositionPath , {user:opt_us, pos:e.value}, (res) => {
-            if(res.status == "success"){
-                notyf.success('Update position complete');
-            }else{
-                notyf.error('Update position not complete');
-            }
+            (res.status == "success") ? notyf.success('Update position complete') : notyf.error('Update position not complete');
         });
     }
 }
@@ -177,11 +166,7 @@ function changePosition(e){
 function changeSubscribe(user,dept,val){
     if(user != null, dept != null, val != null){
         $.post(UpdateSubscribePath , {user:user, dept:dept, status: val | 0}, (res) => {
-            if(res.status == "success"){
-                notyf.success('Update subscribe complete');
-            }else{
-                notyf.error('Update subscribe not complete');
-            }
+            (res.status == "success") ? notyf.success('Update subscribe complete') : notyf.error('Update subscribe not complete');
         });
     }
 }

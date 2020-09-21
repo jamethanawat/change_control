@@ -22,7 +22,7 @@ $(() => {
                     if(res == "True"){
                         var promises = [];
 
-                        $.post(ApproveReviewPath, {review_id:rv_id}, (result) => {
+                        $.post(ApproveReviewPath, {topic_code:topic_code, review_id:rv_id}, (result) => {
                             if(result){
                                 if(result.mail != "" && result.mail != null){
                                 promises.push(
@@ -75,7 +75,7 @@ $(() => {
         $('#loading').removeClass('hidden')
         var optimized_edit_rv = SerializeEditReviewForm();
 
-        $.post(UpdateReviewPath, (result) => {
+        $.post(UpdateReviewPath, {topic_id:topic_id, topic_code:topic_code}, (result) => {
             var promises = [];
             files = file_list_alt;
             console.log("files",files);
@@ -89,6 +89,7 @@ $(() => {
                 var Data = new FormData();
                 Data.append("file",element.file);
                 Data.append("description",element.description);
+                Data.append("code",topic_code);
                 $.ajax({
                     type: "POST",
                     url: InsertFilePath,
