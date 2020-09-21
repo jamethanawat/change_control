@@ -18,7 +18,7 @@ $(() => {
             if(apr){
                 $.post(CheckAllTrialBeforeApprovePath, {topic_code:topic_code}, (res) => {
                     if(res == "True"){
-                        $.post(ApproveTrialPath, {trial_id:tr_id}, (result) => {
+                        $.post(ApproveTrialPath, {topic_code:topic_code,trial_id:tr_id}, (result) => {
                             if(result){
                                 if(result.mail != "" && result.mail != null){
                                     $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept': result.dept, }).fail((error) => {
@@ -61,7 +61,7 @@ $(() => {
                 delete files[index].detail;
             }
 
-            promises.push($.post(UpdateTrialPath,{ desc: trial_form[0].value},(result) => {
+            promises.push($.post(UpdateTrialPath,{topic_id:topic_id, topic_code:topic_code, desc: trial_form[0].value},(result) => {
                 console.log('Inserted trial');
                 files.forEach(element => {
                     var Data = new FormData();

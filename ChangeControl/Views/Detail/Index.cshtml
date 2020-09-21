@@ -1,4 +1,5 @@
 ﻿@using System.Data
+@using System.Dynamic
 @using ChangeControl.Models
 @using ChangeControl.Helpers
 @model DataSet
@@ -55,6 +56,8 @@
     var topic_status = '@Session["Status"].ToString()';
     var topic_id = '@Topic.ID';
     var topic_code = '@Topic.Code';
+    var topic_dept = '@Topic.Department';
+    var topic_status = '@Topic.Status';
     var pe_audit = '@(pe_audit != null ? pe_audit.Department : null)';
     var isQC = '@isQC' == 'true' ? true : false;
     var isTrialable = '@isTrialable' == 'true' ? true : false;
@@ -611,6 +614,8 @@
                                                 }
                                             }
                                             </span>
+                                        
+
                                     </form>
 
 
@@ -626,6 +631,12 @@
                                         window.location.reload();
                                     </script>
                                 }
+                                
+                                @{
+                                    object UpdateModel = new {Related = Topic.RelatedListAlt, Author = Topic.Profile.FullName, FileList = Topic.FileList as List<FileItem>};
+                                }
+                                @* @Html.Partial("Update", UpdateModel)  *@
+
                                     </div>
                                     <!------------------------------------QUALITY CONTROL---------------------------------------------------------->
                                 @if(isExternal || ReviewList.Count != 0){

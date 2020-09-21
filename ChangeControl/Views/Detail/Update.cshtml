@@ -1,0 +1,47 @@
+﻿@using ChangeControl.Models
+@using ChangeControl.Helpers
+
+<div class="card card-primary mt-3">
+    <div class="card-header">
+        <h3 class="card-title">Update (21/09/20)</h3>
+    </div>
+    <div class="card-body">
+        <div class="mailbox-read-message">
+            <form class="form-horizontal">
+                
+                <h4 class="">Author</h4> &nbsp; 
+                <i class="fas fa-angle-right text-primary"></i>&nbsp; 
+                <span> IT - @Model.Author (18 September 2020)</span>
+
+                <h4 class="mt-3">Update Details </h4>
+                <i class="fas fa-angle-right text-primary"></i>&nbsp; 
+                <span>asdczxc</span> &nbsp; &nbsp; &nbsp;
+
+                <h4 class="mt-3">Agreed</h4> &nbsp; 
+                <i class="fas fa-angle-right text-primary"></i>&nbsp; 
+                <span>IT , PE2_Process </span>
+                
+                <h4 class="mt-3">Pending</h4> &nbsp; 
+                <i class="fas fa-angle-right text-primary"></i>&nbsp; 
+                <span>QC1</span>
+            </form>
+
+            @try{
+                if(Model.FileList.Count != 0){
+                    <h4 class="mt-3">Attach File</h4>
+                    <div class="card-footer bg-white">
+                    @Html.Partial("~/Views/Helper/FileList.cshtml",Model.FileList as List<FileItem>)
+                    </div>
+                }   
+            }catch(Exception err){
+                <script>
+                    window.location.reload();
+                </script>
+            }
+
+                <button class="btn btn-info float-right" >Agree this update</button>
+            </div>
+        </div>
+    </div>
+    <!-- /.card-body -->
+</div>

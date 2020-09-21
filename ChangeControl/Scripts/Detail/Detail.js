@@ -44,7 +44,7 @@ $("#reject").click(() => {
         }).then((res) => {
             if(res != null){
                 if(res.trim().length != 0){
-                    $.post(RejectTopicPath, {topic_code:topic_code,desc:res}, (result) => { 
+                    $.post(RejectTopicPath, {topic_status:topic_status, topic_dept:topic_dept, topic_code:topic_code,desc:res}, (result) => { 
                         if(result.status == "success" && result.mail != null && result.mail != ""){
                             $.post(GenerateMailPath,{ 'mode': result.mail, 'dept': result.dept, 'topic_code':topic_code, }).fail((error) => {
                                 console.error(error);
@@ -323,7 +323,7 @@ $.each(DepartmentLists, (key,val) => {
             icon:"warning",
         }).then((res) => {
             if(res){
-                $.post(ApproveTopicPath,() => {
+                $.post(ApproveTopicPath,{topic_code:topic_code},() => {
                     var promises = [];
                     promises.push($.post(GenerateMailPath,{
                         'mode':(topic_code.substring(0,2) == "EX") ? 'InformUser' : 'InformPE',
@@ -357,7 +357,7 @@ $("form#review").submit((e) => {
     e.preventDefault();
     $('#loading').removeClass('hidden')
     let rv_form = SerializeReviewForm();
-    $.post(InsertReviewPath, (result) => {
+    $.post(InsertReviewPath, {topic_id:topic_id, topic_code:topic_code}, (result) => {
         if(result.mail != ""){
             $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept':result.dept, 'pos':result.pos }).fail((error) => {
                 console.error(error);
@@ -378,7 +378,8 @@ $("form#review").submit((e) => {
             var Data = new FormData();
             Data.append("file",element.file);
             Data.append("description",element.description);
-            promises.push($.ajax({
+            Data.append("code",topic_code);
+                promises.push($.ajax({
                 type: "POST",
                 url: InsertFilePath,
                 data: Data,
@@ -448,6 +449,7 @@ $("form#Trial").submit((e) => {
                 var Data = new FormData();
                 Data.append("file",element.file);
                 Data.append("description",element.description);
+                Data.append("code",topic_code);
                 promises.push($.ajax({
                     type: "POST",
                     url: InsertFileTrialPath,
@@ -493,7 +495,7 @@ $("form#Confirm").submit((e) => {
             delete files[index].detail;
         }
 
-        promises.push($.post(InsertConfirmPath,{ desc: confirm_form[0].value},(result) => {
+        promises.push($.post(InsertConfirmPath,{topic_id:topic_id, topic_code:topic_code , desc: confirm_form[0].value},(result) => {
             if(result.mail != ""){
                 $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept':result.dept, 'pos':result.pos }).fail((error) => {
                     console.error(error);
@@ -506,6 +508,7 @@ $("form#Confirm").submit((e) => {
                 var Data = new FormData();
                 Data.append("file",element.file);
                 Data.append("description",element.description);
+                Data.append("code",topic_code);
                 promises.push($.ajax({
                     type: "POST",
                     url: InsertFileConfirmPath,
@@ -619,7 +622,7 @@ $("form#related_form").submit((e) => {
     console.log(new_all_related);
     $.post(InsertRelatedPath, {dept_list : new_all_related}, () =>{
         console.log('Related created');
-        $.post(UpdateTopicRelatedPath,(res) => {
+        $.post(UpdateTopicRelatedPath, {topic_code:topic_code},(res) => {
             if(res.status == "success"){
                 if(topic_status == "8"){
                     $.post(GenerateMailPath,{ 'mode': 'InformUser', 'topic_code':topic_code, 'dept_arry': new_dept_related, }).fail((error) => {
@@ -660,6 +663,7 @@ $("form#related_form").submit((e) => {
                     var Data = new FormData();
                     Data.append("file",element.file);
                     Data.append("description",element.description);
+                    Data.append("code",topic_code);
                     promises.push($.ajax({
                         type: "POST",
                         url: InsertFileResponsePath,

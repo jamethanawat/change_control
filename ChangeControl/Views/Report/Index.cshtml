@@ -89,10 +89,10 @@
         </div>
         <!-- /.container-fluid -->
     </section>
-    @using (Html.BeginForm("CrystalReportReport", "Report", FormMethod.Post))
-    {
-        <button type="submit">CrystalReport</button>
-
+    @if(Session["Position"].ToString() == "Admin"){
+        using (Html.BeginForm("CrystalReportReport", "Report", FormMethod.Post)){
+            <button type="submit">CrystalReport</button>
+        }
     }
 
 </div>

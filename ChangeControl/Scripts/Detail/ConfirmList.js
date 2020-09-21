@@ -18,7 +18,7 @@ $(() => {
             if(apr){
                 $.post(CheckAllConfirmBeforeApprovePath, {topic_code:topic_code}, (res) => {
                     if(res == "True"){
-                        $.post(ApproveConfirmPath, {confirm_id:cf_id}, (result) => {
+                        $.post(ApproveConfirmPath, {topic_code:topic_code, confirm_id:cf_id}, (result) => {
                             if(result){
                                 if(result.mail != "" && result.mail != null){
                                     $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept': result.dept, }).fail((error) => {
@@ -60,7 +60,7 @@ $(() => {
                 delete files[index].detail;
             }
 
-            promises.push($.post(UpdateConfirmPath,{ desc: confirm_form[0].value},(result) => {
+            promises.push($.post(UpdateConfirmPath,{topic_id:topic_id, topic_code:topic_code, desc: confirm_form[0].value},(result) => {
                 console.log('Inserted confirm');
 
                 promises.push($.post(GenerateMailPath,{ 'mode': 'ConfirmUpdate', 'topic_code':topic_code, 'dept':result.dept,'pos':'Approver' }).fail((error) => {
