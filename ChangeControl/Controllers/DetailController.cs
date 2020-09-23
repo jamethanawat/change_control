@@ -10,7 +10,7 @@ using System.Reflection;
 using ChangeControl.Helpers;
 
 namespace ChangeControl.Controllers{
-    public class DetailController : Controller{
+    public class DetailController : ChangeControlController{
         // GET: Detail
         private DetailModel M_Detail;
         private RequestModel M_Req;
@@ -485,29 +485,6 @@ namespace ChangeControl.Controllers{
             }
         }
 
-        [HttpPost]
-        public ActionResult DownloadFile(){
-            var r = Request.Form["load"];
-            var temp = r.Split('^');
-            //string filePath = "km0024.txt";
-            // string fullName = Server.MapPath("~/upload/");
-            string filePath = temp[0];
-            string fullName = Server.MapPath("~/topic_file/");
-            // string fullName = "\\\\172.27.170.19\\File\\Topic";
-            // string fullName = "D:/File/Topic/";
-            byte[] fileBytes = GetFile(fullName + filePath);
-            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, temp[1]);
-        }
-
-        byte[] GetFile(string s){
-            System.IO.FileStream fs = System.IO.File.OpenRead(s);
-            byte[] data = new byte[fs.Length];
-            int br = fs.Read(data, 0, data.Length);
-            if (br != fs.Length)
-                throw new System.IO.IOException(s);
-            return data;
-        }
-
         public void FilterReviewRelated(List<Review> rv_list){
             foreach(var rl_alt in Topic.RelatedListAlt){
                 if(rv_list.Exists( e => e.Department == rl_alt.Department)){
@@ -662,55 +639,8 @@ namespace ChangeControl.Controllers{
             }
         }
 
-
-        [HttpPost]
-        public void GenerateTopicList(string Department, string Position){
-            var dept = Department ?? "Guest";
-            var pos = Position ?? "Guest";
-            bool isApprover = ViewBag.isApprover = (pos == "Approver") || (pos == "Admin") || (pos == "Special") ;
-            var isPEProcess = ViewBag.isPEProcess = (ViewBag.PEAudit.Contains(dept));
-            var isQC = ViewBag.isQC = (ViewBag.QCAudit.Contains(dept));
-            var confirm_dept_list = M_Home.GetConfirmDeptList();
-
-
-            List<TopicNoti> req_list = new List<TopicNoti>();
-            List<TopicNoti> rv_list = new List<TopicNoti>();
-            List<TopicNoti> tr_list = new List<TopicNoti>();
-            List<TopicNoti> cf_list = new List<TopicNoti>();
-
-            if(dept != null){
-                rv_list.AddRange(M_Home.GetReviewPendingByDepartment(dept));
-                if(isApprover){
-                    req_list.AddRange(M_Home.GetRequestIssuedByDepartment(dept));
-                    rv_list.AddRange(M_Home.GetReviewIssuedByDepartment(dept));
-                }
-                if(isPEProcess){
-                    req_list.AddRange(M_Home.GetRequestApprovedByDepartment(dept));
-                }
-                if(isQC){
-                    rv_list.AddRange(M_Home.GetReviewApproved(dept));
-                    tr_list.AddRange(M_Home.GetTrialApproved(dept));
-                    cf_list.AddRange(M_Home.GetConfirmApproved(dept));
-                }
-                if(confirm_dept_list.Contains(dept)){
-                    cf_list.AddRange(M_Home.GetConfirmPendingByDepartment(dept));
-                    if(isApprover){
-                        cf_list.AddRange(M_Home.GetConfirmIssuedByDepartment(dept));
-                    }
-                }
-                if(M_Home.CheckTrialableByDepartment(dept)){
-                    tr_list.AddRange(M_Home.GetTrialPendingByDepartment(dept));
-                    if(isApprover){
-                        tr_list.AddRange(M_Home.GetTrialIssuedByDepartment(dept));
-                    }
-                }
-                ViewData["TopicRequestList"] = req_list;
-                ViewData["TopicReviewList"] = rv_list;
-                ViewData["TopicTrialList"] = tr_list;
-                ViewData["TopicList"] = cf_list;
-            }
+        public ActionResult GetAuditNotification(){
+            return Json(M_Detail.GetAuditNotification(), JsonRequestBehavior.AllowGet);
         }
-
-
     }
 }

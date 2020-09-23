@@ -16,5 +16,8 @@ namespace ChangeControl.Models{
         public List<Response> Responses { get; set; }
         public User Profile {get; set;}
         public string Dept { get; set; }
+        public bool ExistsRelated(string Department){
+            return RelatedList.Exists(x => x.Department == Department);
+        }
     }
 }

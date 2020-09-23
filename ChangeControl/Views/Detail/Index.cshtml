@@ -27,8 +27,7 @@
     var isQC = ViewBag.isQC = (ViewBag.QCAudit.Contains(department ));
 
 
-    string[] status_define = {"-","Approved","Rejected","Waiting","Need more document","Re-submit"," ","Request","Review","Trial & Confirm", "Initial Production", "Finished", "Rejected" };
-    var status = status_define[Topic.Status];
+    var status = Topic.FullStatus;
     Session["Status"] = Topic.Status;
 
     var Type = Topic.Type;
@@ -40,6 +39,7 @@
     var isInternal = ViewBag.isInternal = (Type == "Internal");
     var isExternal = (Type == "External");
     var Resubmitable = (isQC || isPEProcess) && isRelated && (status != "Waiting" && status != "Finished" && status != "Rejected");
+    var isResubmitted = (ResubmitList != null && ResubmitList.Count > 0 && ResubmitList.Exists(x => x.ExistsRelated(Session["Department"].ToString())  == true));
     var Editable = ((status == "Waiting" || status == "Request") && Session["Department"].ToString() == Topic.Department);
     var TopicApproveable = (status == "Waiting" && Session["Department"].ToString() == Topic.Department && isApprover);
 
@@ -59,8 +59,11 @@
     var topic_dept = '@Topic.Department';
     var topic_status = '@Topic.Status';
     var pe_audit = '@(pe_audit != null ? pe_audit.Department : null)';
-    var isQC = '@isQC' == 'true' ? true : false;
-    var isTrialable = '@isTrialable' == 'true' ? true : false;
+    var isQC = '@isQC'.toLowerCase()  == 'true' ? true : false;
+    var isPEProcess = '@isPEProcess'.toLowerCase()  == 'true' ? true : false;
+    var isTrialable = '@isTrialable'.toLowerCase()  == 'true' ? true : false;
+    var Resubmitable = '@Resubmitable'.toLowerCase()  == 'true' ? true : false;
+    var isResubmitted = '@isResubmitted'.toLowerCase()  == 'true' ? true : false;
     var isInternal = '@isInternal';
     var isExternal = '@isExternal';
     var isReview = '@isReview'.toLowerCase() == 'true' ? true : false;
@@ -71,10 +74,9 @@
     var CheckAllConfirmBeforeApprovePath = '@Url.Action("CheckAllConfirmBeforeApprove", "Detail")';
     var RejectTopicPath = '@Url.Action("RejectTopic", "Detail")';
     var UpdateTopicRelatedPath = '@Url.Action("UpdateTopicRelated", "Detail")';
+    var GetAuditNotificationPath = '@Url.Action("GetAuditNotification", "Detail")';
 </script>
 
-    @* @Styles.Render("~/Content/css") *@
-@* @Styles.Render("~/bundles/jquery") *@
 @Scripts.Render("~/bundles/jquery")
 @Scripts.Render("~/bundles/sweetalert")
 @Scripts.Render("~/bundles/filepond")
@@ -433,11 +435,6 @@
                 </div>
                 <div class="row">
                     <div class="w-actions">
-                        @* @if(Editable){
-                            <a class="w-actions__fab w-actions__fab--edit bg-warning" id="tp_edit" href='@Url.Action("Index", "Request",new {id = Topic.Code})'>
-                               <span>Edit</span>
-                            </a>
-                        } *@
                         @if(TopicApproveable){
                             <a class="w-actions__fab w-actions__fab--approve bg-primary" id="tp_approve">
                                <span>Approve</span>
@@ -569,7 +566,7 @@
                         <div class="card-header p-2">
                             <ul class="nav nav-pills">
                                 <li class="nav-item"><a class="nav-link tab-nav mr-2 active" href="#Detail" data-toggle="tab">Detail</a></li>
-                                <li class='nav-item @(ResubmitList.Count == 0 ? "hidden" : "")' ><a class="nav-link tab-nav" href="#timeline" data-toggle="tab">Request Re-submit</a></li>
+                                <li class='nav-item @(ResubmitList.Count == 0 ? "hidden" : "")' ><a class="nav-link tab-nav" href="#timeline" data-toggle="tab" data-intro='ในกรณีที่ QC หรือ PE_Process ได้ทำการ Request document เพิ่มเติมจะสามารถอ่านและตอบในหมวดหมู่ Re-submit'>Request Re-submit</a></li>
                             </ul>
                         </div>
                         <!-- /.card-header -->

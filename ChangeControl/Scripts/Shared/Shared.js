@@ -141,31 +141,54 @@ async function GetDepartmentList(user = null){
         });
     }else{
         await $.post(GetDepartmentListByUserIDPath, {us_id:user} ,(result) => {
-            if(result != null){
-                departments = result.data;
-            }
+            if(result != null) departments = result.data;
         });
     }
-
-        return departments;
+    return departments;
 }
 
 function GetSession(){
     $.post(GetSessionPath,(res) => console.log(res));
 }
 
-
-
-function NoPermissionAlert(){
-    swal({
-        title: "คุณไม่มีสิทธิ์การเข้าถึง", 
-        text: "ขออภัย คุณไม่มีสิทธิ์การเข้าถึงข้อมูลดังกล่าว หากเกิดข้อผิดพลาดกรุณาติดต่อฝ่าย IT เบอร์ 2064", 
-        icon:"error",
-    })
+function createNotification(obj){
+    if(!localStorage.getItem(`${us_id}-${obj.ID}`)){
+        type_noti = obj.Type.toLowerCase();
+        let bg_noti = "";
+        switch(type_noti){
+            case 'success': 
+                bg_noti = '#3dc763';
+                break;
+            case 'info': 
+                bg_noti = 'blue';
+                break;
+            case 'warning': 
+                bg_noti = 'orange';
+                break;
+            case 'error': 
+                bg_noti = 'indianred';
+                break;
+        }
+        notyf.open({
+            type: type_noti,
+            background: bg_noti,
+            ripple: true,
+            duration: 20000,
+            dismissible: true,
+            position: {
+              x: 'right',
+              y: 'top',
+            },
+            message: obj.Message
+        }).on('dismiss', ({target, event}) => localStorage.setItem(`${us_id}-${obj.ID}`,true));
+        
+    }   
 }
 
-$(() => {
-    var NoPermissionDetected = false;
-    if(NoPermissionDetected) NoPermissionAlert();
-    NoPermissionAlert = false;
-})
+function checkLocalStorage(id){
+    if(!localStorage.getItem(`${us_id}-${id}`)){
+        localStorage.setItem(`${us_id}-${id}`,true);
+        return true;
+    }
+    return false;
+}

@@ -17,8 +17,6 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
 
     @Styles.Render("~/Content/css")
-    <!-- Google Font: Source Sans Pro -->
-    @* <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500&display=swap"> *@
 
     <!-- Theme style -->
     <link rel="stylesheet" href="~/tmp/dist/css/adminlte.min.css">
@@ -34,6 +32,8 @@
         var GetSessionPath = '@Url.Action("GetSession", "Login")';
         var GetDepartmentListPath = '@Url.Action("GetDepartment", "Request")';
         var DeleteFileByNameFormatPath = '@Url.Action("DeleteFileByNameFormat", "Detail")';
+        var us_id = '@Session["User"].ToString()';
+        var us_dept = '@Session["Department"].ToString()';
     </script>    
     
     <!-- CSS loading -->
@@ -200,6 +200,15 @@
             overflow-y: auto;
         }
 
+        .notyf{
+            top: 8% !important;
+        }
+
+        .introjs-donebutton {
+            float: right;
+            margin-left: 7px !important;
+        }
+
     </style>
     
 
@@ -221,18 +230,6 @@
                 </li>
             </ul>
 
-            <!-- SEARCH FORM
-            <form class="form-inline ml-3">
-                <div class="input-group input-group-sm">
-                    <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
-                    <div class="input-group-append">
-                        <button class="btn btn-navbar" type="submit">
-                    <i class="fas fa-search"></i>
-                    </button>
-                    </div>
-                </div>
-            </form>
-            -->
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
                 <!-- Messages Dropdown Menu -->
@@ -264,12 +261,10 @@
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <!-- Brand Logo -->
-            @* <a href="http://172.27.170.23/intranet/index.aspx" class="brand-link"> *@
             <a href="#" class="brand-link">
                 @* <img src="~/tmp/dist/img/change.png" alt="AdminLTE Logo" class="brand-image " style="opacity: .8"> *@
                 <img src="~/tmp/dist/img/logo-square.png" alt="AdminLTE Logo" class="brand-image " style="opacity: .8; transform: scale(1.5);">
                 <span class="brand-text font-weight-light" style="font-size: 20px; margin-left: 3%; font-family: Kanit-Light "> CHANGE CONTROL</span>
-                <!--span class="brand-text font-weight-light">Change Control System</span-->
             </a>
 
             <!-- Sidebar -->
@@ -291,7 +286,7 @@
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         <!-- Add icons to the links using the .nav-icon class
-    with font-awesome or any other icon font library -->
+                        with font-awesome or any other icon font library -->
                         <li id="menu1" class="nav-item">
                             <a id="menu1-1" href="@Url.Action("Index", "Home")" class="nav-link animsition-link">
                                 <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -320,7 +315,7 @@
                                     <i class="nav-icon fas fa-user-friends"></i>
                                     <p>
                                         User <span class="right badge badge-danger">New</span>
-                                        
+
                                     </p>
                                 </a>
                             </li>
@@ -432,10 +427,13 @@
 
     <script src="~/Scripts/jquery.transit.min.js"></script>
 
+    <script src="~/Plugin/intro/intro.js"></script>
+    <link href="~/Plugin/intro/introjs.css" rel="stylesheet" />
+
     <link href="~/Plugin/notyf/notyf.min.css" rel="stylesheet" />
     <script src="~/Plugin/notyf/notyf.min.js"></script>
 
-    <script src="~/Scripts/Shared/Shared.js"></script>
+    <script src="~/Scripts/Shared/Shared.js?date='@DateTime.Now.ToString("yyMMddHH")"></script>
 
     <!-- page script -->
     <script>
@@ -513,7 +511,6 @@
                 <div class="dropdown-divider"></div>
                 }
             }
-            @* <a href="#" class="dropdown-item dropdown-footer">See All Document @Mode</a> *@
         </div>
     </li>
 }

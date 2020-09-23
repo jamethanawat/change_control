@@ -17,12 +17,18 @@ namespace ChangeControl.Models
 
         public long review_id;
         private SqlConnection cn = new SqlConnection(ConfigurationManager.ConnectionStrings["CCS"].ConnectionString);
-        public DetailModel()
-        {
+        public DetailModel(){
             DB_Tapics = new DbTapics();
             DB_CCS = new DbCCS();
             date = DateTime.Now.ToString("yyyyMMddHHmmss");
             date_ff = DateTime.Now.ToString("yyyyMMddHHmmss.fff");
+        }
+
+         public class Noti{
+            public int ID { get; set; }
+            public string Type { get; set; }
+            public string Position { get; set; }
+            public string Message { get; set; }
         }
 
         public List<FormReviewItem> GetReviewItemByDepartment(int department_id)
@@ -41,32 +47,27 @@ namespace ChangeControl.Models
             }
         }
 
-        public void SetForeignKey(object foreign_key)
-        {
+        public void SetForeignKey(object foreign_key){
             this.foreign_key = foreign_key;
         }
-        public List<GetID> GetExternalTopicId()
-        {
+        public List<GetID> GetExternalTopicId(){
             var sql = $@"SELECT TOP(1) Code FROM 
             Topic WHERE Code LIKE 'EX-{date.Substring(2, 4)}%' ORDER BY Code DESC";
             var dept = DB_CCS.Database.SqlQuery<GetID>(sql);
             return dept.ToList();
         }
-        public List<GetID> GetInternalTopicId()
-        {
+        public List<GetID> GetInternalTopicId(){
             var sql =$@"SELECT TOP(1) Code FROM Topic 
             WHERE Code LIKE 'IN-{date.Substring(2, 4)} %' ORDER BY Code DESC";
             var dept = DB_CCS.Database.SqlQuery<GetID>(sql);
             return dept.ToList();
         }
-        public void InsertReviewItem(string status, string desc, int item_type, long review_id)
-        {
+        public void InsertReviewItem(string status, string desc, int item_type, long review_id){
             string query = null;
             if (status == null || status == ""){
                 query = $@"INSERT INTO Review_Item (Description, FK_Item_Type, FK_Review_ID) 
                 VALUES('{desc.ReplaceSingleQuote()}', {item_type}, {review_id});";
-            }
-            else{
+            }else{
                 query = $@"INSERT INTO Review_Item (Status, Description, FK_Item_Type, FK_Review_ID) VALUES('{status}', '{desc.ReplaceSingleQuote()}', {item_type}, {review_id});";
             }
             
@@ -123,8 +124,9 @@ namespace ChangeControl.Models
         
         public TopicAlt GetTopicByCode(string topic_code){
             try{
-                var sql = $@"SELECT  Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Department, Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, Timing, TimingDesc, Related, User_insert, Time_insert , ApprovedBy, ApprovedDate, 
-                ID FROM Topic 
+                var sql = $@"SELECT  Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Department, Revision, Model, PartNo, PartName, ProcessName, Topic.Status, Status.Name AS FullStatus  , [APP/IPP] as App, Subject, Detail, Timing, TimingDesc, Related, User_insert, Time_insert , ApprovedBy, ApprovedDate, 
+                Topic.ID FROM Topic 
+                LEFT JOIN Status ON Topic.Status = Status.ID 
                 LEFT JOIN Change_Item ON Topic.Change_item = ID_Change_item 
                 LEFT JOIN Product_Type ON Topic.Product_Type = ID_Product_Type 
                 WHERE ApprovedBy IS NOT NULL
@@ -133,8 +135,9 @@ namespace ChangeControl.Models
                 var Topic = DB_CCS.Database.SqlQuery<TopicAlt>(sql).First();
                 return Topic;
             }catch(Exception ex){
-                var sql = $@"SELECT  Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Department, Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, Timing, TimingDesc, Related, User_insert, Time_insert , ApprovedBy, ApprovedDate, 
-                ID FROM Topic 
+                var sql = $@"SELECT  Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Department, Revision, Model, PartNo, PartName, ProcessName, Topic.Status, Status.Name AS FullStatus  , [APP/IPP] as App, Subject, Detail, Timing, TimingDesc, Related, User_insert, Time_insert , ApprovedBy, ApprovedDate, 
+                Topic.ID FROM Topic 
+                LEFT JOIN Status ON Topic.Status = Status.ID 
                 LEFT JOIN Change_Item ON Topic.Change_item = ID_Change_item 
                 LEFT JOIN Product_Type ON Topic.Product_Type = ID_Product_Type 
                 WHERE Code = '{topic_code}' 
@@ -145,8 +148,9 @@ namespace ChangeControl.Models
         }
         public TopicAlt GetTopicByCodeAndOwned(string topic_code, string dept){
             try{
-                var sql = $@"SELECT  Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Department, Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, Timing, TimingDesc, Related, User_insert, Time_insert , ApprovedBy, ApprovedDate, 
-                ID FROM Topic 
+                var sql = $@"SELECT  Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Department, Revision, Model, PartNo, PartName, ProcessName, Topic.Status, Status.Name AS FullStatus , [APP/IPP] as App, Subject, Detail, Timing, TimingDesc, Related, User_insert, Time_insert , ApprovedBy, ApprovedDate, 
+                Topic.ID FROM Topic 
+                LEFT JOIN Status ON Topic.Status = Status.ID 
                 LEFT JOIN Change_Item ON Topic.Change_item = ID_Change_item 
                 LEFT JOIN Product_Type ON Topic.Product_Type = ID_Product_Type 
                 WHERE  Code = '{topic_code}' 
@@ -246,8 +250,8 @@ namespace ChangeControl.Models
 
         public long InsertResponse(string desc, string department, string user, string date,long resubmit_id){
             string sql = $@"INSERT INTO Response (Description, Department, [User], [Date], Resubmit) 
-            OUTPUT Inserted.ID 
-            VALUES('{desc.ReplaceSingleQuote()}', '{department}', '{user}', '{date}', {resubmit_id});";
+                            OUTPUT Inserted.ID 
+                            VALUES('{desc.ReplaceSingleQuote()}', '{department}', '{user}', '{date}', {resubmit_id});";
             var result = DB_CCS.Database.SqlQuery<long>(sql);
             return result.First(); 
         }
@@ -585,6 +589,12 @@ namespace ChangeControl.Models
             }catch(Exception ex){
                 return false;
             }
+        }
+
+        public List<Noti> GetAuditNotification(){
+            var sql = $@"SELECT ID, [Type], [Position], Message FROM Notification WHERE [Position] = 'Audit';";
+            var result = DB_CCS.Database.SqlQuery<Noti>(sql).ToList();
+            return result;
         }
     }
 }

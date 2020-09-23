@@ -8,7 +8,7 @@ using System.Web.Mvc;
 using ChangeControl.Helpers;
 
 namespace ChangeControl.Controllers{
-    public class HomeController : Controller{
+    public class HomeController : ChangeControlController{
 
         private HomeModel M_Home;
         public class Line{
@@ -31,19 +31,6 @@ namespace ChangeControl.Controllers{
             return View();
         }
 
-        //public ActionResult Search(string user, string password){
-        //    try{
-        //        System.Net.ServicePointManager.Expect100Continue = false;
-
-        //        CheckUser.LdapAuth chk = new CheckUser.LdapAuth();
-        //        bool result = chk.checkLogin(user, password);
-        //        return Json(result, JsonRequestBehavior.AllowGet);
-        //    }
-        //    catch (Exception err){
-        //        return View();
-        //    }
-
-        //}
         [HttpPost]
         public ActionResult GetLine(string Production){
             var result = M_Home.GetLine(Production);
@@ -66,54 +53,6 @@ namespace ChangeControl.Controllers{
         [HttpPost]
         public List<String> GetDepartmentList(){
             return M_Home.GetDepartmentList();
-        }
-
-        [HttpPost]
-        public void GenerateTopicList(string Department, string Position){
-            var dept = Department ?? "Guest";
-            var pos = Position ?? "Guest";
-            bool isApprover = ViewBag.isApprover = (pos == "Approver") || (pos == "Admin") || (pos == "Special") ;
-            var isPEProcess = ViewBag.isPEProcess = (ViewBag.PEAudit.Contains(dept));
-            var isQC = ViewBag.isQC = (ViewBag.QCAudit.Contains(dept));
-            var confirm_dept_list = M_Home.GetConfirmDeptList();
-
-
-            List<TopicNoti> req_list = new List<TopicNoti>();
-            List<TopicNoti> rv_list = new List<TopicNoti>();
-            List<TopicNoti> tr_list = new List<TopicNoti>();
-            List<TopicNoti> cf_list = new List<TopicNoti>();
-
-            if(dept != null){
-                rv_list.AddRange(M_Home.GetReviewPendingByDepartment(dept));
-                if(isApprover){
-                    req_list.AddRange(M_Home.GetRequestIssuedByDepartment(dept));
-                    rv_list.AddRange(M_Home.GetReviewIssuedByDepartment(dept));
-                }
-                if(isPEProcess){
-                    req_list.AddRange(M_Home.GetRequestApprovedByDepartment(dept));
-                }
-                if(isQC){
-                    rv_list.AddRange(M_Home.GetReviewApproved(dept));
-                    tr_list.AddRange(M_Home.GetTrialApproved(dept));
-                    cf_list.AddRange(M_Home.GetConfirmApproved(dept));
-                }
-                if(confirm_dept_list.Contains(dept)){
-                    cf_list.AddRange(M_Home.GetConfirmPendingByDepartment(dept));
-                    if(isApprover){
-                        cf_list.AddRange(M_Home.GetConfirmIssuedByDepartment(dept));
-                    }
-                }
-                if(M_Home.CheckTrialableByDepartment(dept)){
-                    tr_list.AddRange(M_Home.GetTrialPendingByDepartment(dept));
-                    if(isApprover){
-                        tr_list.AddRange(M_Home.GetTrialIssuedByDepartment(dept));
-                    }
-                }
-                ViewData["TopicRequestList"] = req_list;
-                ViewData["TopicReviewList"] = rv_list;
-                ViewData["TopicTrialList"] = tr_list;
-                ViewData["TopicList"] = cf_list;
-            }
         }
 
     }

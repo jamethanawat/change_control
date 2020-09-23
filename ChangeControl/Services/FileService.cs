@@ -9,16 +9,18 @@ using System.Web.Mvc;
 namespace ChangeControl.Controllers
 {
     public class FileService : Controller{
+
         [HttpPost]
-        public ActionResult DownloadFile(string path_name, string file_name)
-        {
-            string filePath = path_name;
-            string fullName = "D:/File/Topic/";
+        public ActionResult DownloadFile(){
+            var r = Request.Form["load"];
+            var temp = r.Split('^');
+            string filePath = temp[0];
+            string fullName = Server.MapPath("~/topic_file/");
             byte[] fileBytes = GetFile(fullName + filePath);
-            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, file_name);
+            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, temp[1]);
         }
-         byte[] GetFile(string s)
-        {
+
+        byte[] GetFile(string s){
             System.IO.FileStream fs = System.IO.File.OpenRead(s);
             byte[] data = new byte[fs.Length];
             int br = fs.Read(data, 0, data.Length);

@@ -332,6 +332,7 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\ChangeControlController.cs" />
     <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\DetailController.cs" />
@@ -488,6 +489,14 @@
     <Content Include="Plugin\input-animate\script.js" />
     <Content Include="Plugin\input-animate\style copy.css" />
     <Content Include="Plugin\input-animate\style.css" />
+    <Content Include="Plugin\intro\intro.js" />
+    <Content Include="Plugin\intro\introjs.css" />
+    <Content Include="Plugin\intro\themes\introjs-dark.css" />
+    <Content Include="Plugin\intro\themes\introjs-flattener.css" />
+    <Content Include="Plugin\intro\themes\introjs-modern.css" />
+    <Content Include="Plugin\intro\themes\introjs-nassim.css" />
+    <Content Include="Plugin\intro\themes\introjs-nazanin.css" />
+    <Content Include="Plugin\intro\themes\introjs-royal.css" />
     <Content Include="Plugin\jq-fab\css\index.css" />
     <Content Include="Plugin\jq-fab\js\index.js" />
     <Content Include="Plugin\jquery.mask.min.js" />
@@ -4256,6 +4265,7 @@
     <Folder Include="App_Data\" />
     <Folder Include="tmp\pages\" />
     <Folder Include="upload\" />
+    <Folder Include="Views\ChangeControl\" />
     <Folder Include="Views\Shared\404\css\" />
     <Folder Include="Views\Shared\404\img\" />
   </ItemGroup>

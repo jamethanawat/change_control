@@ -29,6 +29,24 @@ $(() => {
         $(".zoom-fab#change_status").addClass("hide-fab");
     }
 
+/* ---------------------------------------------------------------------------------------------- */
+/*                                            Intro.js                                            */
+/* ---------------------------------------------------------------------------------------------- */
+    if(isResubmitted && !localStorage.getItem(`${us_id}-reply_submit`)){
+        introJs().onbeforechange(() => {
+            $('[href="#timeline"]').click()
+        }).onexit(() => {
+            localStorage.setItem(`${us_id}-reply_submit`, true);
+        }).start();
+    }
+/* ---------------------------------------------------------------------------------------------- */
+/*                                            For notyf                                           */
+/* ---------------------------------------------------------------------------------------------- */
+
+    if(Resubmitable){
+        createNotification({ID : "resubmit", Type : "Warning", Message : "หากแผนกใดๆ Upload เอกสารไม่ครบถ้วน คุณสามารถ Resubmit แผนกดังกล่าวเพื่อขอเอกสารเพิ่มเติม <br><br> กดกากบาท (X) หากรับทราบแล้ว"})
+    }
+
 /* -------------------------------------------------------------------------- */
 /*                                Reject Topic                                */
 /* -------------------------------------------------------------------------- */
@@ -37,7 +55,6 @@ $("#reject").click(() => {
         swal({
             title: "Warning", 
             text: "Do you want to reject this Topic?", 
-            // closeOnClickOutside: false,
             content: "input",
             buttons : [true,true],
             icon:"warning",
@@ -120,8 +137,8 @@ var rsm_validator = $('#resubmit_form').validate({
             
             quick_form.forEach(item => {
                 if(item.value == "1"){
-                        rsm_related_list.push(item.name);
-                        related = (related == "") ? item.name : related + " , " + item.name;
+                    rsm_related_list.push(item.name);
+                    related = (related == "") ? item.name : related + " , " + item.name;
                 }else if(item.name == "desc"){
                     desc = item.value;
                 }else if(item.name == "due_date"){
@@ -159,7 +176,7 @@ $("#related_rv").on("navigate", (e, navDir, stepNumber) => {
             new_related_list.push(this.name);
         });
         new_related_list.forEach(item => {
-                new_related_string = (new_related_string == "") ? item : new_related_string + " , " + item;
+            new_related_string = (new_related_string == "") ? item : new_related_string + " , " + item;
         });
 
         $("#new_related_dept").html(new_related_string);
@@ -255,7 +272,7 @@ $("#related_rv").on("navigate", (e, navDir, stepNumber) => {
                 });
 
                 if(isAllChecked == 0) {
-                $(`#rs-${val.Name}`).prop("checked", true);
+                    $(`#rs-${val.Name}`).prop("checked", true);
                 }     
             }else{
                 $(`#rs-${val.Name}`).prop("checked", false); 
@@ -287,12 +304,12 @@ $.each(DepartmentLists, (key,val) => {
         if($(this).is(":checked")) {
             var isAllChecked = 0;
 
-            $(`.rl-${val.Name}`).each(function() {
+            $(`.rl-${val.Name}`).each(function() { 
                 if (!this.checked) isAllChecked = 1;
             });
 
             if(isAllChecked == 0) {
-            $(`#rl-${val.Name}`).prop("checked", true);
+                $(`#rl-${val.Name}`).prop("checked", true);
             }     
         }else{
             $(`#rl-${val.Name}`).prop("checked", false); 
@@ -318,7 +335,6 @@ $.each(DepartmentLists, (key,val) => {
         swal({
             title: "Approve Topic", 
             text: "Do you want to approve this Topic?", 
-            // closeOnClickOutside: false,
             buttons : [true,true],
             icon:"warning",
         }).then((res) => {
@@ -645,8 +661,6 @@ $("form#related_form").submit((e) => {
         e.preventDefault();
         $('#loading').removeClass('hidden')
             let form_response = $("form.reply_form").serializeArray();
-            // var response_id = $("form.reply_form").attr("id");
-            // var response_id = $("form.reply_form").attr("id");
             var promises = [];
 
             files = file_list_rd;
@@ -671,8 +685,6 @@ $("form#related_form").submit((e) => {
                         cache: false,
                         processData: false,
                         contentType: false,
-                        success: function () {
-                        },
                         error: function() {
                             swal("Error", "Upload file not success", "error");
                         }
