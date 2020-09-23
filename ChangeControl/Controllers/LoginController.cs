@@ -12,7 +12,7 @@ using System.Data.SqlClient;
 using System.Configuration;
 
 namespace ChangeControl.Controllers{
-    public class LoginController : Controller{
+    public class LoginController : ChangeControlController{
         
         private LoginModel M_Login;
         public List<Department> A = new List<Department>();
@@ -30,12 +30,9 @@ namespace ChangeControl.Controllers{
         }
         public dynamic res = new ExpandoObject();
 
-
         public ActionResult Index(){
             var redirectID = (string) Session["RedirectID"];
             this.SignOut();
-            
-                // return (redirectID != null) ? RedirectToAction("Index", "Detail", new {id = redirectID}) : RedirectToAction("Index", "Home");
             return View();
         }
         public ActionResult CheckUser(string username,string password){
@@ -93,53 +90,6 @@ namespace ChangeControl.Controllers{
             }
         }
 
-
-        public string GetDepartment(string us_id){
-            myAD.ADInfo conAD = new myAD.ADInfo();
-            var temp_dept = conAD.ChkSection(us_id);
-            Session["DepartmentRawName"] = temp_dept;
-
-            string[] PE_Process = ViewBag.PEAudit;
-            string[] MKT = {"MKT"};
-            string[] IT = {"IT"};
-            string[] PE = {"PE1","PE2","PE2_SMT","PE2_PCB","PE2_MT"};
-            string[] PCH = {"PCH"};
-            string[] P = {"P1","P2","P3A","P3M","P4","P5","P6","P7"};
-            string[] PC = {"PC1","PC2"};
-            string[] QC = {"QC1","QC2","QC3"};
-            string[] QC_IN = {"QC_IN1","QC_IN2","QC_IN3"};
-            string[] QC_NFM = {"QC_NFM1","QC_NFM2","QC_NFM3"};
-            string[] QC_FINAL = {"QC_FINAL1","QC_FINAL2","QC_FINAL3"};
-
-            var result = "Error";
-            
-            if(PE_Process.Any(x => temp_dept.Contains(x))){
-                result = "PE1_Process";
-            }else if(MKT.Any(x => temp_dept.Contains(x))){
-                result = "MKT";
-            }else if (IT.Any(x => temp_dept.Contains(x))){ 
-                result = "IT";
-            }else if(PE.Any(x => temp_dept.Contains(x))){
-                result = "PE";
-            }else if(PCH.Any(x => temp_dept.Contains(x))){
-                result = "PCH";
-            }else if(P.Any(x => temp_dept.Contains(x))){
-                result = "P";
-            }else if(PC.Any(x => temp_dept.Contains(x))){
-                result = "PC";
-            }else if(QC.Any(x => temp_dept.Contains(x))){
-                result = "QC";
-            }else if(QC_IN.Any(x => temp_dept.Contains(x))){
-                result = "QC_IN";
-            }else if(QC_NFM.Any(x => temp_dept.Contains(x))){
-                result = "QC_NFM";
-            }else if(QC_FINAL.Any(x => temp_dept.Contains(x))){
-                result = "QC_FINAL";
-            }else{
-                result = "Not found";
-            }
-            return result;
-        }
 
         public int GetDepartmentIdByName(string DepartmentName){
             var DepartmentResult = M_Login.GetDepartmentIdByDepartmentName(DepartmentName); 
@@ -201,54 +151,6 @@ namespace ChangeControl.Controllers{
 
         public ActionResult GetDepartmentListByUserID(string us_id){
             return Json(new { data = M_Login.GetDepartmentListByUserID(us_id) }, JsonRequestBehavior.AllowGet);
-        }
-
-        [HttpPost]
-        public void GenerateTopicList(string Department, string Position){
-            var dept = Department ?? "Guest";
-            var pos = Position ?? "Guest";
-            bool isApprover = ViewBag.isApprover = (pos == "Approver") || (pos == "Admin") || (pos == "Special") ;
-            var isPEProcess = ViewBag.isPEProcess = (ViewBag.PEAudit.Contains(dept));
-            var isQC = ViewBag.isQC = (ViewBag.QCAudit.Contains(dept));
-            var confirm_dept_list = M_Home.GetConfirmDeptList();
-
-
-            List<TopicNoti> req_list = new List<TopicNoti>();
-            List<TopicNoti> rv_list = new List<TopicNoti>();
-            List<TopicNoti> tr_list = new List<TopicNoti>();
-            List<TopicNoti> cf_list = new List<TopicNoti>();
-
-            if(dept != null){
-                rv_list.AddRange(M_Home.GetReviewPendingByDepartment(dept));
-                if(isApprover){
-                    req_list.AddRange(M_Home.GetRequestIssuedByDepartment(dept));
-                    rv_list.AddRange(M_Home.GetReviewIssuedByDepartment(dept));
-                }
-                if(isPEProcess){
-                    req_list.AddRange(M_Home.GetRequestApprovedByDepartment(dept));
-                }
-                if(isQC){
-                    rv_list.AddRange(M_Home.GetReviewApproved(dept));
-                    tr_list.AddRange(M_Home.GetTrialApproved(dept));
-                    cf_list.AddRange(M_Home.GetConfirmApproved(dept));
-                }
-                if(confirm_dept_list.Contains(dept)){
-                    cf_list.AddRange(M_Home.GetConfirmPendingByDepartment(dept));
-                    if(isApprover){
-                        cf_list.AddRange(M_Home.GetConfirmIssuedByDepartment(dept));
-                    }
-                }
-                if(M_Home.CheckTrialableByDepartment(dept)){
-                    tr_list.AddRange(M_Home.GetTrialPendingByDepartment(dept));
-                    if(isApprover){
-                        tr_list.AddRange(M_Home.GetTrialIssuedByDepartment(dept));
-                    }
-                }
-                ViewData["TopicRequestList"] = req_list;
-                ViewData["TopicReviewList"] = rv_list;
-                ViewData["TopicTrialList"] = tr_list;
-                ViewData["TopicList"] = cf_list;
-            }
         }
 
     }

@@ -6,13 +6,12 @@ namespace ChangeControl
     public class BundleConfig
     {
         // For more information on bundling, visit https://go.microsoft.com/fwlink/?LinkId=301862
-        public static void RegisterBundles(BundleCollection bundles)
-        {
+        public static void RegisterBundles(BundleCollection bundles){
+
+            var date = System.DateTime.Now.ToString("yyMMddHH");
+
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
-                        // "~/Scripts/jquery-{version}.js"));
-                        // "~/tmp/plugins/jquery/jquery.min.js",
                         "~/tmp/plugins/jQuery-3.4.1/jquery-3.4.1.js",
-                        // "~/tmp/plugins/jquery/jquery.js",
                         "~/Plugin/jquery.mask.min.js",
                         "~/tmp/plugins/jquery-ui/jquery-ui.min.js"
                         ));
@@ -52,14 +51,14 @@ namespace ChangeControl
                         "~/Plugin/SweetAlert/sweetalert.min.js"));
                         
             bundles.Add(new ScriptBundle("~/bundles/filepond").Include(
-                        "~/Plugin/filepond/filepond.min.js",
-                        "~/Plugin/filepond/filepond.jquery.js",
-                        "~/Plugin/filepond/filepond-plugin-file-encode.js",
-                        "~/Plugin/filepond/filepond-plugin-image-preview.min.js",
-                        "~/Plugin/filepond/filepond-plugin-file-validate-size.js",
-                        "~/Scripts/Shared/FilePond.js",
-                        "~/Scripts/Shared/FilePond_rd.js",
-                        "~/Scripts/Shared/FilePond_alt.js"));
+                        $"~/Plugin/filepond/filepond.min.js?date={date}",
+                        $"~/Plugin/filepond/filepond.jquery.js?date={date}",
+                        $"~/Plugin/filepond/filepond-plugin-file-encode.js?date={date}",
+                        $"~/Plugin/filepond/filepond-plugin-image-preview.min.js?date={date}",
+                        $"~/Plugin/filepond/filepond-plugin-file-validate-size.js?date={date}",
+                        $"~/Scripts/Shared/FilePond.js?date={date}",
+                        $"~/Scripts/Shared/FilePond_rd.js?date={date}",
+                        $"~/Scripts/Shared/FilePond_alt.js?date={date}"));
 
         }
     }

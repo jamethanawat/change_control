@@ -2,7 +2,6 @@
 var GetLine;
 var GetSearch;
 var GetTopicDetail;
-var SessionUser;
 var table_cr;
 $(document).ready(function () {
     $("body").addClass("sidebar-collapse", 1000);
@@ -195,7 +194,7 @@ $(document).ready(function () {
                 }else{
                         var btn_badge = `secondary`;
                         var editable = `disabled`;
-                        if(row.User_insert === SessionUser && (row.FullStatus == "Waiting" || row.FullStatus == "Request")){
+                        if(row.User_insert === us_id && (row.FullStatus == "Waiting" || row.FullStatus == "Request")){
                             btn_badge = `success`;
                             var editable = ``;
                         }

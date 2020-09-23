@@ -15,7 +15,8 @@
             <div>
                 <i class="fas fa-folder-open bg-primary"></i>
 
-                <div class="timeline-item card">
+        
+                <div class="timeline-item card"  @Html.Raw(Resubmit.ExistsRelated(Session["Department"].ToString()) ? "data-intro='ตัวอย่างการ Request Re-submit'" : "") >
                     <div class="timeline-header card-header d-flex" style="padding: 10px 10px 5px 10px;"  data-card-widget="collapse">
                         @{
                             var list = Resubmit.RelatedList as List<RelatedAlt>;
@@ -118,7 +119,7 @@
             }
             if(list.Exists(Related => Related.Response == 0 && Related.Department == Session["Department"].ToString())){
             <!-- timeline item -->
-            <div>
+            <div data-intro='กล่อง Reply สามารถใช้เพื่อ Upload เอกสารที่ถูก Re-submit'>
                 <i class="fas fa-pen bg-warning"></i>
                 <div class="timeline-item " id="my-card">
                     <div class="timeline-body reply_modal d-flex" style="padding: 10px 10px 5px 10px;cursor:pointer;" data-toggle="modal" data-target="#reply_modal" id="rpm-@Resubmit.ID" onclick="SetResubmitID('@Resubmit.ID')">

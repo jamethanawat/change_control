@@ -29,6 +29,7 @@ namespace ChangeControl.Models
             public int Finished { get; set; }
             public int Rejected { get; set; }
         }
+        
         public object GetLine(string Production){
             var sql = "SELECT line FROM bm_line where proddpt ='"+Production+"' ORDER BY line ASC";
             var result = _dbtapics.Database.SqlQuery<Line>(sql);
