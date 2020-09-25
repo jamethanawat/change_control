@@ -319,7 +319,6 @@ namespace ChangeControl.Controllers{
         public ActionResult InsertTrial(string desc){
             try{
                 Session["TrialID"] = M_Detail.InsertTrial((long) Session["TopicID"], Session["TopicCode"].ToString(), desc, Session["Department"].ToString(), Session["User"].ToString());
-                // CheckAllTrialApproved(Session["TrialRelatedList"], C_TrialList);
                 return Json(new { code = true, mail = "EmailTrialed", dept=Session["Department"].ToString(), pos = "Approver" },JsonRequestBehavior.AllowGet);
             }catch (Exception ex){
                 return Json(new { code = false }, JsonRequestBehavior.AllowGet);
@@ -342,9 +341,13 @@ namespace ChangeControl.Controllers{
             if(!CheckCurrentStatus()){
                 throw new Exception("Status has changed");
             }
-            var updated_tr = M_Detail.UpdateTrial(Convert.ToInt64(topic_id), topic_code, desc, Session["Department"].ToString(), Session["User"].ToString());
-            Session["TrialID"] = updated_tr.ID;
-            Session["TrialRev"] = updated_tr.Revision;
+            try{
+                var updated_tr = M_Detail.UpdateTrial(Convert.ToInt64(topic_id), topic_code, desc, Session["Department"].ToString(), Session["User"].ToString());
+                Session["TrialID"] = updated_tr.ID;
+                Session["TrialRev"] = updated_tr.Revision;
+            }catch(Exception err){
+
+            }
             return Json(new {code = 1, dept = Session["Department"].ToString()}, JsonRequestBehavior.AllowGet);
         }
 
@@ -376,9 +379,8 @@ namespace ChangeControl.Controllers{
 
         [HttpPost]
         public ActionResult InsertConfirm(string topic_id, string topic_code, string desc){
-                Session["ConfirmID"] = M_Detail.InsertConfirm(Convert.ToInt64(topic_id), topic_code, desc, Session["Department"].ToString(), Session["User"].ToString());
             try{
-                // CheckAllConfirmApproved(Session["ConfirmRelatedList"], C_ConfirmList);
+                Session["ConfirmID"] = M_Detail.InsertConfirm(Convert.ToInt64(topic_id), topic_code, desc, Session["Department"].ToString(), Session["User"].ToString());
 
                 return Json(new { code = true ,mail = "EmailConfirmed", dept=Session["Department"].ToString(), pos = "Approver"},JsonRequestBehavior.AllowGet);
             }catch (Exception ex){
