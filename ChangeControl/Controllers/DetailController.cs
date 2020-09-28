@@ -644,5 +644,6 @@ namespace ChangeControl.Controllers{
         public ActionResult GetAuditNotification(){
             return Json(M_Detail.GetAuditNotification(), JsonRequestBehavior.AllowGet);
         }
+
     }
 }

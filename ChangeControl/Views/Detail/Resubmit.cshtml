@@ -117,7 +117,7 @@
                 </div>
                 <!-- END timeline item -->
             }
-            if(list.Exists(Related => Related.Response == 0 && Related.Department == Session["Department"].ToString())){
+            if(list.Any(Related => Related.RelatedAndNotResponsed(Session["Department"].ToString() ))){
             <!-- timeline item -->
             <div data-intro='กล่อง Reply สามารถใช้เพื่อ Upload เอกสารที่ถูก Re-submit'>
                 <i class="fas fa-pen bg-warning"></i>

@@ -191,7 +191,7 @@ namespace ChangeControl.Models{
         }
 
         public List<ChangeItem> GetChangeItem(){
-            var sql = "SELECT ID_Change_item as ID, Name as Name FROM Change_Item WHERE ID_Change_item BETWEEN 1 AND 36 AND Name != '?';";
+            var sql = "SELECT ID_Change_item as ID, Name as Name FROM Change_Item WHERE ID_Change_item BETWEEN 1 AND 36 AND Status = 1;";
             var result = DB_CCS.Database.SqlQuery<ChangeItem>(sql);
             return result.ToList();
         }
