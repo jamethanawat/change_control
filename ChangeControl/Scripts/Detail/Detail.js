@@ -4,6 +4,7 @@ var file_list_alt = [];
 var file_list_rd = [];
 var due_date;
 var rsm_id = 0;
+var rsm_dept = '';
 var resubmit_formIsEmpty = true;
 var TrialIsEmpty = true;
 var rsm_related_list = [];
@@ -657,7 +658,7 @@ $("form#related_form").submit((e) => {
 });
 
 /* -------------------------------------------------------------------------- */
-/*                              Response resubmit                             */
+/*                              Reply resubmit                             */
 /* -------------------------------------------------------------------------- */
 
     $("#submit_reply_form").click((e) => {
@@ -695,6 +696,12 @@ $("form#related_form").submit((e) => {
                 });
             }).fail(() => {
                 swal("Error", "Reply not success", "error");
+            }));
+
+            promises.push($.post(GenerateMailPath,{ 'mode': 'ReplyResubmit', 'dept': rsm_dept, 'topic_code':topic_code, }).fail((error) => {
+                console.error(error);
+                swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                return;
             }));
 
             Promise.all(promises).then(() => {
@@ -771,8 +778,9 @@ $('form#review').on('keyup change paste', 'input, select, textarea', (e) => {
     checkRadioAndInput(new_rv,rv_submit);
 });
 
-function SetResubmitID(rsm_id){
+function SetResubmitIDAndDept(rsm_id,rsm_dept){
     this.rsm_id = rsm_id;
+    this.rsm_dept = rsm_dept;
 }
 
 

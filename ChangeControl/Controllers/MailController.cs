@@ -218,6 +218,9 @@ namespace ChangeControl.Controllers{
                     case "RequestDocument" : //Resubmit
                         mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} {Session["Department"].ToString()} Request more documents.";
                         break;
+                    case "ReplyResubmit" : //Resubmit
+                        mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} {Session["Department"].ToString()} Replied resubmit.";
+                        break;
                     default :
                         mailMessage.Subject = "ERROR";
                         break;
