@@ -452,7 +452,7 @@ $("form#Trial").submit((e) => {
             delete files[index].detail;
         }
 
-        $.post(InsertTrialPath,{ desc: trial_form[0].value},(result) => {
+        $.post(InsertTrialPath,{ desc: trial_form[0].value, topic_code: topic_code},(result) => {
             promises.push(files.forEach(element => {
                 var Data = new FormData();
                 Data.append("file",element.file);
@@ -571,7 +571,7 @@ $("form#Confirm").submit((e) => {
             console.log('Related created');
             $.post(RequestResubmitPath, $("#resubmit_form").serialize(), (res) =>{
                 console.log('Resubmit created');
-                if(res.code){
+                if(res.status == "success"){
                     moment.locale('en');
                     $.post(GenerateMailPath,{ 'mode': 'RequestDocument', 'topic_code':topic_code, 'due_date': moment(due_date,"DD-MM-YYYY").format('D MMMM YYYY'), 'dept_arry': rsm_related_list, }).fail((error) => {
                         console.error(error);

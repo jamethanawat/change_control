@@ -36,6 +36,8 @@ namespace ChangeControl.Controllers{
         public class RawFile{
             public HttpPostedFileBase file {get; set;}
             public string description {get; set;}
+            public int id {get; set;}
+            public string code {get; set;}
         }
 
         // public class C_Inherit_Home : HomeController{
@@ -218,7 +220,7 @@ namespace ChangeControl.Controllers{
                 var ServerSavePath = Path.Combine("D:/File/Topic/" + InputFileName);
                 file_item.file.SaveAs(ServerSavePath);
                 if(file_item.description == "null" || file_item.description == null) file_item.description = " ";
-                M_Req.InsertFile(file_item.file, (long) Session["TopicID"], "Topic", file_item.description.ReplaceSingleQuote(), Session["User"].ToString(), Session["TopicCode"].ToString(), Session["Department"].ToString());
+                M_Req.InsertFile(file_item.file, (long) Session["TopicID"], "Topic", file_item.description.ReplaceSingleQuote(), Session["User"].ToString(), file_item.code, Session["Department"].ToString());
             }
             return Json((string)Session["TopicCode"]);
         }
