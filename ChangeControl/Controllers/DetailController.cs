@@ -124,7 +124,6 @@ namespace ChangeControl.Controllers{
 
         [HttpPost]
         public ActionResult InsertFile(RawFile file_item){
-            TopicAlt temp_topic = Topic;
             Value temp_file = new Value();
             temp_file = Session["TxtFile"] as Value;
             
@@ -133,7 +132,7 @@ namespace ChangeControl.Controllers{
                 var ServerSavePath = Path.Combine("D:/File/Topic/" + InputFileName);
                 file_item.file.SaveAs(ServerSavePath);
                 if(file_item.description == "null" || file_item.description == null) file_item.description = " ";
-                M_Detail.InsertFile(file_item.file, (long) Session["ReviewID"], "Review", file_item.description, Session["User"], file_item.code, Session["Department"].ToString());
+                M_Detail.InsertFile(file_item.file, (long) Session["ReviewID"], "Review", file_item.description.ReplaceSingleQuote(), Session["User"], file_item.code, Session["Department"].ToString());
             }
             return Json(new {code=1}, JsonRequestBehavior.AllowGet);
         }
@@ -254,9 +253,10 @@ namespace ChangeControl.Controllers{
         public ActionResult RequestResubmit(string desc, string due_date){
             try{
                 M_Detail.InsertResubmit(desc, due_date, (long) Session["RelatedID"], Topic.Code, (string)Session["User"], Topic.Status, (string)Session["Department"]);
-                return Json(new {code=true}, JsonRequestBehavior.AllowGet);
-            }catch (Exception ex){
-                return Json(new {code=false}, JsonRequestBehavior.AllowGet);
+                return Json(new { status = "success" },JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex){
+                return Json(new { status = "error", message = ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
 
@@ -316,9 +316,9 @@ namespace ChangeControl.Controllers{
         }
 
         [HttpPost]
-        public ActionResult InsertTrial(string desc){
+        public ActionResult InsertTrial(string desc,string topic_code){
             try{
-                Session["TrialID"] = M_Detail.InsertTrial((long) Session["TopicID"], Session["TopicCode"].ToString(), desc, Session["Department"].ToString(), Session["User"].ToString());
+                Session["TrialID"] = M_Detail.InsertTrial((long) Session["TopicID"], topic_code, desc, Session["Department"].ToString(), Session["User"].ToString());
                 return Json(new { code = true, mail = "EmailTrialed", dept=Session["Department"].ToString(), pos = "Approver" },JsonRequestBehavior.AllowGet);
             }catch (Exception ex){
                 return Json(new { code = false }, JsonRequestBehavior.AllowGet);
@@ -413,7 +413,7 @@ namespace ChangeControl.Controllers{
                     
                 M_Detail.ApproveReview(review_id,(string) Session["User"]);
                 if(Topic.Status == 7 && (ViewBag.PEAudit.Contains(Session["Department"].ToString())) && Topic.Type == "Internal"){ //PE_Process open review case
-                    M_Detail.UpdateTopicStatus(Session["TopicCode"].ToString(), 8);
+                    M_Detail.UpdateTopicStatus(topic_code, 8);
                     M_Detail.UpdateTopicApproveRequest(Session["User"].ToString(),Topic.Code);
                     mail = "InformUser";
                 }else if(Topic.Status == 8 && ViewBag.QCAudit.Contains(Session["Department"].ToString()) ){
@@ -427,7 +427,7 @@ namespace ChangeControl.Controllers{
                     M_Detail.UpdateTopicApproveReview(Session["User"].ToString(),Topic.Code);
                 }else if(Topic.Status == 7 ||Topic.Status == 8){
                     var qc_audit = Topic.RelatedListAlt.Find(e => (ViewBag.QCAudit.Contains(e.Department)));
-                    if((Topic.RelatedListAlt.Count(e => e.Review == 0) == 1 || rv_list.Exists(e => e.Department == qc_audit.Department)) && M_Detail.CheckAllReviewApproved(Session["TopicCode"].ToString())){
+                    if((Topic.RelatedListAlt.Count(e => e.Review == 0) == 1 || rv_list.Exists(e => e.Department == qc_audit.Department)) && M_Detail.CheckAllReviewApproved(topic_code)){
                         mail = "ReviewApproved";
                         dept = qc_audit.Department;
                     }

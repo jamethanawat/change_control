@@ -165,6 +165,7 @@ $(document).ready(function () {
                         var Data = new FormData();
                         Data.append("file",element.file);
                         Data.append("description",element.description);
+                        Data.append("code",inserted_id);
                         promises.push($.ajax({
                             type: "POST",
                             url: InsertFilePath,
@@ -297,6 +298,7 @@ $(document).ready(function () {
                                 var Data = new FormData();
                                 Data.append("file",element.file);
                                 Data.append("description",element.description);
+                                Data.append("code",inserted_id);
                                 promises.push($.ajax({
                                     type: "POST",
                                     url: InsertFilePath,
