@@ -12,7 +12,9 @@ namespace ChangeControl.Helpers{
         
         public static string ToFullName(this string user){
             myAD.ADInfo conAD = new myAD.ADInfo();
-            return conAD.ChkFullName(user);
+            var name = conAD.ChkName(user);
+            var sur_name = conAD.ChkSurName(user);
+            return $"{name.UppercaseFirst()} {sur_name.UppercaseFirst()}";
         }
 
         public static string ToShortFullName(this string user){
