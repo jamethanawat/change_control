@@ -1,10 +1,10 @@
-﻿var InsertReviewStatus = false;
-var ReviewStatus = false;
+﻿var ReviewStatus = false;
 var file_list = [];
 var file_list_alt = [];
 var file_list_rd = [];
 var due_date;
 var rsm_id = 0;
+var rsm_dept = '';
 var resubmit_formIsEmpty = true;
 var TrialIsEmpty = true;
 var rsm_related_list = [];
@@ -452,21 +452,13 @@ $("form#Trial").submit((e) => {
             delete files[index].detail;
         }
 
-        promises.push($.post(InsertTrialPath,{ desc: trial_form[0].value},(result) => {
-            if(result.mail != ""){
-                $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept':result.dept, 'pos':result.pos }).fail((error) => {
-                    console.error(error);
-                    swal("Error", "Cannot send email to Requestor, Please try again", "error");
-                    return;
-                })
-            }
-            console.log('Inserted trial');
-            files.forEach(element => {
+        $.post(InsertTrialPath,{ desc: trial_form[0].value},(result) => {
+            promises.push(files.forEach(element => {
                 var Data = new FormData();
                 Data.append("file",element.file);
                 Data.append("description",element.description);
                 Data.append("code",topic_code);
-                promises.push($.ajax({
+                $.ajax({
                     type: "POST",
                     url: InsertFileTrialPath,
                     data: Data,
@@ -478,19 +470,29 @@ $("form#Trial").submit((e) => {
                     },error: function() {
                         swal("Error", "Upload file not success", "error");
                     }
+                });
+            }));
+
+            if(result.mail != ""){
+                promises.push($.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept':result.dept, 'pos':result.pos }).fail((error) => {
+                    console.error(error);
+                    swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                    return;
                 }));
-            });
+            }
+
+            Promise.all(promises).then(() => {
+                $('#loading').addClass('hidden')
+                
+                $("#trial_submit").prop("disabled",true)
+                swal("Success", "Insert Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
+            })
         }).fail(() => {
             swal("Error", "Trial is not succes, Please contact admin", "error");
             $('#loading').addClass('hidden')
-        }));
+        });
         
-        Promise.all(promises).then(() => {
-            $('#loading').addClass('hidden')
-            InsertReviewStatus = false;
-            $("#trial_submit").prop("disabled",true)
-            swal("Success", "Insert Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
-        })
+        
 });
 
 /* -------------------------------------------------------------------------- */
@@ -511,21 +513,13 @@ $("form#Confirm").submit((e) => {
             delete files[index].detail;
         }
 
-        promises.push($.post(InsertConfirmPath,{topic_id:topic_id, topic_code:topic_code , desc: confirm_form[0].value},(result) => {
-            if(result.mail != ""){
-                $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept':result.dept, 'pos':result.pos }).fail((error) => {
-                    console.error(error);
-                    swal("Error", "Cannot send email to Requestor, Please try again", "error");
-                    return;
-                })
-            }
-            console.log('Inserted trial');
-            files.forEach(element => {
+        $.post(InsertConfirmPath,{topic_id:topic_id, topic_code:topic_code , desc: confirm_form[0].value},(result) => {
+            promises.push(files.forEach(element => {
                 var Data = new FormData();
                 Data.append("file",element.file);
                 Data.append("description",element.description);
                 Data.append("code",topic_code);
-                promises.push($.ajax({
+                $.ajax({
                     type: "POST",
                     url: InsertFileConfirmPath,
                     data: Data,
@@ -537,19 +531,29 @@ $("form#Confirm").submit((e) => {
                     },error: function() {
                         swal("Error", "Upload file not success", "error");
                     }
+                });
+            }));
+
+            if(result.mail != ""){
+                promises.push($.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept':result.dept, 'pos':result.pos }).fail((error) => {
+                    console.error(error);
+                    swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                    return;
                 }));
-            });
+            }
+
+            Promise.all(promises).then(() => {
+                $('#loading').addClass('hidden')
+                
+                $("#cf_submit").prop("disabled",true)
+                swal("Success", "Insert Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
+            })
         }).fail(() => {
             swal("Error", "Confirm is not succes, Please contact admin", "error");
             $('#loading').addClass('hidden')
-        }));
+        });
 
-        Promise.all(promises).then(() => {
-            $('#loading').addClass('hidden')
-            InsertReviewStatus = false;
-            $("#cf_submit").prop("disabled",true)
-            swal("Success", "Insert Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
-        })
+        
 });
 
 /* -------------------------------------------------------------------------- */
@@ -654,7 +658,7 @@ $("form#related_form").submit((e) => {
 });
 
 /* -------------------------------------------------------------------------- */
-/*                              Response resubmit                             */
+/*                              Reply resubmit                             */
 /* -------------------------------------------------------------------------- */
 
     $("#submit_reply_form").click((e) => {
@@ -694,9 +698,15 @@ $("form#related_form").submit((e) => {
                 swal("Error", "Reply not success", "error");
             }));
 
+            promises.push($.post(GenerateMailPath,{ 'mode': 'ReplyResubmit', 'dept': rsm_dept, 'topic_code':topic_code, }).fail((error) => {
+                console.error(error);
+                swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                return;
+            }));
+
             Promise.all(promises).then(() => {
                 $('#loading').addClass('hidden')
-                InsertReviewStatus = false;
+                
                 $("#ResponseSubmit").prop("disabled",true)
                 $("#reply_modal").modal("hide")
                 swal("Success", "Insert Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
@@ -768,8 +778,9 @@ $('form#review').on('keyup change paste', 'input, select, textarea', (e) => {
     checkRadioAndInput(new_rv,rv_submit);
 });
 
-function SetResubmitID(rsm_id){
+function SetResubmitIDAndDept(rsm_id,rsm_dept){
     this.rsm_id = rsm_id;
+    this.rsm_dept = rsm_dept;
 }
 
 

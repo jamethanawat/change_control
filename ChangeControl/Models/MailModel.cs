@@ -53,7 +53,7 @@ namespace ChangeControl.Models{
 
         public TopicAlt GetTopicByCode(string topic_code){
             try{
-                var sql = $@"SELECT  Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Department, Revision, Model, PartNo, PartName, ProcessName, Status, Status.Name AS FullStatus, [APP/IPP] as App, Subject, Detail, Timing, Related, User_insert, Time_insert, 
+                var sql = $@"SELECT  Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Department, Revision, Model, PartNo, PartName, ProcessName, Topic.Status, Status.Name AS FullStatus, [APP/IPP] as App, Subject, Detail, Timing, Related, User_insert, Time_insert, 
                 Topic.ID FROM Topic 
                 LEFT JOIN Status ON Topic.Status = Status.id 
                 LEFT JOIN Change_Item ON Topic.Change_item = ID_Change_item 

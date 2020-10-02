@@ -56,11 +56,11 @@ namespace ChangeControl.Models
             if(model.Overstatus == 2){
                 ov_command = $@"(
                     SELECT COUNT(*) 
-                    FROM Related WHERE Related.PK_Related =  Topic.Related AND Related.Department != 'QC1' AND Related.Department != 'QC2' AND Related.Department != 'QC3')
+                    FROM Related WHERE Related.PK_Related =  Topic.Related AND Related.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 ))
 		        =	(SELECT COUNT(Review.ID) FROM Review WHERE  
 					 Review.Revision  = (SELECT MAX(r.Revision) FROM Review r WHERE r.Topic = Review.Topic AND r.Department = Review.Department) AND  Review.Topic = Topic.Code 
                      AND Review.Status = 1
-                     AND Review.Department NOT IN ('QC1', 'QC2', 'QC3'))";
+                     AND Review.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 ))";
             }else if(model.Overstatus == 3){
                 ov_command = $@"(SELECT COUNT(Review.ID) FROM Review 
                             LEFT JOIN Review_Item ON Review_Item.FK_Review_ID = Review.ID 
@@ -70,19 +70,19 @@ namespace ChangeControl.Models
                 =   (SELECT COUNT(Trial.ID) FROM Trial WHERE
 					 Trial.Revision  = (SELECT MAX(t.Revision) FROM Trial t WHERE t.Topic = Trial.Topic AND t.Department = Trial.Department) AND Trial.Topic = Topic.Code 
                      AND Trial.Status = 1
-                     AND Trial.Department NOT IN ('QC1', 'QC2', 'QC3'))";
+                     AND Trial.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 ))";
 
             }else if(model.Overstatus == 4){
                 ov_command = $@"(SELECT COUNT(*) FROM Related  
 						LEFT JOIN Department d ON Related.Department = d.Name 
 						WHERE Related.PK_Related =  Topic.Related 
 						AND (d.[Group] = 'Production')
-                        AND Related.Department != 'QC1' AND Related.Department != 'QC2' AND Related.Department != 'QC3'
+                        AND Related.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 )
 						)
 		        =	(SELECT COUNT(Confirm.ID) FROM Confirm WHERE
 					 Confirm.Revision  = (SELECT MAX(c.Revision) FROM Confirm c WHERE c.Topic = Confirm.Topic AND c.Department = Confirm.Department) AND  Confirm.Topic = Topic.Code 
                      AND Confirm.Status = 1
-                     AND Confirm.Department NOT IN ('QC1', 'QC2', 'QC3'))";
+                     AND Confirm.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 ))";
             }
 
             if(model.Department.AsNullIfWhiteSpace() != null && model.Status != 0){
@@ -105,13 +105,13 @@ namespace ChangeControl.Models
                                             AND Review_Item.Status = 1
                                                 AND Review.Department = '{model.Department}'
 						                    AND Review.Revision = (SELECT MAX(e3.Revision) FROM Review e3 WHERE Review.Topic = e3.Topic AND Review.Department = e3.Department))
-                                            OR '{model.Department}' IN ('QC1','QC2','QC3'))";
+                                            OR '{model.Department}' IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 ))";
                     break;
                 case 10:
                     phase = "Confirm";
                     condition_command = $@" AND ('{model.Department}' IN (SELECT Name FROM Department
                                                         WHERE [Group] = 'Production')
-                                                OR '{model.Department}' IN ('QC1','QC2','QC3'))";
+                                                OR '{model.Department}' IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 ))";
                     break;
                 }
                 if(model.Status != 7 && model.Status != 11 && model.Status != 12 ){
@@ -137,7 +137,7 @@ namespace ChangeControl.Models
                     "WHERE Topic.Revision  = (SELECT MAX(t.Revision) FROM Topic t WHERE t.Code = Topic.Code AND t.Department = Topic.Department) " +
                     (model.Type.AsNullIfWhiteSpace() != null ?  $"AND Topic.Type = '{model.Type}' " : "") +
                     (ov_command != "" ?  $"AND {ov_command} " : "") +
-                    (model.Status != 0 && model.Status == 7 ? $"AND (Topic.Status = '{model.Status}' OR Topic.Status = '3')" : (model.Status != 0 ? $"AND Topic.Status = '{model.Status}'" : "")) +
+                    (model.Status != 0 ? (model.Status == 7 ? $"AND (Topic.Status = '{model.Status}' OR Topic.Status = '3')" : $"AND Topic.Status = '{model.Status}'" ) : "" ) +
                     (model.StartDate.AsNullIfWhiteSpace() != null && model.EndDate.AsNullIfWhiteSpace() != null ? $"AND SUBSTRING(Topic.Timing, 0 ,9) >= {model.StartDate} AND SUBSTRING(Topic.Timing, 0 ,9) <= {model.EndDate} " : "") +
                     (model.ProductType.AsNullIfWhiteSpace() != null ? $"AND Topic.Product_type = {model.ProductType} " : "") +
                     (model.Changeitem.AsNullIfWhiteSpace() != null ? $"AND Topic.Change_item = {model.Changeitem} " : "") +
@@ -146,13 +146,14 @@ namespace ChangeControl.Models
                     (model.Partno.AsNullIfWhiteSpace() != null ? $"AND Topic.PartNo ='{model.Partno}' " : "") +
                     (model.Model.AsNullIfWhiteSpace() != null ? $"AND Topic.Model ='{model.Model}' " : "") +
                     (model.ControlNo.AsNullIfWhiteSpace() != null ? $"AND Topic.Code LIKE '{model.ControlNo}%' " : "") +
-                    (model.Status == 7 ?
-                        (model.Department.AsNullIfWhiteSpace() != null ? $@" AND Topic.Department = '{model.Department}'" : "") : 
-                        (model.Status == 0 || model.Status == 11 || model.Status == 12  ?
-                            (model.Department.AsNullIfWhiteSpace() != null ? $@" AND (Topic.Department = '{model.Department}' OR Related.Department = '{model.Department}')" : "") :
-                            (model.Department.AsNullIfWhiteSpace() != null ? $@" AND Related.Department = '{model.Department}'" : "")
-                        )
-                    )+
+                    (model.Department.AsNullIfWhiteSpace() != null ? 
+                        (model.Status == 7 ? 
+                            $@" AND Topic.Department = '{model.Department}'" : 
+                            (model.Status == 0 || model.Status == 11 || model.Status == 12  ?
+                                $@" AND (Topic.Department = '{model.Department}' OR Related.Department = '{model.Department}')" : $@" AND Related.Department = '{model.Department}'" 
+                            )
+                        ) 
+                    : "") +
                     $"{condition_command} ORDER BY Topic.Code DESC";
             var result = DB_CCS.Database.SqlQuery<TopicAlt>(sql).ToList();
             return result;
@@ -183,14 +184,33 @@ namespace ChangeControl.Models
             var result = DB_CCS.Database.SqlQuery<TopicNoti>(sql).ToList();
             return result;
         }
-        public List<TopicNoti> GetRequestApprovedByDepartment(string dept){
-            var sql = $@"SELECT DISTINCT Code, Topic.Revision, Topic.Status, Subject, Detail, Time_insert, 'Approved' AS SubStatus 
+        public List<TopicNoti> GetReviewPendingPEByDepartment(string dept){
+            var sql = $@"SELECT DISTINCT Code, Topic.Revision, Topic.Status, Subject, Detail, Time_insert, 'Pending' AS SubStatus 
+                        FROM Topic
+                        LEFT JOIN Related ON Topic.Related = PK_Related
+                        WHERE Related.Department = '{dept}'
+                            AND Topic.Revision = (SELECT MAX(t.Revision) FROM Topic t WHERE t.Code = Topic.Code AND t.Department = Topic.Department)
+                            AND (Topic.Status = 7 OR Topic.Status = 8)
+                            AND NOT EXISTS ( 
+                                SELECT * FROM Review WHERE Review.Department = Related.Department AND Review.Topic = Topic.Code
+                                AND Review.Revision = (SELECT MAX(r.Revision) FROM Review r WHERE r.Topic = Review.Topic AND r.Department = Review.Department)
+                            );";
+            var result = DB_CCS.Database.SqlQuery<TopicNoti>(sql).ToList();
+            return result;
+        }
+        
+        public List<TopicNoti> GetReviewIssuedPEByDepartment(string dept){
+            var sql = $@"SELECT DISTINCT Code, Topic.Revision, Topic.Status, Subject, Detail, Time_insert, 'Issued' AS SubStatus 
                         FROM Topic
                         LEFT JOIN Related ON Topic.Related = PK_Related
                         WHERE Related.Department = '{dept}'
                             AND Topic.Revision = (SELECT MAX(t.Revision) FROM Topic t WHERE t.Code = Topic.Code AND t.Department = Topic.Department)
                             AND Topic.[Type] = 'Internal'
-                            AND Topic.Status = 7;";
+                            AND Topic.Status = 7
+                            AND EXISTS ( 
+                                SELECT * FROM Review WHERE Review.Department = Related.Department AND Review.Topic = Topic.Code AND Review.Status = 3
+                                AND Review.Revision = (SELECT MAX(r.Revision) FROM Review r WHERE r.Topic = Review.Topic AND r.Department = Review.Department)
+                            );";
             var result = DB_CCS.Database.SqlQuery<TopicNoti>(sql).ToList();
             return result;
         }
@@ -200,7 +220,7 @@ namespace ChangeControl.Models
                         FROM Topic
                         LEFT JOIN Related ON Topic.Related = PK_Related
                         WHERE Related.Department = '{dept}'
-                            AND Related.Department != 'QC1' AND Related.Department != 'QC2' AND Related.Department != 'QC3' 
+                            AND Related.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 )
                             AND Topic.Revision = (SELECT MAX(t.Revision) FROM Topic t WHERE t.Code = Topic.Code AND t.Department = Topic.Department)
                             AND Topic.Status = 8
                             AND EXISTS ( 
@@ -216,7 +236,7 @@ namespace ChangeControl.Models
                         FROM Topic
                         LEFT JOIN Related ON Topic.Related = PK_Related
                         WHERE Related.Department = '{dept}'
-                            AND Related.Department != 'QC1' AND Related.Department != 'QC2' AND Related.Department != 'QC3' 
+                            AND Related.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 )
                             AND Topic.Revision = (SELECT MAX(t.Revision) FROM Topic t WHERE t.Code = Topic.Code  AND t.Department = Topic.Department)
                             AND ((Topic.Status = 8 AND Topic.[Type] = 'Internal' ) OR ( Topic.Status IN (7,8) AND Topic.[Type] = 'External' ) )
                             AND NOT EXISTS ( 
@@ -238,9 +258,9 @@ namespace ChangeControl.Models
                         WHERE Topic.Revision = (SELECT MAX(t.Revision) FROM Topic t WHERE t.Code = Topic.Code  AND t.Department = Topic.Department)
                             AND Topic.Status = 8
                           	AND 
-                          		(SELECT COUNT(Review.ID) FROM Review WHERE Review.Topic = Topic.Code AND Review.Status = 1 AND Review.Department != 'QC1' AND Review.Department != 'QC2' AND Review.Department != 'QC3' AND Review.Revision = (SELECT MAX(r.Revision) FROM Review r WHERE r.Topic = Review.Topic AND r.Department = Review.Department)) = 
-                          		(SELECT COUNT(Related.ID) FROM Related WHERE Topic.Related = PK_Related AND Related.Department != 'QC1' AND Related.Department != 'QC2' AND Related.Department != 'QC3')
-                            AND NOT EXISTS ( SELECT * FROM Review WHERE Review.Topic = Topic.Code AND Review.Status = 3 AND Review.Department != 'QC1' AND Review.Department != 'QC2' AND Review.Department != 'QC3'  AND Review.Revision = (SELECT MAX(rv.Revision) FROM Review rv WHERE rv.Topic = Review.Topic AND rv.Department = Review.Department)) 
+                          		(SELECT COUNT(Review.ID) FROM Review WHERE Review.Topic = Topic.Code AND Review.Status = 1 AND Review.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 )AND Review.Revision = (SELECT MAX(r.Revision) FROM Review r WHERE r.Topic = Review.Topic AND r.Department = Review.Department)) = 
+                          		(SELECT COUNT(Related.ID) FROM Related WHERE Topic.Related = PK_Related AND Related.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 ))
+                            AND NOT EXISTS ( SELECT * FROM Review WHERE Review.Topic = Topic.Code AND Review.Status = 3 AND Review.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 ) AND Review.Revision = (SELECT MAX(rv.Revision) FROM Review rv WHERE rv.Topic = Review.Topic AND rv.Department = Review.Department)) 
                             AND Related.Department = '{dept}';";
             var result = DB_CCS.Database.SqlQuery<TopicNoti>(sql).ToList();
             return result;
@@ -251,7 +271,7 @@ namespace ChangeControl.Models
                         LEFT JOIN Related ON Topic.Related = PK_Related
                         LEFT JOIN Review ON Related.Department = Review.Department 
                         WHERE Topic.Revision = (SELECT MAX(t.Revision) FROM Topic t WHERE t.Code = Topic.Code  AND t.Department = Topic.Department)
-                        AND Related.Department != 'QC1' AND Related.Department != 'QC2' AND Related.Department != 'QC3' 
+                        AND Related.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 )
 
                             AND Topic.Status = 9
                             AND Review.Topic = Topic.Code
@@ -267,7 +287,7 @@ namespace ChangeControl.Models
                         LEFT JOIN Related ON Topic.Related = PK_Related
                         LEFT JOIN Review ON Related.Department = Review.Department 
                         WHERE Topic.Revision = (SELECT MAX(t.Revision) FROM Topic t WHERE t.Code = Topic.Code  AND t.Department = Topic.Department)
-                            AND Related.Department != 'QC1' AND Related.Department != 'QC2' AND Related.Department != 'QC3' 
+                            AND Related.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 )
                             AND Topic.Status = 9
                             AND Review.Topic = Topic.Code
                           	AND EXISTS ( SELECT * FROM Review_Item ri WHERE Review.ID = ri.FK_Review_ID AND ri.FK_Item_Type = 24 AND ri.Status = 1 AND Review.Department = '{dept}')
@@ -288,7 +308,7 @@ namespace ChangeControl.Models
                             AND ri.FK_Item_Type = 24 AND ri.Status = 1
                             AND Review.Revision = (SELECT MAX(r.Revision) FROM Review r WHERE r.Topic = Review.Topic AND r.Department = Review.Department )
 							AND 
-							(SELECT COUNT(Trial.ID) FROM Trial WHERE Trial.Topic = Topic.Code AND Trial.Status = 1 AND Trial.Department != 'QC1' AND Trial.Department != 'QC2' AND Trial.Department != 'QC3' AND Trial.Revision = (SELECT MAX(t.Revision) FROM Trial t WHERE t.Topic = Trial.Topic  AND t.Department = Trial.Department )) =
+							(SELECT COUNT(Trial.ID) FROM Trial WHERE Trial.Topic = Topic.Code AND Trial.Status = 1 AND Trial.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 ) AND Trial.Revision = (SELECT MAX(t.Revision) FROM Trial t WHERE t.Topic = Trial.Topic  AND t.Department = Trial.Department )) =
 
 							(SELECT COUNT(*) 
 							FROM Review 
@@ -309,7 +329,7 @@ namespace ChangeControl.Models
                             AND Topic.Revision = (SELECT MAX(t.Revision) FROM Topic t WHERE t.Code = Topic.Code  AND t.Department = Topic.Department)
                             AND Topic.Status = 10
                             AND (Department.[Group] = 'Production')
-                            AND Related.Department != 'QC1' AND Related.Department != 'QC2' AND Related.Department != 'QC3' 
+                            AND Related.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 )
                             AND NOT EXISTS ( 
                                 SELECT * FROM Confirm WHERE Confirm.Department = Confirm.Department AND Confirm.Topic = Topic.Code 
                                 AND Confirm.Revision = (
@@ -325,7 +345,7 @@ namespace ChangeControl.Models
                         FROM Topic
                         LEFT JOIN Related ON Topic.Related = PK_Related
                         WHERE Related.Department = '{dept}'
-                        AND Related.Department != 'QC1' AND Related.Department != 'QC2' AND Related.Department != 'QC3' 
+                        AND Related.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 )
                         AND Topic.Revision = (SELECT MAX(t.Revision) FROM Topic t WHERE t.Code = Topic.Code  AND t.Department = Topic.Department)
                         AND Topic.Status = 10
                         AND EXISTS ( 
@@ -344,13 +364,13 @@ namespace ChangeControl.Models
                             AND Topic.Status = 10
                           	AND 
                         (SELECT COUNT(Confirm.ID) FROM Confirm WHERE Confirm.Topic = Topic.Code 
-                        AND Confirm.Status = 1 AND Confirm.Department != 'QC1' AND Confirm.Department != 'QC2' AND Confirm.Department != 'QC3' AND Confirm.Revision = (SELECT MAX(c.Revision) FROM Confirm c WHERE c.Topic = Confirm.Topic AND c.Department = Confirm.Department)) =
+                        AND Confirm.Status = 1 AND Confirm.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 ) AND Confirm.Revision = (SELECT MAX(c.Revision) FROM Confirm c WHERE c.Topic = Confirm.Topic AND c.Department = Confirm.Department)) =
                                                         
                         (SELECT COUNT(Related.ID) FROM Related LEFT JOIN Department sub_d ON Related.Department = sub_d.Name 
-                        WHERE Topic.Related = PK_Related AND Related.Department != 'QC1' AND Related.Department != 'QC2' 
-                        AND Related.Department != 'QC3' AND (sub_d.[Group] = 'Production'))
+                        WHERE Topic.Related = PK_Related AND Related.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 )
+                        AND (sub_d.[Group] = 'Production'))
                         
-                        AND NOT EXISTS ( SELECT * FROM Confirm WHERE Confirm.Topic = Topic.Code AND Confirm.Status = 3 AND Confirm.Department != 'QC1' AND Confirm.Department != 'QC2' AND Confirm.Department != 'QC3') 
+                        AND NOT EXISTS ( SELECT * FROM Confirm WHERE Confirm.Topic = Topic.Code AND Confirm.Status = 3 AND Confirm.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 )) 
                         AND Related.Department = '{dept}';";
             var result = DB_CCS.Database.SqlQuery<TopicNoti>(sql).ToList();
             return result;

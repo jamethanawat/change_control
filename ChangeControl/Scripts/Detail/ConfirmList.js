@@ -60,20 +60,13 @@ $(() => {
                 delete files[index].detail;
             }
 
-            promises.push($.post(UpdateConfirmPath,{topic_id:topic_id, topic_code:topic_code, desc: confirm_form[0].value},(result) => {
-                console.log('Inserted confirm');
-
-                promises.push($.post(GenerateMailPath,{ 'mode': 'ConfirmUpdate', 'topic_code':topic_code, 'dept':result.dept,'pos':'Approver' }).fail((error) => {
-                    console.error(error);
-                    swal("Error", "Cannot send email to Requestor, Please try again", "error");
-                    return;
-                }));
-
-                files.forEach(element => {
+            $.post(UpdateConfirmPath,{topic_id:topic_id, topic_code:topic_code, desc: confirm_form[0].value},(result) => {
+                promises.push( files.forEach(element => {
                     var Data = new FormData();
                     Data.append("file",element.file);
                     Data.append("description",element.description);
-                    promises.push($.ajax({
+                    Data.append("code",topic_code);
+                    $.ajax({ 
                         type: "POST",
                         url: InsertFileConfirmPath,
                         data: Data,
@@ -85,23 +78,30 @@ $(() => {
                         },error: function() {
                             swal("Error", "Upload file not success", "error");
                         }
-                    }));
+                    });
+                }));
+
+                promises.push($.post(GenerateMailPath,{ 'mode': 'ConfirmUpdate', 'topic_code':topic_code, 'dept':result.dept,'pos':'Approver' }).fail((error) => {
+                    console.error(error);
+                    swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                    return;
+                }));
+
+                Promise.all(promises).then(() => {
+                    $('#loading').addClass('hidden')
                     
-                });
-                
+                    $("#confirm_submit").prop("disabled",true)
+                    $("#edit_confirm").modal("hide")
+                    swal("Success", "Insert Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
+                })
+
             }).fail(() => {
                 swal("Status has been updated","will refresh in 2 second","error").then(setTimeout(() => { location.reload(); }, 1500));
                 $('#loading').addClass('hidden')
-            }));
+            });
 
             
-            Promise.all(promises).then(() => {
-                $('#loading').addClass('hidden')
-                InsertReviewStatus = false;
-                $("#confirm_submit").prop("disabled",true)
-                $("#edit_confirm").modal("hide")
-                swal("Success", "Insert Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
-            })
+            
 
         $('form#edit_confirm_form').on('keyup change paste', 'input, select, textarea', (e) => {
             /* --------------- and check is valid or not after submit once -------------- */

@@ -420,7 +420,7 @@ namespace ChangeControl.Models
                 (SELECT MAX(Revision) as Version, Department as dept FROM Review WHERE Topic = '{topic_code}' Group by Department ) lastest
                 WHERE Topic = '{topic_code}'                    
                 AND Review.Revision  = lastest.Version AND Review.Department  = lastest.dept 
-                AND Review.Department != 'QC1' AND Review.Department != 'QC2' AND Review.Department != 'QC3';";
+                AND Review.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 );";
                 var result = DB_CCS.Database.SqlQuery<Review>(sql).ToList();
                 return result;
             }catch(Exception ex){
@@ -434,7 +434,7 @@ namespace ChangeControl.Models
                 (SELECT MAX(Revision) as Version, Department as dept FROM Trial WHERE Topic = '{topic_code}' Group by Department ) lastest
                 WHERE Topic = '{topic_code}'                    
                 AND Trial.Revision  = lastest.Version AND Trial.Department  = lastest.dept 
-                AND Trial.Department != 'QC1' AND Trial.Department != 'QC2' AND Trial.Department != 'QC3';";
+                AND Trial.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 );";
                 var result = DB_CCS.Database.SqlQuery<Trial>(sql).ToList();
                 return result;
             }catch(Exception ex){
@@ -448,7 +448,7 @@ namespace ChangeControl.Models
                 (SELECT MAX(Revision) as Version, Department as dept FROM Confirm WHERE Topic = '{topic_code}' Group by Department ) lastest
                 WHERE Topic = '{topic_code}'                    
                 AND Confirm.Revision  = lastest.Version AND Confirm.Department  = lastest.dept 
-                AND Confirm.Department != 'QC1' AND Confirm.Department != 'QC2' AND Confirm.Department != 'QC3';";
+                AND Confirm.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 );";
                 var result = DB_CCS.Database.SqlQuery<Confirm>(sql).ToList();
                 return result;
             }catch(Exception ex){
@@ -526,7 +526,7 @@ namespace ChangeControl.Models
                                 FROM Review p
                                 WHERE p.Topic = '{tp_code}'
                                 AND p.Revision  = (SELECT MAX(c.Revision) FROM Review c WHERE c.Topic = p.Topic AND c.Department = p.Department )
-                                AND p.Department NOT IN ('QC1','QC2','QC3')
+                                AND p.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 )
                                 AND p.Status = 3
                                 )
                             THEN CAST(1 AS BIT)
@@ -547,7 +547,7 @@ namespace ChangeControl.Models
                                 FROM Trial p
                                 WHERE p.Topic = '{tp_code}'
                                 AND p.Revision  = (SELECT MAX(c.Revision) FROM Trial c WHERE c.Topic = p.Topic AND c.Department = p.Department )
-                                AND p.Department NOT IN ('QC1','QC2','QC3')
+                                AND p.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 )
                                 AND p.Status = 3
                                 )
                             THEN CAST(1 AS BIT)
@@ -568,7 +568,7 @@ namespace ChangeControl.Models
                                 FROM Confirm p
                                 WHERE p.Topic = '{tp_code}'
                                 AND p.Revision  = (SELECT MAX(c.Revision) FROM Confirm c WHERE c.Topic = p.Topic AND c.Department = p.Department )
-                                AND p.Department NOT IN ('QC1','QC2','QC3')
+                                AND p.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 )
                                 AND p.Status = 3
                                 )
                             THEN CAST(1 AS BIT)

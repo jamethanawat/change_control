@@ -1,4 +1,5 @@
 ﻿using ChangeControl.Models;
+using M_CS = ChangeControl.Models.CrystalModel;
 using ChangeControl.Models.ViewModels;
 using CrystalDecisions.CrystalReports.Engine;
 using OfficeOpenXml;
@@ -9,10 +10,11 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using ChangeControl.Helpers;
 
 namespace ChangeControl.Controllers
 {
-    public class ReportController : Controller
+    public class ReportController : ChangeControlController
     {
         // GET: Report
         private HomeModel M_Home;
@@ -35,62 +37,6 @@ namespace ChangeControl.Controllers
             GenerateTopicList(Session["Department"].ToString(), Session["Position"].ToString());
             return View();
         }
-        [HttpPost]
-        public void GenerateTopicList(string Department, string Position)
-        {
-            var dept = Department ?? "Guest";
-            var pos = Position ?? "Guest";
-            bool isApprover = ViewBag.isApprover = (pos == "Approver") || (pos == "Admin") || (pos == "Special");
-            var isPEProcess = ViewBag.isPEProcess = (ViewBag.PEAudit.Contains(dept));
-            var isQC = ViewBag.isQC = (ViewBag.QCAudit.Contains(dept));
-            var confirm_dept_list = M_Home.GetConfirmDeptList();
-
-
-            List<TopicNoti> req_list = new List<TopicNoti>();
-            List<TopicNoti> rv_list = new List<TopicNoti>();
-            List<TopicNoti> tr_list = new List<TopicNoti>();
-            List<TopicNoti> cf_list = new List<TopicNoti>();
-
-            if (dept != null)
-            {
-                rv_list.AddRange(M_Home.GetReviewPendingByDepartment(dept));
-                if (isApprover)
-                {
-                    req_list.AddRange(M_Home.GetRequestIssuedByDepartment(dept));
-                    rv_list.AddRange(M_Home.GetReviewIssuedByDepartment(dept));
-                }
-                if (isPEProcess)
-                {
-                    req_list.AddRange(M_Home.GetRequestApprovedByDepartment(dept));
-                }
-                if(isQC){
-                    rv_list.AddRange(M_Home.GetReviewApproved(dept));
-                    tr_list.AddRange(M_Home.GetTrialApproved(dept));
-                    cf_list.AddRange(M_Home.GetConfirmApproved(dept));
-                }
-                if (confirm_dept_list.Contains(dept))
-                {
-                    cf_list.AddRange(M_Home.GetConfirmPendingByDepartment(dept));
-                    if (isApprover)
-                    {
-                        cf_list.AddRange(M_Home.GetConfirmIssuedByDepartment(dept));
-                    }
-                }
-                if (M_Home.CheckTrialableByDepartment(dept))
-                {
-                    tr_list.AddRange(M_Home.GetTrialPendingByDepartment(dept));
-                    if (isApprover)
-                    {
-                        tr_list.AddRange(M_Home.GetTrialIssuedByDepartment(dept));
-                    }
-                }
-                ViewData["TopicRequestList"] = req_list;
-                ViewData["TopicReviewList"] = rv_list;
-                ViewData["TopicTrialList"] = tr_list;
-                ViewData["TopicList"] = cf_list;
-            }
-        }
-
       
         public void GenerateReport(string StartDate, string EndDate)
         {
@@ -171,44 +117,52 @@ namespace ChangeControl.Controllers
             Response.BinaryWrite(Ep.GetAsByteArray());
             Response.End();
         }
-        public ActionResult CrystalReportReport()
-        {
+        public ActionResult CrystalReportReport(string id){
 
-            List<ReportExcel> result = new List<ReportExcel>();
-     
-            result = M_Report.GetReport("20200901", "20200902");
-            List<test> result2 = new List<test>();
+            List<M_CS.Topic> q_Topic = M_Report.GetTopicByCode(id);
+            List<M_CS.Review> q_Review = M_Report.GetReviewByTopicCode(id);
+            List<M_CS.ReviewItem> q_ReviewItem = M_Report.GetReviewItemByTopicCode(id);
+            List<M_CS.Trial> q_Trial = M_Report.GetTrialByTopicCode(id);
+            List<M_CS.Confirm> q_Confirm = M_Report.GetConfirmByTopicCode(id);
+            string related_str = M_Report.GetRelatedByTopicCode(id);
 
-            result2 = M_Report.test();
-
+            q_Topic.ForEach(e => e.Timing = e.Timing.StringToDateTime());
             ReportDocument rd = new ReportDocument();
-            rd.Load(Server.MapPath("~/CrystalReport/CCS_V_2.rpt"));
+            rd.Load(Server.MapPath("~/CrystalReport/CCS_v_2.rpt"));
             Response.Buffer = false;
             Response.ClearContent();
             Response.ClearHeaders();
 
+            IEnumerable<M_CS.Topic> Topic = q_Topic;
+            IEnumerable<M_CS.Review> Review = q_Review;
+            IEnumerable<M_CS.ReviewItem> ReviewItem = q_ReviewItem;
+            IEnumerable<M_CS.Trial> Trial = q_Trial;
+            IEnumerable<M_CS.Confirm> Confirm = q_Confirm;
 
-
-            IEnumerable<ReportExcel> customers = result;
-            IEnumerable<test> products = result2;
-            //List<object> everything = new List<object>();
-            //everything.Add(customers);
-            //everything.Add(products);
             ArrayList Mainlst = new ArrayList();
-            Mainlst.Add(customers);
-            Mainlst.Add(products);
-            rd.Database.Tables[0].SetDataSource(customers);
-            rd.Database.Tables[1].SetDataSource(products);
+            Mainlst.Add(Topic);
+            Mainlst.Add(Review);
+            Mainlst.Add(ReviewItem);
+            Mainlst.Add(Trial);
+            Mainlst.Add(Confirm);
+            
+            rd.Database.Tables[0].SetDataSource(Topic);
+            rd.Database.Tables[1].SetDataSource(Review);
+            rd.Database.Tables[2].SetDataSource(ReviewItem);
+            rd.Database.Tables[3].SetDataSource(Trial);
+            rd.Database.Tables[4].SetDataSource(Confirm);
 
+            rd.SetParameterValue("PrintDate", DateTime.Now.ToString("d MMM yy"));
+            rd.SetParameterValue("RelatedStr", related_str);
+            
+            rd.SetParameterValue("CountReview", q_Review.Count());
+            rd.SetParameterValue("CountTrial", q_Trial.Count());
+            rd.SetParameterValue("CountConfirm", q_Confirm.Count());
 
-
-            //rd.SetDataSource(list);
             Stream stream = rd.ExportToStream(CrystalDecisions.Shared.ExportFormatType.PortableDocFormat);
             rd.Close();
             rd.Dispose();
             return new FileStreamResult(stream, "application/pdf");
-           // return File(stream, "application/pdf", "CustomerList.pdf");
-        
         }
 
     }

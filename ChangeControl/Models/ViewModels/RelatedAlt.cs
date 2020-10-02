@@ -12,5 +12,12 @@ namespace ChangeControl.Models{
         public int Confirm { get; set; }
         public int Response { get; set; }
 
+        public bool RelatedAndNotResponsed(string dept){
+            return this.Response == 0 && Department == dept;
+        }
+        public bool Related(string dept){
+            return Department == dept;
+        }
+
     }
 }

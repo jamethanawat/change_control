@@ -340,12 +340,23 @@
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\MailController.cs" />
     <Compile Include="Controllers\RequestController.cs" />
+    <Compile Include="CrystalReport\CCS_v_2.cs">
+      <DependentUpon>CCS_v_2.rpt</DependentUpon>
+      <SubType>Component</SubType>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\DateHelper.cs" />
     <Compile Include="Helpers\ProfileHelper.cs" />
     <Compile Include="Helpers\StringHelper.cs" />
+    <Compile Include="Models\CrystalModel\Confirm.cs" />
+    <Compile Include="Models\CrystalModel\Trial.cs" />
+    <Compile Include="Models\CrystalModel\Review.cs" />
+    <Compile Include="Models\CrystalModel\ReviewItem.cs" />
+    <Compile Include="Models\CrystalModel\Topic.cs" />
     <Compile Include="Models\Database\DbCCS.cs" />
     <Compile Include="Models\Database\DbTapics.cs" />
     <Compile Include="Models\DetailModel.cs" />
@@ -389,12 +400,6 @@
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
-    <Compile Include="CrystalReport\CCS_v_2.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>CCS_v_2.rpt</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Services\FileService.cs" />
     <Compile Include="Web References\checkuser\Reference.cs">
@@ -3987,6 +3992,7 @@
     <Content Include="Views\User\Index.cshtml" />
     <Content Include="Views\Report\Index.cshtml" />
     <Content Include="Views\Detail\Update.cshtml" />
+    <Content Include="Views\Mail\Body\ReplyResubmit.cshtml" />
     <None Include="Web References\myAD\ADInfo.disco" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />

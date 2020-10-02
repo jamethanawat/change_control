@@ -49,13 +49,14 @@ namespace ChangeControl.Controllers
             List<TopicNoti> cf_list = new List<TopicNoti>();
 
             if(dept != null){
-                rv_list.AddRange(M_Home.GetReviewPendingByDepartment(dept));
+                if(!isPEProcess) rv_list.AddRange(M_Home.GetReviewPendingByDepartment(dept));
                 if(isApprover){
                     req_list.AddRange(M_Home.GetRequestIssuedByDepartment(dept));
                     rv_list.AddRange(M_Home.GetReviewIssuedByDepartment(dept));
                 }
                 if(isPEProcess){
-                    req_list.AddRange(M_Home.GetRequestApprovedByDepartment(dept));
+                    rv_list.AddRange(M_Home.GetReviewPendingPEByDepartment(dept));
+                    rv_list.AddRange(M_Home.GetReviewIssuedPEByDepartment(dept));
                 }
                 if(isQC){
                     rv_list.AddRange(M_Home.GetReviewApproved(dept));
