@@ -13,6 +13,24 @@ var InsertFilePath;
 var file_list = [];
 $(document).ready(function () {
 
+    $('.textareaSubject').summernote({
+        height: 140,
+        toolbar: [
+            ['font', ['bold', 'underline', 'clear']],
+            ['fontsize', ['fontsize']],
+            ['para', ['ul', 'ol']],
+        ],
+    });
+
+    $('.textareaDetails').summernote({
+        height: 140,
+        toolbar: [
+            ['font', ['bold', 'underline', 'clear']],
+            ['fontsize', ['fontsize']],
+            ['para', ['ul', 'ol']],
+        ],
+    });
+
     isEditMode = (isEditMode == "True" )? true : false;
     var spanSubmit = $('.pTop');
 

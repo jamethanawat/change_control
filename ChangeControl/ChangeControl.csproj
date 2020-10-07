@@ -508,6 +508,9 @@
     <Content Include="Plugin\ldLoader\ldbtn.min.css" />
     <Content Include="Plugin\ldLoader\ldld.min.js" />
     <Content Include="Plugin\ldLoader\loading.min.css" />
+    <Content Include="Plugin\loading-rhombus.css" />
+    <Content Include="Plugin\loading-square.css" />
+    <Content Include="Plugin\loading-loop.css" />
     <Content Include="Plugin\loading.css" />
     <Content Include="Plugin\notyf\notyf.min.css" />
     <Content Include="Plugin\notyf\notyf.min.js" />

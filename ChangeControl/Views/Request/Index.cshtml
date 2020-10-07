@@ -309,18 +309,16 @@
 <script src="~/Plugin/SweetAlert/sweetalert-dev.js"></script>
 <script src="~/Plugin/SweetAlert/sweetalert.min.js"></script>
 
-<link href="~/Plugin/filepond/filepond.css" rel="stylesheet">
-<script src="~/Plugin/filepond/filepond.min.js"></script>
-<script src="~/Plugin/filepond/filepond.jquery.js"></script>
-<script src="~/Plugin/filepond/filepond-plugin-file-encode.js"></script>
-<script src="~/Plugin/filepond/filepond-plugin-image-preview.min.js"></script>
-<script src="~/Plugin/filepond/filepond-plugin-file-validate-size.js"></script>
-<script src="~/Scripts/Shared/FilePond.js"></script>
+<link href="~/Plugin/filepond/filepond.css?date='@DateTime.Now.ToString("yyMMddHH")'" rel="stylesheet">
+<script src="~/Plugin/filepond/filepond.min.js?date='@DateTime.Now.ToString("yyMMddHH")'"></script>
+<script src="~/Plugin/filepond/filepond.jquery.js?date='@DateTime.Now.ToString("yyMMddHH")'"></script>
+<script src="~/Plugin/filepond/filepond-plugin-file-encode.js?date='@DateTime.Now.ToString("yyMMddHH")'"></script>
+<script src="~/Plugin/filepond/filepond-plugin-image-preview.min.js?date='@DateTime.Now.ToString("yyMMddHH")'"></script>
+<script src="~/Plugin/filepond/filepond-plugin-file-validate-size.js?date='@DateTime.Now.ToString("yyMMddHH")'"></script>
+<script src="~/Scripts/Shared/FilePond.js?date='@DateTime.Now.ToString("yyMMddHH")'"></script>
 
 
-<script src="~/Scripts/Request/Request.js"></script>
-
-    @* <div class="loading hidden" id="loading">Loading&#8230;</div> *@
+<script src="~/Scripts/Request/Request.js?date='@DateTime.Now.ToString("yyMMddHH")&version=1.4'"></script>
 
     <!-- Content Wrapper. Contains page content -->
 
@@ -569,24 +567,10 @@
                                     <div class="form-group">
                                         <textarea class="textareaSubject" name="subject" placeholder="Place some text here">
                                         </textarea>
-                                            <script>
-                                                $('.textareaSubject').summernote({
-                                                    height: 140,
-                                                    toolbar: [
-                                                        ['font', ['bold', 'underline', 'clear']],
-                                                        ['fontsize', ['fontsize']],
-                                                        ['para', ['ul', 'ol']],
-                                                    ],
-                                                });
-                                            </script>
                                             @if(isSubject){
                                             <script>
-                                                $(".textareaSubject").summernote('code' , `@Html.Raw(Topic.Subject)`,{
-                                                    toolbar: [
-                                                        ['font', ['bold', 'underline', 'clear']],
-                                                        ['fontsize', ['fontsize']],
-                                                        ['para', ['ul', 'ol']],
-                                                    ],
+                                                $(() => {
+                                                    $(".textareaSubject").summernote('code' , `@Html.Raw(Topic.Subject)`);
                                                 });
                                             </script>
                                             }
@@ -600,24 +584,10 @@
                                     <div class="form-group">
                                         <textarea class="textareaDetails" name="detail" placeholder="Place some text here">
                                         </textarea>
-                                            <script>
-                                                $('.textareaDetails').summernote({
-                                                    height: 140,
-                                                    toolbar: [
-                                                        ['font', ['bold', 'underline', 'clear']],
-                                                        ['fontsize', ['fontsize']],
-                                                        ['para', ['ul', 'ol']],
-                                                    ],
-                                                });
-                                            </script>
                                             @if(isDetail){
                                             <script>
-                                                $(".textareaDetails").summernote('code' , `@Html.Raw(Topic.Detail)`,{
-                                                    toolbar: [
-                                                        ['font', ['bold', 'underline', 'clear']],
-                                                        ['fontsize', ['fontsize']],
-                                                        ['para', ['ul', 'ol']],
-                                                    ],
+                                                $(() => {
+                                                    $(".textareaDetails").summernote('code' , `@Html.Raw(Topic.Detail)`);
                                                 });
                                             </script>
                                             }
