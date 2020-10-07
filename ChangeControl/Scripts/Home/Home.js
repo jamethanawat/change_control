@@ -174,6 +174,11 @@ $(document).ready(function () {
         "pageLength": 10,
         "order": [],
         columnDefs: [
+        {"targets": 2,
+            "render": function (data, type, row) {
+                return (data == '1 Jan 9999') ? 'ไม่สามารถระบุได้' : data;
+            }
+        },
         {"targets": 4,
             createdCell: (td) => { 
                 $(td).css('text-align', 'left'); 
