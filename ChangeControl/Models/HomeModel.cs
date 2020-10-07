@@ -137,7 +137,17 @@ namespace ChangeControl.Models
                     "WHERE Topic.Revision  = (SELECT MAX(t.Revision) FROM Topic t WHERE t.Code = Topic.Code AND t.Department = Topic.Department) " +
                     (model.Type.AsNullIfWhiteSpace() != null ?  $"AND Topic.Type = '{model.Type}' " : "") +
                     (ov_command != "" ?  $"AND {ov_command} " : "") +
-                    (model.Status != 0 ? (model.Status == 7 ? $"AND (Topic.Status = '{model.Status}' OR Topic.Status = '3')" : $"AND Topic.Status = '{model.Status}'" ) : "" ) +
+                    (model.Status != 0 ? 
+                        (model.Status == 7 ? 
+                            $"AND (Topic.Status = '{model.Status}' OR Topic.Status = '3')" : 
+                            (model.Status == 8 && model.Department.AsNullIfWhiteSpace() != null ? 
+                                $@"AND ((Topic.Status = CASE WHEN ('{model.Department}' IN (SELECT Name FROM Department WHERE [Group] = 'Production Engineer Process' and Audit = 1 )) THEN
+                                    '8' ELSE '8' END) OR    
+                                    (Topic.Status = CASE WHEN ('{model.Department}' IN (SELECT Name FROM Department WHERE [Group] = 'Production Engineer Process' and Audit = 1 )) THEN
+                                    '7' ELSE '8' END))"
+                                : $"AND Topic.Status = '{model.Status}'")
+                        )
+                    : "") +
                     (model.StartDate.AsNullIfWhiteSpace() != null && model.EndDate.AsNullIfWhiteSpace() != null ? $"AND SUBSTRING(Topic.Timing, 0 ,9) >= {model.StartDate} AND SUBSTRING(Topic.Timing, 0 ,9) <= {model.EndDate} " : "") +
                     (model.ProductType.AsNullIfWhiteSpace() != null ? $"AND Topic.Product_type = {model.ProductType} " : "") +
                     (model.Changeitem.AsNullIfWhiteSpace() != null ? $"AND Topic.Change_item = {model.Changeitem} " : "") +
