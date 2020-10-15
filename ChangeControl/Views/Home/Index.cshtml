@@ -17,7 +17,6 @@
         $('#menu2-1').removeClass('active');
         $('#menu3-1').removeClass('active');
         $('#menu4-1').removeClass('active');
-        $("[name='dept']").val(us_dept,true)
     });
 
 </script>
@@ -271,7 +270,7 @@
                                                     <option disabled="disabled" selected="selected">Department</option>
                                                     <option value="">--- Blank ---</option>
                                                     @foreach(var dept in ViewBag.Departments){
-                                                        <option value="@dept">@dept</option>
+                                                        <option value="@dept" @(dept == Session["Department"].ToString() ? "selected" : "")>@dept</option>
                                                     }
                                                 </select>
                                             </div>

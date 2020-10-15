@@ -220,7 +220,7 @@ namespace ChangeControl.Controllers{
                 var ServerSavePath = Path.Combine("D:/File/Topic/" + InputFileName);
                 file_item.file.SaveAs(ServerSavePath);
                 if(file_item.description == "null" || file_item.description == null) file_item.description = " ";
-                M_Req.InsertFile(file_item.file, (long) Session["TopicID"], "Topic", file_item.description.ReplaceSingleQuote(), Session["User"].ToString(), file_item.code, Session["Department"].ToString());
+                M_Req.InsertFile(file_item.file, (long) Session["TopicID"], "Topic", file_item.description.ReplaceSingleQuote(), Session["User"].ToString(), file_item.code, Session["Department"].ToString(), date_ff);
             }
             return Json((string)Session["TopicCode"]);
         }

@@ -94,9 +94,9 @@ namespace ChangeControl.Models
             return review_id;
         }
 
-        public long InsertFile(HttpPostedFileBase file, long fk_id, string type, string desc, object session_user, string topic_code, string dept){
+        public long InsertFile(HttpPostedFileBase file, long fk_id, string type, string desc, object session_user, string topic_code, string dept, string file_name){
             string query = $@"INSERT INTO [File] (FK_ID, [Type], Name, Size, Name_Format, Description, Time_Insert, User_Insert, Topic, Department) 
-            OUTPUT Inserted.ID VALUES({fk_id}, '{type}', '{file.FileName.ToString().ReplaceSingleQuote()}','{file.ContentLength}','{date_ff}','{desc}','{date}','{session_user}','{topic_code}', '{dept}');";
+            OUTPUT Inserted.ID VALUES({fk_id}, '{type}', '{file.FileName.ToString().ReplaceSingleQuote()}','{file.ContentLength}','{file_name}','{desc}','{date}','{session_user}','{topic_code}', '{dept}');";
             long result = DB_CCS.Database.SqlQuery<long>(query).First();
             return result;
         }

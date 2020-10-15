@@ -88,11 +88,5 @@
         </div>
         <!-- /.container-fluid -->
     </section>
-    @if(Session["Position"].ToString() == "Admin"){
-        using (Html.BeginForm("CrystalReportReport", "Report", FormMethod.Post)){
-            <button type="submit">CrystalReport</button>
-        }
-    }
-
 </div>
 
