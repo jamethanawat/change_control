@@ -38,6 +38,13 @@
     
     <!-- CSS loading -->
     <link href="~/Plugin/loading-rhombus.css" rel="stylesheet">
+    
+    <!-- REQUIRED SCRIPTS -->
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/vue")
+    @Scripts.Render("~/bundles/filepond")
+    @RenderSection("scripts", required: false)
 
     <style>
         body {
@@ -390,13 +397,6 @@
         </footer>
     </div>
     <!-- ./wrapper -->
-    <!-- REQUIRED SCRIPTS -->
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
-    @Scripts.Render("~/bundles/vue")
-    @Scripts.Render("~/bundles/filepond")
-    @RenderSection("scripts", required: false)
-
     <!-- filepond css -->
     @* <link href="~/Plugin/filepond/filepond.css" rel="stylesheet"> *@
     <link rel="stylesheet" href="~/tmp/plugins/jquery-ui/jquery-ui.min.css">

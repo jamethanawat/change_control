@@ -3,8 +3,6 @@
     ViewBag.Title = "Index";
 }
 
-@Scripts.Render("~/bundles/jquery")
-@Scripts.Render("~/bundles/sweetalert")
 <script type="text/javascript">
     var us_dept = '@Session["Department"].ToString()';
         Report = '@Url.Action("GenerateReport", "Report")';
