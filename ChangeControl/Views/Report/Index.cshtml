@@ -3,8 +3,6 @@
     ViewBag.Title = "Index";
 }
 
-@Scripts.Render("~/bundles/jquery")
-@Scripts.Render("~/bundles/sweetalert")
 <script type="text/javascript">
     var us_dept = '@Session["Department"].ToString()';
         Report = '@Url.Action("GenerateReport", "Report")';
@@ -88,11 +86,5 @@
         </div>
         <!-- /.container-fluid -->
     </section>
-    @if(Session["Position"].ToString() == "Admin"){
-        using (Html.BeginForm("CrystalReportReport", "Report", FormMethod.Post)){
-            <button type="submit">CrystalReport</button>
-        }
-    }
-
 </div>
 

@@ -132,7 +132,7 @@ namespace ChangeControl.Controllers{
                 var ServerSavePath = Path.Combine("D:/File/Topic/" + InputFileName);
                 file_item.file.SaveAs(ServerSavePath);
                 if(file_item.description == "null" || file_item.description == null) file_item.description = " ";
-                M_Detail.InsertFile(file_item.file, (long) Session["ReviewID"], "Review", file_item.description.ReplaceSingleQuote(), Session["User"], file_item.code, Session["Department"].ToString());
+                M_Detail.InsertFile(file_item.file, (long) Session["ReviewID"], "Review", file_item.description.ReplaceSingleQuote(), Session["User"], file_item.code, Session["Department"].ToString(), date_ff);
             }
             return Json(new {code=1}, JsonRequestBehavior.AllowGet);
         }
@@ -293,7 +293,7 @@ namespace ChangeControl.Controllers{
                 var server_path = Path.Combine("D:/File/Topic/" + input_file_name);
                 file_item.file.SaveAs(server_path);
                 if(file_item.description == "null" || file_item.description == null) file_item.description = " ";
-                M_Detail.InsertFile(file_item.file, (long) Session["ResponseID"], "Response", file_item.description, Session["User"], file_item.code, Session["Department"].ToString());
+                M_Detail.InsertFile(file_item.file, (long) Session["ResponseID"], "Response", file_item.description, Session["User"], file_item.code, Session["Department"].ToString(), date_ff);
             }
             return Json(new {code=1}, JsonRequestBehavior.AllowGet);
         }
@@ -372,7 +372,7 @@ namespace ChangeControl.Controllers{
                 var ServerSavePath = Path.Combine("D:/File/Topic/" + InputFileName);
                 file_item.file.SaveAs(ServerSavePath);
                 if(file_item.description == "null" || file_item.description == null) file_item.description = " ";
-                M_Detail.InsertFile(file_item.file, (long) Session["TrialID"], "Trial", file_item.description, Session["User"], file_item.code, Session["Department"].ToString());
+                M_Detail.InsertFile(file_item.file, (long) Session["TrialID"], "Trial", file_item.description, Session["User"], file_item.code, Session["Department"].ToString(), date_ff);
             }
             return Json(new {code=1}, JsonRequestBehavior.AllowGet);
         }
@@ -398,7 +398,7 @@ namespace ChangeControl.Controllers{
                 var ServerSavePath = Path.Combine("D:/File/Topic/" + InputFileName);
                 file_item.file.SaveAs(ServerSavePath);
                 if(file_item.description == "null" || file_item.description == null) file_item.description = " ";
-                M_Detail.InsertFile(file_item.file, (long) Session["ConfirmID"], "Confirm", file_item.description, Session["User"], file_item.code, Session["Department"].ToString());
+                M_Detail.InsertFile(file_item.file, (long) Session["ConfirmID"], "Confirm", file_item.description, Session["User"], file_item.code, Session["Department"].ToString(), date_ff);
             }
             return Json(new {code=1}, JsonRequestBehavior.AllowGet);
         }
