@@ -85,6 +85,13 @@ namespace ChangeControl.Controllers{
         public ActionResult UpdatePosition(string user,string pos){
             return Json(new {status= M_User.UpdatePosition(user, pos)}, JsonRequestBehavior.AllowGet);
         }
+        
+        public ActionResult UpdateDepartment(string user,string prev_dept, string dept){
+            return Json(new {status= M_User.UpdateDepartment(user, prev_dept, dept)}, JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult UpdateDepartmentAndUser(string user,string prev_dept, string dept){
+            return Json(new {status= M_User.UpdateDepartmentAndUser(user, prev_dept, dept)}, JsonRequestBehavior.AllowGet);
+        }
 
         public ActionResult UpdateSubscribe(string user, string dept, int status){
             return Json(new {status= M_User.UpdateSubscribe(user, dept, status)}, JsonRequestBehavior.AllowGet);

@@ -58,9 +58,18 @@ $(document).ready(function () {
                     select_pos += `</select>`;
                     return select_pos;
                 } },
-            { data: 'Dept',
-              className: 'center'
-            },{ 
+            { target: 4,
+                className: 'center', 
+                data: function (item){
+                    let select_dept = `<select class="form-control select2" name="department" style="width: 100%;" onchange="` + (item.Name == "" || item.Name == null ? 'changeDepartment(this)' : 'changeDepartmentAndUser(this)' ) + `" >`;
+                    Departments.forEach(dept => {
+                        select_dept += `<option user="${item.User}" prev-dept="${item.Dept}" value="${dept}"`+(dept == item.Dept ? "selected" : "")+`>${dept}</option>`;
+                    });
+                    select_dept += `</select>`;
+                    return select_dept;
+                } 
+            }
+            ,{ 
                 target: 5,
                 className: 'center', 
                 data: function (item){
@@ -159,6 +168,53 @@ function changePosition(e){
     if((e.value != "" && e.value != null) && (opt_us != "" && opt_us != null)){
         $.post(UpdatePositionPath , {user:opt_us, pos:e.value}, (res) => {
             (res.status == "success") ? notyf.success('Update position complete') : notyf.error('Update position not complete');
+        });
+    }
+}
+
+function changeDepartment(e){
+    console.log(e);
+    let opt_us = e.selectedOptions[0].getAttribute("user")
+    let prev_dept = e.selectedOptions[0].getAttribute("prev-dept")
+    if((e.value != "" && e.value != null) && (opt_us != "" && opt_us != null)){
+        $.post(UpdateDepartmentPath , {user:opt_us, prev_dept:prev_dept, dept:e.value}, (res) => {
+            switch(res.status){
+                case "success" : 
+                    notyf.success('Update department complete');
+                    break;
+                case "duplicated" : 
+                    notyf.error('Duplicated department')
+                    $(e).children(`[value='${prev_dept}']`).prop('selected',true)
+                    break;
+                case "error" : 
+                    notyf.error('Update department not complete')
+                    $(e).children(`[value='${prev_dept}']`).prop('selected',true)
+                    break;
+            }
+        });
+    }
+}
+
+function changeDepartmentAndUser(e){
+    console.log(e);
+    let opt_us = e.selectedOptions[0].getAttribute("user")
+    let prev_dept = e.selectedOptions[0].getAttribute("prev-dept")
+    if((e.value != "" && e.value != null) && (opt_us != "" && opt_us != null)){
+        $.post(UpdateDepartmentAndUserPath , {user:opt_us, prev_dept:prev_dept, dept:e.value}, (res) => {
+            switch(res.status){
+                case "success" : 
+                    notyf.success('Update department complete');
+                    dataTable.ajax.reload();
+                    break;
+                case "duplicated" : 
+                    notyf.error('Duplicated department')
+                    $(e).children(`[value='${prev_dept}']`).prop('selected',true)
+                    break;
+                case "error" : 
+                    notyf.error('Update department not complete')
+                    $(e).children(`[value='${prev_dept}']`).prop('selected',true)
+                    break;
+            }
         });
     }
 }
