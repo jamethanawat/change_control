@@ -101,7 +101,7 @@ namespace ChangeControl.Models{
         }
 
         public List<UserWithPermission> GetUserByDeptGroup(string dept){
-            var sql = $@"SELECT DISTINCT [User].*, Code as [User], Active, Subscribe FROM [User]
+            var sql = $@"SELECT DISTINCT [User].Name, Position, Email, p.Department AS Dept, Code as [User], Active, Subscribe FROM [User]
                         LEFT JOIN Department d1 ON Dept = d1.Name 
                         LEFT JOIN Permission p ON p.[User] = [User].Code AND p.Department = [User].Dept
                         WHERE [Group] = (SELECT [GROUP] FROM Department d2 WHERE d2.Name = '{dept}');";
@@ -120,6 +120,28 @@ namespace ChangeControl.Models{
                 var sql = $@"UPDATE [User] SET [Position]='{pos}' WHERE Code='{user}';";
                 DB_CCS.Database.ExecuteSqlCommand(sql);
                 return "success";
+            }catch(Exception ex){
+                return "error";
+            }
+        }
+        
+        public string UpdateDepartment(string user, string prev_dept, string dept){
+            try{
+                var sql = $@"UPDATE [Permission] SET Department='{dept}' WHERE Department='{prev_dept}' AND [User]='{user}'
+                            AND NOT EXISTS(SELECT * FROM [Permission] WHERE [User] = '{user}' AND Department = '{dept}');";
+                var result = DB_CCS.Database.ExecuteSqlCommand(sql);
+                return (result == 0) ? "duplicated" : "success";
+            }catch(Exception ex){
+                return "error";
+            }
+        }
+        public string UpdateDepartmentAndUser(string user, string prev_dept, string dept){
+            try{
+                var sql = $@"UPDATE [User] SET Dept='{dept}' WHERE Code='{user}';
+                            UPDATE [Permission] SET Department='{dept}' WHERE Department='{prev_dept}' AND [User]='{user}'
+                            AND NOT EXISTS(SELECT * FROM [Permission] WHERE [User] = '{user}' AND Department = '{dept}');";
+                var result = DB_CCS.Database.ExecuteSqlCommand(sql);
+                return (result == 0) ? "duplicated" : "success";
             }catch(Exception ex){
                 return "error";
             }

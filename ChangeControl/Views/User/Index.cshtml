@@ -10,10 +10,13 @@
     var GetUserCodeByDeptPath = '@Url.Action("GetUserCodeByDept", "User")';
     var GetUserWithPermissionByDeptPath = '@Url.Action("GetUserWithPermissionByDept", "User")';
     var UpdatePositionPath = '@Url.Action("UpdatePosition", "User")';
+    var UpdateDepartmentPath = '@Url.Action("UpdateDepartment", "User")';
+    var UpdateDepartmentAndUserPath = '@Url.Action("UpdateDepartmentAndUser", "User")';
     var UpdateSubscribePath = '@Url.Action("UpdateSubscribe", "User")';
     var DeletePermissionPath = '@Url.Action("DeletePermission", "User")';
     var DeleteUserPath = '@Url.Action("DeleteUser", "User")';
     var Positions = @Html.Raw(Json.Encode(ViewBag.Positions));
+    var Departments = @Html.Raw(Json.Encode(ViewBag.Depts));
 </script>
 
 <script>

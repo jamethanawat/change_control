@@ -3987,7 +3987,6 @@
     <Content Include="Views\Mail\Body\ConfirmUpdate.cshtml" />
     <Content Include="Views\Mail\Body\TrialUpdate.cshtml" />
     <Content Include="Views\Detail\Related.cshtml" />
-    <Content Include="Views\Detail\Test.cshtml" />
     <Content Include="Views\Helper\FileList.cshtml" />
     <Content Include="Views\Mail\Body\EmailConfirmed.cshtml" />
     <Content Include="Views\Mail\Body\EmailRequested.cshtml" />
