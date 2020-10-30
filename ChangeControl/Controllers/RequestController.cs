@@ -1,4 +1,4 @@
-using ChangeControl.Models;
+﻿using ChangeControl.Models;
 using ChangeControl.Helpers;
 using System;
 using System.Collections.Generic;
@@ -167,6 +167,7 @@ namespace ChangeControl.Controllers{
 
         [HttpPost, ValidateInput(false)]
         public ActionResult UpdateRequest(int changeItem,int productType,string model,string partNo, string partName, string processName,string appRadio, string appDescription,string subject,string detail,string timing,string timingDesc){
+            //update revision (edit)
           var mode = "Edit";
           var mail = "";
           var temp_topic = (TopicAlt) Session["Topic"];
@@ -179,9 +180,12 @@ namespace ChangeControl.Controllers{
                 timing = $"{new_timing[2]}{new_timing[1]}{new_timing[0]}000000";
                 var new_topic = new Topic(temp_topic.Code, temp_topic.Type, changeItem, productType, temp_topic.Revision,temp_topic.Department, model.ReplaceSingleQuote(),partNo.ReplaceSingleQuote(), partName.ReplaceSingleQuote(), processName.ReplaceSingleQuote(), status, appDescription.ReplaceSingleQuote(), subject.ReplaceSingleQuote(), detail.ReplaceSingleQuote(), timing.ReplaceSingleQuote(), timingDesc.ReplaceSingleQuote(), (long)Session["RelatedID"],(string)(Session["User"]), date );
                 if(temp_topic.Status == 3){
+                    //ยังไม่approve
+
                     mail = "EmailRequested";
                     Session["TopicID"] = M_Req.UpdateTopic(new_topic);
                 }else{
+                    //approve
                     mail = "TopicUpdate";
                     Session["TopicID"] = M_Req.UpdateTopicWithRev(new_topic);
                 }
