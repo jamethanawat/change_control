@@ -78,7 +78,7 @@ namespace ChangeControl.Controllers{
             var DepartmentGroup = M_Detail.GetDepartmentGroup(); //Get raw group of departments
             List<DepartmentList> departmentList = new List<DepartmentList>();
             
-            foreach(string GroupName in DepartmentGroup){
+            foreach(string GroupName in DepartmentGroup){ //For edit related as PE_Process in Review phase
                 List<Department> departments = new List<Department>();
                 departments = M_Detail.GetDepartmentByGroup(GroupName);
                 foreach(Department department in departments){
@@ -94,7 +94,7 @@ namespace ChangeControl.Controllers{
 
             var Related = M_Detail.GetRelatedByID(Topic.Related);
 
-            if(Topic.Status == 12){
+            if(Topic.Status == 12){ //If topic rejected
                 var RejectMessage = GetRejectMessageByTopicCode(Topic.Code);
                 RejectMessage.Profile =  M_Detail.getUserByID(RejectMessage.User);
                 RejectMessage.Date =  RejectMessage.Date.StringToDateTime();
@@ -499,14 +499,14 @@ namespace ChangeControl.Controllers{
             foreach (var rv in rv_list){
                     var temp_tr = new Trial();
                         Topic.RelatedListAlt.ForEach(rl_alt => {
-                            if(rv.Item.Exists(rv_e => rv_e.Type == 24 && rv_e.Status == 1 && rv.Department == rl_alt.Department)){
+                            if(rv.Item.Exists(rv_e => rv_e.Type == 24 && rv_e.Status == 1 && rv.Department == rl_alt.Department)){ // Can trial
                                 temp_tr = tr_list.Find( e => e.Department == rv.Department);
-                                if (temp_tr != null && rl_alt.Department == temp_tr.Department){
+                                if (temp_tr != null && rl_alt.Department == temp_tr.Department){ //Trialed
                                     rl_alt.Trial = 1;
-                                }else if(rl_alt.Department == rv.Department){
+                                }else if(rl_alt.Department == rv.Department){ //Not trial
                                     rl_alt.Trial = 0;
                                 }
-                            }else{
+                            }else{ //Cannot trial
                                 if(rl_alt.Department == rv.Department){
                                     rl_alt.Trial = 2;
                                 }

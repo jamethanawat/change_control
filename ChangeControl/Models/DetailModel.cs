@@ -123,7 +123,7 @@ namespace ChangeControl.Models
         }
         
         public TopicAlt GetTopicByCode(string topic_code){
-            try{
+            try{ //This topic must be approved
                 var sql = $@"SELECT  Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Department, Revision, Model, PartNo, PartName, ProcessName, Topic.Status, Status.Name AS FullStatus  , [APP/IPP] as App, Subject, Detail, Timing, TimingDesc, Related, User_insert, Time_insert , ApprovedBy, ApprovedDate, 
                 Topic.ID FROM Topic 
                 LEFT JOIN Status ON Topic.Status = Status.ID 
@@ -134,7 +134,7 @@ namespace ChangeControl.Models
                 ORDER BY Revision DESC;";
                 var Topic = DB_CCS.Database.SqlQuery<TopicAlt>(sql).First();
                 return Topic;
-            }catch(Exception ex){
+            }catch(Exception ex){ //This topic dont have be approved
                 var sql = $@"SELECT  Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Department, Revision, Model, PartNo, PartName, ProcessName, Topic.Status, Status.Name AS FullStatus  , [APP/IPP] as App, Subject, Detail, Timing, TimingDesc, Related, User_insert, Time_insert , ApprovedBy, ApprovedDate, 
                 Topic.ID FROM Topic 
                 LEFT JOIN Status ON Topic.Status = Status.ID 
@@ -147,7 +147,7 @@ namespace ChangeControl.Models
             }
         }
         public TopicAlt GetTopicByCodeAndOwned(string topic_code, string dept){
-            try{
+            try{  //Query by condition (User's department must be owner)
                 var sql = $@"SELECT  Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Department, Revision, Model, PartNo, PartName, ProcessName, Topic.Status, Status.Name AS FullStatus , [APP/IPP] as App, Subject, Detail, Timing, TimingDesc, Related, User_insert, Time_insert , ApprovedBy, ApprovedDate, 
                 Topic.ID FROM Topic 
                 LEFT JOIN Status ON Topic.Status = Status.ID 
@@ -159,6 +159,7 @@ namespace ChangeControl.Models
                 var Topic = DB_CCS.Database.SqlQuery<TopicAlt>(sql).First();
                 return Topic;
             }catch(Exception ex){
+                //Query by condition (User's department is not be owner)
                 return this.GetTopicByCode(topic_code);
             }
         }

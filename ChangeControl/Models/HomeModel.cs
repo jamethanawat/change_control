@@ -50,8 +50,8 @@ namespace ChangeControl.Models
         public List<TopicAlt> GetSearch(SearchAttribute model){
             var where="";
             var sql = "";
-            var ov_command = "";
-            var job_command = "";
+            var ov_command = ""; //For overstatus qc command 
+            var job_command = ""; //For sub status
             var condition_command = "";
             if(model.Overstatus == 2){
                 ov_command = $@"(
