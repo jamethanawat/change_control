@@ -30,7 +30,7 @@ namespace ChangeControl.Controllers{
         }
         public dynamic res = new ExpandoObject();
 
-        public ActionResult Index(){
+        public ActionResult Index(string id){
             var redirectID = (string) Session["RedirectID"];
             this.SignOut();
             return View();

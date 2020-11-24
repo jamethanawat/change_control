@@ -380,7 +380,9 @@ namespace ChangeControl.Models
                         WHERE Topic.Related = PK_Related AND Related.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 )
                         AND (sub_d.[Group] = 'Production'))
                         
-                        AND NOT EXISTS ( SELECT * FROM Confirm WHERE Confirm.Topic = Topic.Code AND Confirm.Status = 3 AND Confirm.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 )) 
+                        AND NOT EXISTS ( SELECT * FROM Confirm WHERE Confirm.Topic = Topic.Code AND Confirm.Status = 3 
+                        AND Confirm.Revision = (SELECT MAX(c.Revision) FROM Confirm c WHERE c.Topic = Confirm.Topic AND c.Department = Confirm.Department)
+                        AND Confirm.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 )) 
                         AND Related.Department = '{dept}';";
             var result = DB_CCS.Database.SqlQuery<TopicNoti>(sql).ToList();
             return result;
