@@ -49,17 +49,26 @@ namespace ChangeControl.Controllers{
                     Session["User"] = username;
                     Session["FullName"] = response.FullName;
                     Session["Name"] = response.Name;
-                    Session["SurName"] = response.SurName;
-                    
+                    Session["SurName"] = response.SurName;                 
                     res = M_Login.GetPositionByUserID(username);
-                    Session["Position"] = pos = (res.status == "success") ? res.data : "Issue";
-                    if(pos == "Admin"){
-                        Session["Department"] = "IT";
-                        Session["Position"] = "Admin";
-                        Session["DepartmentID"] = 9;
-                    }else if(pos != "Guest"){
-                        res = M_Login.GetDepartmentByUserID(username);
-                    }
+
+                if(res.data == "Document"){          
+                    Session["Document"] = true;
+                    res.data = "Issue";
+                }
+                else
+                {
+                    Session["Document"] = false;
+                }
+             
+                Session["Position"] = pos = (res.status == "success") ? res.data : "Issue";  
+                if(pos == "Admin"){
+                    Session["Department"] = "IT";
+                    Session["Position"] = "Admin";
+                    Session["DepartmentID"] = 9;
+                }else if(pos != "Guest"){
+                    res = M_Login.GetDepartmentByUserID(username);
+                }
                     
                     if(pos == "Admin"){
                         status = "success";
@@ -82,8 +91,8 @@ namespace ChangeControl.Controllers{
                 Session["Name"] = "Admin";
                 Session["SurName"] = "QC";
                 Session["Email"] = $"Admin@QC.com";
-                Session["Department"] = "QC";
-                Session["DepartmentRawName"] = "QC";
+                Session["Department"] = "QC1";
+                Session["DepartmentRawName"] = "QC1";
                 Session["DepartmentID"] = 29;
                 Session["Position"] = "Admin";
                 return Json(new { status = "success" ,data = "QC1" }, JsonRequestBehavior.AllowGet);

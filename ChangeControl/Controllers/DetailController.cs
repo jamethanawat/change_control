@@ -49,7 +49,7 @@ namespace ChangeControl.Controllers{
                 return RedirectToAction("Index", "LogIn");
             }
 
-            GenerateTopicList(Session["Department"].ToString(), Session["Position"].ToString());
+            GenerateTopicList(Session["Department"].ToString(), Session["Position"].ToString());//noti top layout
             Session["RedirectID"] = null;
 
                 Session["TopicCode"] = id ?? M_Detail.GetFirstTopic();
@@ -65,7 +65,7 @@ namespace ChangeControl.Controllers{
             if(Topic.ApprovedBy != null) {Topic.ApproverProfile = M_Detail.getUserByID(Topic.ApprovedBy);}
 
             ViewBag.ResubmitList = this.GetResubmitListByTopicID();
-            Session["ReviewList"]  = ViewBag.ReviewList = this.GetReviewListByTopicID();
+            Session["ReviewList"]  = ViewBag.ReviewList = this.GetReviewListByTopicID();// Get element for department review
             Session["TrialList"]  = ViewBag.TrialList = this.GetTrialListByTopicCode();
             Session["ConfirmList"] = ViewBag.ConfirmList = this.GetConfirmListByTopicCode();
 

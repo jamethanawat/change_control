@@ -35,6 +35,7 @@ namespace ChangeControl.Controllers
 
                 [HttpPost]
         public void GenerateTopicList(string Department, string Position){
+            //noti top layout
             var dept = Department ?? "Guest";
             var pos = Position ?? "Guest";
             bool isApprover = ViewBag.isApprover = (pos == "Approver") || (pos == "Admin") || (pos == "Special") ;

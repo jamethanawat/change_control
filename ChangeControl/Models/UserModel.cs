@@ -24,6 +24,7 @@ namespace ChangeControl.Models{
 
         public bool InsertUser(string user, string name, string dept, int position, string email){
             try{
+               
                 var sql = $@"INSERT INTO [User] (Code, Name, Dept, [Position], Email) VALUES('{user}', '{name}', '{dept}', (SELECT Name FROM [Position] WHERE ID = {position}), '{email}')
                              INSERT INTO Permission ([User], Department, [Rank], Active, Subscribe) VALUES('{user}', '{dept}', 'Staff', 1, 1);";
                 DB_CCS.Database.ExecuteSqlCommand(sql);
@@ -32,6 +33,7 @@ namespace ChangeControl.Models{
                 return false;
             }
         }
+   
         public bool InsertPermission(string user, string dept,int receive_mail){
             try{
                 var sql = $@"INSERT INTO Permission ([User], Department, [Rank], Active, Subscribe) VALUES('{user}', '{dept}', 'Staff', 1, {receive_mail});";
@@ -105,6 +107,15 @@ namespace ChangeControl.Models{
                         LEFT JOIN Department d1 ON Dept = d1.Name 
                         LEFT JOIN Permission p ON p.[User] = [User].Code AND p.Department = [User].Dept
                         WHERE [Group] = (SELECT [GROUP] FROM Department d2 WHERE d2.Name = '{dept}');";
+            var result = DB_CCS.Database.SqlQuery<UserWithPermission>(sql).ToList();
+            return result;
+        }
+
+        public List<UserWithPermission> GetUserByDept(string dept)
+        {
+            var sql = $@"SELECT DISTINCT [User].Name, Position, Email, p.Department AS Dept, Code as [User], Active, Subscribe FROM [User]                     
+                        LEFT JOIN Permission p ON p.[User] = [User].Code 
+                        WHERE p.Department= '{dept}';";
             var result = DB_CCS.Database.SqlQuery<UserWithPermission>(sql).ToList();
             return result;
         }

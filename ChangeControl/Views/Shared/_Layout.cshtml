@@ -315,7 +315,7 @@
                                 </a>
                             </li>
                         }
-                        @if (Session["Position"].ToString() == "Admin")
+                        @if (Session["Position"].ToString() == "Admin"|| bool.Parse(Session["Document"].ToString()))
                         {
                             <li id="menu4" class="nav-item">
                                 <a id="menu4-1" href="@Url.Action("Index", "User")" class="nav-link animsition-link">

@@ -36,7 +36,7 @@ namespace ChangeControl.Controllers{
             return View();
         }
 
-        public ActionResult AddUser(string user, string name, int position, string email){
+        public ActionResult AddUser(string user, string name, int position,string email){
             try{
                 var status = "";
                 if(M_User.CheckExistsUser(user)){
@@ -69,14 +69,25 @@ namespace ChangeControl.Controllers{
             return Json(new {data= M_User.GetUserCodeByDept(dept)}, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult GetUserWithPermissionByDept(string dept){
-            try{
-                List<UserWithPermission> us_list = M_User.GetUserByDeptGroup(dept);
-                us_list.ForEach(us => {
-                   us.children = M_User.GetPermissionByUser(us.User,us.Dept); 
-                   us.children.ForEach(x => x.User = us.User);
-                });
-                return Json(new {status = "success", data = us_list}, JsonRequestBehavior.AllowGet);
+        public ActionResult GetUserWithPermissionByDept(string dept,string searchdept)
+        {
+            try
+                {
+                dept = dept.Replace("&amp;", "&");
+                if (searchdept == "" || searchdept == "Select Department")
+                {
+                    List<UserWithPermission> us_list = M_User.GetUserByDeptGroup(dept);
+                    us_list.ForEach(us => {
+                        us.children = M_User.GetPermissionByUser(us.User, us.Dept);
+                        us.children.ForEach(x => x.User = us.User);
+                    });
+                    return Json(new { status = "success", data = us_list }, JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    List<UserWithPermission> us_list = M_User.GetUserByDept(searchdept);
+                    return Json(new { status = "success", data = us_list }, JsonRequestBehavior.AllowGet);
+                }                    
             }catch(Exception err){
                 return Json(new {status="error"}, JsonRequestBehavior.AllowGet);
             }

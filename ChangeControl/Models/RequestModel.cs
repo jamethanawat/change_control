@@ -155,7 +155,7 @@ namespace ChangeControl.Models{
                 query += $"((SELECT TOP(1) MAX(PK_Related)+1 FROM Related), '{dept}', '{us_id}'),";
             });
             query = query.TrimEnd(',');
-            
+          
             var result = DB_CCS.Database.SqlQuery<long>(query);
             return result.First();   
         }
@@ -197,7 +197,7 @@ namespace ChangeControl.Models{
         }
         
         public List<ProductType> GetProductType(){
-            var sql = "SELECT ID_Product_Type as ID, Name as Name FROM Product_Type WHERE ID_Product_Type BETWEEN 1 AND 8;";
+            var sql = "SELECT ID_Product_Type as ID, Name as Name FROM Product_Type WHERE ID_Product_Type BETWEEN 1 AND 10;";
             var result = DB_CCS.Database.SqlQuery<ProductType>(sql);
             return result.ToList();
         }

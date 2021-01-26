@@ -15,7 +15,7 @@
     List<Confirm> ConfirmList = ViewBag.ConfirmList as List<Confirm>;
 
     TopicAlt Topic = ViewData["Topic"] as TopicAlt;
-    
+
     var department = (Session["Department"] != null) ? Session["Department"].ToString() : null;
     var pos = (Session["Position"] != null) ? Session["Position"].ToString() : null;
 
@@ -25,20 +25,20 @@
     bool isApprover = ViewBag.isApprover = (pos == "Approver") || (pos == "Admin") || (pos == "Special") ;
     var isPEProcess = ViewBag.isPEProcess = (ViewBag.PEAudit.Contains(department));
     var isQC = ViewBag.isQC = (ViewBag.QCAudit.Contains(department ));
-
+    var isPCH = ("PCH".Contains(department));
 
     var status = Topic.FullStatus;
     Session["Status"] = Topic.Status;
 
     var Type = Topic.Type;
-    
+
     var isReview = (Topic.RelatedListAlt.Exists(Related => Related.Review == 1 && Related.Department == Session["Department"].ToString()));
     var isRelated = (Topic.RelatedListAlt.Exists(Related => Related.Department == Session["Department"].ToString()));
     var isTrial = (TrialList.Exists(trial => trial.Department == Session["Department"].ToString()));
     var isConfirm = (ConfirmList.Exists(confirm => confirm.Department == Session["Department"].ToString()));
     var isInternal = ViewBag.isInternal = (Type == "Internal");
     var isExternal = (Type == "External");
-    var Resubmitable = (isQC || isPEProcess) && isRelated && (status != "Waiting" && status != "Finished" && status != "Rejected");
+    var Resubmitable = (isQC || isPEProcess|| isPCH) && isRelated && (status != "Waiting" && status != "Finished" && status != "Rejected");
     var isResubmitted = (ResubmitList != null && ResubmitList.Count > 0 && ResubmitList.Exists(x => x.ExistsRelated(Session["Department"].ToString())  == true));
     var Editable = ((status == "Waiting" || status == "Request") && Session["Department"].ToString() == Topic.Department);
     var TopicApproveable = (status == "Waiting" && Session["Department"].ToString() == Topic.Department && isApprover);

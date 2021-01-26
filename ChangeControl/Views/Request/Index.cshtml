@@ -423,7 +423,7 @@
                                 <div class="col-sm-10 col-form-label">
                                 @foreach(var Type in ProductTypes){
                                     <label class="mr-3">
-                                        <input type="radio" name="productType" value="@(isEditMode && Type.ID == 8 && Topic.Product_type != Type.ID.ToString() ? Topic.Product_type : Type.ID.ToString())" class='flat-red @(Type.ID == 8 ? "other":"")' @(isEditMode && (Topic.Product_type == Type.ID.ToString() || Convert.ToInt32(Topic.Product_type) > 8)? "checked" : "") required>
+                                        <input type="radio" name="productType" value="@(isEditMode && Type.ID == 10 && Topic.Product_type != Type.ID.ToString() ? Topic.Product_type : Type.ID.ToString())" class='flat-red @(Type.ID == 10 ? "other":"")' @(isEditMode && (Topic.Product_type == Type.ID.ToString() || Convert.ToInt32(Topic.Product_type) > 10)? "checked" : "") required>
                                         @Html.DisplayFor(model => Type.Name)
                                         <span class="productType-desc"></span>
                                     </label>
