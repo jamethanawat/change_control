@@ -26,6 +26,7 @@
     var isPEProcess = ViewBag.isPEProcess = (ViewBag.PEAudit.Contains(department));
     var isQC = ViewBag.isQC = (ViewBag.QCAudit.Contains(department ));
     var isPCH = ("PCH".Contains(department));
+    var isQCIN = ("QC_IN1".Contains(department)|| "QC_IN2".Contains(department)|| "QC_IN3".Contains(department));
 
     var status = Topic.FullStatus;
     Session["Status"] = Topic.Status;
@@ -38,7 +39,7 @@
     var isConfirm = (ConfirmList.Exists(confirm => confirm.Department == Session["Department"].ToString()));
     var isInternal = ViewBag.isInternal = (Type == "Internal");
     var isExternal = (Type == "External");
-    var Resubmitable = (isQC || isPEProcess|| isPCH) && isRelated && (status != "Waiting" && status != "Finished" && status != "Rejected");
+    var Resubmitable = (isQC || isPEProcess|| isPCH|| isQCIN) && isRelated && (status != "Waiting" && status != "Finished" && status != "Rejected");
     var isResubmitted = (ResubmitList != null && ResubmitList.Count > 0 && ResubmitList.Exists(x => x.ExistsRelated(Session["Department"].ToString())  == true));
     var Editable = ((status == "Waiting" || status == "Request") && Session["Department"].ToString() == Topic.Department);
     var TopicApproveable = (status == "Waiting" && Session["Department"].ToString() == Topic.Department && isApprover);
