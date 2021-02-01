@@ -52,21 +52,26 @@ namespace ChangeControl.Controllers{
                     Session["SurName"] = response.SurName;                 
                     res = M_Login.GetPositionByUserID(username);
 
-                if(res.data == "Document"){          
-                    Session["Document"] = true;
-                    res.data = "Issue";
-                }
-                else
+                if(res.status == "success")
                 {
-                    Session["Document"] = false;
+
+                    if(res.data == "Document"){          
+                        Session["Document"] = "YES";
+                        res.data = "Issue";
+                    }
+                    else
+                    {
+                        Session["Document"] = "NO";
+                    }
                 }
-             
-                Session["Position"] = pos = (res.status == "success") ? res.data : "Issue";  
+                     
+                 Session["Position"] = pos = (res.status == "success") ? res.data : "Issue";  
                 if(pos == "Admin"){
                     Session["Department"] = "IT";
                     Session["Position"] = "Admin";
                     Session["DepartmentID"] = 9;
                 }else if(pos != "Guest"){
+                    
                     res = M_Login.GetDepartmentByUserID(username);
                 }
                     
@@ -77,6 +82,7 @@ namespace ChangeControl.Controllers{
                         status = "success";
                     }else{
                         status = "guest";
+                        Session["Document"] = "NO";
                         Session["Department"] = "Guest";
                         Session["DepartmentID"] = 46;
                     }
