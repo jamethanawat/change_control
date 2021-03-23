@@ -565,11 +565,12 @@ $("form#Confirm").submit((e) => {
         for(x in quick_form){
             quick_form[x] = quick_form[x].name;
         }
-
+        topic_code: topic_code
         console.log(quick_form);
         $.post(InsertRelatedPath, {dept_list:quick_form}, () =>{
             console.log('Related created');
-            $.post(RequestResubmitPath, $("#resubmit_form").serialize(), (res) =>{
+            let tmp = $("#resubmit_form").serializeArray();
+            $.post(RequestResubmitPath, { 'desc': tmp[2].value, 'due_date': tmp[1].value, 'topic_code': topic_code },(res) =>{
                 console.log('Resubmit created');
                 if(res.status == "success"){
                     moment.locale('en');

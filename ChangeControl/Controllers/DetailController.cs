@@ -250,9 +250,11 @@ namespace ChangeControl.Controllers{
             return Confirm_list;
         }
 
-        public ActionResult RequestResubmit(string desc, string due_date){
+        public ActionResult RequestResubmit(string desc, string due_date,string topic_code)
+        {
             try{
-                M_Detail.InsertResubmit(desc, due_date, (long) Session["RelatedID"], Topic.Code, (string)Session["User"], Topic.Status, (string)Session["Department"]);
+                //M_Detail.InsertResubmit(desc, due_date, (long) Session["RelatedID"], Topic.Code, (string)Session["User"], Topic.Status, (string)Session["Department"]);
+                M_Detail.InsertResubmit(desc, due_date, (long) Session["RelatedID"], topic_code, (string)Session["User"], Topic.Status, (string)Session["Department"]);
                 return Json(new { status = "success" },JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex){

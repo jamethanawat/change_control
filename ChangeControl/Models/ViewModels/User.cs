@@ -20,9 +20,9 @@ namespace ChangeControl.Models{
             this.Position = Position;
         }
         public User(){
-            this.FullName = "Pakawat Smutkun";
-            this.Name = "Pakawat";
-            this.SurName = "Smutkun";
+            this.FullName = "Thanawat thanamahamongkol";
+            this.Name = "Thanawat";
+            this.SurName = "thanamahamongkol";
             this.Position = "Issue";
         }
     }
