@@ -120,10 +120,15 @@
             <hr style="margin-top:0px !important">
             <div class="timeline-footer">
                 <div class="float-right ">
-                    <a href="#" class="btn btn-warning btn-sm cf-edit"id="edit_cf" data-toggle="modal" data-target="#edit_confirm" value="@Element.ID" >Edit</a>
-                        @if(ViewBag.isApprover && ((Element.Status !=1 && !ViewBag.isQC) || (!ElementList.Exists(e => e.Status == 3 && !ViewBag.QCAudit.Contains(e.Department )) && ViewBag.isQC))){ 
-                            <button a href="#" class="btn btn-info btn-sm mr-1 cf-approve" value="@Element.ID">Approve</button> 
-                        }
+                    @if ((Element.ApprovedBy == null && Element.ApprovedBy == "") || (ViewBag.isApprover))
+                    {
+                    <a href="#" class="btn btn-warning btn-sm cf-edit" id="edit_cf" data-toggle="modal" data-target="#edit_confirm" value="@Element.ID">Edit</a>
+                    }
+                    
+                    @if (ViewBag.isApprover && ((Element.Status != 1 && !ViewBag.isQC) || (!ElementList.Exists(e => e.Status == 3 && !ViewBag.QCAudit.Contains(e.Department)) && ViewBag.isQC)))
+                    {
+                        <button a href="#" class="btn btn-info btn-sm mr-1 cf-approve" value="@Element.ID">Approve</button>
+                    }
                 </div>
             </div>
             }

@@ -153,14 +153,19 @@
             <hr style="margin-top:0px !important">
             <div class="timeline-footer">
                 <div class="float-right ">
-                    <button class="btn btn-warning btn-sm rv-edit" id="edit_rv" data-toggle="modal" data-target="#edit_review" value="@Element.ID">Edit</button>
-                    @if((ViewBag.isQC || (ViewBag.isPEProcess && ViewBag.isInternal)) && ViewBag.isApprover){
+                    @if ((Element.ApprovedBy == null && Element.ApprovedBy == "") || (ViewBag.isApprover))
+                    {
+                        <button class="btn btn-warning btn-sm rv-edit" id="edit_rv" data-toggle="modal" data-target="#edit_review" value="@Element.ID">Edit</button>
+                    }
+                    @if ((ViewBag.isQC || (ViewBag.isPEProcess && ViewBag.isInternal)) && ViewBag.isApprover)
+                    {
                         <button class="btn btn-info btn-sm rv-related" id="related_rv" data-toggle="modal" data-target="#related_rv" value="@Element.ID">Add Related</button>
                         <button type="button" id="reject" class="btn btn-danger btn-sm">Reject</button>
                     }
-                        @if(ViewBag.isApprover && ((Element.Status !=1 && !ViewBag.isQC) || (!Topic.RelatedListAlt.Exists(e => e.Review == 0 && !ViewBag.QCAudit.Contains(e.Department )) && ViewBag.isQC && !WaitingForCustomer))){ 
-                            <button class="btn btn-info btn-sm mr-1 rv-approve" value="@Element.ID">Approve</button>
-                        }
+                    @if (ViewBag.isApprover && ((Element.Status != 1 && !ViewBag.isQC) || (!Topic.RelatedListAlt.Exists(e => e.Review == 0 && !ViewBag.QCAudit.Contains(e.Department)) && ViewBag.isQC && !WaitingForCustomer)))
+                    {
+                        <button class="btn btn-info btn-sm mr-1 rv-approve" value="@Element.ID">Approve</button>
+                    }
                 </div>
             </div>
             }

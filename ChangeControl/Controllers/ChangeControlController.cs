@@ -48,9 +48,11 @@ namespace ChangeControl.Controllers
             List<TopicNoti> rv_list = new List<TopicNoti>();
             List<TopicNoti> tr_list = new List<TopicNoti>();
             List<TopicNoti> cf_list = new List<TopicNoti>();
+            List<TopicNoti> rsm_list = new List<TopicNoti>();
 
             if(dept != null){
-                if(!isPEProcess) rv_list.AddRange(M_Home.GetReviewPendingByDepartment(dept)); //Default case
+                rsm_list.AddRange(M_Home.GetResubmitPendingByDepartment(dept)); //Default case
+                if (!isPEProcess) rv_list.AddRange(M_Home.GetReviewPendingByDepartment(dept)); //Default case
                 if(isApprover){
                     req_list.AddRange(M_Home.GetRequestIssuedByDepartment(dept));
                     rv_list.AddRange(M_Home.GetReviewIssuedByDepartment(dept));
@@ -76,6 +78,7 @@ namespace ChangeControl.Controllers
                         tr_list.AddRange(M_Home.GetTrialIssuedByDepartment(dept));
                     }
                 }
+                ViewData["TopicResubmitList"] = rsm_list;
                 ViewData["TopicRequestList"] = req_list;
                 ViewData["TopicReviewList"] = rv_list;
                 ViewData["TopicTrialList"] = tr_list;

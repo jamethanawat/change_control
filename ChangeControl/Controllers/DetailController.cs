@@ -195,7 +195,8 @@ namespace ChangeControl.Controllers{
                 resubmit.Description = resubmit.Description.ReplaceNullWithDash();
                 resubmit.Date = resubmit.Date.StringToDigitDate();
                 resubmit.DueDate = resubmit.DueDate.StringToDigitDate3();
-                resubmit.Profile = M_Detail.getUserByID(resubmit.User);
+                resubmit.Profile = M_Detail.getUserByID(resubmit.User);             
+                resubmit.FileList = M_Detail.GetFileByFKID(resubmit.ID, "Resubmit", Session["TopicCode"].ToString(), resubmit.Dept);
 
                 var result = M_Detail.GetResponseByResubmitID(resubmit.ID);
                 foreach(var response in result){
@@ -254,7 +255,7 @@ namespace ChangeControl.Controllers{
         {
             try{
                 //M_Detail.InsertResubmit(desc, due_date, (long) Session["RelatedID"], Topic.Code, (string)Session["User"], Topic.Status, (string)Session["Department"]);
-                M_Detail.InsertResubmit(desc, due_date, (long) Session["RelatedID"], topic_code, (string)Session["User"], Topic.Status, (string)Session["Department"]);
+                Session["ResubmitID"] = M_Detail.InsertResubmit(desc, due_date, (long) Session["RelatedID"], topic_code, (string)Session["User"], Topic.Status, (string)Session["Department"]);
                 return Json(new { status = "success" },JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex){
@@ -288,8 +289,9 @@ namespace ChangeControl.Controllers{
         [HttpPost]
         public ActionResult InsertFileResponse(RawFile file_item){
             Value temp_file = new Value();
-            temp_file = Session["TxtFile"] as Value;
-            
+            temp_file = Session["TxtFile"] as Value; 
+
+
             if (file_item.file != null && file_item.file.ContentLength > 0){
                 var input_file_name = Path.GetFileName(date_ff);
                 var server_path = Path.Combine("D:/File/Topic/" + input_file_name);
@@ -298,6 +300,28 @@ namespace ChangeControl.Controllers{
                 M_Detail.InsertFile(file_item.file, (long) Session["ResponseID"], "Response", file_item.description, Session["User"], file_item.code, Session["Department"].ToString(), date_ff);
             }
             return Json(new {code=1}, JsonRequestBehavior.AllowGet);
+        }
+
+
+        [HttpPost]
+        public ActionResult InsertFileResubmit(RawFile file_item)
+        {
+            Value temp_file = new Value();
+            temp_file = Session["TxtFile"] as Value;
+
+            if (file_item.file != null && file_item.file.ContentLength > 0)
+            {
+                var input_file_name = Path.GetFileName(date_ff);
+                var server_path = Path.Combine("D:/File/Topic/" + input_file_name);
+                file_item.file.SaveAs(server_path);
+                if (file_item.description == "null" || file_item.description == null) file_item.description = " ";
+                M_Detail.InsertFile(file_item.file, (long)Session["ResubmitID"], "Resubmit", file_item.description, Session["User"], file_item.code, Session["Department"].ToString(), date_ff);
+            }
+            return Json(new { code = 1 }, JsonRequestBehavior.AllowGet);
+            //catch (Exception err)
+            //{
+            //    return Json(new { error = err }, JsonRequestBehavior.AllowGet);
+            //}
         }
 
         [HttpPost]

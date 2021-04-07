@@ -123,10 +123,27 @@ $(document).ready(function () {
     
         let isInternal = $("#type_internal").is(":checked");
         let isExternal = $("#type_external").is(":checked");
+        let P1 = $("input#1").prop("checked");
+        let P2 = $("input#2").prop("checked");
+        let P3A = $("input#3").prop("checked");
+        let P3M = $("input#4").prop("checked");
+        let P4 = $("input#5").prop("checked");
+        let P5 = $("input#6").prop("checked");
+        let P6 = $("input#7").prop("checked");
+        let P7 = $("input#8").prop("checked");
+        //console.log(Number(P1), "Number(P1)");
+        //console.log(Number(P2), "Number(P2)");
+        //console.log(Number(P3A), "Number(P3A)");
+        //console.log(Number(P3M), "Number(P3M)");
+        //console.log(Number(P4), "Number(P4)");
+        //console.log(Number(P5), "Number(P5)");
     
-    
-        if(isInternal){
-            if(!(PE1_Process || PE2_Process || P5_ProcessDesign || P6_ProcessDesign) || !(QC1 || QC2 || QC3)){ //Need to select PE_Process or QC as Auditor at lease one
+        if (isInternal) {
+             if (Number(P1) + Number(P2) + Number(P3A) + Number(P3M) + Number(P4) + Number(P5) + Number(P6) + Number(P7) == 0) { //When select Production more than one
+                swal("Warning", "Please select Production at least one ", "warning");
+                return
+            }
+            if (!(PE1_Process || PE2_Process || P5_ProcessDesign || P6_ProcessDesign) || !(QC1 || QC2 || QC3)){ //Need to select PE_Process or QC as Auditor at lease one
                 swal("Warning", "Please select PE_Process and QC at least one", "warning");
                 return;
             }else if(Number(QC1) + Number(QC2) + Number(QC3) != 1 && Number(PE1_Process) + Number(PE2_Process) + Number(P5_ProcessDesign) + Number(P6_ProcessDesign) != 1  == false){ //When select QC and PE_Process more than one
@@ -139,7 +156,12 @@ $(document).ready(function () {
                 swal("Warning", "Please select one PE_Process", "warning");
                 return
             }
-        }else if(isExternal){
+         
+        } else if (isExternal) {
+            if (Number(P1) + Number(P2) + Number(P3A) + Number(P3M) + Number(P4) + Number(P5) + Number(P6) + Number(P7) ==0 ) { //When select Production more than one
+                swal("Warning", "Please select Production at least one ", "warning");
+                return
+            }
             if(!(QC1 || QC2 || QC3)){ //Need to select QC as Auditor at lease one
                 swal("Warning", "Please select QC at least one", "warning");
                 return;
@@ -237,12 +259,26 @@ $(document).ready(function () {
         let PE2_Process = $("input#33").prop("checked");
         let P5_ProcessDesign = $("input#44").prop("checked");
         let P6_ProcessDesign = $("input#45").prop("checked");
-    
+
+
+        let P1 = $("input#1").prop("checked");
+        let P2 = $("input#2").prop("checked");
+        let P3A = $("input#3").prop("checked");
+        let P3M = $("input#4").prop("checked");
+        let P4 = $("input#5").prop("checked");
+        let P5 = $("input#6").prop("checked");
+        let P6 = $("input#7").prop("checked");
+        let P7 = $("input#8").prop("checked");
+
         let isInternal = $("#type_internal").is(":checked");
         let isExternal = $("#type_external").is(":checked");
     
     
-        if(isInternal){
+        if (isInternal) {
+            if (Number(P1) + Number(P2) + Number(P3A) + Number(P3M) + Number(P4) + Number(P5) + Number(P6) + Number(P7) == 0) { //When select Production more than one
+                swal("Warning", "Please select Production at least one ", "warning");
+                return
+            }
             if(!(PE1_Process || PE2_Process || P5_ProcessDesign || P6_ProcessDesign) || !(QC1 || QC2 || QC3)){ //Need to select PE_Process or QC as Auditor at lease one
                 swal("Warning", "Please select PE_Process and QC at least one", "warning");
                 return;
@@ -256,7 +292,15 @@ $(document).ready(function () {
                 swal("Warning", "Please select one PE_Process", "warning");
                 return
             }
-        }else if(isExternal){
+            else if (Number(P1) + Number(P2) + Number(P3A) + Number(P3M) + Number(P4) + Number(P5) + Number(P6) + Number(P7) != 1) { //When select Production more than one
+                swal("Warning", "Please select Production at least one ", "warning");
+                return
+            }
+        } else if (isExternal) {
+            if (Number(P1) + Number(P2) + Number(P3A) + Number(P3M) + Number(P4) + Number(P5) + Number(P6) + Number(P7) == 0) { //When select Production more than one
+                swal("Warning", "Please select Production at least one ", "warning");
+                return
+            }
             if(!(QC1 || QC2 || QC3)){ //Need to select QC as Auditor at lease one
                 swal("Warning", "Please select QC at least one", "warning");
                 return;
@@ -264,6 +308,7 @@ $(document).ready(function () {
                 swal("Warning", "Please select one QC", "warning");
                 return
             }
+          
         }
         
             let form = SerializeReviewForm();
@@ -444,6 +489,16 @@ function CheckAudit(){
     let P5_ProcessDesign = $("input#44").prop("checked");
     let P6_ProcessDesign = $("input#45").prop("checked");
 
+
+    let P1 = $("input#1").prop("checked");
+    let P2 = $("input#2").prop("checked");
+    let P3A = $("input#3").prop("checked");
+    let P3M = $("input#4").prop("checked");
+    let P4 = $("input#5").prop("checked");
+    let P5 = $("input#6").prop("checked");
+    let P6 = $("input#7").prop("checked");
+    let P7 = $("input#8").prop("checked");
+
     let isInternal = $("#type_internal").is(":checked");
     let isExternal = $("#type_external").is(":checked");
 
@@ -462,12 +517,20 @@ function CheckAudit(){
             swal("Warning", "Please select one PE_Process", "warning");
             return
         }
+        else if (Number(P1) + Number(P2) + Number(P3A) + Number(P3M) + Number(P4) + Number(P5) + Number(P6) + Number(P7) != 1) { //When select Production more than one
+            swal("Warning", "Please select Production at least one ", "warning");
+            return
+        }
     }else if(isExternal){
         if(!(QC1 || QC2 || QC3)){ //Need to select QC as Auditor at lease one
             swal("Warning", "Please select QC at least one", "warning");
             return;
         }else if(Number(QC1) + Number(QC2) + Number(QC3) != 1 ){ //When select QC more than one
             swal("Warning", "Please select one QC", "warning");
+            return
+        }
+        else if (Number(P1) + Number(P2) + Number(P3A) + Number(P3M) + Number(P4) + Number(P5) + Number(P6) + Number(P7) != 1) { //When select Production more than one
+            swal("Warning", "Please select Production at least one ", "warning");
             return
         }
     }

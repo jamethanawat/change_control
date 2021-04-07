@@ -2,6 +2,7 @@
 var file_list = [];
 var file_list_alt = [];
 var file_list_rd = [];
+var file_list_rsm = [];
 var due_date;
 var rsm_id = 0;
 var rsm_dept = '';
@@ -566,25 +567,81 @@ $("form#Confirm").submit((e) => {
             quick_form[x] = quick_form[x].name;
         }
         topic_code: topic_code
-        console.log(quick_form);
-        $.post(InsertRelatedPath, {dept_list:quick_form}, () =>{
+        console.log("sunmit", quick_form);
+        let tmp = $("#resubmit_form").serializeArray();
+        var promises = [];
+        files = file_list_rsm;
+        console.log("files", files);
+        for (var index in files) {
+            files[index].file = files[index].detail.file;
+            delete files[index].detail;
+        }
+
+
+        promises.push($.post(InsertRelatedPath, { dept_list: quick_form }, () => {
             console.log('Related created');
-            let tmp = $("#resubmit_form").serializeArray();
-            $.post(RequestResubmitPath, { 'desc': tmp[2].value, 'due_date': tmp[1].value, 'topic_code': topic_code },(res) =>{
-                console.log('Resubmit created');
-                if(res.status == "success"){
-                    moment.locale('en');
-                    $.post(GenerateMailPath,{ 'mode': 'RequestDocument', 'topic_code':topic_code, 'due_date': moment(due_date,"DD-MM-YYYY").format('D MMMM YYYY'), 'dept_arry': rsm_related_list, }).fail((error) => {
-                        console.error(error);
-                        swal("Error", "Cannot send email to Requestor, Please try again", "error");
-                        return;
-                    })
-                    swal("Success", "Resubmit Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
-                }else{
-                    swal("Error", "Resubmit Not Success, Please Try Again", "error");
-                }
+            return;
+        }).fail(() => {
+            swal("Error", "Resubmit not success", "error");
+        }));
+
+        promises.push($.post(RequestResubmitPath, { 'desc': tmp[2].value, 'due_date': tmp[1].value, 'topic_code': topic_code }, () => {
+            console.log('Resubmit created');
+            moment.locale('en');
+            files.forEach(element => {
+                var Data = new FormData();
+                Data.append("file", element.file);
+                Data.append("description", element.description);
+                Data.append("code", topic_code);
+                promises.push($.ajax({
+                    type: "POST",
+                    url: InsertFileResubmitPath,
+                    data: Data,
+                    cache: false,
+                    processData: false,
+                    contentType: false,
+                    error: function () {
+                        swal("Error", "Upload file not success", "error");
+                    }
+                }));
             });
-        });
+        }).fail(() => {
+            swal("Error", "Resubmit not success", "error");
+        }));
+     
+        promises.push($.post(GenerateMailPath, { 'mode': 'RequestDocument', 'topic_code': topic_code, 'due_date': moment(due_date, "DD-MM-YYYY").format('D MMMM YYYY'), 'dept_arry': rsm_related_list, }).fail((error) => {
+            console.error(error);
+            swal("Error", "Cannot send email to Requestor, Please try again", "error");
+            return;
+        }));
+
+        Promise.all(promises).then(() => {
+            $('#loading').addClass('hidden')
+            swal("Success", "Resubmit Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
+        })
+        //$.post(InsertRelatedPath, {dept_list:quick_form}, () =>{
+        //    console.log('Related created');
+        //    let tmp = $("#resubmit_form").serializeArray();
+        //    $.post(RequestResubmitPath, { 'desc': tmp[2].value, 'due_date': tmp[1].value, 'topic_code': topic_code },(res) =>{
+        //        console.log('Resubmit created');
+        //        if(res.status == "success"){
+        //            moment.locale('en');
+        //            $.post(GenerateMailPath,{ 'mode': 'RequestDocument', 'topic_code':topic_code, 'due_date': moment(due_date,"DD-MM-YYYY").format('D MMMM YYYY'), 'dept_arry': rsm_related_list, }).fail((error) => {
+        //                console.error(error);
+        //                swal("Error", "Cannot send email to Requestor, Please try again", "error");
+        //                return;
+        //            })
+        //            swal("Success", "Resubmit Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
+        //        }else{
+        //            swal("Error", "Resubmit Not Success, Please Try Again", "error");
+        //        }
+        //    });
+        //});
+
+        //-----------------------------------------------------------//
+
+     
+
     });
 
 /* -------------------------------------------------------------------------- */
@@ -659,7 +716,7 @@ $("form#related_form").submit((e) => {
 });
 
 /* -------------------------------------------------------------------------- */
-/*                              Reply resubmit                             */
+/*                              Reply resubmit                               */
 /* -------------------------------------------------------------------------- */
 
     $("#submit_reply_form").click((e) => {

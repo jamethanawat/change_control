@@ -184,7 +184,17 @@ namespace ChangeControl.Models
             var result = DB_CCS.Database.SqlQuery<String>(sql).ToList();
             return result;
         }
-        
+        public List<TopicNoti> GetResubmitPendingByDepartment(string dept)
+        {
+            var sql = $@"select DISTINCT  Topic as Code,Resubmit.[Date] as Time_insert from Resubmit 
+                        left join Related on Resubmit.Related = Related.PK_Related
+                        left join Response on Resubmit.ID = Response.Resubmit and  Related.Department = Response.Department
+                        where Related.Department = '{dept}'
+                        and Response.ID is null;";
+
+            var result = DB_CCS.Database.SqlQuery<TopicNoti>(sql).ToList();
+            return result;
+        }
         public List<TopicNoti> GetRequestIssuedByDepartment(string dept){
             var sql = $@"SELECT DISTINCT Code, Topic.Revision, Topic.Status, Subject, Detail, Time_insert , 'Issued' AS SubStatus 
                         FROM Topic

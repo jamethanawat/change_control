@@ -4,6 +4,7 @@
 @using ChangeControl.Helpers
 
 @{
+    var rsm_list = ViewData["TopicResubmitList"] as List<TopicNoti>;
     var req_list = ViewData["TopicRequestList"] as List<TopicNoti>;
     var rv_list = ViewData["TopicReviewList"] as List<TopicNoti>;
     var tr_list = ViewData["TopicTrialList"] as List<TopicNoti>;
@@ -34,11 +35,11 @@
         var DeleteFileByNameFormatPath = '@Url.Action("DeleteFileByNameFormat", "Detail")';
         var us_id = '@Session["User"].ToString()';
         var us_dept = '@Session["Department"].ToString()';
-    </script>    
-    
+    </script>
+
     <!-- CSS loading -->
     <link href="~/Plugin/loading-rhombus.css" rel="stylesheet">
-    
+
     <!-- REQUIRED SCRIPTS -->
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/sweetalert")
@@ -119,11 +120,11 @@
         @@font-face{
             font-family: "Kanit-Bold";
             src: url("@Href("~/fonts/Kanit/Kanit-Bold.ttf")") format("truetype");
-        }           
+        }
 
         .center{
             text-align: center;
-        }             
+        }
 
         .right{
             float: right;
@@ -132,7 +133,7 @@
         .left{
             float: left;
         }
-        
+
         [data-filepond-item-state='idle'] .filepond--item-panel {
             background-color: #22a061;
         }
@@ -160,7 +161,7 @@
         }
 
         .hidden{
-            display: none;        
+            display: none;
         }
 
         .txt-right{
@@ -217,7 +218,7 @@
         }
 
     </style>
-    
+
 
 </head>
 
@@ -240,6 +241,7 @@
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
                 <!-- Messages Dropdown Menu -->
+                @NodeRSM(rsm_list, "Re-submit")
                 @NodeNoti(req_list, "Request")
                 @NodeNoti(rv_list, "Review")
                 @NodeNoti(tr_list, "Trial & Confirm")
@@ -315,7 +317,7 @@
                                 </a>
                             </li>
                         }
-                        @if (Session["Position"].ToString() == "Admin"|| Session["Document"].ToString()=="YES")
+                        @if (Session["Position"].ToString() == "Admin" || Session["Document"].ToString() == "YES")
                         {
                             <li id="menu4" class="nav-item">
                                 <a id="menu4-1" href="@Url.Action("Index", "User")" class="nav-link animsition-link">
@@ -473,63 +475,132 @@
 
 </html>
 
-@helper NodeNoti(List<TopicNoti> ElementList, string Mode){
+@helper NodeNoti(List<TopicNoti> ElementList, string Mode)
+{
     <li class="nav-item dropdown">
         <a class="nav-link pr-0" data-toggle="dropdown" href='#'>
-            @if(ElementList.Count() > 0){
+            @if (ElementList.Count() > 0)
+            {
                 <span class="badge badge-danger navbar-badge">@ElementList.Count()</span>
                 <input type="submit" class="btn btn-block btn-sm btn-outline-primary" value="@Mode">
-            }else{
+            }
+            else
+            {
                 <input type="submit" class="btn btn-block btn-sm btn-outline-secondary" value="@Mode" disabled>
             }
-            
+
 
         </a>
         <div class="sub-nav-link dropdown-menu dropdown-menu-lg dropdown-menu-right">
-            @if(ElementList != null){
-                foreach(var Element in ElementList){
+            @if (ElementList != null)
+            {
+                foreach (var Element in ElementList)
+                {
                     <a href="~/Detail/?id=@Element.Code" class="dropdown-item">
-                    <!-- Message Start -->
-                    <div class="media">
-                        <img src="~/tmp/dist/img/doc.png" alt="User Avatar" class="img-size-50 mr-3 img-circle">
-                        <div class="media-body">
-                            <h3 class="dropdown-item-title">
-                                @Element.Code
+                        <!-- Message Start -->
+                        <div class="media">
+                            <img src="~/tmp/dist/img/doc.png" alt="User Avatar" class="img-size-50 mr-3 img-circle">
+                            <div class="media-body">
+                                <h3 class="dropdown-item-title">
+                                    @Element.Code
 
-                                @if(Element.SubStatus == "Pending"){
-                                    <span class='badge badge-pill badge-secondary'> PENDING
-                                        <i class='fa fa-hourglass-half '></i>
-                                    </span> 
-                                }else if(Element.SubStatus == "Issued"){
-                                    <span class='badge badge-pill badge-warning'>ISSUED
-                                        <i class='fa fa-clock '></i>
-                                    </span> 
-                                }else if(Element.SubStatus == "Approved"){
-                                    <span class='badge badge-pill badge-primary'>APPROVED
-                                        <i class='fa fa-clock '></i>
-                                    </span> 
-                                }
-                                
-                            </h3>
+                                    @if (Element.SubStatus == "Pending")
+                                    {
+                                        <span class='badge badge-pill badge-secondary'>
+                                            PENDING
+                                            <i class='fa fa-hourglass-half '></i>
+                                        </span>
+                                    }
+                                    else if (Element.SubStatus == "Issued")
+                                    {
+                                        <span class='badge badge-pill badge-warning'>
+                                            ISSUED
+                                            <i class='fa fa-clock '></i>
+                                        </span>
+                                    }
+                                    else if (Element.SubStatus == "Approved")
+                                    {
+                                        <span class='badge badge-pill badge-primary'>
+                                            APPROVED
+                                            <i class='fa fa-clock '></i>
+                                        </span>
+                                    }
 
-                            @if(Element.SubStatus == "Pending"){
-                                <p class="text-sm">Waiting for review</p>
-                            }else if(Element.SubStatus == "Issued"){
-                                <p class="text-sm">Waiting for approve</p>
-                            }else if(Element.SubStatus == "Approved"){
-                                if(Element.Status == 7){
-                                    <p class="text-sm">Waiting for PE Process</p>
-                                }else{
-                                    <p class="text-sm">Waiting for QC</p>
+                                </h3>
+
+                                @if (Element.SubStatus == "Pending")
+                                {
+                                    <p class="text-sm">Waiting for review</p>
                                 }
-                            }
-                            
-                            <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i>@Element.Time_insert.StringToDateTimeShort()</p>
+                                else if (Element.SubStatus == "Issued")
+                                {
+                                    <p class="text-sm">Waiting for approve</p>
+                                }
+                                else if (Element.SubStatus == "Approved")
+                                {
+                                    if (Element.Status == 7)
+                                    {
+                                        <p class="text-sm">Waiting for PE Process</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="text-sm">Waiting for QC</p>
+                                    }
+                                }
+
+                                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i>@Element.Time_insert.StringToDateTimeShort()</p>
+                            </div>
                         </div>
-                    </div>
-                    <!-- Message End -->
-                </a>
-                <div class="dropdown-divider"></div>
+                        <!-- Message End -->
+                    </a>
+                    <div class="dropdown-divider"></div>
+                }
+            }
+        </div>
+    </li>
+}
+@helper NodeRSM(List<TopicNoti> ElementList, string Mode)
+{
+    <li class="nav-item dropdown">
+        <a class="nav-link pr-0" data-toggle="dropdown" href='#'>
+            @if (ElementList.Count() > 0)
+            {
+                <span class="badge badge-danger navbar-badge"> @ElementList.Count() </span>
+                <input type="submit" class="btn btn-block btn-sm btn-outline-primary" value="@Mode">
+            }
+            else
+            {
+                <input type="submit" class="btn btn-block btn-sm btn-outline-secondary" value="@Mode" disabled>
+            }
+
+        </a>
+        <div class="sub-nav-link dropdown-menu dropdown-menu-lg dropdown-menu-right">
+            @if (ElementList != null)
+            {
+                foreach (var Element in ElementList)
+                {
+                    <a href="~/Detail/?id=@Element.Code" class="dropdown-item">
+                        <!-- Message Start -->
+                        <div class="media">
+                            <img src="~/tmp/dist/img/doc.png" alt="User Avatar" class="img-size-50 mr-3 img-circle">
+                            <div class="media-body">
+                                <h3 class="dropdown-item-title">
+                                    @Element.Code
+
+                                    <span class='badge badge-pill badge-secondary'>
+                                        PENDING
+                                        <i class='fa fa-hourglass-half '></i>
+                                    </span>
+
+
+                                </h3>
+                                <p class="text-sm">Waiting for Response</p>
+                                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i>@Element.Time_insert.StringToDateTimeShort()</p>
+                            </div>
+                        </div>
+                        <!-- Message End -->
+                    </a>
+                    <div class="dropdown-divider"></div>
                 }
             }
         </div>
