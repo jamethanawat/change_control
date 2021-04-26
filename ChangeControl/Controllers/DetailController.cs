@@ -208,7 +208,7 @@ namespace ChangeControl.Controllers{
                 }
                 resubmit.Responses = response_list;
                 foreach(var response in resubmit.Responses){
-                    var rs_file_list = M_Detail.GetFileByID(response.ID, "Response", Session["TopicCode"].ToString(), response.Department);
+                    var rs_file_list = M_Detail.GetFileByFKID(response.ID, "Response", Session["TopicCode"].ToString(), response.Department);
                     response.FileList = rs_file_list;
                 }
                 resubmit.RelatedList = M_Detail.GetRelatedByID(resubmit.Related);
