@@ -20,7 +20,7 @@ namespace ChangeControl.Models
         public List<ReportExcel> GetReport(string StartDate, string EndDate)
         {
             var sql = $@"
-                select t.Code AS TNSNO,(select Name from Change_Item where ID_Change_item =t.Change_item) as ChangeItem,(select Name from Change_Item where ID_Change_item =t.Product_type) as ProductType , CAST(t.Revision as varchar(5)) as Rev, convert(VARCHAR(10),(cast( left(t.Time_insert ,4)+substring(t.Time_insert ,5,2)+substring(t.Time_insert,7,2) as datetime)),6) as DateRequest,
+                select t.Code AS TNSNO,(select Name from Change_Item where ID_Change_item =t.Change_item) as ChangeItem,(select Name from Product_Type where ID_Product_Type =t.Product_type) as ProductType , CAST(t.Revision as varchar(5)) as Rev, convert(VARCHAR(10),(cast( left(t.Time_insert ,4)+substring(t.Time_insert ,5,2)+substring(t.Time_insert,7,2) as datetime)),6) as DateRequest,
                 (select Email from [User] where Code =t.User_insert) as RequestBy,
                     convert(VARCHAR(10),(cast( left(t.ApprovedDate  ,4)+substring(t.ApprovedDate ,5,2)+substring(t.ApprovedDate,7,2) as datetime)),6) as ApprovedDateRequest,
                     RE.Department,
