@@ -120,7 +120,7 @@
             <hr style="margin-top:0px !important">
             <div class="timeline-footer">
                 <div class="float-right ">
-                    @if ((Element.ApprovedBy == null && Element.ApprovedBy == "") || (ViewBag.isApprover))
+                    @if ((Element.ApprovedBy == null || Element.ApprovedBy == "") || (ViewBag.isApprover))
                     {
                         <a href="#" class="btn btn-warning btn-sm tr-edit" id="edit_tr" data-toggle="modal" data-target="#edit_trial" value="@Element.ID">Edit</a>
                     }
