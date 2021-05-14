@@ -374,7 +374,7 @@ $("form#review").submit((e) => {
     e.preventDefault();
     $('#loading').removeClass('hidden')
     let rv_form = SerializeReviewForm();
-    $.post(InsertReviewPath, {topic_id:topic_id, topic_code:topic_code}, (result) => {
+    $.post(InsertReviewPath, { topic_id: topic_id, topic_code: topic_code, topic_status: topic_status, isExternal: isExternal}, (result) => {
         if(result.mail != ""){
             $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept':result.dept, 'pos':result.pos }).fail((error) => {
                 console.error(error);

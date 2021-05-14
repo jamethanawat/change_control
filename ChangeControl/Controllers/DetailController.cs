@@ -104,10 +104,15 @@ namespace ChangeControl.Controllers{
             return View();
         }
 
-        public ActionResult InsertReview(string topic_id, string topic_code){
+        public ActionResult InsertReview(string topic_id, string topic_code,string topic_status,Boolean isExternal)
+        {
             var mail = "";
             var pos = "";
-            if((Topic.Status == 3 || Topic.Status == 7) && Topic.Type == "External"){
+            //if((Topic.Status == 3 || Topic.Status == 7) && Topic.Type == "External"){
+            //    M_Detail.UpdateTopicStatus(topic_code, 8);
+            //}
+            if ((topic_status == "3" || topic_status == "7") && isExternal)
+            {
                 M_Detail.UpdateTopicStatus(topic_code, 8);
             }
             mail = "EmailReviewed";
