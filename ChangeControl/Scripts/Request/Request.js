@@ -31,14 +31,14 @@ $(document).ready(function () {
         ],
     });
 
-    isEditMode = (isEditMode == "True" )? true : false;
+    isEditMode = (isEditMode == "True") ? true : false;
     var spanSubmit = $('.pTop');
 
     spanSubmit.on('click', () => {
         $(this).submit();
     });
 
-    
+
     $('[data-toggle="datepicker"]').datepicker({
         format: 'dd-MM-yyyy'
     });
@@ -50,11 +50,20 @@ $(document).ready(function () {
     $("#change_date_switch").on("click", function (e) {
         $("[name='timing']").datepicker('setDate', (this.checked) ? '01-01-9999' : moment().format("DD-MM-YYYY"));
         $("[name='timing']").prop('disabled', (this.checked) ? true : false);
-        if(!this.checked) $("[name='timingDesc']").val(""); 
+        if (!this.checked) $("[name='timingDesc']").val("");
         $("#change_date_desc").toggle();
     });
 
-    $("[name='timing']").datepicker('setDate', (this.checked) ? '01-01-9999' : Timing);
+    if (Timing == " ") {
+        $('[data-toggle="datepicker"]').datepicker({
+            format: 'dd-MM-yyyy',
+            defaultDate: ''
+        });
+    } else {
+
+         $("[name='timing']").datepicker('setDate', (this.checked) ? '01-01-9999' : Timing);
+    }
+ 
     if($("[name='timingDesc']").val().length > 0){
         $("#change_date_switch").click();
     }
@@ -137,6 +146,10 @@ $(document).ready(function () {
         //console.log(Number(P3M), "Number(P3M)");
         //console.log(Number(P4), "Number(P4)");
         //console.log(Number(P5), "Number(P5)");
+        if (moment().format("DD-MM-YYYY") == $("[name='timing']").val()) {
+            swal("Warning", " Change Date Not Correct", "warning");
+            return
+        }
     
         if (isInternal) {
              if (Number(P1) + Number(P2) + Number(P3A) + Number(P3M) + Number(P4) + Number(P5) + Number(P6) + Number(P7) == 0) { //When select Production more than one
@@ -272,7 +285,10 @@ $(document).ready(function () {
 
         let isInternal = $("#type_internal").is(":checked");
         let isExternal = $("#type_external").is(":checked");
-    
+        if (moment().format("DD-MM-YYYY") == $("[name='timing']").val()) {
+            swal("Warning", " Change Date Not Correct", "warning");
+            return
+        }
     
         if (isInternal) {
             if (Number(P1) + Number(P2) + Number(P3A) + Number(P3M) + Number(P4) + Number(P5) + Number(P6) + Number(P7) == 0) { //When select Production more than one
@@ -292,10 +308,10 @@ $(document).ready(function () {
                 swal("Warning", "Please select one PE_Process", "warning");
                 return
             }
-            else if (Number(P1) + Number(P2) + Number(P3A) + Number(P3M) + Number(P4) + Number(P5) + Number(P6) + Number(P7) != 1) { //When select Production more than one
-                swal("Warning", "Please select Production at least one ", "warning");
-                return
-            }
+            //else if (Number(P1) + Number(P2) + Number(P3A) + Number(P3M) + Number(P4) + Number(P5) + Number(P6) + Number(P7) != 1) { //When select Production more than one
+            //    swal("Warning", "Please select Production at least one ", "warning");
+            //    return
+            //}
         } else if (isExternal) {
             if (Number(P1) + Number(P2) + Number(P3A) + Number(P3M) + Number(P4) + Number(P5) + Number(P6) + Number(P7) == 0) { //When select Production more than one
                 swal("Warning", "Please select Production at least one ", "warning");
@@ -517,7 +533,7 @@ function CheckAudit(){
             swal("Warning", "Please select one PE_Process", "warning");
             return
         }
-        else if (Number(P1) + Number(P2) + Number(P3A) + Number(P3M) + Number(P4) + Number(P5) + Number(P6) + Number(P7) != 1) { //When select Production more than one
+        else if (Number(P1) + Number(P2) + Number(P3A) + Number(P3M) + Number(P4) + Number(P5) + Number(P6) + Number(P7) == 0) { //When select Production more than one
             swal("Warning", "Please select Production at least one ", "warning");
             return
         }
@@ -529,7 +545,7 @@ function CheckAudit(){
             swal("Warning", "Please select one QC", "warning");
             return
         }
-        else if (Number(P1) + Number(P2) + Number(P3A) + Number(P3M) + Number(P4) + Number(P5) + Number(P6) + Number(P7) != 1) { //When select Production more than one
+        else if (Number(P1) + Number(P2) + Number(P3A) + Number(P3M) + Number(P4) + Number(P5) + Number(P6) + Number(P7) == 0) { //When select Production more than one
             swal("Warning", "Please select Production at least one ", "warning");
             return
         }

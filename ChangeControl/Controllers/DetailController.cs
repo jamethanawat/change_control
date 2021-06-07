@@ -437,6 +437,9 @@ namespace ChangeControl.Controllers{
         [HttpPost]
         public ActionResult ApproveReview(string topic_code, long review_id){
             var rv_list = Session["ReviewList"] as List<Review>;
+            Topic = M_Detail.GetTopicByCodeAndOwned(topic_code, Session["Department"].ToString());
+
+            Topic.RelatedListAlt = M_Detail.GetRelatedByID(Topic.Related);
             try
             {
                 var mail = "";

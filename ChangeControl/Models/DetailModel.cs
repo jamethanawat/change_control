@@ -189,13 +189,13 @@ namespace ChangeControl.Models
         }
 
         public List<FileItem> GetFileByID(long fk_id, string type, string topic_code, string dept){
-            var sql = $"SELECT ID, FK_ID, [Type], Name, Name_Format, Description, [Size], Time_Insert, User_Insert FROM [File] WHERE [Type] = '{type}' AND Topic = '{topic_code}' AND Department = '{dept}'";
+            var sql = $"SELECT ID, FK_ID, [Type], Name, Name_Format, Description, [Size], Time_Insert, User_Insert,Department FROM [File] WHERE [Type] = '{type}' AND Topic = '{topic_code}' AND Department = '{dept}'";
             var FileList = DB_CCS.Database.SqlQuery<FileItem>(sql).ToList();
             return FileList;
         }
         public List<FileItem> GetFileByFKID(long fk_id, string type, string topic_code, string dept)
         {
-            var sql = $"SELECT ID, FK_ID, [Type], Name, Name_Format, Description, [Size], Time_Insert, User_Insert FROM [File] WHERE FK_ID='{fk_id}' AND [Type] = '{type}' AND Topic = '{topic_code}' AND Department = '{dept}'";
+            var sql = $"SELECT ID, FK_ID, [Type], Name, Name_Format, Description, [Size], Time_Insert, User_Insert,Department FROM [File] WHERE FK_ID='{fk_id}' AND [Type] = '{type}' AND Topic = '{topic_code}' AND Department = '{dept}'";
             var FileList = DB_CCS.Database.SqlQuery<FileItem>(sql).ToList();
             return FileList;
         }
