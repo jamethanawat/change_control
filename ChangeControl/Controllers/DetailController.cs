@@ -481,7 +481,7 @@ namespace ChangeControl.Controllers{
                 M_Detail.ApproveTrial(trial_id,(string) Session["User"]);
                 if(Topic.Status == 9 && ViewBag.QCAudit.Contains(Session["Department"].ToString()) ){
                     M_Detail.UpdateTopicStatus(topic_code, 10);
-                    M_Detail.UpdateTopicApproveTrial(Session["User"].ToString(),Topic.Code);
+                    M_Detail.UpdateTopicApproveTrial(Session["User"].ToString(), topic_code);
                     mail = "StartConfirm";
                 }else if(Topic.Status == 9){
                     var qc_audit = Topic.RelatedListAlt.Find(e => (ViewBag.QCAudit.Contains(e.Department)));

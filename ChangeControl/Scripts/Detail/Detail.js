@@ -568,7 +568,8 @@ $("form#Confirm").submit((e) => {
         }
         topic_code: topic_code
         console.log("sunmit", quick_form);
-        let tmp = $("#resubmit_form").serializeArray();
+       // let tmp = $("#resubmit_form").serializeArray();
+        //let due = tmp[1].value;
         var promises = [];
         files = file_list_rsm;
         console.log("files", files);
@@ -585,7 +586,7 @@ $("form#Confirm").submit((e) => {
             swal("Error", "Resubmit not success", "error");
         }));
 
-        promises.push($.post(RequestResubmitPath, { 'desc': tmp[2].value, 'due_date': tmp[1].value, 'topic_code': topic_code }, () => {
+        promises.push($.post(RequestResubmitPath, { 'desc': $("#resubmit_form [name='desc']").val(), 'due_date': $("#resubmit_form [name='due_date']").val(), 'topic_code': topic_code }, () => {
             console.log('Resubmit created');
             moment.locale('en');
             files.forEach(element => {
