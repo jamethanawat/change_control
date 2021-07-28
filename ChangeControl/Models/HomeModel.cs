@@ -189,7 +189,10 @@ namespace ChangeControl.Models
             var sql = $@"select DISTINCT  Topic as Code,Resubmit.[Date] as Time_insert from Resubmit 
                         left join Related on Resubmit.Related = Related.PK_Related
                         left join Response on Resubmit.ID = Response.Resubmit and  Related.Department = Response.Department
+                        left join Topic  on Resubmit.Topic =Topic.Code 
                         where Related.Department = '{dept}'
+                        and Topic.Status !=2
+                        and Topic.Status !=12
                         and Response.ID is null;";
 
             var result = DB_CCS.Database.SqlQuery<TopicNoti>(sql).ToList();
