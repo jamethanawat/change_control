@@ -1,0 +1,10 @@
+diff a/ChangeControl/Scripts/Detail/ReviewList.js b/ChangeControl/Scripts/Detail/ReviewList.js	(rejected hunks)
+@@ -34,7 +34,7 @@
+                                 );
+                                 }
+                                 promises.push(
+-                                    $.post(CheckApproveIPPPath, {topic_code:topic_code}, (res) => { 
++                                    $.post(CheckApproveIPPPath, { topic_code: topic_code, topic_Related: topic_Related}, (res) => { 
+                                     if(res.status == "success" && (res.data != null && res.data.length > 0)){
+                                         promises.push(
+                                             $.post(GenerateMailPath,{ 'mode': 'InformIPP', 'topic_code':topic_code, 'dept_arry': res.data, }).fail((error) => {

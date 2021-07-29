@@ -1,0 +1,10 @@
+diff a/ChangeControl/Controllers/MailController.cs b/ChangeControl/Controllers/MailController.cs	(rejected hunks)
+@@ -20,7 +20,7 @@
+         
+         private DetailModel M_Detail;
+         private MailModel M_Mail;
+-        public static TopicAlt Topic;
++        public TopicAlt Topic;
+         public List<Department> A = new List<Department>();
+         public MailController(){
+             M_Detail = new DetailModel();

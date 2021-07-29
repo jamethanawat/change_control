@@ -161,7 +161,7 @@ namespace ChangeControl.Controllers{
             List<Review> rv_list = new List<Review>();
             List<FileItem> file_list = new List<FileItem>();
 
-            var tc_file_list = M_Detail.GetFileByID(Topic.ID, "Topic", Topic.Code, Topic.Department);
+            var tc_file_list = M_Detail.GetFileByID(Topic.ID, "Topic", Session["TopicCode"].ToString(), Topic.Department);
             Topic.FileList = tc_file_list;
 
             ViewData["FormReviewItem"] = null;
@@ -201,7 +201,7 @@ namespace ChangeControl.Controllers{
                 resubmit.Date = resubmit.Date.StringToDigitDate();
                 resubmit.DueDate = resubmit.DueDate.StringToDigitDate3();
                 resubmit.Profile = M_Detail.getUserByID(resubmit.User);             
-                resubmit.FileList = M_Detail.GetFileByFKID(resubmit.ID, "Resubmit", Topic.Code, resubmit.Dept);
+                resubmit.FileList = M_Detail.GetFileByFKID(resubmit.ID, "Resubmit", Session["TopicCode"].ToString(), resubmit.Dept);
 
                 var result = M_Detail.GetResponseByResubmitID(resubmit.ID);
                 foreach(var response in result){
@@ -213,7 +213,7 @@ namespace ChangeControl.Controllers{
                 }
                 resubmit.Responses = response_list;
                 foreach(var response in resubmit.Responses){
-                    var rs_file_list = M_Detail.GetFileByFKID(response.ID, "Response", Topic.Code, response.Department);
+                    var rs_file_list = M_Detail.GetFileByFKID(response.ID, "Response", Session["TopicCode"].ToString(), response.Department);
                     response.FileList = rs_file_list;
                 }
                 resubmit.RelatedList = M_Detail.GetRelatedByID(resubmit.Related);
@@ -231,7 +231,7 @@ namespace ChangeControl.Controllers{
             List<FileItem> file_list = new List<FileItem>();
             trial_list = M_Detail.GetTrialByTopicCode(Topic.Code);
             foreach(Trial tr_element in trial_list){
-                var tr_file_list = M_Detail.GetFileByID(tr_element.ID, "Trial", Topic.Code, tr_element.Department);
+                var tr_file_list = M_Detail.GetFileByID(tr_element.ID, "Trial", Session["TopicCode"].ToString(), tr_element.Department);
                 tr_element.FileList = tr_file_list;
                 tr_element.Date =  tr_element.Date.StringToDigitDate();
                 if(tr_element.ApprovedDate.AsNullIfEmpty() != null) tr_element.ApprovedDate = tr_element.ApprovedDate.StringToDigitDate();
@@ -246,7 +246,7 @@ namespace ChangeControl.Controllers{
             List<FileItem> file_list = new List<FileItem>();
             Confirm_list = M_Detail.GetConfirmByTopicCode(Topic.Code);
             foreach(Confirm cf_element in Confirm_list){
-                var tr_file_list = M_Detail.GetFileByID(cf_element.ID, "Confirm", Topic.Code, cf_element.Department);
+                var tr_file_list = M_Detail.GetFileByID(cf_element.ID, "Confirm", Session["TopicCode"].ToString(), cf_element.Department);
                 cf_element.FileList = tr_file_list;
                 cf_element.Date = cf_element.Date.StringToDigitDate();
                 if(cf_element.ApprovedDate.AsNullIfEmpty() != null) cf_element.ApprovedDate = cf_element.ApprovedDate.StringToDigitDate();
@@ -630,19 +630,15 @@ namespace ChangeControl.Controllers{
             }
         }
 
-        public ActionResult CheckApproveIPP(string topic_code,string topic_Related)
-        {
+        public ActionResult CheckApproveIPP(string topic_code){
             try{
                 List<Review> temp_rv_list = (List<Review>) Session["ReviewList"];
                 if(temp_rv_list.Exists(rv => rv.Item.Exists(rv_item => rv_item.Type == 26 && rv_item.Status == 1)) && ViewBag.QCAudit.Contains(Session["Department"].ToString())){
                     string[] pt_list = {"P1","P2","P3A","P3M","P4","P5","P6","P7"};
                     string[] qcf_list = {"QC_FINAL1", "QC_FINAL2", "QC_FINAL3"};
-             
-                    List<RelatedAlt> RelatedListAlt = new List<RelatedAlt>();
-                    RelatedListAlt = M_Detail.GetRelatedByID(long.Parse(topic_Related));
-                    var related_pt_qcf = RelatedListAlt.FindAll(e => e.Review == 1 && (pt_list.Contains(e.Department) || qcf_list.Contains(e.Department)));
-                     var related_pt_qcf2 = Topic.RelatedListAlt.FindAll(e => e.Review == 1 && (pt_list.Contains(e.Department) || qcf_list.Contains(e.Department)));
-                    return Json(new {status="success",data=related_pt_qcf2.Select(s => s.Department).ToList()}, JsonRequestBehavior.AllowGet);
+
+                    var related_pt_qcf = Topic.RelatedListAlt.FindAll(e => e.Review == 1 && (pt_list.Contains(e.Department) || qcf_list.Contains(e.Department)));
+                    return Json(new {status="success",data=related_pt_qcf.Select(s => s.Department).ToList()}, JsonRequestBehavior.AllowGet);
                 }else{
                     return Json(new {status="error"}, JsonRequestBehavior.AllowGet);
                 }

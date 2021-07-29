@@ -18,7 +18,7 @@ $(() => {
             icon: "warning",
         }).then((apr) => {
             if(apr){
-                $.post(CheckAllReviewBeforeApprovePath, { topic_code: topic_code, isInternal: isInternal}, (res) => {
+                $.post(CheckAllReviewBeforeApprovePath, {topic_code:topic_code}, (res) => {
                     if(res == "True"){
                         var promises = [];
 
@@ -34,7 +34,7 @@ $(() => {
                                 );
                                 }
                                 promises.push(
-                                    $.post(CheckApproveIPPPath, { topic_code: topic_code, topic_Related: topic_Related}, (res) => { 
+                                    $.post(CheckApproveIPPPath, {topic_code:topic_code}, (res) => { 
                                     if(res.status == "success" && (res.data != null && res.data.length > 0)){
                                         promises.push(
                                             $.post(GenerateMailPath,{ 'mode': 'InformIPP', 'topic_code':topic_code, 'dept_arry': res.data, }).fail((error) => {

@@ -20,7 +20,7 @@ namespace ChangeControl.Controllers{
         
         private DetailModel M_Detail;
         private MailModel M_Mail;
-        public TopicAlt Topic;
+        public static TopicAlt Topic;
         public List<Department> A = new List<Department>();
         public MailController(){
             M_Detail = new DetailModel();
@@ -94,8 +94,7 @@ namespace ChangeControl.Controllers{
                     if (temp_email_list != null) address_list.AddRange(temp_email_list);
                 }
 
-                if(temp_email_list != null && temp_email_list.Count!=0)
-                {
+                if(temp_email_list != null){
                     SendMail(email,address_list);
                 } 
                 return Json(new {status = true}, JsonRequestBehavior.AllowGet);
