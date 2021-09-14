@@ -157,6 +157,7 @@ namespace ChangeControl.Controllers{
         }
 
         public List<Review> GetReviewListByTopicID(){
+            //ok
             List<ReviewItem> rv_item_list = new List<ReviewItem>();
             List<Review> rv_list = new List<Review>();
             List<FileItem> file_list = new List<FileItem>();
@@ -194,6 +195,7 @@ namespace ChangeControl.Controllers{
         }
 
         public List<Resubmit> GetResubmitListByTopicID(){
+            //ok
             var temp_resubmit_list = M_Detail.GetResubmitByTopicID(Topic.Code);
             foreach(Resubmit resubmit in temp_resubmit_list){
                 List<Response> response_list = new List<Response>();
@@ -227,6 +229,7 @@ namespace ChangeControl.Controllers{
         }
 
         public List<Trial> GetTrialListByTopicCode(){
+            //ok
             List<Trial> trial_list = new List<Trial>();
             List<FileItem> file_list = new List<FileItem>();
             trial_list = M_Detail.GetTrialByTopicCode(Topic.Code);
@@ -242,6 +245,7 @@ namespace ChangeControl.Controllers{
         }
 
         public List<Confirm> GetConfirmListByTopicCode(){
+            //ok
             List<Confirm> Confirm_list = new List<Confirm>();
             List<FileItem> file_list = new List<FileItem>();
             Confirm_list = M_Detail.GetConfirmByTopicCode(Topic.Code);
@@ -258,6 +262,7 @@ namespace ChangeControl.Controllers{
 
         public ActionResult RequestResubmit(string desc, string due_date,string topic_code)
         {
+            //no
             try{
                 //M_Detail.InsertResubmit(desc, due_date, (long) Session["RelatedID"], Topic.Code, (string)Session["User"], Topic.Status, (string)Session["Department"]);
                 Session["ResubmitID"] = M_Detail.InsertResubmit(desc, due_date, (long) Session["RelatedID"], topic_code, (string)Session["User"], Topic.Status, (string)Session["Department"]);
@@ -331,6 +336,7 @@ namespace ChangeControl.Controllers{
 
         [HttpPost]
         public ActionResult UpdateTopicStatus(string topic_code, int status){
+            // no
             try{
                 M_Detail.UpdateTopicStatus(topic_code,status);
                 if(status == 9){
@@ -436,6 +442,7 @@ namespace ChangeControl.Controllers{
 
         [HttpPost]
         public ActionResult ApproveReview(string topic_code, long review_id){
+            //ok
             var rv_list = Session["ReviewList"] as List<Review>;
             Topic = M_Detail.GetTopicByCodeAndOwned(topic_code, Session["Department"].ToString());
 
@@ -474,6 +481,7 @@ namespace ChangeControl.Controllers{
 
         [HttpPost]
         public ActionResult ApproveTrial(string topic_code, long trial_id){
+            //no
             var tr_list = Session["TrialList"] as List<Review>;
             try{
                 var mail = "";
@@ -498,6 +506,7 @@ namespace ChangeControl.Controllers{
 
         [HttpPost]
         public ActionResult ApproveConfirm(string topic_code, long confirm_id){
+            //no
             var cf_list = Session["ConfirmList"] as List<Review>;
             try{
                 var confirm_dept_list = M_Home.GetConfirmDeptList();
@@ -522,6 +531,7 @@ namespace ChangeControl.Controllers{
         }
 
         public void FilterReviewRelated(List<Review> rv_list){
+            //no
             foreach(var rl_alt in Topic.RelatedListAlt){
                 if(rv_list.Exists( e => e.Department == rl_alt.Department)){
                     rl_alt.Review = 1;
@@ -530,6 +540,7 @@ namespace ChangeControl.Controllers{
         }
 
         public void FilterTrialRelated(List<Review> rv_list, List<Trial> tr_list){
+            //no
             foreach (var rv in rv_list){
                     var temp_tr = new Trial();
                         Topic.RelatedListAlt.ForEach(rl_alt => {
@@ -550,6 +561,7 @@ namespace ChangeControl.Controllers{
         }
 
         public void FilterConfirmRelated(List<Confirm> cf_list) {
+            //no
             var confirm_dept_list = M_Detail.GetConfirmDeptList();
             ViewBag.cf_list = confirm_dept_list;
 
@@ -631,6 +643,7 @@ namespace ChangeControl.Controllers{
         }
 
         public ActionResult CheckApproveIPP(string topic_code){
+            //no
             try{
                 List<Review> temp_rv_list = (List<Review>) Session["ReviewList"];
                 if(temp_rv_list.Exists(rv => rv.Item.Exists(rv_item => rv_item.Type == 26 && rv_item.Status == 1)) && ViewBag.QCAudit.Contains(Session["Department"].ToString())){

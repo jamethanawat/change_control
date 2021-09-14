@@ -354,7 +354,7 @@ namespace ChangeControl.Models
                             AND (Department.[Group] = 'Production')
                             AND Related.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 )
                             AND NOT EXISTS ( 
-                                SELECT * FROM Confirm WHERE Confirm.Department = Confirm.Department AND Confirm.Topic = Topic.Code 
+                                SELECT * FROM Confirm WHERE Confirm.Department = Related.Department AND Confirm.Topic = Topic.Code 
                                 AND Confirm.Revision = (
                                     SELECT MAX(c.Revision) FROM Confirm c WHERE c.Topic = Confirm.Topic AND c.Department = Confirm.Department
                                     AND Confirm.Revision = (SELECT MAX(c.Revision) FROM Confirm c WHERE c.Topic = Confirm.Topic AND c.Department = Confirm.Department)

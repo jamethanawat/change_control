@@ -144,7 +144,7 @@ namespace ChangeControl.Controllers{
             var datemail = DateTime.Now.ToString("dd/MM/yyy HH:mm:ss");
             string FromName = "Change Control System";
             string FromEmail = "ccs@email.thns.co.th";
-            System.Net.Mail.SmtpClient smtp = new SmtpClient("172.27.170.11");
+            System.Net.Mail.SmtpClient smtp = new SmtpClient("172.27.168.11");
             smtp.EnableSsl = false;
             System.Net.Mail.MailMessage mailMessage = new System.Net.Mail.MailMessage();
             mailMessage.From = new System.Net.Mail.MailAddress(FromEmail, FromName);
