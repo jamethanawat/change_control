@@ -39,7 +39,9 @@ namespace ChangeControl.Models
         public List<String> GetConfirmDeptList(){
             try{
                 var sql = $@"SELECT Name FROM Department
-                            WHERE [Group] = 'Production';";
+                            WHERE [Group] = 'Production'
+                            OR [Group] = 'Purchase'
+                            OR ([Group] = 'Quality Control' AND (Audit <> 1 or Audit is null))";
                 var result = DB_CCS.Database.SqlQuery<String>(sql).ToList();
                 return result;
             }catch(Exception ex){
@@ -351,7 +353,7 @@ namespace ChangeControl.Models
                         WHERE Related.Department = '{dept}'
                             AND Topic.Revision = (SELECT MAX(t.Revision) FROM Topic t WHERE t.Code = Topic.Code  AND t.Department = Topic.Department)
                             AND Topic.Status = 10
-                            AND (Department.[Group] = 'Production')
+                            AND (Department.[Group] = 'Production' or (Department.[Group] = 'Quality Control' and (Department.Audit <> 1 or Department.Audit is null )) or Department.[Group] =  'Purchase')
                             AND Related.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 )
                             AND NOT EXISTS ( 
                                 SELECT * FROM Confirm WHERE Confirm.Department = Related.Department AND Confirm.Topic = Topic.Code 
@@ -391,7 +393,7 @@ namespace ChangeControl.Models
                                                         
                         (SELECT COUNT(Related.ID) FROM Related LEFT JOIN Department sub_d ON Related.Department = sub_d.Name 
                         WHERE Topic.Related = PK_Related AND Related.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 )
-                        AND (sub_d.[Group] = 'Production'))
+                         AND (sub_d.[Group] = 'Production' OR (sub_d.[Group] = 'Quality Control' AND   (sub_d.Audit <> 1 or sub_d.Audit is null )) OR sub_d.[Group] = 'Purchase'))
                         
                         AND NOT EXISTS ( SELECT * FROM Confirm WHERE Confirm.Topic = Topic.Code AND Confirm.Status = 3 
                         AND Confirm.Revision = (SELECT MAX(c.Revision) FROM Confirm c WHERE c.Topic = Confirm.Topic AND c.Department = Confirm.Department)

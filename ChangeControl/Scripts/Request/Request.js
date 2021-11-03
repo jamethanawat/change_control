@@ -12,6 +12,8 @@ var InsertRelatedPath;
 var InsertFilePath;
 var file_list = [];
 $(document).ready(function () {
+ 
+  
 
     $('.textareaSubject').summernote({
         height: 140,
@@ -30,6 +32,38 @@ $(document).ready(function () {
             ['para', ['ul', 'ol']],
         ],
     });
+    $('.Management').summernote({
+        height: 140,
+        toolbar: [
+            ['font', ['bold', 'underline', 'clear']],
+            ['fontsize', ['fontsize']],
+            ['para', ['ul', 'ol']],
+        ],
+    });
+    if ($("input[name='risk']:checked").val() == "N") {
+        $("#Specity_Q").prop('disabled', true);
+        $("#Specity_C").prop('disabled', true);
+        $("#Specity_D").prop('disabled', true);
+
+        $("#Specity_Q").prop("checked", false);
+        $("#Specity_C").prop("checked", false);
+        $("#Specity_D").prop("checked", false);
+
+        $(".Management").summernote("disable");
+        $(".Management").summernote('code', "");
+    } else {
+        //$("#Specity_Q").prop('disabled', false);
+        //$("#Specity_C").prop('disabled', false);
+        //$("#Specity_D").prop('disabled', false);
+
+        //$("#Specity_Q").prop("checked", false);
+        //$("#Specity_C").prop("checked", false);
+        //$("#Specity_D").prop("checked", false);
+
+
+        //$(".Management").summernote("enable");
+        //$(".Management").summernote('code', "");
+    }
 
     isEditMode = (isEditMode == "True") ? true : false;
     var spanSubmit = $('.pTop');
@@ -67,6 +101,41 @@ $(document).ready(function () {
     if($("[name='timingDesc']").val().length > 0){
         $("#change_date_switch").click();
     }
+
+/* -------------------------------------------------------------------------- */
+/*                          Risk checkbox list                                */
+/* -------------------------------------------------------------------------- */
+
+    $("input[name='risk']").click(function () {
+        console.log('click risk')
+        var radioValue = $("input[name='risk']:checked").val();
+        if (radioValue == "N") {
+            $("#Specity_Q").prop('disabled', true);
+            $("#Specity_C").prop('disabled', true);
+            $("#Specity_D").prop('disabled', true);
+
+            $("#Specity_Q").prop("checked", false);
+            $("#Specity_C").prop("checked", false);
+            $("#Specity_D").prop("checked", false);
+
+            $(".Management").summernote("disable");
+            $(".Management").summernote('code', "");
+        } else {
+            $("#Specity_Q").prop('disabled', false);
+            $("#Specity_C").prop('disabled', false);
+            $("#Specity_D").prop('disabled', false);
+
+            $("#Specity_Q").prop("checked", false);
+            $("#Specity_C").prop("checked", false);
+            $("#Specity_D").prop("checked", false);
+
+
+            $(".Management").summernote("enable");         
+            $(".Management").summernote('code', "");
+        }
+    });
+
+
 
 
 /* -------------------------------------------------------------------------- */
@@ -119,6 +188,27 @@ $(document).ready(function () {
 
     $("form.Request").submit((e) => {
         e.preventDefault();
+        //check risk
+        if ($("input[name='risk']:checked").val() == "Y") {
+
+            let Qua = $("input#Specity_Q").prop("checked");
+            let Cost = $("input#Specity_C").prop("checked");
+            let Deli = $("input#Specity_D").prop("checked");
+            //console.log((Number(Qua) + Number(Cost) + Number(Deli), "number"))
+            if ((Number(Qua) + Number(Cost) + Number(Deli)) == 0) {
+                swal("Warning", "Please select one Specity", "warning");
+                return
+            }
+
+
+           // console.log($(".Management").summernote('code'))
+
+            if ($(".Management").summernote('code')== "") {
+                swal("Warning", "Please Input Management Plan", "warning");
+                return
+            }
+
+        }
         
         // CheckAudit();
         let QC1 = $("input#29").prop("checked");
@@ -183,8 +273,12 @@ $(document).ready(function () {
                 return
             }
         }
+
+
+     
         
         let form = SerializeReviewForm();
+        console.log(form);
         let quick_form = $(".related_radio").serializeArray();
         for(x in quick_form){
             quick_form[x] = quick_form[x].name;
@@ -263,6 +357,26 @@ $(document).ready(function () {
     $("form.Edit").submit((e) => {
         e.preventDefault();
 
+        if ($("input[name='risk']:checked").val() == "Y") {
+
+            let Qua = $("input#Specity_Q").prop("checked");
+            let Cost = $("input#Specity_C").prop("checked");
+            let Deli = $("input#Specity_D").prop("checked");
+            //console.log((Number(Qua) + Number(Cost) + Number(Deli), "number"))
+            if ((Number(Qua) + Number(Cost) + Number(Deli)) == 0) {
+                swal("Warning", "Please select one Specity", "warning");
+                return
+            }
+
+
+            // console.log($(".Management").summernote('code'))
+
+            if ($(".Management").summernote('code') == "") {
+                swal("Warning", "Please Input Management Plan", "warning");
+                return
+            }
+
+        }
         // CheckAudit();
         let QC1 = $("input#29").prop("checked");
         let QC2 = $("input#30").prop("checked");

@@ -384,271 +384,368 @@
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Change Items<span class="text-danger">*</span></label>
                                 <div class="col-sm-10 col-form-label row" style="padding-left: 13px;">
-                                @{
-                                    var i=0;
-                                    var j=0; 
-                                }
-                                    @foreach(var Item in ChangeItems){
-                                        if(i==0){ 
-                                            if(j==0){
-                                                @:<div class="col-sm-4"> 
-                                            }else if(j==1){
-                                                @:<div class="col-sm-3"> 
-                                            }else if(j==2){
-                                                @:<div class="col-sm-5"> 
+                                    @{
+                                        var i = 0;
+                                        var j = 0;
+                                    }
+                                    @foreach (var Item in ChangeItems)
+                                    {
+                                        if (i == 0)
+                                        {
+                                            if (j == 0)
+                                            {
+                                                @:<div class="col-sm-4">
+                                                }
+                                                else if (j == 1)
+                                                {
+                                                    @:<div class="col-sm-3">
+                                                    }
+                                                    else if (j == 2)
+                                                    {
+                                                        @:<div class="col-sm-5">
+                                                        }
+                                                    }
+                                                    <div class="row">
+                                                        <label class="mr-3">
+                                                            <input type="radio" name="changeItem" value="@(isEditMode && Item.ID == 36 && Topic.Change_item != Item.ID.ToString() ? Topic.Change_item : Item.ID.ToString())" class='flat-red @(Item.ID == 36 ? "other":"")' @(isEditMode && (Topic.Change_item == Item.ID.ToString() || Convert.ToInt32(Topic.Change_item) > 36) ? "checked" : "") required>
+                                                            @Html.DisplayFor(model => Item.Name)
+                                                            <span class="changeItem-desc"></span>
+                                                        </label>
+                                                    </div>
+                                                    if (i == 3)
+                                                    {
+                                                    @:</div>
+                                                    i = 0;
+                                                    j++;
+                                                }
+                                                else
+                                                {
+                                                    i++;
+                                                }
                                             }
+                                </div>
+                                </div>
+                                <hr>
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">Product Type<span class="text-danger">*</span></label>
+                                    <div class="col-sm-10 col-form-label">
+                                        @foreach (var Type in ProductTypes)
+                                        {
+                                            <label class="mr-3">
+                                                <input type="radio" name="productType" value="@(isEditMode && Type.ID == 10 && Topic.Product_type != Type.ID.ToString() ? Topic.Product_type : Type.ID.ToString())" class='flat-red @(Type.ID == 10 ? "other":"")' @(isEditMode && (Topic.Product_type == Type.ID.ToString() || Convert.ToInt32(Topic.Product_type) > 10) ? "checked" : "") required>
+                                                @Html.DisplayFor(model => Type.Name)
+                                                <span class="productType-desc"></span>
+                                            </label>
                                         }
-                                            <div class="row">
+                                    </div>
+                                    <div class="col-sm-2"></div>
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label>Model</label>
+                                            <input type="text" name="model" class="form-control" id="P_model" placeholder="Enter Model" value='@(isEditMode?Topic.Model.Trim():"")' required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label>Part No</label>
+                                            <input type="text" name="partNo" class="form-control" id="P_partno" placeholder="Enter Part No" value='@(isEditMode?Topic.PartNo.Trim():"")' required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2"></div>
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label>Part Name</label>
+                                            <input type="text" name="partName" class="form-control" id="P_partname" placeholder="Enter Part Name" value='@(isEditMode?Topic.PartName.Trim():"")' required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <div class="form-group has-error">
+                                            <label>Process Name</label>
+                                            <input type="text" name="processName" class="form-control" id="P_processname" placeholder="Enter Process Name" value='@(isEditMode?Topic.ProcessName.Trim():"")' required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
+
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">Risk Analysis of Change<span class="text-danger">*</span></label>
+                                    <div class="col-sm-10 col-form-label">
+                                    </div>
+                                        <div class="col-sm-2"></div>
+                                        <div class="col-sm-10">
+                                            <label>The Change Has Risk of Product(Q-C-D)</label>
+                                        </div>
+                                        <div class="col-sm-2"></div>
+                                        <div class="col-sm-10">
+                                        <div class="form-group">
                                                 <label class="mr-3">
-                                                    <input type="radio" name="changeItem" value="@(isEditMode && Item.ID == 36 && Topic.Change_item != Item.ID.ToString() ? Topic.Change_item : Item.ID.ToString())" class='flat-red @(Item.ID == 36 ? "other":"")' @(isEditMode && (Topic.Change_item == Item.ID.ToString() || Convert.ToInt32(Topic.Change_item) > 36)? "checked" : "") required>
-                                                    @Html.DisplayFor(model => Item.Name) 
-                                                    <span class="changeItem-desc"></span>
+                                                    <input type="radio" name="risk" value="Y" class="flat-red " @(!isEditMode ? "checked" : Topic.Risk == "Y" ? "checked" : "")>
+                                                    YES
+                                                    <span class="productType-desc"></span>
+                                                </label>
+                                                <label class="mr-3">
+                                                    <input type="radio" name="risk" value="N" class="flat-red " @(!isEditMode ? "" : Topic.Risk == "N" ? "checked" : "")>
+                                                    No
+                                                    <span class="productType-desc"></span>
                                                 </label>
                                             </div>
-                                        if(i==3){
-                                            @:</div>
-                                            i=0;
-                                            j++;
-                                        }else{
-                                            i++;
+                                    </div>
+
+                                        <div class="col-sm-2"></div>
+                                        <div class="col-sm-10">
+                                            <label>If Yes Please Specity</label>
+                                        </div>
+                                        <div class="col-sm-2"></div>
+                                        <div class="col-sm-10">
+                                            <div class="form-group">
+                                                    <label class="mr-3">
+                                                        <input type="checkbox" id="Specity_Q" name="Specity_Q" value="Quality" class="flat-red Specity" @(!isEditMode ? "" : Topic.Specify.Contains("Quality") ? "checked" : "") >
+                                                        Quality
+                                                        <span class="productType-desc"></span>
+                                                    </label>
+                                                    <label class="mr-3">
+                                                        <input type="checkbox" id="Specity_C" name="Specity_C" value="Cost" class="flat-red Specity" @(!isEditMode ? "" : Topic.Specify.Contains("Cost") ? "checked" : "") >
+                                                        Cost
+                                                        <span class="productType-desc"></span>
+                                                    </label>
+                                                    <label class="mr-3">
+                                                        <input type="checkbox" id="Specity_D" name="Specity_D" value="Delivery" class="flat-red Specity" @(!isEditMode ? "" : Topic.Specify.Contains("Delivery") ? "checked" : "") >
+                                                        Delivery
+                                                        <span class="productType-desc"></span>
+                                                    </label>
+                                                </div>
+                                    </div>
+
+                                    <div class="col-sm-2"></div>
+                                    <div class="col-sm-10">
+                                            <div class="form-group">
+                                                <label>Management Plan</label>
+                                                    <textarea class="Management" name="Management" placeholder="Place some text here">
+                                                    </textarea>
+                                                        @if (isEditMode && Topic.Management_Plan != null && Topic.Management_Plan != "" && Topic.Management_Plan != "-")
+                                                        {
+                                                            <script>
+                                                        $(() => {
+                                                            $(".Management").summernote('code' , `@Html.Raw(Topic.Management_Plan)`);
+                                                        });
+                                                            </script>
+                                                        }
+                                            </div>
+                                    </div>
+
+                                    </div>
+                                    <hr>
+                                    @{
+                                        var isApp = true;
+                                        if (isEditMode)
+                                        {
+                                            if (Topic.App == null || Topic.App == "" || Topic.App == "-")
+                                            {
+                                                isApp = false;
+                                            }
                                         }
                                     }
-                                </div>
-                            </div>
-                            <hr>
-
-
-                            <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">Product Type<span class="text-danger">*</span></label>
-                                <div class="col-sm-10 col-form-label">
-                                @foreach(var Type in ProductTypes){
-                                    <label class="mr-3">
-                                        <input type="radio" name="productType" value="@(isEditMode && Type.ID == 10 && Topic.Product_type != Type.ID.ToString() ? Topic.Product_type : Type.ID.ToString())" class='flat-red @(Type.ID == 10 ? "other":"")' @(isEditMode && (Topic.Product_type == Type.ID.ToString() || Convert.ToInt32(Topic.Product_type) > 10)? "checked" : "") required>
-                                        @Html.DisplayFor(model => Type.Name)
-                                        <span class="productType-desc"></span>
-                                    </label>
-                                }
-                                </div>
-                                <div class="col-sm-2"></div>
-                                <div class="col-sm-5">
-                                    <div class="form-group">
-                                        <label>Model</label>
-                                        <input type="text" name="model" class="form-control" id="P_model" placeholder="Enter Model" value='@(isEditMode?Topic.Model.Trim():"")' required>
-                                    </div>
-                                </div>
-                                <div class="col-sm-5">
-                                    <div class="form-group">
-                                        <label>Part No</label>
-                                        <input type="text" name="partNo" class="form-control" id="P_partno" placeholder="Enter Part No" value='@(isEditMode?Topic.PartNo.Trim():"")' required>
-                                    </div>
-                                </div>
-                                <div class="col-sm-2"></div>
-                                <div class="col-sm-5">
-                                    <div class="form-group">
-                                        <label>Part Name</label>
-                                        <input type="text" name="partName" class="form-control" id="P_partname" placeholder="Enter Part Name" value='@(isEditMode?Topic.PartName.Trim():"")' required>
-                                    </div>
-                                </div>
-                                <div class="col-sm-5">
-                                    <div class="form-group has-error">
-                                        <label>Process Name</label>
-                                        <input type="text" name="processName" class="form-control" id="P_processname" placeholder="Enter Process Name" value='@(isEditMode?Topic.ProcessName.Trim():"")' required>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <hr>
-                            @{
-                                var isApp = true;
-                                if(isEditMode){
-                                    if(Topic.App == null || Topic.App == "" || Topic.App == "-"){
-                                        isApp = false;
-                                    }  
-                                }
-                            }
-                            @if(isApp && isEditMode){
-                            <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">APP/IPP Inform to customer </label>
-                                <div class="col-sm-10">
-                                    <div class="form-group">
-                                        <textarea name="appDescription" placeholder="Place some text here" style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;" disabled>@Html.DisplayFor(model => Topic.App)
+                                    @if (isApp && isEditMode)
+                                    {
+                                        <div class="form-group row">
+                                            <label class="col-sm-2 col-form-label">APP/IPP Inform to customer </label>
+                                            <div class="col-sm-10">
+                                                <div class="form-group">
+                                                    <textarea name="appDescription" placeholder="Place some text here" style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;" disabled>@Html.DisplayFor(model => Topic.App)
                                         </textarea>
-                                    </div>
-                                </div>
-                            </div>
-                            }
-
-                            @{
-                                var isSubject = false;
-                                var isDetail = false;
-                                var isTiming = false;
-                                
-                                if(isEditMode){
-                                    if(Topic.Subject != null && Topic.Subject != "" && Topic.Subject != "-"){
-                                        isSubject = true;
-                                    }  
-                                    if(Topic.Detail != null && Topic.Detail != "" && Topic.Detail != "-"){
-                                        isDetail = true;
-                                    }  
-                                    if(Topic.Timing != null && Topic.Timing != "" && Topic.Timing != "-"){
-                                        isTiming = true;
-                                    }  
-                                }
-                            }
-                            <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">Change Date<span class="text-danger">*</span> </label>
-                                <div class="col-sm-4">
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                                                </div>
+                                            </div>
                                         </div>
-                                            <input data-toggle="datepicker" class="form-control required" placeholder="Select Date " autocomplete="off" name="timing" data-inputmask-alias="datetime" data-inputmask-inputformat="dd-MM-yyyy" data-mask="99-99-9999" style="border-radius: 0px 5px 5px 0px; !important" required>
-                                            <div data-toggle="datepicker"></div>
-                                            @* @if(Topic != null && Topic.Timing != null){
-                                                <script>
-                                                    $("[name='timing']").datepicker('setDate', '@Topic.Timing');
-                                                </script>
-                                            } *@
-                                    </div>
-                                </div>
-                                <div class="col-sm-6">
-                                <div class="form-group">
-                                    <div class="custom-control custom-switch mt-2">
-                                        <input type="checkbox" class="custom-control-input" id="change_date_switch">
-                                        @{
-                                                var t_desc = (Topic!= null ?  Topic.TimingDesc ?? null : null);
+                                    }
+
+                                    @{
+                                        var isSubject = false;
+                                        var isDetail = false;
+                                        var isTiming = false;
+
+                                        if (isEditMode)
+                                        {
+                                            if (Topic.Subject != null && Topic.Subject != "" && Topic.Subject != "-")
+                                            {
+                                                isSubject = true;
                                             }
-                                        <label class="custom-control-label" for="change_date_switch">ไม่สามารถระบุได้</label>
+                                            if (Topic.Detail != null && Topic.Detail != "" && Topic.Detail != "-")
+                                            {
+                                                isDetail = true;
+                                            }
+                                            if (Topic.Timing != null && Topic.Timing != "" && Topic.Timing != "-")
+                                            {
+                                                isTiming = true;
+                                            }
+                                        }
+                                    }
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label">Change Date<span class="text-danger">*</span> </label>
+                                        <div class="col-sm-4">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                                                </div>
+                                                <input data-toggle="datepicker" class="form-control required" placeholder="Select Date " autocomplete="off" name="timing" data-inputmask-alias="datetime" data-inputmask-inputformat="dd-MM-yyyy" data-mask="99-99-9999" style="border-radius: 0px 5px 5px 0px; !important" required>
+                                                <div data-toggle="datepicker"></div>
+                                                @* @if(Topic != null && Topic.Timing != null){
+                        <script>
+                            $("[name='timing']").datepicker('setDate', '@Topic.Timing');
+                        </script>
+                    } *@
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <div class="custom-control custom-switch mt-2">
+                                                    <input type="checkbox" class="custom-control-input" id="change_date_switch">
+                                                    @{
+                                                        var t_desc = (Topic != null ? Topic.TimingDesc ?? null : null);
+                                                    }
+                                                    <label class="custom-control-label" for="change_date_switch">ไม่สามารถระบุได้</label>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                </div>
-                            </div>
 
 
-                            <div class="form-group row" id="change_date_desc" style="display:none">
-                                <label class="col-sm-2 col-form-label">Change Date's Description<span class="text-danger">*</span> </label>
-                                <div class="col-sm-10">
-                                    <div class="form-group">
-                                        @* <textarea class="textareaSubject" name="subject" placeholder="Place some text here">
-                                        </textarea>
-                                            <script>
-                                                $('.textareaSubject').summernote({
-                                                    height: 140,
-                                                    toolbar: [
-                                                        ['font', ['bold', 'underline', 'clear']],
-                                                        ['fontsize', ['fontsize']],
-                                                        ['para', ['ul', 'ol']],
-                                                    ],
-                                                });
-                                            </script>
-                                            @if(isSubject){
-                                            <script>
-                                                $(".textareaSubject").summernote('code' , `@Html.Raw(Topic.Subject)`,{
-                                                    toolbar: [
-                                                        ['font', ['bold', 'underline', 'clear']],
-                                                        ['fontsize', ['fontsize']],
-                                                        ['para', ['ul', 'ol']],
-                                                    ],
-                                                });
-                                            </script>
-                                            } *@
-                                            
+                                    <div class="form-group row" id="change_date_desc" style="display:none">
+                                        <label class="col-sm-2 col-form-label">Change Date's Description<span class="text-danger">*</span> </label>
+                                        <div class="col-sm-10">
+                                            <div class="form-group">
+                                                @* <textarea class="textareaSubject" name="subject" placeholder="Place some text here">
+                    </textarea>
+                        <script>
+                            $('.textareaSubject').summernote({
+                                height: 140,
+                                toolbar: [
+                                    ['font', ['bold', 'underline', 'clear']],
+                                    ['fontsize', ['fontsize']],
+                                    ['para', ['ul', 'ol']],
+                                ],
+                            });
+                        </script>
+                        @if(isSubject){
+                        <script>
+                            $(".textareaSubject").summernote('code' , `@Html.Raw(Topic.Subject)`,{
+                                toolbar: [
+                                    ['font', ['bold', 'underline', 'clear']],
+                                    ['fontsize', ['fontsize']],
+                                    ['para', ['ul', 'ol']],
+                                ],
+                            });
+                        </script>
+                        } *@
 
-                                        <input type="text" class="form-control" name="timingDesc" placeholder="กรุณาระบุรายละเอียด" value="@t_desc"></input>
+
+                                                <input type="text" class="form-control" name="timingDesc" placeholder="กรุณาระบุรายละเอียด" value="@t_desc"></input>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
 
-                            <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">Subject/Purpose for change </label>
-                                <div class="col-sm-10">
-                                    <div class="form-group">
-                                        <textarea class="textareaSubject" name="subject" placeholder="Place some text here">
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label">Subject/Purpose for change </label>
+                                        <div class="col-sm-10">
+                                            <div class="form-group">
+                                                <textarea class="textareaSubject" name="subject" placeholder="Place some text here">
                                         </textarea>
-                                            @if(isSubject){
-                                            <script>
+                                                @if (isSubject)
+                                                {
+                                                    <script>
                                                 $(() => {
                                                     $(".textareaSubject").summernote('code' , `@Html.Raw(Topic.Subject)`);
                                                 });
-                                            </script>
-                                            }
+                                                    </script>
+                                                }
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
 
-                            <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">Change Details & Introduction </label>
-                                <div class="col-sm-10">
-                                    <div class="form-group">
-                                        <textarea class="textareaDetails" name="detail" placeholder="Place some text here">
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label">Change Details & Introduction </label>
+                                        <div class="col-sm-10">
+                                            <div class="form-group">
+                                                <textarea class="textareaDetails" name="detail" placeholder="Place some text here">
                                         </textarea>
-                                            @if(isDetail){
-                                            <script>
+                                                @if (isDetail)
+                                                {
+                                                    <script>
                                                 $(() => {
                                                     $(".textareaDetails").summernote('code' , `@Html.Raw(Topic.Detail)`);
                                                 });
-                                            </script>
+                                                    </script>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr>
+
+                                    <div class="form-group row">
+                                        <label for="inputSkills" class="col-sm-2 col-form-label">Attach File</label>
+                                        <div class="col-sm-10">
+                                            <input type="file" class="my-pond" name="filepond" />
+                                            @if (isEditMode && Topic.FileList.Count != 0)
+                                            {
+                                                <div class="card-footer bg-white">
+                                                    @{ ViewBag.DisableFileList = true; }
+                                                    @Html.Partial("~/Views/Helper/FileList.cshtml", Topic.FileList as List<FileItem>)
+                                                </div>
                                             }
+                                        </div>
+                                    </div>
+
+                                    <hr>
+
+                                    <div class="form-group row">
+                                        <label for="inputSkills" class="col-sm-2 col-form-label">Review & Result Confirm Requirement<span class="text-danger">*</span></label>
+                                        <div class="col-sm-10">
+                                            @foreach (var DepartmentGroup in DepartmentLists)
+                                            {
+                                                <fieldset class="group border p-2">
+                                                    @{var departMentGroupName = DepartmentGroup.Name.Replace("_", " ");}
+                                                    <legend class="w-auto"> <input type="checkbox" class="checkedAll" id="@DepartmentGroup.Name" /> <label for="@DepartmentGroup.Name" style="display: contents;">@departMentGroupName</label></legend>
+                                                    <ul class="checkbox">
+                                                        @foreach (var Department in DepartmentGroup.Department)
+                                                        {
+                                                            try
+                                                            {
+                                                                var isChecked = false;
+                                                                if (isEditMode)
+                                                                {
+                                                                    if (Topic.RelatedListAlt.Exists(x => x.Department == Department.Name))
+                                                                    {
+                                                                        isChecked = true;
+                                                                    }
+                                                                }
+                                                                <li><input type="checkbox" class="related_radio checkSingle @DepartmentGroup.Name" id="@Department.ID" value="1" name="@Department.Name" @(isChecked ? "checked" : "") /><label for="@Department.ID">@Department.Name</label></li>
+
+                                                            }
+                                                            catch (Exception err)
+                                                            {
+                                                                <li><input type="checkbox" class="related_radio checkSingle @DepartmentGroup.Name" id="@Department.ID" value="1" name="@Department.Name" /><label for="@Department.ID">@Department.Name</label></li>
+
+
+
+                                                            }
+
+                                                        }
+                                                    </ul>
+                                                </fieldset>
+                                            }
+                                        </div>
+                                    </div>
+
+                                    <br>
+                                    <hr>
+                                    <br>
+                                    <div class="form-group row">
+                                        <div class="col-sm-12">
+                                            <button type="submit" id="ReviewSubmit" class="btn btn-info float-right">Submit</button>
+                                        </div>
+
                                     </div>
                                 </div>
-                            </div>
-
-                            <hr>
-
-                            <div class="form-group row">
-                                <label for="inputSkills" class="col-sm-2 col-form-label">Attach File</label>
-                                <div class="col-sm-10">
-                                    <input type="file" class="my-pond" name="filepond"/>
-                                    @if(isEditMode && Topic.FileList.Count != 0){
-                                        <div class="card-footer bg-white">
-                                        @{ ViewBag.DisableFileList = true; }
-                                            @Html.Partial("~/Views/Helper/FileList.cshtml",Topic.FileList as List<FileItem>)
-                                        </div>
-                                    }
-                                </div>
-                            </div>
-                            
-                            <hr>
-
-                            <div class="form-group row">
-                                <label for="inputSkills" class="col-sm-2 col-form-label">Review & Result Confirm Requirement<span class="text-danger">*</span></label>
-                                <div class="col-sm-10">
-                                @foreach(var DepartmentGroup in DepartmentLists){
-                                    <fieldset class="group border p-2"> 
-                                        @{var departMentGroupName = DepartmentGroup.Name.Replace("_", " ");}
-                                        <legend class="w-auto"> <input type="checkbox" class="checkedAll" id="@DepartmentGroup.Name"/> <label for="@DepartmentGroup.Name" style="display: contents;">@departMentGroupName</label></legend> 
-                                        <ul class="checkbox"> 
-                                            @foreach(var Department in DepartmentGroup.Department){
-                                                try{
-                                                    var isChecked = false;
-                                                    if(isEditMode){
-                                                        if(Topic.RelatedListAlt.Exists(x => x.Department == Department.Name)){
-                                                                isChecked = true;
-                                                        }
-                                                    }
-                                                    <li><input type="checkbox" class="related_radio checkSingle @DepartmentGroup.Name" id="@Department.ID" value="1" name="@Department.Name" @(isChecked ? "checked" : "")/><label for="@Department.ID">@Department.Name</label></li> 
-                                                }catch(Exception err){
-                                                    <li><input type="checkbox" class="related_radio checkSingle @DepartmentGroup.Name" id="@Department.ID" value="1" name="@Department.Name" /><label for="@Department.ID">@Department.Name</label></li> 
-
-                                                }
-                                            
-                                            }
-                                        </ul> 
-                                    </fieldset> 
-                                }
-                                </div>
-                            </div>
-
-                            <br>
-                            <hr>
-                            <br>
-                            <div class="form-group row">
-                                <div class="col-sm-12">
-                                    <button type="submit" id="ReviewSubmit" class="btn btn-info float-right">Submit</button>
-                                </div>
-                
-                            </div>
-                    </div>
                     </form>
                 </div>
             </div>

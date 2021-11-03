@@ -374,11 +374,18 @@ $("form#review").submit((e) => {
     e.preventDefault();
     $('#loading').removeClass('hidden')
     let rv_form = SerializeReviewForm();
-    $.post(InsertReviewPath, { topic_id: topic_id, topic_code: topic_code, topic_status: topic_status, isExternal: isExternal}, (result) => {
+    $.post(InsertReviewPath, { topic_id: topic_id, topic_code: topic_code, topic_status: topic_status, isExternal: isExternal }, (result) => {
+
+        if (result.code == 2) {
+            swal("Error", "Duplicate Review, Please try again", "error").then(setTimeout(() => { location.reload(); }, 1500));
+            $('#loading').addClass('hidden')
+            return;
+        }
         if(result.mail != ""){
             $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept':result.dept, 'pos':result.pos }).fail((error) => {
                 console.error(error);
                 swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                $('#loading').addClass('hidden')
                 return;
             })
         }
@@ -453,7 +460,12 @@ $("form#Trial").submit((e) => {
             delete files[index].detail;
         }
 
-        $.post(InsertTrialPath,{ desc: trial_form[0].value, topic_code: topic_code},(result) => {
+    $.post(InsertTrialPath, { desc: trial_form[0].value, topic_code: topic_code }, (result) => {
+        if (result.code == 2) {
+            swal("Error", "Duplicate Trial, Please try again", "error").then(setTimeout(() => { location.reload(); }, 1500));
+            $('#loading').addClass('hidden')
+            return;
+        }
             promises.push(files.forEach(element => {
                 var Data = new FormData();
                 Data.append("file",element.file);
@@ -514,7 +526,12 @@ $("form#Confirm").submit((e) => {
             delete files[index].detail;
         }
 
-        $.post(InsertConfirmPath,{topic_id:topic_id, topic_code:topic_code , desc: confirm_form[0].value},(result) => {
+    $.post(InsertConfirmPath, { topic_id: topic_id, topic_code: topic_code, desc: confirm_form[0].value }, (result) => {
+            if (result.code == 2) {
+                swal("Error", "Duplicate Confirm, Please try again", "error").then(setTimeout(() => { location.reload(); }, 1500));
+                $('#loading').addClass('hidden')
+                return;
+            }
             promises.push(files.forEach(element => {
                 var Data = new FormData();
                 Data.append("file",element.file);
@@ -586,7 +603,7 @@ $("form#Confirm").submit((e) => {
             swal("Error", "Resubmit not success", "error");
         }));
 
-        promises.push($.post(RequestResubmitPath, { 'desc': $("#resubmit_form [name='desc']").val(), 'due_date': $("#resubmit_form [name='due_date']").val(), 'topic_code': topic_code }, () => {
+        promises.push($.post(RequestResubmitPath, { 'desc': $("#resubmit_form [name='desc']").val(), 'due_date': $("#resubmit_form [name='due_date']").val(), 'topic_code': topic_code, 'status': topic_status }, () => {
             console.log('Resubmit created');
             moment.locale('en');
             files.forEach(element => {

@@ -119,8 +119,8 @@ namespace ChangeControl.Models{
         }
 
         public long InsertTopic(Topic m){
-            string query = $@"INSERT INTO Topic (Code, [Type], Change_item, Product_type, Revision , Department, Model, PartNo, PartName, ProcessName, Status, [APP/IPP], Subject, Detail, Timing , TimingDesc ,Related, User_insert, Time_insert)  OUTPUT Inserted.ID
-            VALUES( '{m.Code}','{m.Type}', {m.Change_item}, '{m.Product_type}', '{m.Revision}', '{m.Department}', '{m.Model}', '{m.PartNo}', '{m.PartName}', '{m.ProcessName}', '{m.Status}', '{m.App}' , '{m.Subject}' , '{m.Detail}', '{m.Timing}', '{m.TimingDesc}', '{m.Related}','{m.User_insert}','{m.Time_insert}' );";
+            string query = $@"INSERT INTO Topic (Code, [Type], Change_item, Product_type, Revision , Department, Model, PartNo, PartName, ProcessName, Status, [APP/IPP], Subject, Detail, Timing , TimingDesc ,Related, User_insert, Time_insert, Risk, Specify, Management_Plan)  OUTPUT Inserted.ID
+            VALUES( '{m.Code}','{m.Type}', {m.Change_item}, '{m.Product_type}', '{m.Revision}', '{m.Department}', '{m.Model}', '{m.PartNo}', '{m.PartName}', '{m.ProcessName}', '{m.Status}', '{m.App}' , '{m.Subject}' , '{m.Detail}', '{m.Timing}', '{m.TimingDesc}', '{m.Related}','{m.User_insert}','{m.Time_insert}','{m.Risk}','{m.Specify}','{m.Management_Plan}' );";
             var result = DB_CCS.Database.SqlQuery<long>(query).First();
             return result;
         }
@@ -129,17 +129,20 @@ namespace ChangeControl.Models{
             string query = $@"
             UPDATE CCS_TEST.dbo.Topic SET Status = 3 WHERE Code = '{m.Code}';
 
-            INSERT INTO Topic (Code, [Type], Change_item, Product_type, Revision , Department, Model, PartNo, PartName, ProcessName, Status, [APP/IPP], Subject, Detail, Timing , TimingDesc ,Related, User_insert, Time_insert)  
+            INSERT INTO Topic (Code, [Type], Change_item, Product_type, Revision , Department, Model, PartNo, PartName, ProcessName, Status, [APP/IPP], Subject, Detail, Timing , TimingDesc ,Related, User_insert, Time_insert, Risk, Specify, Management_Plan)  
             OUTPUT Inserted.ID VALUES( '{m.Code}','{m.Type}', {m.Change_item} , '{m.Product_type}' , 
                 (SELECT MAX(t.Revision)+1 FROM Topic t WHERE t.Code = '{m.Code}') 
-             ,'{m.Department}' ,'{m.Model}', '{m.PartNo}', '{m.PartName}', '{m.ProcessName}', '{m.Status}', '{m.App}' , '{m.Subject}' , '{m.Detail}', '{m.Timing}','{m.TimingDesc}', '{m.Related}','{m.User_insert}','{m.Time_insert}' );";
+             ,'{m.Department}' ,'{m.Model}', '{m.PartNo}', '{m.PartName}', '{m.ProcessName}', '{m.Status}', '{m.App}' , '{m.Subject}' , '{m.Detail}', '{m.Timing}','{m.TimingDesc}', '{m.Related}','{m.User_insert}','{m.Time_insert}','{m.Risk}','{m.Specify}','{m.Management_Plan}' );";
             var result = DB_CCS.Database.SqlQuery<long>(query).First();
             return result;
         }
 
         public long UpdateTopic(Topic m){
             string query = $@"UPDATE Topic SET 
-            [Type] = '{m.Type}', Change_item = {m.Change_item} , Product_type = '{m.Product_type}' , Revision  = '{m.Revision}' , Department = '{m.Department}' , Model = '{m.Model}', PartNo =  '{m.PartNo}', PartName = '{m.PartName}', ProcessName = '{m.ProcessName}', Status =  '{m.Status}', [APP/IPP] =  '{m.App}' , Subject = '{m.Subject}' , Detail =  '{m.Detail}', Timing =  '{m.Timing}', TimingDesc =  '{m.TimingDesc}', Related = '{m.Related}', User_insert = '{m.User_insert}', Time_insert = '{m.Time_insert}' OUTPUT Inserted.ID WHERE Code = '{m.Code}' AND Revision = '{m.Revision}';";
+            [Type] = '{m.Type}', Change_item = {m.Change_item} , Product_type = '{m.Product_type}' , Revision  = '{m.Revision}' , 
+            Risk='{m.Risk}', Specify='{m.Specify}', Management_Plan='{m.Management_Plan}',
+            Department = '{m.Department}' , Model = '{m.Model}', PartNo =  '{m.PartNo}', PartName = '{m.PartName}', ProcessName = '{m.ProcessName}', Status =  '{m.Status}', [APP/IPP] =  '{m.App}' , Subject = '{m.Subject}' , Detail =  '{m.Detail}', Timing =  '{m.Timing}', TimingDesc =  '{m.TimingDesc}', Related = '{m.Related}', User_insert = '{m.User_insert}', Time_insert = '{m.Time_insert}'
+            OUTPUT Inserted.ID WHERE Code = '{m.Code}' AND Revision = '{m.Revision}';";
             var result = DB_CCS.Database.SqlQuery<long>(query).First();
             return result;
         }
@@ -220,7 +223,7 @@ namespace ChangeControl.Models{
         }
 
         public TopicAlt GetTopicByID(string topic_code){
-            var sql = $@"SELECT TOP(1) ID, Code, [Type], CAST(Change_item AS varchar) AS Change_item, CAST(Product_type AS varchar) AS Product_type , Department, Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, Timing, TimingDesc, Related, User_insert, Time_insert, ID
+            var sql = $@"SELECT TOP(1) ID, Code, [Type], CAST(Change_item AS varchar) AS Change_item, CAST(Product_type AS varchar) AS Product_type , Department, Revision, Model, PartNo, PartName, ProcessName, Status, [APP/IPP] as App, Subject, Detail, Timing, TimingDesc, Related, User_insert, Time_insert, ID,Risk,Specify,Management_Plan
                 FROM Topic 
                 WHERE Code = '{topic_code}' ORDER BY Revision DESC;";
             var Topic = DB_CCS.Database.SqlQuery<TopicAlt>(sql);

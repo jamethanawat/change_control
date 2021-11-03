@@ -66,7 +66,8 @@ namespace ChangeControl.Controllers
                     tr_list.AddRange(M_Home.GetTrialApproved(dept));
                     cf_list.AddRange(M_Home.GetConfirmApproved(dept));
                 }
-                if(confirm_dept_list.Contains(dept)){
+                if(confirm_dept_list.Contains(dept))
+                {
                     cf_list.AddRange(M_Home.GetConfirmPendingByDepartment(dept));
                     if(isApprover){
                         cf_list.AddRange(M_Home.GetConfirmIssuedByDepartment(dept));

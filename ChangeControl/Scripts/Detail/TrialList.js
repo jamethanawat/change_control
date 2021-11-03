@@ -8,31 +8,36 @@ $(() => {
     
     $(".tr-approve").click(function (e) { 
         e.preventDefault();
-        console.log("trial",e);
+        //console.log("trial",e);
         let tr_id = e.target.value;
         swal({
             title: "Approve Trial", 
             buttons: [true,"Approve"],
             icon: "warning",
         }).then((apr) => {
-            if(apr){
+            if (apr) {
+                $('#loading').removeClass('hidden')
                 $.post(CheckAllTrialBeforeApprovePath, {topic_code:topic_code}, (res) => {
                     if(res == "True"){
-                        $.post(ApproveTrialPath, {topic_code:topic_code,trial_id:tr_id}, (result) => {
+                        $.post(ApproveTrialPath, { topic_code: topic_code, trial_id: tr_id, status: topic_status}, (result) => {
                             if(result){
                                 if(result.mail != "" && result.mail != null){
                                     $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept': result.dept, }).fail((error) => {
                                         console.error(error);
+                                        $('#loading').addClass('hidden')
                                         swal("Error", "Cannot send email to Requestor, Please try again", "error");
                                         return;
                                     });
                                 }
+                                $('#loading').addClass('hidden')
                                 swal("Success", "Change Status Success", "success").then(location.reload());
-                            }else{
+                            } else {
+                                $('#loading').addClass('hidden')
                                 swal("Error", "User Password Not Correct", "error");
                             }
                         },"json");
-                    }else{
+                    } else {
+                        $('#loading').addClass('hidden')
                         swal("Error", "Trial status has been changed , Refresh in 2 Second.", "error").then(setTimeout(() => { location.reload(); }, 1500));
                     }
                 })

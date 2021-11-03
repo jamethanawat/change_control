@@ -121,10 +121,48 @@ namespace ChangeControl.Controllers{
             }
         }
         [HttpPost, ValidateInput(false)]
-        public ActionResult Submit(string changeType,int changeItem,int productType,string model,string partNo, string partName, string processName,string appRadio, string appDescription,string subject,string detail,string timing,string timingDesc){
+        public ActionResult Submit(string changeType,int changeItem,int productType,string model,string partNo, string partName, string processName,string appRadio, string appDescription,string subject,string detail,string risk,string Specity_Q,string Specity_C,string Specity_D, string Management, string timing,string timingDesc){
           int status;
           var mode = "Insert";
           var revision = 0;
+          string Specity = "";
+            if (risk == "Y")
+            {
+                if(Specity_Q !=null)
+                {
+                    if(Specity == "")
+                    {
+                        Specity = Specity_Q;
+                    }
+                    else
+                    {
+                        Specity = Specity+","+ Specity_Q;
+                    }
+                }
+                if (Specity_C != null)
+                {
+                    if (Specity == "")
+                    {
+                        Specity = Specity_C;
+                    }
+                    else
+                    {
+                        Specity = Specity + "," + Specity_C;
+                    }
+
+                }
+                if (Specity_D != null)
+                {
+                    if (Specity == "")
+                    {
+                        Specity = Specity_D;
+                    }
+                    else
+                    {
+                        Specity = Specity + "," + Specity_D;
+                    }
+                }
+            }
 
           Session["Mode"] = mode;
           Session["Foreignkey"] = null;
@@ -152,7 +190,10 @@ namespace ChangeControl.Controllers{
               var new_timing = timing.Split('-');
               timing = $"{new_timing[2]}{new_timing[1]}{new_timing[0]}000000";
               
-              var temp_topic = new Topic((string)(Session["TopicCode"]), changeType, changeItem, productType, revision , (string) Session["Department"], model.ReplaceSingleQuote(),partNo.ReplaceSingleQuote(), partName.ReplaceSingleQuote(), processName.ReplaceSingleQuote(), status, appDescription.ReplaceSingleQuote() , subject.ReplaceSingleQuote(), detail.ReplaceSingleQuote(), timing.ReplaceSingleQuote(), timingDesc.ReplaceSingleQuote(), (long)Session["RelatedID"],(string)(Session["User"]), date );
+              var temp_topic = new Topic((string)(Session["TopicCode"]), changeType, changeItem, productType, revision , (string) Session["Department"], 
+                  model.ReplaceSingleQuote(),partNo.ReplaceSingleQuote(), partName.ReplaceSingleQuote(), processName.ReplaceSingleQuote(), 
+                  status, appDescription.ReplaceSingleQuote() , subject.ReplaceSingleQuote(), detail.ReplaceSingleQuote(), timing.ReplaceSingleQuote(),
+                  timingDesc.ReplaceSingleQuote(), (long)Session["RelatedID"],(string)(Session["User"]), date,risk, Specity, Management.ReplaceSingleQuote());
 
               Session["TopicID"] = M_Req.InsertTopic(temp_topic);
               M_Req.InsertTopicApprove((string)Session["TopicCode"]);
@@ -166,19 +207,62 @@ namespace ChangeControl.Controllers{
         }
 
         [HttpPost, ValidateInput(false)]
-        public ActionResult UpdateRequest(int changeItem,int productType,string model,string partNo, string partName, string processName,string appRadio, string appDescription,string subject,string detail,string timing,string timingDesc){
+        public ActionResult UpdateRequest(int changeItem,int productType,string model,string partNo, string partName, string processName,string appRadio, string appDescription,string subject,string detail, string risk, string Specity_Q, string Specity_C, string Specity_D, string Management,string timing,string timingDesc){
             //update revision (edit)
           var mode = "Edit";
           var mail = "";
           var temp_topic = (TopicAlt) Session["Topic"];
         //   var status = temp_topic.Status;
           var status = 3;
+            string Specity = "";
+            if (risk == "Y")
+            {
+                if (Specity_Q != null)
+                {
+                    if (Specity == "")
+                    {
+                        Specity = Specity_Q;
+                    }
+                    else
+                    {
+                        Specity = Specity + "," + Specity_Q;
+                    }
+                }
+                if (Specity_C != null)
+                {
+                    if (Specity == "")
+                    {
+                        Specity = Specity_C;
+                    }
+                    else
+                    {
+                        Specity = Specity + "," + Specity_C;
+                    }
 
-          Session["Mode"] = mode;
+                }
+                if (Specity_D != null)
+                {
+                    if (Specity == "")
+                    {
+                        Specity = Specity_D;
+                    }
+                    else
+                    {
+                        Specity = Specity + "," + Specity_D;
+                    }
+                }
+            }
+
+            Session["Mode"] = mode;
           try{
                 var new_timing = timing.Split('-');
                 timing = $"{new_timing[2]}{new_timing[1]}{new_timing[0]}000000";
-                var new_topic = new Topic(temp_topic.Code, temp_topic.Type, changeItem, productType, temp_topic.Revision,temp_topic.Department, model.ReplaceSingleQuote(),partNo.ReplaceSingleQuote(), partName.ReplaceSingleQuote(), processName.ReplaceSingleQuote(), status, appDescription.ReplaceSingleQuote(), subject.ReplaceSingleQuote(), detail.ReplaceSingleQuote(), timing.ReplaceSingleQuote(), timingDesc.ReplaceSingleQuote(), (long)Session["RelatedID"],(string)(Session["User"]), date );
+                var new_topic = new Topic(temp_topic.Code, temp_topic.Type, changeItem, productType,
+                    temp_topic.Revision,temp_topic.Department, model.ReplaceSingleQuote(),partNo.ReplaceSingleQuote(), partName.ReplaceSingleQuote(),
+                    processName.ReplaceSingleQuote(), status, appDescription.ReplaceSingleQuote(),
+                    subject.ReplaceSingleQuote(), detail.ReplaceSingleQuote(), timing.ReplaceSingleQuote()
+                    , timingDesc.ReplaceSingleQuote(), (long)Session["RelatedID"],(string)(Session["User"]),
+                    date, risk, Specity, Management.ReplaceSingleQuote());
                 if(temp_topic.Status == 3){
                     //ยังไม่approve
 
