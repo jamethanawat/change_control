@@ -8,31 +8,36 @@ $(() => {
     
     $(".cf-approve").click(function (e) { 
         e.preventDefault();
-        console.log("confirm",e);
+        //console.log("confirm",e);
         let cf_id = e.target.value;
         swal({
             title: "Approve Confirm", 
             buttons: [true,"Approve"],
             icon: "warning",
         }).then((apr) => {
-            if(apr){
+            if (apr) {
+                $('#loading').removeClass('hidden')
                 $.post(CheckAllConfirmBeforeApprovePath, {topic_code:topic_code}, (res) => {
                     if(res == "True"){
-                        $.post(ApproveConfirmPath, {topic_code:topic_code, confirm_id:cf_id}, (result) => {
+                        $.post(ApproveConfirmPath, { topic_code: topic_code, confirm_id: cf_id, status: topic_status}, (result) => {
                             if(result){
                                 if(result.mail != "" && result.mail != null){
                                     $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept': result.dept, }).fail((error) => {
                                         console.error(error);
-                                        swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                                        $('#loading').addClass('hidden')
+                                        swal("Error", "Cannot send email to Requestor, Please try again #001", "error");
                                         return;
                                     });
                                 }
+                                $('#loading').addClass('hidden')
                                 swal("Success", "Change Status Success", "success").then(location.reload());
-                            }else{
+                            } else {
+                                $('#loading').addClass('hidden')
                                 swal("Error", "User Password Not Correct", "error");
                             }
                         },"json");
-                    }else{
+                    } else {
+                        $('#loading').addClass('hidden')
                         swal("Error", "Confirm status has been changed , Refresh in 2 Second.", "error").then(setTimeout(() => { location.reload(); }, 1500));
                     }
                 })
@@ -83,7 +88,7 @@ $(() => {
 
                 promises.push($.post(GenerateMailPath,{ 'mode': 'ConfirmUpdate', 'topic_code':topic_code, 'dept':result.dept,'pos':'Approver' }).fail((error) => {
                     console.error(error);
-                    swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                    swal("Error", "Cannot send email to Requestor, Please try again #002", "error");
                     return;
                 }));
 

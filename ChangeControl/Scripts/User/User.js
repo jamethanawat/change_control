@@ -1,17 +1,23 @@
 ﻿var dataTable;
+var se_dept = '';
 $(document).ready(function () {
+    
     dataTable = $('#user_tb').DataTable({
         // "paging": true,
         // "lengthChange": true,
-        // "searching": true,
+         //"searching": true,
         // ordering: false,
         // "info": true,
         // "autoWidth": true,
-        // "pageLength": 10,
+        // "pageLength": 10,        
         ajax: {
             url: GetUserWithPermissionByDeptPath,
             type: "POST",
-            data: {dept: us_dept}
+            //data: { dept: us_dept, searchdept: se_dept}
+            data: function (d) {
+                d.dept = us_dept,
+                d.searchdept = se_dept;
+            }
         },
         treeGrid: {
             left: 10,
@@ -63,9 +69,10 @@ $(document).ready(function () {
                 data: function (item){
                     let select_dept = `<select class="form-control select2" name="department" style="width: 100%;" onchange="` + (item.Name == "" || item.Name == null ? 'changeDepartment(this)' : 'changeDepartmentAndUser(this)' ) + `" >`;
                     Departments.forEach(dept => {
-                        select_dept += `<option user="${item.User}" prev-dept="${item.Dept}" value="${dept}"`+(dept == item.Dept ? "selected" : "")+`>${dept}</option>`;
+                        select_dept += `<option user="${item.User}" prev-dept="${item.Dept}" value="${dept}"` + (dept == item.Dept ? "selected" : "") + `>${dept}</option>`;
                     });
                     select_dept += `</select>`;
+                    console.log(item.Dept);
                     return select_dept;
                 } 
             }
@@ -112,6 +119,7 @@ $(document).ready(function () {
                             pm_select.append(`<option value="${user}">${user}</option>`);
                         });
                     }).done(() => {
+                        se_dept = '';
                         dataTable.ajax.reload();
                         swal("Success", "Add user success.", "success");
                     });
@@ -137,6 +145,7 @@ $(document).ready(function () {
             $.post(AddPermissionPath , $(this).serialize(), (res) => {
                 if(res.status == "success"){
                     $(this).trigger('reset');
+                    se_dept = '';
                         dataTable.ajax.reload();
                         swal("Success", "Add permission success.", "success");
                 }else if(res.status == "duplicated"){
@@ -159,8 +168,46 @@ $(document).ready(function () {
         if(e.which != 13) $(this.form).trigger('reset');
     })
 
+    /* ---------------------------------------------------------------------------------------------- */
+    /*                                          On Search Department                                  */
+    /* ---------------------------------------------------------------------------------------------- */
+
+    $("#search_department").click(function (e) {
+
+        var select;
+        select = CreateDepartmentOption2();
+        swal({
+            title: "Search By Department",
+            text: "Please select Department",
+            closeOnClickOutside: true,
+            // buttons : [true,true],
+            content: select,
+            icon: "warning",
+        }).then(() => {
+            se_dept = $(".select-custom").children("option:selected").text();
+            //console.log(se_dept, "select");
+            dataTable.ajax.reload();
+
+        });
+    })
+
+
 });
 
+
+function CreateDepartmentOption2() {
+    const select = document.createElement('select');
+    select.className = 'select-custom'
+    let i = 1;
+    $('[name="dept"] option').each(function () {
+        let option = document.createElement('option');
+        option.innerHTML = $(this).val();
+        option.value = i;
+        select.appendChild(option);
+        i++;
+    });
+    return select;
+}
 
 function changePosition(e){
     console.log(e);
@@ -204,6 +251,7 @@ function changeDepartmentAndUser(e){
             switch(res.status){
                 case "success" : 
                     notyf.success('Update department complete');
+                    se_dept = '';
                     dataTable.ajax.reload();
                     break;
                 case "duplicated" : 
@@ -240,6 +288,7 @@ function deletePermission(e){
             $.post(DeletePermissionPath, {dept:e.getAttribute("department"), user:e.getAttribute("user")}, (res) => {
                 if(res.status == "success"){
                     notyf.success('Delete permission success');
+                    se_dept = '';
                     dataTable.ajax.reload();
                 }else{
                     notyf.error('Delete permission not success');
@@ -261,6 +310,7 @@ function deleteUser(e){
             $.post(DeleteUserPath, {user:e.getAttribute("user")}, (res) => {
                 if(res.status == "success"){
                     notyf.success('Delete user success');
+                    se_dept = '';
                     dataTable.ajax.reload();
                 }else{
                     notyf.error('Delete user not success');

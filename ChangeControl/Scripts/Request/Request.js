@@ -12,6 +12,8 @@ var InsertRelatedPath;
 var InsertFilePath;
 var file_list = [];
 $(document).ready(function () {
+ 
+  
 
     $('.textareaSubject').summernote({
         height: 140,
@@ -30,15 +32,47 @@ $(document).ready(function () {
             ['para', ['ul', 'ol']],
         ],
     });
+    $('.Management').summernote({
+        height: 140,
+        toolbar: [
+            ['font', ['bold', 'underline', 'clear']],
+            ['fontsize', ['fontsize']],
+            ['para', ['ul', 'ol']],
+        ],
+    });
+    if ($("input[name='risk']:checked").val() == "N") {
+        $("#Specity_Q").prop('disabled', true);
+        $("#Specity_C").prop('disabled', true);
+        $("#Specity_D").prop('disabled', true);
 
-    isEditMode = (isEditMode == "True" )? true : false;
+        $("#Specity_Q").prop("checked", false);
+        $("#Specity_C").prop("checked", false);
+        $("#Specity_D").prop("checked", false);
+
+        $(".Management").summernote("disable");
+        $(".Management").summernote('code', "");
+    } else {
+        //$("#Specity_Q").prop('disabled', false);
+        //$("#Specity_C").prop('disabled', false);
+        //$("#Specity_D").prop('disabled', false);
+
+        //$("#Specity_Q").prop("checked", false);
+        //$("#Specity_C").prop("checked", false);
+        //$("#Specity_D").prop("checked", false);
+
+
+        //$(".Management").summernote("enable");
+        //$(".Management").summernote('code', "");
+    }
+
+    isEditMode = (isEditMode == "True") ? true : false;
     var spanSubmit = $('.pTop');
 
     spanSubmit.on('click', () => {
         $(this).submit();
     });
 
-    
+
     $('[data-toggle="datepicker"]').datepicker({
         format: 'dd-MM-yyyy'
     });
@@ -50,14 +84,58 @@ $(document).ready(function () {
     $("#change_date_switch").on("click", function (e) {
         $("[name='timing']").datepicker('setDate', (this.checked) ? '01-01-9999' : moment().format("DD-MM-YYYY"));
         $("[name='timing']").prop('disabled', (this.checked) ? true : false);
-        if(!this.checked) $("[name='timingDesc']").val(""); 
+        if (!this.checked) $("[name='timingDesc']").val("");
         $("#change_date_desc").toggle();
     });
 
-    $("[name='timing']").datepicker('setDate', (this.checked) ? '01-01-9999' : Timing);
+    if (Timing == " ") {
+        $('[data-toggle="datepicker"]').datepicker({
+            format: 'dd-MM-yyyy',
+            defaultDate: ''
+        });
+    } else {
+
+         $("[name='timing']").datepicker('setDate', (this.checked) ? '01-01-9999' : Timing);
+    }
+ 
     if($("[name='timingDesc']").val().length > 0){
         $("#change_date_switch").click();
     }
+
+/* -------------------------------------------------------------------------- */
+/*                          Risk checkbox list                                */
+/* -------------------------------------------------------------------------- */
+
+    $("input[name='risk']").click(function () {
+        console.log('click risk')
+        var radioValue = $("input[name='risk']:checked").val();
+        if (radioValue == "N") {
+            $("#Specity_Q").prop('disabled', true);
+            $("#Specity_C").prop('disabled', true);
+            $("#Specity_D").prop('disabled', true);
+
+            $("#Specity_Q").prop("checked", false);
+            $("#Specity_C").prop("checked", false);
+            $("#Specity_D").prop("checked", false);
+
+            $(".Management").summernote("disable");
+            $(".Management").summernote('code', "");
+        } else {
+            $("#Specity_Q").prop('disabled', false);
+            $("#Specity_C").prop('disabled', false);
+            $("#Specity_D").prop('disabled', false);
+
+            $("#Specity_Q").prop("checked", false);
+            $("#Specity_C").prop("checked", false);
+            $("#Specity_D").prop("checked", false);
+
+
+            $(".Management").summernote("enable");         
+            $(".Management").summernote('code', "");
+        }
+    });
+
+
 
 
 /* -------------------------------------------------------------------------- */
@@ -110,6 +188,27 @@ $(document).ready(function () {
 
     $("form.Request").submit((e) => {
         e.preventDefault();
+        //check risk
+        if ($("input[name='risk']:checked").val() == "Y") {
+
+            let Qua = $("input#Specity_Q").prop("checked");
+            let Cost = $("input#Specity_C").prop("checked");
+            let Deli = $("input#Specity_D").prop("checked");
+            //console.log((Number(Qua) + Number(Cost) + Number(Deli), "number"))
+            if ((Number(Qua) + Number(Cost) + Number(Deli)) == 0) {
+                swal("Warning", "Please select one Specity", "warning");
+                return
+            }
+
+
+           // console.log($(".Management").summernote('code'))
+
+            if ($(".Management").summernote('code')== "") {
+                swal("Warning", "Please Input Management Plan", "warning");
+                return
+            }
+
+        }
         
         // CheckAudit();
         let QC1 = $("input#29").prop("checked");
@@ -123,10 +222,31 @@ $(document).ready(function () {
     
         let isInternal = $("#type_internal").is(":checked");
         let isExternal = $("#type_external").is(":checked");
+        let P1 = $("input#1").prop("checked");
+        let P2 = $("input#2").prop("checked");
+        let P3A = $("input#3").prop("checked");
+        let P3M = $("input#4").prop("checked");
+        let P4 = $("input#5").prop("checked");
+        let P5 = $("input#6").prop("checked");
+        let P6 = $("input#7").prop("checked");
+        let P7 = $("input#8").prop("checked");
+        //console.log(Number(P1), "Number(P1)");
+        //console.log(Number(P2), "Number(P2)");
+        //console.log(Number(P3A), "Number(P3A)");
+        //console.log(Number(P3M), "Number(P3M)");
+        //console.log(Number(P4), "Number(P4)");
+        //console.log(Number(P5), "Number(P5)");
+        if (moment().format("DD-MM-YYYY") == $("[name='timing']").val()) {
+            swal("Warning", " Change Date Not Correct", "warning");
+            return
+        }
     
-    
-        if(isInternal){
-            if(!(PE1_Process || PE2_Process || P5_ProcessDesign || P6_ProcessDesign) || !(QC1 || QC2 || QC3)){ //Need to select PE_Process or QC as Auditor at lease one
+        if (isInternal) {
+             if (Number(P1) + Number(P2) + Number(P3A) + Number(P3M) + Number(P4) + Number(P5) + Number(P6) + Number(P7) == 0) { //When select Production more than one
+                swal("Warning", "Please select Production at least one ", "warning");
+                return
+            }
+            if (!(PE1_Process || PE2_Process || P5_ProcessDesign || P6_ProcessDesign) || !(QC1 || QC2 || QC3)){ //Need to select PE_Process or QC as Auditor at lease one
                 swal("Warning", "Please select PE_Process and QC at least one", "warning");
                 return;
             }else if(Number(QC1) + Number(QC2) + Number(QC3) != 1 && Number(PE1_Process) + Number(PE2_Process) + Number(P5_ProcessDesign) + Number(P6_ProcessDesign) != 1  == false){ //When select QC and PE_Process more than one
@@ -139,7 +259,12 @@ $(document).ready(function () {
                 swal("Warning", "Please select one PE_Process", "warning");
                 return
             }
-        }else if(isExternal){
+         
+        } else if (isExternal) {
+            if (Number(P1) + Number(P2) + Number(P3A) + Number(P3M) + Number(P4) + Number(P5) + Number(P6) + Number(P7) ==0 ) { //When select Production more than one
+                swal("Warning", "Please select Production at least one ", "warning");
+                return
+            }
             if(!(QC1 || QC2 || QC3)){ //Need to select QC as Auditor at lease one
                 swal("Warning", "Please select QC at least one", "warning");
                 return;
@@ -148,8 +273,12 @@ $(document).ready(function () {
                 return
             }
         }
+
+
+     
         
         let form = SerializeReviewForm();
+        console.log(form);
         let quick_form = $(".related_radio").serializeArray();
         for(x in quick_form){
             quick_form[x] = quick_form[x].name;
@@ -171,7 +300,7 @@ $(document).ready(function () {
                 if(result.mail != ""){
                     $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':inserted_id, 'dept':result.dept, 'pos':result.pos }).fail((error) => {
                         console.error(error);
-                        swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                        swal("Error", "Cannot send email to Requestor, Please try again #007", "error");
                         return;
                     })
                 }
@@ -228,6 +357,26 @@ $(document).ready(function () {
     $("form.Edit").submit((e) => {
         e.preventDefault();
 
+        if ($("input[name='risk']:checked").val() == "Y") {
+
+            let Qua = $("input#Specity_Q").prop("checked");
+            let Cost = $("input#Specity_C").prop("checked");
+            let Deli = $("input#Specity_D").prop("checked");
+            //console.log((Number(Qua) + Number(Cost) + Number(Deli), "number"))
+            if ((Number(Qua) + Number(Cost) + Number(Deli)) == 0) {
+                swal("Warning", "Please select one Specity", "warning");
+                return
+            }
+
+
+            // console.log($(".Management").summernote('code'))
+
+            if ($(".Management").summernote('code') == "") {
+                swal("Warning", "Please Input Management Plan", "warning");
+                return
+            }
+
+        }
         // CheckAudit();
         let QC1 = $("input#29").prop("checked");
         let QC2 = $("input#30").prop("checked");
@@ -237,12 +386,29 @@ $(document).ready(function () {
         let PE2_Process = $("input#33").prop("checked");
         let P5_ProcessDesign = $("input#44").prop("checked");
         let P6_ProcessDesign = $("input#45").prop("checked");
-    
+
+
+        let P1 = $("input#1").prop("checked");
+        let P2 = $("input#2").prop("checked");
+        let P3A = $("input#3").prop("checked");
+        let P3M = $("input#4").prop("checked");
+        let P4 = $("input#5").prop("checked");
+        let P5 = $("input#6").prop("checked");
+        let P6 = $("input#7").prop("checked");
+        let P7 = $("input#8").prop("checked");
+
         let isInternal = $("#type_internal").is(":checked");
         let isExternal = $("#type_external").is(":checked");
+        if (moment().format("DD-MM-YYYY") == $("[name='timing']").val()) {
+            swal("Warning", " Change Date Not Correct", "warning");
+            return
+        }
     
-    
-        if(isInternal){
+        if (isInternal) {
+            if (Number(P1) + Number(P2) + Number(P3A) + Number(P3M) + Number(P4) + Number(P5) + Number(P6) + Number(P7) == 0) { //When select Production more than one
+                swal("Warning", "Please select Production at least one ", "warning");
+                return
+            }
             if(!(PE1_Process || PE2_Process || P5_ProcessDesign || P6_ProcessDesign) || !(QC1 || QC2 || QC3)){ //Need to select PE_Process or QC as Auditor at lease one
                 swal("Warning", "Please select PE_Process and QC at least one", "warning");
                 return;
@@ -256,7 +422,15 @@ $(document).ready(function () {
                 swal("Warning", "Please select one PE_Process", "warning");
                 return
             }
-        }else if(isExternal){
+            //else if (Number(P1) + Number(P2) + Number(P3A) + Number(P3M) + Number(P4) + Number(P5) + Number(P6) + Number(P7) != 1) { //When select Production more than one
+            //    swal("Warning", "Please select Production at least one ", "warning");
+            //    return
+            //}
+        } else if (isExternal) {
+            if (Number(P1) + Number(P2) + Number(P3A) + Number(P3M) + Number(P4) + Number(P5) + Number(P6) + Number(P7) == 0) { //When select Production more than one
+                swal("Warning", "Please select Production at least one ", "warning");
+                return
+            }
             if(!(QC1 || QC2 || QC3)){ //Need to select QC as Auditor at lease one
                 swal("Warning", "Please select QC at least one", "warning");
                 return;
@@ -264,6 +438,7 @@ $(document).ready(function () {
                 swal("Warning", "Please select one QC", "warning");
                 return
             }
+          
         }
         
             let form = SerializeReviewForm();
@@ -290,7 +465,7 @@ $(document).ready(function () {
                     if(result.mail != ""){
                         $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':inserted_id, 'dept':result.dept, 'pos':result.pos }).fail((error) => {
                             console.error(error);
-                            swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                            swal("Error", "Cannot send email to Requestor, Please try again #008", "error");
                             return;
                         })
                     }
@@ -444,6 +619,16 @@ function CheckAudit(){
     let P5_ProcessDesign = $("input#44").prop("checked");
     let P6_ProcessDesign = $("input#45").prop("checked");
 
+
+    let P1 = $("input#1").prop("checked");
+    let P2 = $("input#2").prop("checked");
+    let P3A = $("input#3").prop("checked");
+    let P3M = $("input#4").prop("checked");
+    let P4 = $("input#5").prop("checked");
+    let P5 = $("input#6").prop("checked");
+    let P6 = $("input#7").prop("checked");
+    let P7 = $("input#8").prop("checked");
+
     let isInternal = $("#type_internal").is(":checked");
     let isExternal = $("#type_external").is(":checked");
 
@@ -462,12 +647,20 @@ function CheckAudit(){
             swal("Warning", "Please select one PE_Process", "warning");
             return
         }
+        else if (Number(P1) + Number(P2) + Number(P3A) + Number(P3M) + Number(P4) + Number(P5) + Number(P6) + Number(P7) == 0) { //When select Production more than one
+            swal("Warning", "Please select Production at least one ", "warning");
+            return
+        }
     }else if(isExternal){
         if(!(QC1 || QC2 || QC3)){ //Need to select QC as Auditor at lease one
             swal("Warning", "Please select QC at least one", "warning");
             return;
         }else if(Number(QC1) + Number(QC2) + Number(QC3) != 1 ){ //When select QC more than one
             swal("Warning", "Please select one QC", "warning");
+            return
+        }
+        else if (Number(P1) + Number(P2) + Number(P3A) + Number(P3M) + Number(P4) + Number(P5) + Number(P6) + Number(P7) == 0) { //When select Production more than one
+            swal("Warning", "Please select Production at least one ", "warning");
             return
         }
     }

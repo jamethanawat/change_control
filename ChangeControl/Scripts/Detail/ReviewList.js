@@ -10,15 +10,16 @@ $(() => {
 
     $(".rv-approve").click(function (e) { 
         e.preventDefault();
-        console.log("review",e);
+        //console.log("review",e);
         let rv_id = e.target.value;
         swal({
             title: "Approve Issue", 
             buttons: [true,"Approve"],
             icon: "warning",
         }).then((apr) => {
-            if(apr){
-                $.post(CheckAllReviewBeforeApprovePath, {topic_code:topic_code}, (res) => {
+            if (apr) {
+                $('#loading').removeClass('hidden')
+                $.post(CheckAllReviewBeforeApprovePath, { topic_code: topic_code, isInternal: isInternal}, (res) => {
                     if(res == "True"){
                         var promises = [];
 
@@ -28,7 +29,8 @@ $(() => {
                                 promises.push(
                                     $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept': result.dept, }).fail((error) => {
                                         console.error(error);
-                                        swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                                        $('#loading').addClass('hidden')
+                                        swal("Error", "Cannot send email to Requestor, Please try again #005", "error");
                                         return;
                                     })
                                 );
@@ -39,7 +41,8 @@ $(() => {
                                         promises.push(
                                             $.post(GenerateMailPath,{ 'mode': 'InformIPP', 'topic_code':topic_code, 'dept_arry': res.data, }).fail((error) => {
                                             console.error(error);
-                                            console.error("err: ipp");
+                                                console.error("err: ipp");
+                                                $('#loading').addClass('hidden')
                                             swal("Error", "Cannot send email to IPP, Please try again", "error");
                                             return;
                                             })
@@ -48,13 +51,16 @@ $(() => {
                                 })
                                 );
                                 Promise.all(promises).then(() => {
+                                    $('#loading').addClass('hidden')
                                     swal("Success", "Change Status Success", "success").then(location.reload());
                                 });
-                            }else{
+                            } else {
+                                $('#loading').addClass('hidden')
                                 swal("Error", "User Password Not Correct", "error");
                             }
                         },"json");
-                    }else{
+                    } else {
+                        $('#loading').addClass('hidden')
                         swal("Error", "Review status has been changed , Refresh in 2 Second.", "error").then(setTimeout(() => { location.reload(); }, 1500));
                     }
                 })
@@ -122,7 +128,7 @@ $(() => {
             promises.push(
                 $.post(GenerateMailPath,{ 'mode': 'ReviewUpdate', 'topic_code':topic_code, 'dept':result.dept,'pos':'Approver' }).fail((error) => {
                     console.error(error);
-                    swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                    swal("Error", "Cannot send email to Requestor, Please try again #006", "error");
                     return;
                 })
             );

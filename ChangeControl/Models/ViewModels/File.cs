@@ -13,5 +13,6 @@ namespace ChangeControl.Models{
         public int? Size { get; set;}
         public string Time_Insert { get; set; }
         public string User_Insert { get; set; }
+        public string Department { get; set; }
     }
 }

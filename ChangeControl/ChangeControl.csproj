@@ -570,6 +570,7 @@
     <Content Include="Scripts\Detail\ReviewList.js" />
     <Content Include="Scripts\Detail\TrialList.js" />
     <Content Include="Scripts\Report\Report.js" />
+    <Content Include="Scripts\Shared\FilePond_rsm.js" />
     <Content Include="Scripts\User\User.js" />
     <Content Include="Scripts\Home\Home.js" />
     <!-- <Content Include="Scripts\jquery-3.4.1.js" />

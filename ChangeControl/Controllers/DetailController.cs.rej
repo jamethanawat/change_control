@@ -1,0 +1,10 @@
+diff a/ChangeControl/Controllers/DetailController.cs b/ChangeControl/Controllers/DetailController.cs	(rejected hunks)
+@@ -201,7 +201,7 @@
+                 resubmit.Date = resubmit.Date.StringToDigitDate();
+                 resubmit.DueDate = resubmit.DueDate.StringToDigitDate3();
+                 resubmit.Profile = M_Detail.getUserByID(resubmit.User);             
+-                resubmit.FileList = M_Detail.GetFileByFKID(resubmit.ID, "Resubmit", Session["TopicCode"].ToString(), resubmit.Dept);
++                resubmit.FileList = M_Detail.GetFileByFKID(resubmit.ID, "Resubmit", Topic.Code, resubmit.Dept);
+ 
+                 var result = M_Detail.GetResponseByResubmitID(resubmit.ID);
+                 foreach(var response in result){

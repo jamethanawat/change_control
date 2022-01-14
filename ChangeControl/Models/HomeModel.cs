@@ -39,7 +39,9 @@ namespace ChangeControl.Models
         public List<String> GetConfirmDeptList(){
             try{
                 var sql = $@"SELECT Name FROM Department
-                            WHERE [Group] = 'Production';";
+                            WHERE [Group] = 'Production'
+                            OR [Group] = 'Purchase'
+                            OR ([Group] = 'Quality Control' AND (Audit <> 1 or Audit is null))";
                 var result = DB_CCS.Database.SqlQuery<String>(sql).ToList();
                 return result;
             }catch(Exception ex){
@@ -184,7 +186,20 @@ namespace ChangeControl.Models
             var result = DB_CCS.Database.SqlQuery<String>(sql).ToList();
             return result;
         }
-        
+        public List<TopicNoti> GetResubmitPendingByDepartment(string dept)
+        {
+            var sql = $@"select DISTINCT  Topic as Code,Resubmit.[Date] as Time_insert from Resubmit 
+                        left join Related on Resubmit.Related = Related.PK_Related
+                        left join Response on Resubmit.ID = Response.Resubmit and  Related.Department = Response.Department
+                        left join Topic  on Resubmit.Topic =Topic.Code 
+                        where Related.Department = '{dept}'
+                        and Topic.Status !=2
+                        and Topic.Status !=12
+                        and Response.ID is null;";
+
+            var result = DB_CCS.Database.SqlQuery<TopicNoti>(sql).ToList();
+            return result;
+        }
         public List<TopicNoti> GetRequestIssuedByDepartment(string dept){
             var sql = $@"SELECT DISTINCT Code, Topic.Revision, Topic.Status, Subject, Detail, Time_insert , 'Issued' AS SubStatus 
                         FROM Topic
@@ -338,10 +353,10 @@ namespace ChangeControl.Models
                         WHERE Related.Department = '{dept}'
                             AND Topic.Revision = (SELECT MAX(t.Revision) FROM Topic t WHERE t.Code = Topic.Code  AND t.Department = Topic.Department)
                             AND Topic.Status = 10
-                            AND (Department.[Group] = 'Production')
+                            AND (Department.[Group] = 'Production' or (Department.[Group] = 'Quality Control' and (Department.Audit <> 1 or Department.Audit is null )) or Department.[Group] =  'Purchase')
                             AND Related.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 )
                             AND NOT EXISTS ( 
-                                SELECT * FROM Confirm WHERE Confirm.Department = Confirm.Department AND Confirm.Topic = Topic.Code 
+                                SELECT * FROM Confirm WHERE Confirm.Department = Related.Department AND Confirm.Topic = Topic.Code 
                                 AND Confirm.Revision = (
                                     SELECT MAX(c.Revision) FROM Confirm c WHERE c.Topic = Confirm.Topic AND c.Department = Confirm.Department
                                     AND Confirm.Revision = (SELECT MAX(c.Revision) FROM Confirm c WHERE c.Topic = Confirm.Topic AND c.Department = Confirm.Department)
@@ -378,9 +393,11 @@ namespace ChangeControl.Models
                                                         
                         (SELECT COUNT(Related.ID) FROM Related LEFT JOIN Department sub_d ON Related.Department = sub_d.Name 
                         WHERE Topic.Related = PK_Related AND Related.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 )
-                        AND (sub_d.[Group] = 'Production'))
+                         AND (sub_d.[Group] = 'Production' OR (sub_d.[Group] = 'Quality Control' AND   (sub_d.Audit <> 1 or sub_d.Audit is null )) OR sub_d.[Group] = 'Purchase'))
                         
-                        AND NOT EXISTS ( SELECT * FROM Confirm WHERE Confirm.Topic = Topic.Code AND Confirm.Status = 3 AND Confirm.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 )) 
+                        AND NOT EXISTS ( SELECT * FROM Confirm WHERE Confirm.Topic = Topic.Code AND Confirm.Status = 3 
+                        AND Confirm.Revision = (SELECT MAX(c.Revision) FROM Confirm c WHERE c.Topic = Confirm.Topic AND c.Department = Confirm.Department)
+                        AND Confirm.Department NOT IN (SELECT Name FROM Department WHERE [Group] = 'Quality Control' and Audit = 1 )) 
                         AND Related.Department = '{dept}';";
             var result = DB_CCS.Database.SqlQuery<TopicNoti>(sql).ToList();
             return result;

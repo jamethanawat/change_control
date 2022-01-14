@@ -15,6 +15,8 @@
                     @foreach(var Item in ReviewItem){
                         var temp_rd = $"rd-{@Item.Type}";
                         var temp_desc = $"desc-{@Item.Type}";
+                        var txtshow1 = Item.Type != 15 ? "Yes" : "Acceptance";
+                        var txtshow2 = Item.Type != 15 ? "No" : "Not Acceptance";
                         <div class="form-group row">
                             <label for="inputProDesRe" class="col-sm-2 col-form-label">@Item.Name</label>
                             @if(Item.Status != null){
@@ -22,11 +24,11 @@
                             <div class="col-sm-3 col-form-label">
                                 <label class="mr-3">
                                     <input data-type="status" data-id="@Item.Type" type="radio" name="@temp_rd" value="1" class="flat-red" @(Item.Status == 1 ? "checked" : "")>
-                                    Yes
+                                    @txtshow1
                                 </label>
                                 <label class="mr-3">
                                     <input data-type="status" data-id="@Item.Type" type="radio" name="@temp_rd" value="0" class="flat-red" @(Item.Status == 1 ? "" : "checked")>
-                                    No
+                                    @txtshow2
                                 </label>
                             </div>
                             <div class="col-sm-7 col-form-label">

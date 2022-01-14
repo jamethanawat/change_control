@@ -28,7 +28,7 @@ namespace ChangeControl.Controllers{
             Topic = new TopicAlt();
         }
 
-        public static string DevMode = "on";
+        //public static string DevMode = "on";
 
         public ActionResult Index(string mode,string topic_code , string dept = null){
             try{
@@ -63,7 +63,10 @@ namespace ChangeControl.Controllers{
         }
 
         public ActionResult GenerateMail(string mode,string topic_code, string dept = null, string[] dept_arry=null, string due_date="", string pos="")  {
-            try{
+            List<String> temp_email_list = new List<string>();
+            var address_list = new List<string>();
+            try
+            {
                 Topic = M_Mail.GetTopicByCode(topic_code);
                 ViewBag.Mode = mode;
                 ViewBag.Url = $"http://172.27.170.19/ChangeControl/Detail/Index/?id={Topic.Code}";
@@ -73,8 +76,8 @@ namespace ChangeControl.Controllers{
                 if(ViewBag.Topic.FullStatus == "Waiting") ViewBag.Topic.FullStatus = "Request";
 
                 var email = RenderView("~/Views/Mail/index.cshtml",Topic);
-                var address_list = new List<string>();
-                List<String> temp_email_list = new List<string>();
+           
+              
 
                 if(dept_arry != null){ //Dept as array
                     foreach(var temp_dept in dept_arry){
@@ -94,12 +97,32 @@ namespace ChangeControl.Controllers{
                     if (temp_email_list != null) address_list.AddRange(temp_email_list);
                 }
 
-                if(temp_email_list != null){
+                if(address_list != null && address_list.Count !=0){
                     SendMail(email,address_list);
+
+                    string date = DateTime.Now.ToString("yyyyMMddHHmmss");
+                    string listmail = "";
+                    foreach (var i in address_list)
+                    {
+                        if (listmail != "") listmail += " ,";
+                        listmail += i;
+                    }
+
+                    M_Mail.InsertlogMail(topic_code, mode, listmail, date, Session["User"].ToString(), Session["Department"].ToString());
                 } 
                 return Json(new {status = true}, JsonRequestBehavior.AllowGet);
             // return View(Topic);
             }catch(Exception err){
+
+                string date = DateTime.Now.ToString("yyyyMMddHHmmss");
+                string listmail = "";
+                foreach (var i in address_list)
+                {
+                    if (listmail != "") listmail += " ,";
+                    listmail += i;
+                }
+                string er = "GenerateMail_ERROR " + err.ToString();
+                M_Mail.InsertlogMail_error(topic_code, mode, listmail, date, er, Session["User"].ToString(), Session["Department"].ToString());
                 return Json(new {error = err}, JsonRequestBehavior.AllowGet);
             }
         }
@@ -139,96 +162,115 @@ namespace ChangeControl.Controllers{
             //   return Json(new { code = -1 }, JsonRequestBehavior.AllowGet);
             // }
         }
-        public void SendMail(string email_body,List<string> address_list){
-            
-            var datemail = DateTime.Now.ToString("dd/MM/yyy HH:mm:ss");
-            string FromName = "Change Control System";
-            string FromEmail = "ccs@email.thns.co.th";
-            System.Net.Mail.SmtpClient smtp = new SmtpClient("172.27.170.11");
-            smtp.EnableSsl = false;
-            System.Net.Mail.MailMessage mailMessage = new System.Net.Mail.MailMessage();
-            mailMessage.From = new System.Net.Mail.MailAddress(FromEmail, FromName);
-            foreach(var address in address_list){
-                if(address == null) continue;
-                mailMessage.To.Add(new System.Net.Mail.MailAddress(address));
-            }
-            var MNo = "1";
-            var Msub = "1";
-            var Mdetail = "1";
-            mailMessage.IsBodyHtml = true;
-            mailMessage.Body = email_body;
-            
-            switch(ViewBag.Mode){
-                case "EmailRequestor" : // Unused
-                    mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Issue request.";
-                    break;
-                case "EmailRequested" : //Approve on request
-                    mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Issued.";
-                    break;
-                case "EmailReviewed" : //Approve on review
-                    mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Issued.";
-                    break;
-                case "EmailTrialed" : //Approve on trial
-                    mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Issued.";
-                    break;
-                case "EmailConfirmed" :
-                    mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Issued.";
-                    break;
-                case "InformPE" : //Request PE_Process to review
-                    mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Requested.";
-                    break;
-                case "InformUser" :
-                    mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Please Review.";
-                    break;
-                case "RequestTrial" :
-                    mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Production request Trial please followup";
-                    break;
-                case "ReviewApproved" : //Request QC to Approved
-                    mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Approved by Related Department.";
-                    break;
-                case "StartTrial" : //Start Trial
-                    mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Please start Trial and Confirm.";
-                    break;
-                case "InformIPP" :
-                    mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Please attach IPP label.";
-                    break;
-                case "TrialApproved" :
-                    mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Approved by Related Department.";
-                    break;
-                case "StartConfirm" :
-                    mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Please Issue in Initial Production.";
-                    break;
-                case "ConfirmApproved" :
-                    mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Approved by Related Department.";
-                    break;
-                case "TopicUpdate" :
-                    mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} {Session["FullName"].ToString()} Revised data to Rev.{ViewBag.Topic.Revision.ToString("00")}";
-                    break;
-                case "ReviewUpdate" :
-                    mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} {Session["FullName"].ToString()} Revised data to Rev.{Convert.ToInt32(Session["ReviewRev"].ToString()).ToString("00")}";
-                    break;
-                case "TrialUpdate" :
-                    mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} {Session["FullName"].ToString()} Revised data to Rev.{Convert.ToInt32(Session["TrialRev"].ToString()).ToString("00")}";
-                    break;
-                case "ConfirmUpdate" :
-                    mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} {Session["FullName"].ToString()} Revised data to Rev{Convert.ToInt32(Session["ConfirmRev"].ToString()).ToString("00")}";
-                    break;
-                case "TopicReject" :
-                    mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Rejected.";
-                    break;
-                case "RequestDocument" : //Resubmit
-                    mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} {Session["Department"].ToString()} Request more documents.";
-                    break;
-                case "ReplyResubmit" : //Resubmit
-                    mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} {Session["Department"].ToString()} Replied resubmit.";
-                    break;
-                default :
-                    mailMessage.Subject = "ERROR";
-                    break;
-            }
+        public void SendMail(string email_body, List<string> address_list) {
+            try
+            {
 
-            smtp.Send(mailMessage);
-            mailMessage.Dispose();
+            
+                var datemail = DateTime.Now.ToString("dd/MM/yyy HH:mm:ss");
+                Random rand = new Random();
+                int number = rand.Next(1, 200); //returns random number between 0-200
+
+                string FromName = "Change Control System";
+                string FromEmail = $"ccs_{number.ToString()}@email.thns.co.th";
+                System.Net.Mail.SmtpClient smtp = new SmtpClient("172.27.168.11");
+                smtp.EnableSsl = false;
+                System.Net.Mail.MailMessage mailMessage = new System.Net.Mail.MailMessage();
+                mailMessage.From = new System.Net.Mail.MailAddress(FromEmail, FromName);
+                foreach (var address in address_list) {
+                    if (address == null) continue;
+                    mailMessage.To.Add(new System.Net.Mail.MailAddress(address));
+                }
+                var MNo = "1";
+                var Msub = "1";
+                var Mdetail = "1";
+                mailMessage.IsBodyHtml = true;
+                mailMessage.Body = email_body;
+
+                switch (ViewBag.Mode) {
+                    case "EmailRequestor": // Unused
+                        mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Issue request.";
+                        break;
+                    case "EmailRequested": //Approve on request
+                        mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Issued.";
+                        break;
+                    case "EmailReviewed": //Approve on review
+                        mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Issued.";
+                        break;
+                    case "EmailTrialed": //Approve on trial
+                        mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Issued.";
+                        break;
+                    case "EmailConfirmed":
+                        mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Issued.";
+                        break;
+                    case "InformPE": //Request PE_Process to review
+                        mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Requested.";
+                        break;
+                    case "InformUser":
+                        mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Please Review.";
+                        break;
+                    case "RequestTrial":
+                        mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Production request Trial please followup";
+                        break;
+                    case "ReviewApproved": //Request QC to Approved
+                        mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Approved by Related Department.";
+                        break;
+                    case "StartTrial": //Start Trial
+                        mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Please start Trial and Confirm.";
+                        break;
+                    case "InformIPP":
+                        mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Please attach IPP label.";
+                        break;
+                    case "TrialApproved":
+                        mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Approved by Related Department.";
+                        break;
+                    case "StartConfirm":
+                        mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Please Issue in Initial Production.";
+                        break;
+                    case "ConfirmApproved":
+                        mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Approved by Related Department.";
+                        break;
+                    case "TopicUpdate":
+                        mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} {Session["FullName"].ToString()} Revised data to Rev.{ViewBag.Topic.Revision.ToString("00")}";
+                        break;
+                    case "ReviewUpdate":
+                        mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} {Session["FullName"].ToString()} Revised data to Rev.{Convert.ToInt32(Session["ReviewRev"].ToString()).ToString("00")}";
+                        break;
+                    case "TrialUpdate":
+                        mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} {Session["FullName"].ToString()} Revised data to Rev.{Convert.ToInt32(Session["TrialRev"].ToString()).ToString("00")}";
+                        break;
+                    case "ConfirmUpdate":
+                        mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} {Session["FullName"].ToString()} Revised data to Rev{Convert.ToInt32(Session["ConfirmRev"].ToString()).ToString("00")}";
+                        break;
+                    case "TopicReject":
+                        mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} Rejected.";
+                        break;
+                    case "RequestDocument": //Resubmit
+                        mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} {Session["Department"].ToString()} Request more documents.";
+                        break;
+                    case "ReplyResubmit": //Resubmit
+                        mailMessage.Subject = $"Phase {ViewBag.Topic.FullStatus} : Process change no. {ViewBag.Topic.Code} {Session["Department"].ToString()} Replied resubmit.";
+                        break;
+                    default:
+                        mailMessage.Subject = "ERROR";
+                        break;
+                }
+
+                smtp.Send(mailMessage);
+                mailMessage.Dispose();
+            }
+            catch (Exception er)
+            {
+                string date = DateTime.Now.ToString("yyyyMMddHHmmss");
+                string listmail = "";
+                foreach (var i in address_list)
+                {
+                    if (listmail != "") listmail += " ,";
+                    listmail += i;
+                }
+                string err = "SendMail_ERROR " + er.ToString();
+                M_Mail.InsertlogMail_error(ViewBag.Topic.Code, ViewBag.Mode, listmail, date, err, Session["User"].ToString(), Session["Department"].ToString());
+            }
         }
 
         

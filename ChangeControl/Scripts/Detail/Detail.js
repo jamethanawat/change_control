@@ -2,6 +2,7 @@
 var file_list = [];
 var file_list_alt = [];
 var file_list_rd = [];
+var file_list_rsm = [];
 var due_date;
 var rsm_id = 0;
 var rsm_dept = '';
@@ -65,7 +66,7 @@ $("#reject").click(() => {
                         if(result.status == "success" && result.mail != null && result.mail != ""){
                             $.post(GenerateMailPath,{ 'mode': result.mail, 'dept': result.dept, 'topic_code':topic_code, }).fail((error) => {
                                 console.error(error);
-                                swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                                swal("Error", "Cannot send email to Requestor, Please try again #012", "error");
                                 return;
                             })
                         }
@@ -347,7 +348,7 @@ $.each(DepartmentLists, (key,val) => {
                         'dept':(topic_code.substring(0,2) == "IN") ? pe_audit : null,
                     }).fail((error) => {
                     console.error(error);
-                    swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                        swal("Error", "Cannot send email to Requestor, Please try again #013", "error");
                     return;
                 }));
                     swal("Success", "Approve Success", "success").then(location.reload());
@@ -373,11 +374,18 @@ $("form#review").submit((e) => {
     e.preventDefault();
     $('#loading').removeClass('hidden')
     let rv_form = SerializeReviewForm();
-    $.post(InsertReviewPath, {topic_id:topic_id, topic_code:topic_code}, (result) => {
+    $.post(InsertReviewPath, { topic_id: topic_id, topic_code: topic_code, topic_status: topic_status, isExternal: isExternal }, (result) => {
+
+        if (result.code == 2) {
+            swal("Error", "Duplicate Review, Please try again", "error").then(setTimeout(() => { location.reload(); }, 1500));
+            $('#loading').addClass('hidden')
+            return;
+        }
         if(result.mail != ""){
             $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept':result.dept, 'pos':result.pos }).fail((error) => {
                 console.error(error);
-                swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                swal("Error", "Cannot send email to Requestor, Please try again #014", "error");
+                $('#loading').addClass('hidden')
                 return;
             })
         }
@@ -452,7 +460,12 @@ $("form#Trial").submit((e) => {
             delete files[index].detail;
         }
 
-        $.post(InsertTrialPath,{ desc: trial_form[0].value, topic_code: topic_code},(result) => {
+    $.post(InsertTrialPath, { desc: trial_form[0].value, topic_code: topic_code }, (result) => {
+        if (result.code == 2) {
+            swal("Error", "Duplicate Trial, Please try again", "error").then(setTimeout(() => { location.reload(); }, 1500));
+            $('#loading').addClass('hidden')
+            return;
+        }
             promises.push(files.forEach(element => {
                 var Data = new FormData();
                 Data.append("file",element.file);
@@ -476,7 +489,7 @@ $("form#Trial").submit((e) => {
             if(result.mail != ""){
                 promises.push($.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept':result.dept, 'pos':result.pos }).fail((error) => {
                     console.error(error);
-                    swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                    swal("Error", "Cannot send email to Requestor, Please try again #015", "error");
                     return;
                 }));
             }
@@ -513,7 +526,12 @@ $("form#Confirm").submit((e) => {
             delete files[index].detail;
         }
 
-        $.post(InsertConfirmPath,{topic_id:topic_id, topic_code:topic_code , desc: confirm_form[0].value},(result) => {
+    $.post(InsertConfirmPath, { topic_id: topic_id, topic_code: topic_code, desc: confirm_form[0].value }, (result) => {
+            if (result.code == 2) {
+                swal("Error", "Duplicate Confirm, Please try again", "error").then(setTimeout(() => { location.reload(); }, 1500));
+                $('#loading').addClass('hidden')
+                return;
+            }
             promises.push(files.forEach(element => {
                 var Data = new FormData();
                 Data.append("file",element.file);
@@ -537,7 +555,7 @@ $("form#Confirm").submit((e) => {
             if(result.mail != ""){
                 promises.push($.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept':result.dept, 'pos':result.pos }).fail((error) => {
                     console.error(error);
-                    swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                    swal("Error", "Cannot send email to Requestor, Please try again #009", "error");
                     return;
                 }));
             }
@@ -565,25 +583,83 @@ $("form#Confirm").submit((e) => {
         for(x in quick_form){
             quick_form[x] = quick_form[x].name;
         }
+        topic_code: topic_code
+        console.log("sunmit", quick_form);
+       // let tmp = $("#resubmit_form").serializeArray();
+        //let due = tmp[1].value;
+        var promises = [];
+        files = file_list_rsm;
+        console.log("files", files);
+        for (var index in files) {
+            files[index].file = files[index].detail.file;
+            delete files[index].detail;
+        }
 
-        console.log(quick_form);
-        $.post(InsertRelatedPath, {dept_list:quick_form}, () =>{
+
+        promises.push($.post(InsertRelatedPath, { dept_list: quick_form }, () => {
             console.log('Related created');
-            $.post(RequestResubmitPath, $("#resubmit_form").serialize(), (res) =>{
-                console.log('Resubmit created');
-                if(res.status == "success"){
-                    moment.locale('en');
-                    $.post(GenerateMailPath,{ 'mode': 'RequestDocument', 'topic_code':topic_code, 'due_date': moment(due_date,"DD-MM-YYYY").format('D MMMM YYYY'), 'dept_arry': rsm_related_list, }).fail((error) => {
-                        console.error(error);
-                        swal("Error", "Cannot send email to Requestor, Please try again", "error");
-                        return;
-                    })
-                    swal("Success", "Resubmit Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
-                }else{
-                    swal("Error", "Resubmit Not Success, Please Try Again", "error");
-                }
+            return;
+        }).fail(() => {
+            swal("Error", "Resubmit not success", "error");
+        }));
+
+        promises.push($.post(RequestResubmitPath, { 'desc': $("#resubmit_form [name='desc']").val(), 'due_date': $("#resubmit_form [name='due_date']").val(), 'topic_code': topic_code, 'status': topic_status }, () => {
+            console.log('Resubmit created');
+            moment.locale('en');
+            files.forEach(element => {
+                var Data = new FormData();
+                Data.append("file", element.file);
+                Data.append("description", element.description);
+                Data.append("code", topic_code);
+                promises.push($.ajax({
+                    type: "POST",
+                    url: InsertFileResubmitPath,
+                    data: Data,
+                    cache: false,
+                    processData: false,
+                    contentType: false,
+                    error: function () {
+                        swal("Error", "Upload file not success", "error");
+                    }
+                }));
             });
-        });
+        }).fail(() => {
+            swal("Error", "Resubmit not success", "error");
+        }));
+     
+        promises.push($.post(GenerateMailPath, { 'mode': 'RequestDocument', 'topic_code': topic_code, 'due_date': moment(due_date, "DD-MM-YYYY").format('D MMMM YYYY'), 'dept_arry': rsm_related_list, }).fail((error) => {
+            console.error(error);
+            swal("Error", "Cannot send email to Requestor, Please try again #010", "error");
+            return;
+        }));
+
+        Promise.all(promises).then(() => {
+            $('#loading').addClass('hidden')
+            swal("Success", "Resubmit Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
+        })
+        //$.post(InsertRelatedPath, {dept_list:quick_form}, () =>{
+        //    console.log('Related created');
+        //    let tmp = $("#resubmit_form").serializeArray();
+        //    $.post(RequestResubmitPath, { 'desc': tmp[2].value, 'due_date': tmp[1].value, 'topic_code': topic_code },(res) =>{
+        //        console.log('Resubmit created');
+        //        if(res.status == "success"){
+        //            moment.locale('en');
+        //            $.post(GenerateMailPath,{ 'mode': 'RequestDocument', 'topic_code':topic_code, 'due_date': moment(due_date,"DD-MM-YYYY").format('D MMMM YYYY'), 'dept_arry': rsm_related_list, }).fail((error) => {
+        //                console.error(error);
+        //                swal("Error", "Cannot send email to Requestor, Please try again", "error");
+        //                return;
+        //            })
+        //            swal("Success", "Resubmit Complete", "success").then(setTimeout(() => { location.reload(); }, 1500));
+        //        }else{
+        //            swal("Error", "Resubmit Not Success, Please Try Again", "error");
+        //        }
+        //    });
+        //});
+
+        //-----------------------------------------------------------//
+
+     
+
     });
 
 /* -------------------------------------------------------------------------- */
@@ -658,7 +734,7 @@ $("form#related_form").submit((e) => {
 });
 
 /* -------------------------------------------------------------------------- */
-/*                              Reply resubmit                             */
+/*                              Reply resubmit                               */
 /* -------------------------------------------------------------------------- */
 
     $("#submit_reply_form").click((e) => {
@@ -700,7 +776,7 @@ $("form#related_form").submit((e) => {
 
             promises.push($.post(GenerateMailPath,{ 'mode': 'ReplyResubmit', 'dept': rsm_dept, 'topic_code':topic_code, }).fail((error) => {
                 console.error(error);
-                swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                swal("Error", "Cannot send email to Requestor, Please try again #011", "error");
                 return;
             }));
 

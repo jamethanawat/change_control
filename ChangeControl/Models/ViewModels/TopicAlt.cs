@@ -36,7 +36,11 @@ namespace ChangeControl.Models{
         public string ApprovedBy{ get; set; }
         public string ApprovedDate{ get; set; }
         public User ApproverProfile{ get; set; }
-        public TopicAlt(string Code,string Type,string ChangeItem,string ProductType,int Revision ,string Model,string PartNo,string PartName,string ProcessName,int Status,string App,string Subject,string Detail,string Timing ,string TimingDesc ,long Related,string UserInsert,string TimeInsert){
+        public string Risk { get; set; }
+        public string Specify { get; set; }
+        public string Management_Plan { get; set; }
+        public TopicAlt(string Code,string Type,string ChangeItem,string ProductType,int Revision ,string Model,string PartNo,string PartName,string ProcessName,int Status,string App,string Subject,string Detail,string Timing ,string TimingDesc ,long Related,string UserInsert,string TimeInsert,string risk,string specify,string management_Plan)
+        {
             this.Code = Code.ReplaceNullWithDash();
             this.Type = Type.ReplaceNullWithDash();
             this.Change_item = ChangeItem.ReplaceNullWithDash();
@@ -55,6 +59,9 @@ namespace ChangeControl.Models{
             this.Related = Related;
             this.User_insert = UserInsert;
             this.Time_insert = TimeInsert;
+            this.Risk = risk;
+            this.Specify = specify;
+            this.Management_Plan = management_Plan;
         }
 
         public TopicAlt(){
@@ -80,8 +87,11 @@ namespace ChangeControl.Models{
             this.Profile.FullName = "John Doe";
             this.Profile.Name = "John";
             this.Profile.SurName = "Doe";
-            this.ApprovedBy = "63014";
+            this.ApprovedBy = "62084";
             this.ApprovedDate = DateTime.Now.ToString("d MMMM yyyy");
+            this.Risk = "";
+            this.Specify = "";
+            this.Management_Plan = "";
         }
     }
 }

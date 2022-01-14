@@ -28,8 +28,13 @@ namespace ChangeControl.Models
         public string User_insert{ get; set; }
         public string Time_insert{ get; set; }
         public string Date{ get; set; }
+        public string Risk{ get; set; }
+        public string Specify{ get; set; }
+        public string Management_Plan { get; set; }
         
-        public Topic(string Code,string changeType,int changeItem,int productType,int revision ,string department,string model,string partNo,string partName,string processName,int status,string appDescription,string subject,string detail,string timing, string timingDesc,long related,string UserInsert,string TimeInsert){
+        public Topic(string Code,string changeType,int changeItem,int productType,int revision ,string department,string model,string partNo,string partName,string processName,int status,string appDescription,string subject,
+            string detail,string timing, string timingDesc,long related,string UserInsert,string TimeInsert,string risk ,string specify,string management_Plan)
+        {
             this.Code = Code;
             this.Type = changeType;
             this.Change_item = changeItem;
@@ -49,6 +54,9 @@ namespace ChangeControl.Models
             this.Related = related;
             this.User_insert = UserInsert;
             this.Time_insert = TimeInsert;
+            this.Risk = risk;
+            this.Specify = specify;
+            this.Management_Plan = management_Plan;
         }
 
         public Topic(){
@@ -70,6 +78,9 @@ namespace ChangeControl.Models
             this.Related = 0;
             this.User_insert = null;
             this.Time_insert = null;
+            this.Risk = null;
+            this.Specify = null;
+            this.Management_Plan = null;
         }
     }
 }

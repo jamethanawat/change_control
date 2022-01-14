@@ -46,28 +46,30 @@ namespace ChangeControl.Controllers
             result= M_Report.GetReport(StartDate,EndDate);
             ExcelPackage Ep = new ExcelPackage();
             ExcelWorksheet Sheet = Ep.Workbook.Worksheets.Add("Issued "+ StartDate + " To "+ EndDate + "");
-            Sheet.Cells["A1:U1"].Style.Font.Bold = true;
+            Sheet.Cells["A1:W1"].Style.Font.Bold = true;
             Sheet.Cells["A1"].Value = "CCSNO";
             Sheet.Cells["B1"].Value = "ChangeItem";
             Sheet.Cells["C1"].Value = "ProductType";
             Sheet.Cells["D1"].Value = "REV";
             Sheet.Cells["E1"].Value = "DateRequest";
             Sheet.Cells["F1"].Value = "RequestBy";
-            Sheet.Cells["G1"].Value = "ApprovedDateRequest";
-            Sheet.Cells["H1"].Value = "Department";
-            Sheet.Cells["I1"].Value = "Status";
-            Sheet.Cells["J1"].Value = "ReviewFinishWithin";
-            Sheet.Cells["K1"].Value = "TrialConfirmFinishWithin";
-            Sheet.Cells["L1"].Value = "InitialProductionFinishWithin";
-            Sheet.Cells["M1"].Value = "REV.Review";
-            Sheet.Cells["N1"].Value = "IssueDateReview";
-            Sheet.Cells["O1"].Value = "ApprovedDateReview";
-            Sheet.Cells["P1"].Value = "REV.TrialConfirm";
-            Sheet.Cells["Q1"].Value = "IssueDateTrialConfirm";
-            Sheet.Cells["R1"].Value = "ApprovedDateTrialConfirm";
-            Sheet.Cells["S1"].Value = "REV.InitialProduction";
-            Sheet.Cells["T1"].Value = "IssueDateInitialProduction";
-            Sheet.Cells["U1"].Value = "ApprovedDateInitialProduction";
+            Sheet.Cells["G1"].Value = "RequestDept";
+            Sheet.Cells["H1"].Value = "ApprovedDateRequest";
+            Sheet.Cells["I1"].Value = "ChangeDate";
+            Sheet.Cells["J1"].Value = "Department";
+            Sheet.Cells["K1"].Value = "Status";
+            Sheet.Cells["L1"].Value = "ReviewFinishWithin";
+            Sheet.Cells["M1"].Value = "TrialConfirmFinishWithin";
+            Sheet.Cells["N1"].Value = "InitialProductionFinishWithin";
+            Sheet.Cells["O1"].Value = "REV.Review";
+            Sheet.Cells["P1"].Value = "IssueDateReview";
+            Sheet.Cells["Q1"].Value = "ApprovedDateReview";
+            Sheet.Cells["R1"].Value = "REV.TrialConfirm";
+            Sheet.Cells["S1"].Value = "IssueDateTrialConfirm";
+            Sheet.Cells["T1"].Value = "ApprovedDateTrialConfirm";
+            Sheet.Cells["U1"].Value = "REV.InitialProduction";
+            Sheet.Cells["V1"].Value = "IssueDateInitialProduction";
+            Sheet.Cells["W1"].Value = "ApprovedDateInitialProduction";
            
             int row = 2;
             string nameshow;
@@ -79,33 +81,35 @@ namespace ChangeControl.Controllers
                 Sheet.Cells[string.Format("D{0}", row)].Value = item.Rev ?? "-";
                 Sheet.Cells[string.Format("E{0}", row)].Value = item.DateRequest ?? "-";
           
-                try
-                {
-                    var fullname = item.RequestBy.Split('@');
-                    var tmpname = fullname[0].Split('.');
-                     nameshow = (tmpname[1].ToString()).Substring(0, 1) + "." + tmpname[0].ToString();
-                }
-                catch (Exception err)
-                {
-                    nameshow = "";
-                }
+                //try
+                //{
+                //    var fullname = item.RequestBy.Split('@');
+                //    var tmpname = fullname[0].Split('.');
+                //     nameshow = (tmpname[1].ToString()).Substring(0, 1) + "." + tmpname[0].ToString();
+                //}
+                //catch (Exception err)
+                //{
+                //    nameshow = "";
+                //}
           
-                Sheet.Cells[string.Format("F{0}", row)].Value = nameshow;
-                Sheet.Cells[string.Format("G{0}", row)].Value = item.ApprovedDateRequest ?? "-";
-                Sheet.Cells[string.Format("H{0}", row)].Value = item.Department ?? "-";
-                Sheet.Cells[string.Format("I{0}", row)].Value = item.Status ?? "-";
-                Sheet.Cells[string.Format("J{0}", row)].Value = item.ReviewFinishWithin ?? "-";
-                Sheet.Cells[string.Format("K{0}", row)].Value = item.TrialConfirmFinishWithin ?? "-";
-                Sheet.Cells[string.Format("L{0}", row)].Value = item.InitialProductionFinishWithin ?? "-";
-                Sheet.Cells[string.Format("M{0}", row)].Value = item.RevReview ?? "-";
-                Sheet.Cells[string.Format("N{0}", row)].Value = item.IssueDateReview ?? "-";
-                Sheet.Cells[string.Format("O{0}", row)].Value = item.ApprovedDateReview ?? "-";
-                Sheet.Cells[string.Format("P{0}", row)].Value = item.RevTrialConfirm ?? "-";
-                Sheet.Cells[string.Format("Q{0}", row)].Value = item.IssueDateTrialConfirm ?? "-";
-                Sheet.Cells[string.Format("R{0}", row)].Value = item.ApprovedDateTrialConfirm ?? "-";
-                Sheet.Cells[string.Format("S{0}", row)].Value = item.RevInitialProduction ?? "-";
-                Sheet.Cells[string.Format("T{0}", row)].Value = item.IssueDateInitialProduction ?? "-";
-                Sheet.Cells[string.Format("U{0}", row)].Value = item.ApprovedDateInitialProduction ?? "-";  
+                Sheet.Cells[string.Format("F{0}", row)].Value = item.RequestBy ?? "-";
+                Sheet.Cells[string.Format("G{0}", row)].Value = item.RequestDept ?? "-";
+                Sheet.Cells[string.Format("H{0}", row)].Value = item.ApprovedDateRequest ?? "-";
+                Sheet.Cells[string.Format("I{0}", row)].Value = item.ChangeDate ?? "-";
+                Sheet.Cells[string.Format("J{0}", row)].Value = item.Department ?? "-";
+                Sheet.Cells[string.Format("K{0}", row)].Value = item.Status ?? "-";
+                Sheet.Cells[string.Format("L{0}", row)].Value = item.ReviewFinishWithin ?? "-";
+                Sheet.Cells[string.Format("M{0}", row)].Value = item.TrialConfirmFinishWithin ?? "-";
+                Sheet.Cells[string.Format("N{0}", row)].Value = item.InitialProductionFinishWithin ?? "-";
+                Sheet.Cells[string.Format("O{0}", row)].Value = item.RevReview ?? "-";
+                Sheet.Cells[string.Format("P{0}", row)].Value = item.IssueDateReview ?? "-";
+                Sheet.Cells[string.Format("Q{0}", row)].Value = item.ApprovedDateReview ?? "-";
+                Sheet.Cells[string.Format("R{0}", row)].Value = item.RevTrialConfirm ?? "-";
+                Sheet.Cells[string.Format("S{0}", row)].Value = item.IssueDateTrialConfirm ?? "-";
+                Sheet.Cells[string.Format("T{0}", row)].Value = item.ApprovedDateTrialConfirm ?? "-";
+                Sheet.Cells[string.Format("U{0}", row)].Value = item.RevInitialProduction ?? "-";
+                Sheet.Cells[string.Format("V{0}", row)].Value = item.IssueDateInitialProduction ?? "-";
+                Sheet.Cells[string.Format("W{0}", row)].Value = item.ApprovedDateInitialProduction ?? "-";  
                 row++;
             }
 

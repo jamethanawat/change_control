@@ -15,7 +15,7 @@
     List<Confirm> ConfirmList = ViewBag.ConfirmList as List<Confirm>;
 
     TopicAlt Topic = ViewData["Topic"] as TopicAlt;
-    
+
     var department = (Session["Department"] != null) ? Session["Department"].ToString() : null;
     var pos = (Session["Position"] != null) ? Session["Position"].ToString() : null;
 
@@ -25,20 +25,21 @@
     bool isApprover = ViewBag.isApprover = (pos == "Approver") || (pos == "Admin") || (pos == "Special") ;
     var isPEProcess = ViewBag.isPEProcess = (ViewBag.PEAudit.Contains(department));
     var isQC = ViewBag.isQC = (ViewBag.QCAudit.Contains(department ));
-
+    var isPCH = ("PCH".Contains(department));
+    var isQCIN = ("QC_IN1".Contains(department)|| "QC_IN2".Contains(department)|| "QC_IN3".Contains(department));
 
     var status = Topic.FullStatus;
     Session["Status"] = Topic.Status;
 
     var Type = Topic.Type;
-    
+
     var isReview = (Topic.RelatedListAlt.Exists(Related => Related.Review == 1 && Related.Department == Session["Department"].ToString()));
     var isRelated = (Topic.RelatedListAlt.Exists(Related => Related.Department == Session["Department"].ToString()));
     var isTrial = (TrialList.Exists(trial => trial.Department == Session["Department"].ToString()));
     var isConfirm = (ConfirmList.Exists(confirm => confirm.Department == Session["Department"].ToString()));
     var isInternal = ViewBag.isInternal = (Type == "Internal");
     var isExternal = (Type == "External");
-    var Resubmitable = (isQC || isPEProcess) && isRelated && (status != "Waiting" && status != "Finished" && status != "Rejected");
+    var Resubmitable = (isQC || isPEProcess|| isPCH|| isQCIN) && isRelated && (status != "Waiting" && status != "Finished" && status != "Rejected");
     var isResubmitted = (ResubmitList != null && ResubmitList.Count > 0 && ResubmitList.Exists(x => x.ExistsRelated(Session["Department"].ToString())  == true));
     var Editable = ((status == "Waiting" || status == "Request") && Session["Department"].ToString() == Topic.Department);
     var TopicApproveable = (status == "Waiting" && Session["Department"].ToString() == Topic.Department && isApprover);
@@ -367,6 +368,7 @@
     var RequestResubmitPath = '@Url.Action("RequestResubmit", "Detail")';
     var InsertResponsePath = '@Url.Action("InsertResponse", "Detail")';
     var InsertFileResponsePath = '@Url.Action("InsertFileResponse", "Detail")';
+    var InsertFileResubmitPath = '@Url.Action("InsertFileResubmit", "Detail")';
 
     var InsertReviewPath = '@Url.Action("InsertReview", "Detail")';
     var InsertReviewItemPath = '@Url.Action("InsertReviewItem", "Detail")';
@@ -396,6 +398,7 @@
 <script src="~/Scripts/Shared/FilePond.js?date='@DateTime.Now.ToString("yyMMddHH")'"></script>
 <script src="~/Scripts/Shared/FilePond_alt.js?date='@DateTime.Now.ToString("yyMMddHH")'"></script>
 <script src="~/Scripts/Shared/FilePond_rd.js?date='@DateTime.Now.ToString("yyMMddHH")'"></script>
+<script src="~/Scripts/Shared/FilePond_rsm.js?date='@DateTime.Now.ToString("yyMMddHH")'"></script>
 
 <script>
     $(() => {
@@ -576,198 +579,253 @@
                                 <div class="active tab-pane" id="Detail">
                                     <!-- /.mailbox-controls -->
                                     <div class="mailbox-read-message">
-                                    <form class="form-horizontal">
-                                    @if(ViewBag.RejectMessage != null){
-                                        var rj_msg = ViewBag.RejectMessage;
-                                        <h4 class="text-danger">Rejected By</h4>
-                                            @:&nbsp; <i class="fas fa-angle-right text-danger"></i>&nbsp; <span class="text-danger"> @rj_msg.Department - @rj_msg.Profile.FullName (@rj_msg.Date) : @rj_msg.Description</span> 
-                                    }
-                                        <h4 class="@(@ViewBag.RejectMessage != null ? "mt-3":"")">Author</h4>
-                                            &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span> @Topic.Department -  @Topic.Profile.FullName (@Topic.Time_insert)</span>
-                                    @if(status != "Waiting" && Topic.ApprovedBy != null){
-                                        <h4 class="mt-3">Approved By</h4>
-                                            try{
-                                                @:&nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span> @Topic.Department -  @Topic.ApproverProfile.FullName (@Topic.ApprovedDate)</span>
-                                            }catch(Exception err){
-                                                <script>
-                                                   window.location.reload();
-                                                </script>
+                                        <form class="form-horizontal">
+                                            @if (ViewBag.RejectMessage != null)
+                                            {
+                                                var rj_msg = ViewBag.RejectMessage;
+                                                <h4 class="text-danger">Rejected By</h4>
+                                                @:&nbsp; <i class="fas fa-angle-right text-danger"></i>&nbsp; <span class="text-danger"> @rj_msg.Department - @rj_msg.Profile.FullName (@rj_msg.Date) : @rj_msg.Description</span>
                                             }
-                                    }
-                                        <h4 class="mt-3">Subject/Purpose for change</h4>
-                                            &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Subject.ReplaceNullWithDash().TrimStart()))</span>
-                                        <h4 class="mt-3">Change Details</h4>
-                                            &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Detail.ReplaceNullWithDash().TrimStart()))</span>
-                                        <h4 class="mt-3">Change Date</h4>
-                                            &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Timing.ReplaceNullWithDash().TrimStart()))</span> 
-                                        @if(Topic.TimingDesc != null) {<span>@Html.Raw(HttpUtility.HtmlDecode(Topic.TimingDesc.TrimStart()))</span>}
-                                        <h4 class="mt-3">Related Department</h4>
-                                            &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>
-                                            @{
-                                                var j=0;
-                                                foreach (var Related in Topic.RelatedListAlt){
-                                                    var isResponsed = (Related.Review == 1) ? true : false;
-                                                    @(j>0?" , ":"")@Related.Department
-                                                    j++;
+                                            <h4 class="@(@ViewBag.RejectMessage != null ? "mt-3":"")">Author</h4>
+                                            &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span> @Topic.Department -  @Topic.Profile.FullName (@Topic.Time_insert)</span>
+                                            @if (status != "Waiting" && Topic.ApprovedBy != null)
+                                            {
+                                                <h4 class="mt-3">Approved By</h4>
+                                                try
+                                                {
+                                                    @:&nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span> @Topic.Department -  @Topic.ApproverProfile.FullName (@Topic.ApprovedDate)</span>
+                                                }
+                                                catch (Exception err)
+                                                {
+                                                    <script>
+                                                        window.location.reload();
+                                                    </script>
                                                 }
                                             }
+                                            <h4 class="mt-3">Subject/Purpose for change</h4>
+                                            &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Subject.ReplaceNullWithDash().TrimStart()))</span>
+                                            @if (Topic.Risk != null && Topic.Risk != "")
+                                            {
+                                                string strSpacer = "&nbsp;";
+                                                <h4 class="mt-3">Risk Analysis of Change</h4>
+                                                @Html.Raw(strSpacer) <i class="fas fa-angle-right text-primary"></i>@Html.Raw(strSpacer) <span>The Change Has Risk of Product(Q-C-D): @(Topic.Risk =="Y"?"Yes ("+ Topic.Specify + ")" : "No")  </span>
+
+                                                if (Topic.Risk == "Y")
+                                                {
+                                                    <br>
+                                                    @:&nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>Management Plan: @Html.Raw(HttpUtility.HtmlDecode(Topic.Management_Plan.ReplaceNullWithDash().TrimStart()))</span>
+                                                }
+                                            }
+
+
+
+
+                                            <h4 class="mt-3">Change Details</h4>
+                                            &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Detail.ReplaceNullWithDash().TrimStart()))</span>
+                                            <h4 class="mt-3">Change Date</h4>
+                                            &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>@Html.Raw(HttpUtility.HtmlDecode(Topic.Timing.ReplaceNullWithDash().TrimStart()))</span>
+                                            @if (Topic.TimingDesc != null)
+                                            {<span>@Html.Raw(HttpUtility.HtmlDecode(Topic.TimingDesc.TrimStart()))</span>}
+                                            <h4 class="mt-3">Related Department</h4>
+                                            &nbsp; <i class="fas fa-angle-right text-primary"></i>&nbsp; <span>
+                                                @{
+                                                    var j = 0;
+                                                    foreach (var Related in Topic.RelatedListAlt)
+                                                    {
+                                                        var isResponsed = (Related.Review == 1) ? true : false;
+                                                        @(j>0?" , ":"")@Related.Department
+                                                        j++;
+                                                    }
+                                                }
                                             </span>
-                                        
-
-                                    </form>
 
 
-                                @try{
-                                    if(Topic.FileList.Count != 0){
-                                        <h4 class="mt-3">Attach File</h4>
-                                        <div class="card-footer bg-white">
-                                        @Html.Partial("~/Views/Helper/FileList.cshtml",Topic.FileList as List<FileItem>)
-                                        </div>
-                                    }   
-                                }catch(Exception err){
-                                    <script>
-                                        window.location.reload();
-                                    </script>
-                                }
-                                
-                                @{
-                                    object UpdateModel = new {Related = Topic.RelatedListAlt, Author = Topic.Profile.FullName, FileList = Topic.FileList as List<FileItem>};
-                                }
-                                @* @Html.Partial("Update", UpdateModel)  *@
+                                        </form>
+
+
+                                        @try
+                                        {
+                                            if (Topic.FileList.Count != 0)
+                                            {
+                                                <h4 class="mt-3">Attach File</h4>
+                                                <div class="card-footer bg-white">
+                                                    @Html.Partial("~/Views/Helper/FileList.cshtml", Topic.FileList as List<FileItem>)
+                                                </div>
+                                            }
+                                        }
+                                        catch (Exception err)
+                                        {
+                                            <script>
+                                                window.location.reload();
+                                            </script>
+                                        }
+
+                                        @{
+                                            object UpdateModel = new { Related = Topic.RelatedListAlt, Author = Topic.Profile.FullName, FileList = Topic.FileList as List<FileItem> };
+                                        }
+                                        @* @Html.Partial("Update", UpdateModel)  *@
 
                                     </div>
                                     <!------------------------------------QUALITY CONTROL---------------------------------------------------------->
-                                @if(isExternal || ReviewList.Count != 0){
-                                    <hr>
-                                    @* <h1>Quality Control</h1> *@
-                                    <!-- The timeline -->
-                                    <div class="timeline timeline-inverse">
+                                    @if (isExternal || ReviewList.Count != 0)
+                                    {
+                                        <hr>
+                                        @* <h1>Quality Control</h1> *@
+                                        <!-- The timeline -->
+                                        <div class="timeline timeline-inverse">
 
-                @* /* ------------------------------- Review List ------------------------------ */ *@
-                                        <div class="time-label">
-                                            <span class="bg-primary">
-                                                Review <br> 
-                                                @* <span class="time"><i class="far fa-clock"></i> 12:05</span> *@
-                                            </span>
-                                        </div>
-                                            @Html.Partial("Review/List",ReviewList) 
-
-                @* /* ------------------------------- Trial List ------------------------------ */ *@
-                                        @if(Topic.Status == 9 || Topic.Status == 10 || Topic.Status == 11 || Topic.Status == 12){
-                                        <div class="time-label">
-                                            @if((Topic.RelatedListAlt.Count(e => e.Trial == 1) > 0 && Topic.Status != 9 ) || Topic.Status == 9 ){ //Request trial not exist
+                                            @* /* ------------------------------- Review List ------------------------------ */ *@
+                                            <div class="time-label">
                                                 <span class="bg-primary">
-                                                    Trial & Confirm
+                                                    Review <br>
+                                                    @* <span class="time"><i class="far fa-clock"></i> 12:05</span> *@
                                                 </span>
+                                            </div>
+                                            @Html.Partial("Review/List", ReviewList)
+
+                                            @* /* ------------------------------- Trial List ------------------------------ */ *@
+                                            @if (Topic.Status == 9 || Topic.Status == 10 || Topic.Status == 11 || Topic.Status == 12)
+                                            {
+                                                <div class="time-label">
+                                                    @if ((Topic.RelatedListAlt.Count(e => e.Trial == 1) > 0 && Topic.Status != 9) || Topic.Status == 9)
+                                                    { //Request trial not exist
+                                                        <span class="bg-primary">
+                                                            Trial & Confirm
+                                                        </span>
+                                                    }
+                                                </div>
+                                                @Html.Partial("Trial/List", TrialList)
                                             }
-                                        </div>
-                                            @Html.Partial("Trial/List",TrialList) 
-                                        }
 
-                @* /* ------------------------------- Confirm List ------------------------------ */ *@
-                                        @if(Topic.Status == 10 || Topic.Status == 11 || Topic.Status == 12){
-                                        <div class="time-label">
-                                            <span class="bg-primary">
-                                                Initial Production
-                                            </span>
-                                        </div>
-                                            @Html.Partial("Confirm/List",ConfirmList) 
-                                        }
+                                            @* /* ------------------------------- Confirm List ------------------------------ */ *@
+                                            @if (Topic.Status == 10 || Topic.Status == 11 || Topic.Status == 12)
+                                            {
+                                                <div class="time-label">
+                                                    <span class="bg-primary">
+                                                        Initial Production
+                                                    </span>
+                                                </div>
+                                                @Html.Partial("Confirm/List", ConfirmList)
+                                            }
 
-                                        @if(Topic.Status == 11 || Topic.Status == 12){
-                                        <div class="time-label">
-                                            <span class="bg-primary">
-                                                Closed 
-                                                @* <br><span class="time"><i class="far fa-clock"></i> 2 days ago</span> *@
-                                            </span>
+                                            @if (Topic.Status == 11 || Topic.Status == 12)
+                                            {
+                                                <div class="time-label">
+                                                    <span class="bg-primary">
+                                                        Closed
+                                                        @* <br><span class="time"><i class="far fa-clock"></i> 2 days ago</span> *@
+                                                    </span>
+                                                </div>
+                                            }
+                                            <div>
+                                                <i class="far fa-clock bg-gray"></i>
+                                            </div>
                                         </div>
-                                        }
-                                        <div>
-                                            <i class="far fa-clock bg-gray"></i>
-                                        </div>
-                                    </div>
-                                }
-
-                                @* /* ----------------------------- Review section ----------------------------- */ *@
-                                @if(isRelated && !isReview && (Topic.Status == 7 || Topic.Status == 8)){
-                                    if(isPEProcess && (Topic.Status == 7 || Topic.Status == 8)){
-                                        Session["isIssued"] = true;
-                                        @Html.Partial("Review/PE_Process") 
-                                    }else if(isQC && QcReviewable && (Topic.Status == 8)){
-                                        @Html.Partial("Review/QC")
-                                    }else if(((!isQC && !isPEProcess && Topic.Status == 8 && isInternal) || (isExternal && !isQC))){
-                                        @Html.Partial("Review/Other", ReviewItems) 
                                     }
 
-                                }else if(isRelated && (isTrialable || (QcTrialable && isQC)) && !isTrial && Topic.Status == 9){
-                                @* /* ----------------------------- Trial section ----------------------------- */ *@
-                                    <hr><br>
-                                    <h1>Trial & Confirm</h1><br>
-                                    <form class="form-horizontal"  action="javascript:void(0);" id="Trial">
-                                    <div class="form-group row">
-                                        <label class="col-sm-2 col-form-label"> Description: </label>
-                                        <div class="col-sm-10 col-form-label">
-                                            <textarea class="form-control" name="tr_desc" style="height:20vh"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label class="col-sm-2 col-form-label"> Attach File: </label>
-                                        <div class="col-sm-10">
-                                            <input type="file" class="my-pond" name="filepond"/>
-                                        </div>
-                                    </div>
-                                    <hr><br>
-                                        <div class="form-group row">
-                                            <div class="col-sm-12">
-                                                <button type="submit" id="tr_submit" class="btn btn-info float-right" disabled>Submit</button>
+                                    @* /* ----------------------------- Review section ----------------------------- */ *@
+                                    @if (isRelated && !isReview && (Topic.Status == 7 || Topic.Status == 8))
+                                    {
+                                        if (isPEProcess && (Topic.Status == 7 || Topic.Status == 8))
+                                        {
+                                            Session["isIssued"] = true;
+                                            @Html.Partial("Review/PE_Process")
+                                        }
+                                        else if (isQC && QcReviewable && (Topic.Status == 8))
+                                        {
+                                            @Html.Partial("Review/QC")
+                                        }
+                                        else if (((!isQC && !isPEProcess && Topic.Status == 8 && isInternal) || (isExternal && !isQC)))
+                                        {
+                                            @Html.Partial("Review/Other", ReviewItems)
+                                        }
+
+                                    }
+                                    else if (isRelated && (isTrialable || (QcTrialable && isQC)) && !isTrial && Topic.Status == 9)
+                                    {
+                                        @* /* ----------------------------- Trial section (Trial and Confirm)----------------------------- */ *@
+                                        <hr><br>
+                                        <h1>Trial & Confirm</h1><br>
+                                        <form class="form-horizontal" action="javascript:void(0);" id="Trial">
+                                            <div class="form-group row">
+                                                <label class="col-sm-2 col-form-label"> Description: </label>
+                                                <div class="col-sm-10 col-form-label">
+                                                    <textarea class="form-control" name="tr_desc" style="height:20vh"></textarea>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </form>                                    
-                                }else if(isRelated && ((ViewBag.cf_list.Contains(department) && !isQC) || (isQC && QcConfirmable)) && !isConfirm && Topic.Status == 10){
-                                @* /* ----------------------------- Confirm section ----------------------------- */ *@
-                                    <hr><br>
-                                    <h1>Initial Production</h1><br>
-                                    <form class="form-horizontal"  action="javascript:void(0);" id="Confirm">
-                                    <div class="form-group row">
-                                        <label class="col-sm-2 col-form-label"> Description: </label>
-                                        <div class="col-sm-10 col-form-label">
-                                            <textarea class="form-control" name="cf_desc" style="height:20vh"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label class="col-sm-2 col-form-label"> Attach File: </label>
-                                        <div class="col-sm-10">
-                                            <input type="file" class="my-pond" name="filepond"/>
-                                        </div>
-                                    </div>
-                                    <hr><br>
-                                        <div class="form-group row">
-                                            <div class="col-sm-12">
-                                                <button type="submit" id="cf_submit" class="btn btn-info float-right" disabled>Submit</button>
+                                            <div class="form-group row">
+                                                <label class="col-sm-2 col-form-label"> Attach File: </label>
+                                                <div class="col-sm-10">
+                                                    <input type="file" class="my-pond" name="filepond" />
+                                                </div>
                                             </div>
-                                        </div>
-                                    </form>                                    
-                                }
+                                            <hr><br>
+                                            <div class="form-group row">
+                                                <div class="col-sm-12">
+                                                    <button type="submit" id="tr_submit" class="btn btn-info float-right" disabled>Submit</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    }
+                                    else if (isRelated && ((ViewBag.cf_list.Contains(department) && !isQC) || (isQC && QcConfirmable)) && !isConfirm && Topic.Status == 10)
+                                    {
+                                        @* /* ----------------------------- Confirm section ( Initial )----------------------------- */ *@
+                                        <hr><br>
+                                        <h1>Initial Production</h1><br>
+                                        <form class="form-horizontal" action="javascript:void(0);" id="Confirm">
+                                            <div class="form-group row">
+                                                <label class="col-sm-2 col-form-label"> Description: </label>
+                                                <div class="col-sm-10 col-form-label">
+                                                    <textarea class="form-control" name="cf_desc" style="height:20vh"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label class="col-sm-2 col-form-label"> Attach File: </label>
+                                                <div class="col-sm-10">
+                                                    <input type="file" class="my-pond" name="filepond" />
+                                                </div>
+                                            </div>
+                                            <hr><br>
+                                            <div class="form-group row">
+                                                <div class="col-sm-12">
+                                                    <button type="submit" id="cf_submit" class="btn btn-info float-right" disabled>Submit</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    }
                                     @{
                                         var temp_dept = Session["Department"].ToString();
-                                        if(Topic.Status == 7 || Topic.Status == 8){
+                                        if (Topic.Status == 7 || Topic.Status == 8)
+                                        {
                                             Review rv_edit = ReviewList.Find(Review => Review.Department == temp_dept);
-                                            if(rv_edit != null) { 
-                                                if(isQC){
-                                                    @Html.Partial("Review/Edit_QC",rv_edit) 
-                                                }else if(isPEProcess){
-                                                    @Html.Partial("Review/Edit_PE_Process",rv_edit) 
-                                                }else{
-                                                    @Html.Partial("Review/Edit",rv_edit) 
+                                            if (rv_edit != null)
+                                            {
+                                                if (isQC)
+                                                {
+                                                    @Html.Partial("Review/Edit_QC", rv_edit)
+                                                }
+                                                else if (isPEProcess)
+                                                {
+                                                    @Html.Partial("Review/Edit_PE_Process", rv_edit)
+                                                }
+                                                else
+                                                {
+                                                    @Html.Partial("Review/Edit", rv_edit)
                                                 }
                                             }
-                                        }else if(Topic.Status == 9){
-                                            Trial tr_edit = TrialList.Find(Trial => Trial.Department == Session["Department"].ToString());
-                                            if(tr_edit != null) { @Html.Partial("Trial/Edit",tr_edit) }
-                                        }else if(Topic.Status == 10){
-                                            Confirm cf_edit = ConfirmList.Find(Confirm => Confirm.Department == Session["Department"].ToString());
-                                            if(cf_edit != null) { @Html.Partial("Confirm/Edit",cf_edit) } 
                                         }
+                                        else if (Topic.Status == 9)
+                                        {
+                                            Trial tr_edit = TrialList.Find(Trial => Trial.Department == Session["Department"].ToString());
+                                            if (tr_edit != null)
+                                            { @Html.Partial("Trial/Edit", tr_edit) }
+                                    }
+                                    else if (Topic.Status == 10)
+                                    {
+                                        Confirm cf_edit = ConfirmList.Find(Confirm => Confirm.Department == Session["Department"].ToString());
+                                        if (cf_edit != null)
+                                        { @Html.Partial("Confirm/Edit", cf_edit) }
+                                }
                                     }
 
                                 </div> @* End of tab-pane *@

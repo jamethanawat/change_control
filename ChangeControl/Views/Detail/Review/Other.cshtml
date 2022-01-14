@@ -3,18 +3,22 @@
 <form class="form-horizontal" action="javascript:void(0);" id="review" >
     @if(Model != null){
         foreach(var Item in Model){
-        var temp_rd = $"rd-{@Item.ID}";
-        var temp_desc = $"desc-{@Item.ID}";
+            var temp_rd = $"rd-{@Item.ID}";
+            var temp_desc = $"desc-{@Item.ID}";
+            // support QC_IN
+            var txtshow1 = Item.ID!=15?"Yes":"Acceptance";
+            var txtshow2 = Item.ID!=15?"No":"Not Acceptance";
+    
         <div class="form-group row">
             <label for="inputProDesRe" class="col-sm-2 col-form-label">@Item.Name</label>
             <div class="col-sm-3 col-form-label">
                 <label class="mr-3">
                     <input data-type="status" data-id="@Item.ID" type="radio" name="@temp_rd" value="1" class="flat-red" checked>
-                    Yes
+                    @txtshow1
                 </label>
                 <label class="mr-3">
                     <input data-type="status" data-id="@Item.ID" type="radio" name="@temp_rd" value="0" class="flat-red" >
-                    No
+                    @txtshow2
                 </label>
             </div>
             <div class="col-sm-7 col-form-label">

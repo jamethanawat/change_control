@@ -13,7 +13,9 @@ namespace ChangeControl.Models.ViewModels
         public string Rev { get; set; }
         public string DateRequest { get; set; }
         public string RequestBy { get; set; }
+        public string RequestDept { get; set; }
         public string ApprovedDateRequest { get; set; }
+        public string ChangeDate { get; set; }
         public string Department { get; set; }
         public string Status { get; set; }
         public string ReviewFinishWithin { get; set; }

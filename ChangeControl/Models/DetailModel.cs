@@ -14,12 +14,14 @@ namespace ChangeControl.Models
         private string date;
         private string date_ff;
         private object foreign_key;
+  
 
         public long review_id;
         private SqlConnection cn = new SqlConnection(ConfigurationManager.ConnectionStrings["CCS"].ConnectionString);
         public DetailModel(){
             DB_Tapics = new DbTapics();
             DB_CCS = new DbCCS();
+       
             date = DateTime.Now.ToString("yyyyMMddHHmmss");
             date_ff = DateTime.Now.ToString("yyyyMMddHHmmss.fff");
         }
@@ -73,7 +75,21 @@ namespace ChangeControl.Models
             
             DB_CCS.Database.ExecuteSqlCommand(query);
         }
-
+        public bool CKInsertReview(long topic_id, string topic_code, string dept)
+        {
+            string query = null;
+            query = $"SELECT ID , Topic FROM Review  WHERE Topic ='{topic_code}' and FK_Topic ={topic_id} and Department = '{dept}' and  Revision ='0'";
+            var ReviewResult = DB_CCS.Database.SqlQuery<Review>(query).ToList();
+            if(ReviewResult.Count > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+            
+        }
         public long InsertReview(long topic_id, string topic_code, string us_id, string dept){
             string query = null;
             query = $"INSERT INTO Review (Topic, FK_Topic, [Date], [User], Department, Revision, UpdateBy, UpdateDate) OUTPUT Inserted.ID VALUES('{topic_code}', {topic_id}, {date}, '{us_id}', '{dept}', 0, '{us_id}', {date});";
@@ -125,7 +141,7 @@ namespace ChangeControl.Models
         public TopicAlt GetTopicByCode(string topic_code){
             try{ //This topic must be approved
                 var sql = $@"SELECT  Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Department, Revision, Model, PartNo, PartName, ProcessName, Topic.Status, Status.Name AS FullStatus  , [APP/IPP] as App, Subject, Detail, Timing, TimingDesc, Related, User_insert, Time_insert , ApprovedBy, ApprovedDate, 
-                Topic.ID FROM Topic 
+                Topic.ID ,Risk,Specify,Management_Plan FROM Topic 
                 LEFT JOIN Status ON Topic.Status = Status.ID 
                 LEFT JOIN Change_Item ON Topic.Change_item = ID_Change_item 
                 LEFT JOIN Product_Type ON Topic.Product_Type = ID_Product_Type 
@@ -136,7 +152,7 @@ namespace ChangeControl.Models
                 return Topic;
             }catch(Exception ex){ //This topic dont have be approved
                 var sql = $@"SELECT  Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Department, Revision, Model, PartNo, PartName, ProcessName, Topic.Status, Status.Name AS FullStatus  , [APP/IPP] as App, Subject, Detail, Timing, TimingDesc, Related, User_insert, Time_insert , ApprovedBy, ApprovedDate, 
-                Topic.ID FROM Topic 
+                Topic.ID ,Risk,Specify,Management_Plan FROM Topic 
                 LEFT JOIN Status ON Topic.Status = Status.ID 
                 LEFT JOIN Change_Item ON Topic.Change_item = ID_Change_item 
                 LEFT JOIN Product_Type ON Topic.Product_Type = ID_Product_Type 
@@ -149,7 +165,7 @@ namespace ChangeControl.Models
         public TopicAlt GetTopicByCodeAndOwned(string topic_code, string dept){
             try{  //Query by condition (User's department must be owner)
                 var sql = $@"SELECT  Code, Type, Change_Item.Name as Change_item, Product_Type.Name AS Product_Type, Department, Revision, Model, PartNo, PartName, ProcessName, Topic.Status, Status.Name AS FullStatus , [APP/IPP] as App, Subject, Detail, Timing, TimingDesc, Related, User_insert, Time_insert , ApprovedBy, ApprovedDate, 
-                Topic.ID FROM Topic 
+                Topic.ID,Risk,Specify,Management_Plan FROM Topic 
                 LEFT JOIN Status ON Topic.Status = Status.ID 
                 LEFT JOIN Change_Item ON Topic.Change_item = ID_Change_item 
                 LEFT JOIN Product_Type ON Topic.Product_Type = ID_Product_Type 
@@ -189,10 +205,17 @@ namespace ChangeControl.Models
         }
 
         public List<FileItem> GetFileByID(long fk_id, string type, string topic_code, string dept){
-            var sql = $"SELECT ID, FK_ID, [Type], Name, Name_Format, Description, [Size], Time_Insert, User_Insert FROM [File] WHERE [Type] = '{type}' AND Topic = '{topic_code}' AND Department = '{dept}'";
+            var sql = $"SELECT ID, FK_ID, [Type], Name, Name_Format, Description, [Size], Time_Insert, User_Insert,Department FROM [File] WHERE [Type] = '{type}' AND Topic = '{topic_code}' AND Department = '{dept}'";
             var FileList = DB_CCS.Database.SqlQuery<FileItem>(sql).ToList();
             return FileList;
         }
+        public List<FileItem> GetFileByFKID(long fk_id, string type, string topic_code, string dept)
+        {
+            var sql = $"SELECT ID, FK_ID, [Type], Name, Name_Format, Description, [Size], Time_Insert, User_Insert,Department FROM [File] WHERE FK_ID='{fk_id}' AND [Type] = '{type}' AND Topic = '{topic_code}' AND Department = '{dept}'";
+            var FileList = DB_CCS.Database.SqlQuery<FileItem>(sql).ToList();
+            return FileList;
+        }
+
 
         public User getUserByID(string id){
             if(id == null){
@@ -205,16 +228,24 @@ namespace ChangeControl.Models
             }
         }
 
-        public void InsertResubmit(string desc, string due_date, long related, string topic_code, string user_id, int status,string dept){
-            var sql = $@"INSERT INTO Resubmit (Description, DueDate, [Date], Related, Topic, [User], Status, Dept) 
-            VALUES('{desc.ReplaceSingleQuote()}', '{due_date}', '{date}', '{related}', '{topic_code}', '{user_id}', {status}, '{dept}');";
-            DB_CCS.Database.ExecuteSqlCommand(sql);
+        public long InsertResubmit(string desc, string due_date, long related, string topic_code, string user_id, int status,string dept){
+            var sql = $@"INSERT INTO Resubmit (Description, DueDate, [Date], Related, Topic, [User], Status, Dept)
+            VALUES('{desc.ReplaceSingleQuote()}', '{due_date}', '{date}', '{related}', '{topic_code}', '{user_id}', {status}, '{dept}');
+            SELECT MAX(Resubmit.ID) FROM Resubmit;";
+            //DB_CCS.Database.ExecuteSqlCommand(sql);
+            var result = DB_CCS.Database.SqlQuery<long>(sql);
+            return result.First();
         }
         
         public List<Resubmit> GetResubmitByTopicID(string topic_code){
+
             var sql = $@"SELECT ID, Description, DueDate, [Date], Related, Topic, [User] ,Dept
-            FROM Resubmit WHERE Topic = '{topic_code}' 
-            ORDER BY [Date] DESC;";
+            FROM Resubmit WHERE Topic = '{topic_code}';" ;
+
+
+            //var sql = $@" SELECT a.ID, a.Description, a.DueDate, a.[Date], a.Related, a.Topic, a.[User] ,a.Dept,b.[Type] 
+            //FROM Resubmit a left join [File] b on a.Topic =b.Topic WHERE b.[Type]='Resubmit' and a.Topic = '{topic_code}'
+            //ORDER BY [Date] DESC;";
             var result = DB_CCS.Database.SqlQuery<Resubmit>(sql).ToList();
             return result;
         }
@@ -308,6 +339,26 @@ namespace ChangeControl.Models
             }
         }
 
+        public bool CKInsertTrial(long topic_id, string topic_code, string department)
+        {
+            try
+            {
+                var sql = $@"SELECT Topic, FK_Topic FROM Trial WHERE Topic='{topic_code}' AND FK_Topic={topic_id} AND Department='{department}'  ";            
+                var result = DB_CCS.Database.SqlQuery<Trial>(sql).ToList();
+                if (result.Count > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }           
+            }
+            catch (Exception ex)
+            {
+                return true;
+            }
+        }
         public long InsertTrial(long topic_id, string topic_code,string desc, string department, string user){
             try{
                 var sql= $@"INSERT INTO Trial (Topic, FK_Topic, Detail, [Date], [User], Revision, Department, Status, UpdateDate, UpdateBy) 
@@ -368,8 +419,28 @@ namespace ChangeControl.Models
                 return blank_trial;
             }
         }
+        public bool CKInsertConfirm( string topic_code,  string department)
+        {
+            try
+            {
+                var sql = $@"SELECT Topic FROM Confirm 
+                WHERE Topic='{topic_code}' AND Department ='{department}' ";             
+                var result = DB_CCS.Database.SqlQuery<Confirm>(sql).ToList();
+                if (result.Count >0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }           
+            }
+            catch (Exception ex)
+            {
+                return true;
+            }
+        }
 
-        
         public long InsertConfirm(long topic_id, string topic_code,string desc, string department, string user){
             try{
                 var sql= $@"INSERT INTO Confirm (Topic, Detail, [Date], [User], Revision, Department, Status, UpdateDate, UpdateBy) 
@@ -511,7 +582,9 @@ namespace ChangeControl.Models
         public List<String> GetConfirmDeptList(){
             try{
                 var sql = $@"SELECT Name FROM Department
-                            WHERE [Group] = 'Production';";
+                            WHERE [Group] = 'Production'
+                            OR [Group] = 'Purchase'
+                            OR ([Group] = 'Quality Control' AND (Audit <> 1 or Audit is null))";
                 var result = DB_CCS.Database.SqlQuery<String>(sql).ToList();
                 return result;
             }catch(Exception ex){

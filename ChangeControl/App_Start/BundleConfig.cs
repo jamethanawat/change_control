@@ -58,6 +58,7 @@ namespace ChangeControl
                         $"~/Plugin/filepond/filepond-plugin-file-validate-size.js?date={date}",
                         $"~/Scripts/Shared/FilePond.js?date={date}",
                         $"~/Scripts/Shared/FilePond_rd.js?date={date}",
+                        $"~/Scripts/Shared/FilePond_rsm.js?date={date}",
                         $"~/Scripts/Shared/FilePond_alt.js?date={date}"));
 
         }
