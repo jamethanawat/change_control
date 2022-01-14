@@ -66,7 +66,7 @@ $("#reject").click(() => {
                         if(result.status == "success" && result.mail != null && result.mail != ""){
                             $.post(GenerateMailPath,{ 'mode': result.mail, 'dept': result.dept, 'topic_code':topic_code, }).fail((error) => {
                                 console.error(error);
-                                swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                                swal("Error", "Cannot send email to Requestor, Please try again #012", "error");
                                 return;
                             })
                         }
@@ -348,7 +348,7 @@ $.each(DepartmentLists, (key,val) => {
                         'dept':(topic_code.substring(0,2) == "IN") ? pe_audit : null,
                     }).fail((error) => {
                     console.error(error);
-                    swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                        swal("Error", "Cannot send email to Requestor, Please try again #013", "error");
                     return;
                 }));
                     swal("Success", "Approve Success", "success").then(location.reload());
@@ -384,7 +384,7 @@ $("form#review").submit((e) => {
         if(result.mail != ""){
             $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept':result.dept, 'pos':result.pos }).fail((error) => {
                 console.error(error);
-                swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                swal("Error", "Cannot send email to Requestor, Please try again #014", "error");
                 $('#loading').addClass('hidden')
                 return;
             })
@@ -489,7 +489,7 @@ $("form#Trial").submit((e) => {
             if(result.mail != ""){
                 promises.push($.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept':result.dept, 'pos':result.pos }).fail((error) => {
                     console.error(error);
-                    swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                    swal("Error", "Cannot send email to Requestor, Please try again #015", "error");
                     return;
                 }));
             }
@@ -555,7 +555,7 @@ $("form#Confirm").submit((e) => {
             if(result.mail != ""){
                 promises.push($.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept':result.dept, 'pos':result.pos }).fail((error) => {
                     console.error(error);
-                    swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                    swal("Error", "Cannot send email to Requestor, Please try again #009", "error");
                     return;
                 }));
             }
@@ -629,7 +629,7 @@ $("form#Confirm").submit((e) => {
      
         promises.push($.post(GenerateMailPath, { 'mode': 'RequestDocument', 'topic_code': topic_code, 'due_date': moment(due_date, "DD-MM-YYYY").format('D MMMM YYYY'), 'dept_arry': rsm_related_list, }).fail((error) => {
             console.error(error);
-            swal("Error", "Cannot send email to Requestor, Please try again", "error");
+            swal("Error", "Cannot send email to Requestor, Please try again #010", "error");
             return;
         }));
 
@@ -776,7 +776,7 @@ $("form#related_form").submit((e) => {
 
             promises.push($.post(GenerateMailPath,{ 'mode': 'ReplyResubmit', 'dept': rsm_dept, 'topic_code':topic_code, }).fail((error) => {
                 console.error(error);
-                swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                swal("Error", "Cannot send email to Requestor, Please try again #011", "error");
                 return;
             }));
 

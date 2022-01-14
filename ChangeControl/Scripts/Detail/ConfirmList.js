@@ -25,7 +25,7 @@ $(() => {
                                     $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':topic_code, 'dept': result.dept, }).fail((error) => {
                                         console.error(error);
                                         $('#loading').addClass('hidden')
-                                        swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                                        swal("Error", "Cannot send email to Requestor, Please try again #001", "error");
                                         return;
                                     });
                                 }
@@ -88,7 +88,7 @@ $(() => {
 
                 promises.push($.post(GenerateMailPath,{ 'mode': 'ConfirmUpdate', 'topic_code':topic_code, 'dept':result.dept,'pos':'Approver' }).fail((error) => {
                     console.error(error);
-                    swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                    swal("Error", "Cannot send email to Requestor, Please try again #002", "error");
                     return;
                 }));
 

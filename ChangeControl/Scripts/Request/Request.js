@@ -300,7 +300,7 @@ $(document).ready(function () {
                 if(result.mail != ""){
                     $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':inserted_id, 'dept':result.dept, 'pos':result.pos }).fail((error) => {
                         console.error(error);
-                        swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                        swal("Error", "Cannot send email to Requestor, Please try again #007", "error");
                         return;
                     })
                 }
@@ -465,7 +465,7 @@ $(document).ready(function () {
                     if(result.mail != ""){
                         $.post(GenerateMailPath,{ 'mode': result.mail, 'topic_code':inserted_id, 'dept':result.dept, 'pos':result.pos }).fail((error) => {
                             console.error(error);
-                            swal("Error", "Cannot send email to Requestor, Please try again", "error");
+                            swal("Error", "Cannot send email to Requestor, Please try again #008", "error");
                             return;
                         })
                     }

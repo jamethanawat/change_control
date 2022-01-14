@@ -113,6 +113,44 @@ namespace ChangeControl.Models{
                 return new List<string>();
             }
         }
+        public void InsertlogMail_error(string doc, string mode, string listmail, string date, string error, string user, string dept)
+        {
+            string val = $@"('{doc}','{mode}','{listmail}','{user}','{dept}','{date}','{error}')";
+            try
+            {
+                var sql = $@"INSERT INTO logmail
+                            (doc_no, mode, mail,userid,dept ,insdttm, remark)
+                            VALUES {val}";
+                var result = DB_CCS.Database.ExecuteSqlCommand(sql);
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+        public void InsertlogMail(string doc, string mode, string listmail, string date, string user, string dept)
+        {
+            string val = $@"('{doc}','{mode }','{listmail}','{user}','{dept}','{date}','')";
+            try
+            {
+                if (val != "")
+                {
+                    var sql = $@"INSERT INTO logmail
+                            (doc_no, mode, mail,userid,dept, insdttm, remark)
+                            VALUES {val}";
+                    var result = DB_CCS.Database.ExecuteSqlCommand(sql);
+                }
+            }
+            catch (Exception ex)
+            {
+                string val2 = $@"('{doc}','{mode}','{ex}','{date}','ERROR')";
+                var sql = $@"INSERT INTO logmail
+                            (doc_no, mode, mail, insdttm, remark)
+                            VALUES {val2}";
+                var result = DB_CCS.Database.ExecuteSqlCommand(sql);
+            }
+        }
     }
         
 }
